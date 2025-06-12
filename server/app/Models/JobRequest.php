@@ -9,8 +9,7 @@ class JobRequest extends Model
     protected $guarded = [];
 
     public function jobOrder()
-{
-    return $this->belongsTo(JobOrder::class);
-}
-
+    {
+        return $this->belongsTo(JobOrder::class);
+    }
 }

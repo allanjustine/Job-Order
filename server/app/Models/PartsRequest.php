@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class PartsRequest extends Model
 {
-    protected $guarded =[];
+    protected $guarded = [];
 
 
     public function jobOrder()
-{
-    return $this->belongsTo(JobOrder::class);
-}
-
+    {
+        return $this->belongsTo(JobOrder::class);
+    }
 }
