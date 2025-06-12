@@ -27,7 +27,7 @@ body {
 } */
 
 
-@media print {
+/* @media print {
   body * {
     visibility: hidden;
   }
@@ -42,6 +42,14 @@ body {
     left: 0;
     width: 100%;
   }
+} */
+
+button {
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  cursor: pointer;
 }
 
 
