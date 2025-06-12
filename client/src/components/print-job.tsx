@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface PrintJobOrderProps {
   data: {
@@ -42,7 +42,7 @@ interface PrintJobOrderProps {
   };
 }
 
-const PrintJobOrder: React.FC<PrintJobOrderProps> = ({ data }) => {
+const PrintJobOrder = forwardRef<HTMLDivElement, PrintJobOrderProps>(({ data }, ref) => {
   const calculateLaborTotal = () => {
     return data.jobRequests.reduce((sum, item) => sum + (item.cost || 0), 0);
   };
@@ -56,7 +56,7 @@ const PrintJobOrder: React.FC<PrintJobOrderProps> = ({ data }) => {
   };
 
   return (
-    <div className="p-6 font-sans" style={{ fontSize: '12pt' }}>
+    <div ref={ref} className="p-6 font-sans" style={{ fontSize: '12pt' }}>
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">SMC7</h1>
         <h2 className="text-lg font-bold">SMC7 GROUP OF COMPANIES</h2>
@@ -202,6 +202,6 @@ const PrintJobOrder: React.FC<PrintJobOrderProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
 
 export default PrintJobOrder;
