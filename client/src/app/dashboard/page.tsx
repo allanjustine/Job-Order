@@ -16,8 +16,6 @@ const data = {
 
 const Dashboard = () => {
   const { data: jobOrders, isLoading, error } = useFetch("/job-orders");
-
-  console.log(jobOrders);
   return (
     <div className="p-6 bg-gradient-to-br from-gray-100 to-white min-h-screen">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
