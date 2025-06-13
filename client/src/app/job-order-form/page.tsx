@@ -13,6 +13,7 @@ import JobDetailsGrid from "@/components/JobDetailsGrid";
 import DocumentAndVisualCheck from "@/components/DocumentAndVisualCheck";
 import CustomersJobRequest from "@/components/CustomersJobRequest";
 import PartsAndLubricantsRequest from "@/components/PartsAndLubricantsRequest";
+import { api } from "@/lib/api";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -252,6 +253,7 @@ export default function JobOrderForm() {
 
     window.onafterprint = () => {
       handlePrint();
+      handleSavePrint();
     };
 
     window.print();
@@ -260,6 +262,15 @@ export default function JobOrderForm() {
       window.onafterprint = null;
     };
   }, [isPrint]);
+
+  const handleSavePrint = async () => {
+    try {
+      const response = await api.post("/create-job-order", jobOrderData);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handlePrint = () => {
     setIsPrint(!isPrint);

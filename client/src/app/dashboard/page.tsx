@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import useFetch from "@/hooks/useFetch";
 import { Search } from "lucide-react";
 
 const data = {
@@ -13,6 +15,9 @@ const data = {
 };
 
 const Dashboard = () => {
+  const { data: jobOrders, isLoading, error } = useFetch("/job-orders");
+
+  console.log(jobOrders);
   return (
     <div className="p-6 bg-gradient-to-br from-gray-100 to-white min-h-screen">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -21,10 +26,16 @@ const Dashboard = () => {
           { label: "Today's Prints", value: data.todaysPrints },
           { label: "Weekly Prints", value: data.weeklyPrints },
           { label: "Monthly Prints", value: data.monthlyPrints },
-          { label: "Branch Printed Records", value: data.totalBranchPrintedRecords },
+          {
+            label: "Branch Printed Records",
+            value: data.totalBranchPrintedRecords,
+          },
           { label: "Cash Sales/Invoices", value: data.totalCashSales },
           { label: "Customer Payments", value: data.totalCustomerPayments },
-          { label: "Total Sales", value: `₱${data.totalSales.toLocaleString()}` },
+          {
+            label: "Total Sales",
+            value: `₱${data.totalSales.toLocaleString()}`,
+          },
         ].map((item, index) => (
           <div
             key={index}
@@ -38,7 +49,9 @@ const Dashboard = () => {
 
       <div className="bg-white mt-10 p-6 rounded-2xl shadow-md border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800">Recent Print Jobs</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Recent Print Jobs
+          </h2>
           <div className="relative w-full md:w-1/3">
             <input
               type="text"
@@ -74,8 +87,12 @@ const Dashboard = () => {
                   <td className="px-4 py-3">₱0.00</td>
                   <td className="px-4 py-3">Apr 24, 2025 - 5:30 AM</td>
                   <td className="px-4 py-3 space-x-2">
-                    <button className="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-lg hover:bg-blue-600 transition">Edit</button>
-                    <button className="bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-lg hover:bg-red-600 transition">Delete</button>
+                    <button className="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-lg hover:bg-blue-600 transition">
+                      Edit
+                    </button>
+                    <button className="bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-lg hover:bg-red-600 transition">
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

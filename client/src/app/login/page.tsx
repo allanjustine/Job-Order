@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import data from "@/app/data/credentials.json";
+import data from "@/data/credentials.json";
 
 
 export default function Login () {

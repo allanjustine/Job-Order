@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parts_lubricants_request', function (Blueprint $table) {
+        Schema::create('job_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('jobOrder_id');
-            $table->string('partsName');
-            $table->string('partNo');
-            $table->string('quantity');
-            $table->string('price');
+            $table->foreignId('job_order_id')->constrained()->cascadeOnDelete();
+            $table->bigInteger('cost')->default(0);
+            $table->string('job_request');
             $table->timestamps();
         });
     }

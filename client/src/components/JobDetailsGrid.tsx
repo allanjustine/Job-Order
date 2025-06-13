@@ -15,10 +15,10 @@ export default function JobDetailsGrid({
       <div>
         <Label>Type of Job</Label>
         <Select value={jobType} onChange={(e) => setJobType(e.target.value)}>
-          <option value="">Select job type</option>
-          <option value="Repair">Repair</option>
-          <option value="Maintenance">Maintenance</option>
-          <option value="Inspection">Inspection</option>
+          <option value="" disabled>Select Job Type</option>
+          <option value="pms">PMS</option>
+          <option value="rr">Regular Repair</option>
+          <option value="wc">Warranty Claim</option>
         </Select>
       </div>
       <div>

@@ -4,9 +4,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\JobOrderController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(
+    fn() =>
+    [
+        Route::get('/user', fn(Request $request) => $request->user()),
+        // Route::controller(JobOrderController::class)->group(fn() => [
+        //     Route::post('/create-job-order', 'store'),
+        //     Route::get('/job-orders', 'index'),
+        // ])
+    ]
+);
 
-Route::post('/create-job-order', [JobOrderController::class, 'store']);
-Route::get('/job-orders', [JobOrderController::class, 'index']);
+Route::controller(JobOrderController::class)->group(fn() => [
+    Route::post('/create-job-order', 'store'),
+    Route::get('/job-orders', 'index'),
+]);
