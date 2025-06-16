@@ -2,15 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import data from "@/app/data/credentials.json";
+import Input from "@/components/ui/input";
+import Label from "@/components/ui/label";
+import Select from "@/components/ui/select";
 
 export default function Login() {
   const router = useRouter();
-  const [branchCode, setBranchCode] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [branch, setBranch] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({branchName: "", branchCode: "", email: "",password: ""});
+  const [branchCode, setBranchCode] = useState("");
+  const [branchName, setBranchName] = useState("");
+  const [email, setEmail] = useState("");
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,31 +27,8 @@ export default function Login() {
     // Simulate network delay for better UX
     await new Promise(resolve => setTimeout(resolve, 800));
 
-
-      let foundUser = null;
-
-      for (const branch of data) {
-        const user = branch.users.find(
-          (u) => u.branchCode === branchCode && u.password === password
-        );
-        if (user) {
-           if(user.branchCode === "ADMIN") {
-             router.push("/dashboard");
-           }else{
-             foundUser = user;
-             router.push("/job-order-form");
-           }
-          break;
-        }
-      }
-
-      if (!foundUser) {
-        setError("Invalid branch code or password");
-        return;
-      }
-
       // Login success
-      router.push("/job-order-form");
+      router.push("/login");
       setIsLoading(false);
     
   };
@@ -70,10 +54,10 @@ export default function Login() {
           </div>
 
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
-            Welcome Back
+            Registration Form
           </h1>
           <p className="text-sm text-gray-600 text-center mb-6">
-            Please enter your credentials to login
+            Please enter your credentials to register
           </p>
 
           {error && (
@@ -87,17 +71,27 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="branchCode" className="block text-sm font-medium text-gray-700 mb-1">
-                Branch Code
-              </label>
+             
+                <Label>Type of Job</Label>
+                <Select value={branch} onChange={(e) => setBranch(e.target.value)}>
+                  <option value="" disabled>Select Branch</option>
+                  <option value="Repair">Strong Moto Centrum Inc</option>
+                  <option value="Maintenance">DES Appliance Plaza Inc</option>
+                  <option value="Inspection">DES Strong Motors Inc</option>
+                  <option value="Inspection">Honda DES Inc</option>
+                </Select>
+                
+              
+               <Label> Branch Name</Label>
+             
               <div className="relative">
-                <input
-                  id="branchCode"
+                <Input
                   type="text"
-                  placeholder="Enter your branch code"
-                  value={branchCode}
-                  onChange={(e) => setBranchCode(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter your branch name"
+                  error={errors.branchName}
+                  value={branchName}
+                  onChange={(e) => setBranchName(e.target.value)}
+  
                   required
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -109,17 +103,58 @@ export default function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+            
+           <Label>Branch Code</Label> 
+         
+            <div className="relative">
+            <Input
+                type="text"
+                placeholder="Enter your branch code"
+                error={errors.branchCode}
+                value={branchCode}
+                onChange={(e) => setBranchCode(e.target.value)}      
+                required
+            />
+            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            </div>
+            </div>
+
+              <div>
+              
+                <Label>Branch Email</Label>
+             
               <div className="relative">
-                <input
-                  id="password"
+                <Input
+                  type="email"
+                  placeholder="Enter your branch email"
+                  error={errors.email}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+             
+                <Label>Password</Label>
+        
+              <div className="relative">
+                <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
+                  error={errors.password}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-10"
                   required
                 />
                 <button
@@ -143,25 +178,6 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
-              <div className="text-sm">
-                <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-
            <button
               type="submit"
               disabled={isLoading}
@@ -181,22 +197,12 @@ export default function Login() {
                     className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
                     aria-hidden="true"
                   />
-                  <span>Signing in...</span>
+                  <span>Registering...</span>
                 </>
               ) : (
-                <span>Sign In</span>
+                <span>Register</span>
               )}
             </button>
-
-            <div className="text-center text-sm text-gray-600">
-              Don't have an account?{' '}
-              <a onClick={() => router.push("/register")}
-                className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer">
-              
-                Sign Up
-            
-              </a>
-            </div>
           </form>
         </div>
 
