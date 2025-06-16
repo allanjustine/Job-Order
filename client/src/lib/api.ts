@@ -50,6 +50,7 @@ api.interceptors.response.use(
         isAlertShown = false;
       });
     }
+
     return Promise.reject(error);
   }
 );

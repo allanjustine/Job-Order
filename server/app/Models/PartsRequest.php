@@ -9,7 +9,6 @@ class PartsRequest extends Model
     protected $guarded = [];
 
     protected $appends = [
-        "total_price",
         "sub_total_price",
     ];
 
@@ -21,10 +20,5 @@ class PartsRequest extends Model
     public function getSubTotalPriceAttribute()
     {
         return $this->quantity * $this->price;
-    }
-
-    public function getTotalPriceAttribute()
-    {
-        return $this->sum("price");
     }
 }

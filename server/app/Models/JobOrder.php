@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TypeOfJob;
 use Illuminate\Database\Eloquent\Model;
 
 class JobOrder extends Model
@@ -14,7 +15,8 @@ class JobOrder extends Model
             'repair_job_end'    => 'datetime',
             'repair_job_start'  => 'datetime',
             'date'              => 'datetime',
-            'date_sold'         => 'datetime'
+            'date_sold'         => 'datetime',
+            'type_of_job'       => TypeOfJob::class
         ];
     }
 

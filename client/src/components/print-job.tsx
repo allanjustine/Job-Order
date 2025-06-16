@@ -44,11 +44,13 @@ interface PrintJobOrderProps {
       quantity: number;
       price: number;
     }[];
+    serviceAdvisor: string;
+    branchManager: string;
   };
 }
 
 const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
-  console.log(data);
+  // console.log(data);
   const calculateLaborTotal = () => {
     return data?.jobRequests.reduce((sum, item) => sum + (item.cost || 0), 0);
   };
@@ -92,7 +94,8 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
             <strong className="text-gray-700">Address:</strong> {data?.address}
           </p>
           <p className="mb-2">
-            <strong className="text-gray-700">Vehicle Model:</strong> {data?.vehicleModel}
+            <strong className="text-gray-700">Vehicle Model:</strong>{" "}
+            {data?.vehicleModel}
           </p>
           <p className="mb-2">
             <strong className="text-gray-700">Chassis/Engine #:</strong>{" "}
@@ -105,16 +108,14 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
         </div>
         <div>
           <p className="mb-2">
-            <strong className="text-gray-700">Date:</strong>{" "}
-            {data?.date}
+            <strong className="text-gray-700">Date:</strong> {data?.date}
           </p>
           <p className="mb-2">
             <strong className="text-gray-700">Contact #:</strong>{" "}
             {data?.contact}
           </p>
           <p className="mb-2">
-            <strong className="text-gray-700">Mileage:</strong>{" "}
-            {data?.mileage}
+            <strong className="text-gray-700">Mileage:</strong> {data?.mileage}
           </p>
           <p className="mb-2">
             <strong className="text-gray-700">Date Sold:</strong>{" "}
@@ -170,7 +171,9 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
             >
               {data?.documents.ownerManual ? "✓" : ""}
             </span>
-            <span className={data?.documents.ownerManual ? "" : "text-gray-500"}>
+            <span
+              className={data?.documents.ownerManual ? "" : "text-gray-500"}
+            >
               Owner Manual
             </span>
           </div>
@@ -236,13 +239,17 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
           <div className="flex items-start">
             <span
               className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
-                data?.visualCheck.scratch ? "bg-blue-500 text-white" : "bg-white"
+                data?.visualCheck.scratch
+                  ? "bg-blue-500 text-white"
+                  : "bg-white"
               }`}
             >
               {data?.visualCheck.scratch ? "✓" : ""}
             </span>
             <div>
-              <span className={data?.visualCheck.scratch ? "" : "text-gray-500"}>
+              <span
+                className={data?.visualCheck.scratch ? "" : "text-gray-500"}
+              >
                 Scratch
               </span>
               {data?.visualCheck.scratch && (
@@ -274,13 +281,17 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
           <div className="flex items-start">
             <span
               className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
-                data?.visualCheck.missing ? "bg-blue-500 text-white" : "bg-white"
+                data?.visualCheck.missing
+                  ? "bg-blue-500 text-white"
+                  : "bg-white"
               }`}
             >
               {data?.visualCheck.missing ? "✓" : ""}
             </span>
             <div>
-              <span className={data?.visualCheck.missing ? "" : "text-gray-500"}>
+              <span
+                className={data?.visualCheck.missing ? "" : "text-gray-500"}
+              >
                 Missing
               </span>
               {data?.visualCheck.missing && (
@@ -412,17 +423,20 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
       {/* Signatures */}
       <div className="grid grid-cols-3 gap-6 mt-10">
         <div className="text-center">
-          <div className="h-16 border-t-2 border-black mt-2"></div>
+          <span>{data?.serviceAdvisor}</span>
+          <div className="h-2 border-b-2 border-black mt-2"></div>
           <p className="text-sm text-gray-600 mt-2">
             Service Advisor Name & Signature
           </p>
         </div>
         <div className="text-center">
-          <div className="h-16 border-t-2 border-black mt-2"></div>
+          <span>{data?.branchManager}</span>
+          <div className="h-2 border-b-2 border-black mt-2"></div>
           <p className="text-sm text-gray-600 mt-2">BA / KB Name & Signature</p>
         </div>
         <div className="text-center">
-          <div className="h-16 border-t-2 border-black mt-2"></div>
+          <span className="opacity-0">Customer</span>
+          <div className="h-2 border-b-2 border-black mt-2"></div>
           <p className="text-sm text-gray-600 mt-2">CUSTOMER SIGNATURE</p>
         </div>
       </div>

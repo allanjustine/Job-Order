@@ -14,5 +14,5 @@ export const logout = () => {
 };
 
 export const fetchProfile = () => {
-  return api.get("/profile");
+  return api.get("/user");
 };

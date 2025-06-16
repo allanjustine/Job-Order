@@ -14,6 +14,19 @@ import DocumentAndVisualCheck from "@/components/DocumentAndVisualCheck";
 import CustomersJobRequest from "@/components/CustomersJobRequest";
 import PartsAndLubricantsRequest from "@/components/PartsAndLubricantsRequest";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import ServiceAndManager from "@/components/ServiceAndManager";
+import {
+  JobRequest,
+  PartRequest,
+  VehicleDocument,
+  VehicleVisualCheck,
+} from "@/types/jobOrderFormType";
+import Image from "next/image";
+import { useAuth } from "@/context/authContext";
+import { useRouter } from "next/navigation";
+import acronymName from "@/utils/acronymName";
+import authenticatedPage from "@/lib/hoc/authenticatedPage";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -25,39 +38,9 @@ const formSchema = z.object({
   chassis: z.string().min(1, "Chassis number is required"),
 });
 
-type JobRequest = {
-  request: string;
-  cost: number;
-};
-
-type PartRequest = {
-  name: string;
-  partNo: string;
-  quantity: number;
-  price: number;
-};
-
-type VehicleDocument = {
-  ownerToolKit: boolean;
-  ownerManual: boolean;
-  warrantyGuideBook: boolean;
-  others: boolean;
-  othersText: string;
-};
-
-type VehicleVisualCheck = {
-  dent: boolean;
-  dentNotes: string;
-  scratch: boolean;
-  scratchNotes: string;
-  broken: boolean;
-  brokenNotes: string;
-  missing: boolean;
-  missingNotes: string;
-};
-
-export default function JobOrderForm() {
+const JobOrderForm = () => {
   // Form state
+  const { user, handleLogout } = useAuth();
   const [customerName, setCustomerName] = useState("");
   const [date, setDate] = useState("");
   const [address, setAddress] = useState("");
@@ -70,6 +53,13 @@ export default function JobOrderForm() {
   const [jobType, setJobType] = useState("");
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
+  const [signatures, setSignatures] = useState<{
+    serviceAdvisor: string;
+    branchManager: string;
+  }>({
+    serviceAdvisor: "",
+    branchManager: "",
+  });
 
   const [documents, setDocuments] = useState<VehicleDocument>({
     ownerToolKit: false,
@@ -98,6 +88,7 @@ export default function JobOrderForm() {
   ]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
+  const router = useRouter();
 
   // Set default date to today
   useState(() => {
@@ -221,6 +212,7 @@ export default function JobOrderForm() {
     mileage,
     dateSold,
     jobType,
+    ...signatures,
   };
 
   // Form validation
@@ -266,7 +258,9 @@ export default function JobOrderForm() {
   const handleSavePrint = async () => {
     try {
       const response = await api.post("/create-job-order", jobOrderData);
-      console.log(response);
+      if (response.status === 201) {
+        toast.success(response.data);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -317,139 +311,173 @@ export default function JobOrderForm() {
     setJobType("");
   };
 
+  const handleLogoutUser = async () => {
+    try {
+      await handleLogout(router);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       {/* Print View (hidden until printing) */}
       {isPrint ? (
         <PrintJobOrder data={jobOrderData} />
       ) : (
-        <div className="min-h-screen bg-gray-50 py-4 px-20 no-print">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-[95vw] mx-auto">
-            <form onSubmit={handleSubmit}>
-              {/* Header */}
-              <div className="text-center mb-6 border-b pb-4">
-                <img
-                  src="/logo.png"
-                  alt="Company Logo"
-                  className="mx-auto mb-3 w-32 h-auto"
-                />
-                <h1 className="text-2xl font-extrabold text-gray-900">
-                  JOB ORDER
-                </h1>
-                <h2 className="text-lg text-gray-600">
-                  SMCT GROUP OF COMPANIES
-                </h2>
+        <>
+          <div className="flex items-center p-3 bg-white">
+            <div className="flex items-center justify-end w-full gap-3">
+              <div className="ml-3 overflow-hidden text-end">
+                <p
+                  className="font-medium text-gray-900 whitespace-nowrap"
+                  onClick={handleLogoutUser}
+                >
+                  {user?.name}
+                </p>
+                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
               </div>
-
-              {/* Customer Info - Wider 5-column layout */}
-              <p className="block text-lg font-bold text-gray-900 mb-1">
-                CUSTOMER DETAILS
-              </p>
-
-              <CustomerGrid
-                errors={errors}
-                customerName={customerName}
-                date={date}
-                address={address}
-                setCustomerName={setCustomerName}
-                setDate={setDate}
-                setAddress={setAddress}
-                setContact={setContact}
-                contact={contact}
-              />
-              <p className="block text-lg font-bold text-gray-900 mb-1">
-                VEHICLE DETAILS
-              </p>
-
-              {/* Vehicle Info - Wider 5-column layout */}
-              <VehicleGrid
-                errors={errors}
-                vehicleModel={vehicleModel}
-                chassis={chassis}
-                dealer={dealer}
-                mileage={mileage}
-                dateSold={dateSold}
-                setVehicleModel={setVehicleModel}
-                setChassis={setChassis}
-                setDealer={setDealer}
-                setMileage={setMileage}
-                setDateSold={setDateSold}
-              />
-
-              <p className="block text-lg font-bold text-gray-900 mb-1">
-                JOB DETAILS
-              </p>
-
-              {/* Repair Dates - Full width */}
-              <JobDetailsGrid
-                jobType={jobType}
-                repairStart={repairStart}
-                repairEnd={repairEnd}
-                setJobType={setJobType}
-                setRepairStart={setRepairStart}
-                setRepairEnd={setRepairEnd}
-              />
-
-              {/* Documents and Visual Check - Side by side */}
-              <DocumentAndVisualCheck
-                documents={documents}
-                setDocuments={setDocuments}
-                visualCheck={visualCheck}
-                setVisualCheck={setVisualCheck}
-              />
-
-              {/* Customer Job Request - Full width */}
-              <CustomersJobRequest
-                jobRequests={jobRequests}
-                addJobRequest={addJobRequest}
-                updateJobRequest={updateJobRequest}
-                deleteJobRequest={deleteJobRequest}
-                removeAllJobRequest={removeAllJobRequest}
-                laborTotal={laborTotal}
-              />
-
-              {/* Parts & Lubricants Request - Full width */}
-              <PartsAndLubricantsRequest
-                partsRequests={partsRequests}
-                updatePartRequest={updatePartRequest}
-                deletePartRequest={deletePartRequest}
-                removeAllPartRequest={removeAllPartRequest}
-                addPartRequest={addPartRequest}
-                partsTotal={partsTotal}
-              />
-
-              {/* Total Amount */}
-              <div className="text-right text-xl font-bold mb-6 p-3 bg-blue-50 rounded-md">
-                TOTAL AMOUNT:{" "}
-                {totalAmount.toLocaleString("en-PH", {
-                  style: "currency",
-                  currency: "PHP",
-                })}
+              <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
+                {acronymName(user?.name)}
               </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end">
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={handleReset}
-                    className="bg-yellow-500 hover:bg-yellow-700 text-white"
-                  >
-                    <FaRotate /> Reset
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <FaPrint /> Print Job Order
-                  </Button>
-                </div>
-              </div>
-            </form>
+            </div>
           </div>
-        </div>
+          <div className="min-h-screen bg-gray-50 py-4 px-20 no-print">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-[95vw] mx-auto">
+              <form onSubmit={handleSubmit}>
+                {/* Header */}
+                <div className="text-center mb-6 border-b-1 border-gray-300 pb-4">
+                  <img
+                    src="/logo.png"
+                    alt="Company Logo"
+                    className="mx-auto mb-3 w-32 h-auto"
+                  />
+                  <h1 className="text-2xl font-extrabold text-gray-900">
+                    JOB ORDER
+                  </h1>
+                  <h2 className="text-lg text-gray-600">
+                    SMCT GROUP OF COMPANIES
+                  </h2>
+                </div>
+
+                {/* Customer Info - Wider 5-column layout */}
+                <p className="block text-lg font-bold text-gray-900 mb-1">
+                  CUSTOMER DETAILS
+                </p>
+
+                <CustomerGrid
+                  errors={errors}
+                  customerName={customerName}
+                  date={date}
+                  address={address}
+                  setCustomerName={setCustomerName}
+                  setDate={setDate}
+                  setAddress={setAddress}
+                  setContact={setContact}
+                  contact={contact}
+                />
+                <p className="block text-lg font-bold text-gray-900 mb-1">
+                  VEHICLE DETAILS
+                </p>
+
+                {/* Vehicle Info - Wider 5-column layout */}
+                <VehicleGrid
+                  errors={errors}
+                  vehicleModel={vehicleModel}
+                  chassis={chassis}
+                  dealer={dealer}
+                  mileage={mileage}
+                  dateSold={dateSold}
+                  setVehicleModel={setVehicleModel}
+                  setChassis={setChassis}
+                  setDealer={setDealer}
+                  setMileage={setMileage}
+                  setDateSold={setDateSold}
+                />
+
+                <p className="block text-lg font-bold text-gray-900 mb-1">
+                  JOB DETAILS
+                </p>
+
+                {/* Repair Dates - Full width */}
+                <JobDetailsGrid
+                  jobType={jobType}
+                  repairStart={repairStart}
+                  repairEnd={repairEnd}
+                  setJobType={setJobType}
+                  setRepairStart={setRepairStart}
+                  setRepairEnd={setRepairEnd}
+                />
+
+                {/* Documents and Visual Check - Side by side */}
+                <DocumentAndVisualCheck
+                  documents={documents}
+                  setDocuments={setDocuments}
+                  visualCheck={visualCheck}
+                  setVisualCheck={setVisualCheck}
+                />
+
+                {/* Customer Job Request - Full width */}
+                <CustomersJobRequest
+                  jobRequests={jobRequests}
+                  addJobRequest={addJobRequest}
+                  updateJobRequest={updateJobRequest}
+                  deleteJobRequest={deleteJobRequest}
+                  removeAllJobRequest={removeAllJobRequest}
+                  laborTotal={laborTotal}
+                />
+
+                {/* Parts & Lubricants Request - Full width */}
+                <PartsAndLubricantsRequest
+                  partsRequests={partsRequests}
+                  updatePartRequest={updatePartRequest}
+                  deletePartRequest={deletePartRequest}
+                  removeAllPartRequest={removeAllPartRequest}
+                  addPartRequest={addPartRequest}
+                  partsTotal={partsTotal}
+                />
+
+                {/* Total Amount */}
+                <div className="text-right text-xl font-bold mb-6 p-3 bg-blue-50 rounded-md">
+                  TOTAL AMOUNT:{" "}
+                  {totalAmount.toLocaleString("en-PH", {
+                    style: "currency",
+                    currency: "PHP",
+                  })}
+                </div>
+
+                <ServiceAndManager
+                  errors={errors}
+                  signatures={signatures}
+                  setSignatures={setSignatures}
+                />
+
+                {/* Submit Button */}
+                <div className="flex justify-end">
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={handleReset}
+                      className="bg-yellow-500 hover:bg-yellow-700 text-white"
+                    >
+                      <FaRotate /> Reset
+                    </Button>
+
+                    <Button
+                      type="submit"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <FaPrint /> Print Job Order
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
       )}
     </>
   );
-}
+};
+
+export default authenticatedPage(JobOrderForm);

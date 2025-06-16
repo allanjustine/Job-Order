@@ -23,6 +23,8 @@ return new class extends Migration
             $table->dateTimeTz('repair_job_end');
             $table->dateTimeTz('repair_job_start');
             $table->string('vehicle_model');
+            $table->string('service_advisor');
+            $table->string('branch_manager');
             $table->timestamps();
         });
     }
