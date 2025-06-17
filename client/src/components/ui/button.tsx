@@ -11,6 +11,7 @@ export default function Button({
   hidden?: boolean;
   className?: string;
   onClick?: () => void;
+  ref?: any;
 }) {
   return (
     <button

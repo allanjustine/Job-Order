@@ -14,6 +14,7 @@ export default function useFetch(url: string) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [cardData, setCardData] = useState<any>([]);
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
@@ -39,13 +40,13 @@ export default function useFetch(url: string) {
             ...payload,
           },
         });
-        setData(response.data);
+        setData(response?.data?.data?.data);
+        setCardData(response?.data);
         setPagination((pagination: PaginationType) => ({
           ...pagination,
-          total: response.data.job_orders.total,
-          page: response.data.job_orders.current_page,
-          lastPage: response.data.job_orders.last_page,
-          perPage: response.data.job_orders.per_page,
+          total: response.data.data.total,
+          page: response.data.data.current_page,
+          perPage: response.data.data.per_page,
         }));
       } catch (error: any) {
         console.error(error);
@@ -112,6 +113,7 @@ export default function useFetch(url: string) {
 
   return {
     data,
+    cardData,
     sort,
     error,
     isRefresh,

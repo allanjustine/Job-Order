@@ -187,7 +187,7 @@ export default function PreviewData({ data }: any) {
               </span>
               {data?.visual_check.dent && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visual_check.dent_notes}
+                  NOTE: {data?.visual_check.dent_note}
                 </p>
               )}
             </div>
@@ -210,7 +210,7 @@ export default function PreviewData({ data }: any) {
               </span>
               {data?.visual_check.scratch && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visual_check.scratch_notes}
+                  NOTE: {data?.visual_check.scratch_note}
                 </p>
               )}
             </div>
@@ -233,7 +233,7 @@ export default function PreviewData({ data }: any) {
               </span>
               {data?.visual_check.broken && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visual_check.broken_notes}
+                  NOTE: {data?.visual_check.broken_note}
                 </p>
               )}
             </div>
@@ -256,7 +256,7 @@ export default function PreviewData({ data }: any) {
               </span>
               {data?.visual_check.missing && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visual_check.missing_notes}
+                  NOTE: {data?.visual_check.missing_note}
                 </p>
               )}
             </div>

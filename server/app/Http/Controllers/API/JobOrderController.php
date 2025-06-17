@@ -12,13 +12,14 @@ use App\Models\JobRequest;
 use App\Models\PartsRequest;
 use App\Models\User;
 use App\Models\VisualCheck;
+use Illuminate\Support\Facades\Auth;
 
 class JobOrderController extends Controller
 {
     public function store(Request $request)
     {
         $customer = Customer::create([
-            'user_id'               => 1,
+            'user_id'               => Auth::id(),
             'name'                  => $request->customerName,
             'address'               => $request->address,
             'contact_number'        => $request->contact
@@ -186,7 +187,7 @@ class JobOrderController extends Controller
         [$totalLabor, $totalParts, $totalOverAllAmount, $totalPmsAmount, $totalRrAmount, $totalWcAmount] = $this->totalAmounts();
 
         $data = async(fn() => [
-            "job_orders"                => $job_orders,
+            "data"                      => $job_orders,
             "total_job_orders"          => $totalJobOrders,
             "total_pms"                 => $totalPms,
             "total_rr"                  => $totalRr,
