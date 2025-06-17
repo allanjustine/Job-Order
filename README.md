@@ -1,7 +1,6 @@
 # 🖨️ Job Order Printing System
 
-![Job Order Printing System Banner](https://via.placeholder.com/1200x400/3B82F6/FFFFFF?text=Job+Order+Printing+System)  
-*(Replace with your actual project banner image)*  
+![Job Order Printing System Banner](https://job-order.smctgroup.ph/logo.png)  
 
 ---
 
@@ -57,7 +56,7 @@ A streamlined system for **generating, managing, and printing job orders** with 
    - Direct FAQ answers with `>` blockquotes  
 
 Replace the placeholder image URL with your actual project banner (recommended size: **1200x400px**). For additional polish, add:  
-- Badges (e.g., `![Version](https://img.shields.io/badge/version-1.0.0-blue)`)  
+- Badges (e.g., ![Job Order Printing System Banner](https://job-order.smctgroup.ph/logo.png))  
 - Screenshots in an `## 📸 Screenshots` section  
 - Animated GIF demonstrating key features
 
