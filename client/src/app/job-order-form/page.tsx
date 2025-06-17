@@ -107,6 +107,44 @@ const JobOrderForm = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Form validation
+  const validateForm = () => {
+    try {
+      formSchema.parse({
+        customerName,
+        date,
+        address,
+        contact,
+        vehicleModel,
+        chassis,
+      });
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          newErrors[err.path[0]] = err.message;
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isPrint]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -249,31 +287,6 @@ const JobOrderForm = () => {
     dateSold,
     jobType,
     ...signatures,
-  };
-
-  // Form validation
-  const validateForm = () => {
-    try {
-      formSchema.parse({
-        customerName,
-        date,
-        address,
-        contact,
-        vehicleModel,
-        chassis,
-      });
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          newErrors[err.path[0]] = err.message;
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
   };
 
   useEffect(() => {
