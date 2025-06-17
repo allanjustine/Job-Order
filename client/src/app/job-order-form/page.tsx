@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { FaPrint } from "react-icons/fa";
 import PrintJobOrder from "@/components/print-job";
 import { z } from "zod";
-import { FaRotate } from "react-icons/fa6";
+import { FaEye, FaRotate } from "react-icons/fa6";
 import Button from "@/components/ui/button";
 import Swal from "sweetalert2";
 import CustomerGrid from "@/components/CustomerGrid";
@@ -26,6 +26,18 @@ import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 import acronymName from "@/utils/acronymName";
 import authenticatedPage from "@/lib/hoc/authenticatedPage";
+import dap from "@/assets/images/dap.jpg";
+import dsm from "@/assets/images/dsm.png";
+import smct from "@/assets/images/smct_branch.png";
+import hd from "@/assets/images/hd.png";
+import Image from "next/image";
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "@/components/ui/modal";
+import PreviewPrint from "@/components/PreviewPrint";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -91,6 +103,28 @@ const JobOrderForm = () => {
   const [dropDownOpen, setDropdownOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const modalButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        modalButtonRef.current &&
+        !modalButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Set default date to today
   useState(() => {
@@ -291,6 +325,8 @@ const JobOrderForm = () => {
             padding: "15px",
           },
         });
+        handlePreviewPrint();
+        handleReset();
       }
     } catch (error) {
       console.error(error);
@@ -304,8 +340,12 @@ const JobOrderForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      handlePrint();
+      handlePreviewPrint();
     }
+  };
+
+  const handlePreviewPrint = () => {
+    setIsOpen(!isOpen);
   };
 
   const handleReset = () => {
@@ -353,6 +393,14 @@ const JobOrderForm = () => {
     setDropdownOpen(!dropDownOpen);
   };
 
+  const branchImages: any = {
+    HO: smct,
+    SMCT: smct,
+    DSM: dsm,
+    DAP: dap,
+    HD: hd,
+  };
+
   return (
     <>
       {/* Print View (hidden until printing) */}
@@ -361,24 +409,36 @@ const JobOrderForm = () => {
       ) : (
         <>
           <div className="flex items-center p-5 bg-white">
-            <div className="flex items-center justify-end relative w-full gap-3">
-              <div className="ml-3 overflow-hidden text-end">
-                <p
-                  className="font-medium text-gray-900 whitespace-nowrap"
-                  onClick={handleLogoutUser}
-                >
-                  {user?.name}
-                </p>
-                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+            <div className="flex items-center justify-between relative w-full">
+              <div>
+                <Image
+                  height={100}
+                  width={200}
+                  src={branchImages[user?.branch?.branch_code] || ""}
+                  alt="logo"
+                />
               </div>
-              <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-                <Button
-                  type="button"
-                  onClick={handleToggleDropdown}
-                  ref={buttonRef}
-                >
-                  {acronymName(user?.name)}
-                </Button>
+              <div className="flex items-center gap-3">
+                <div className="ml-3 overflow-hidden text-end">
+                  <p
+                    className="font-medium text-gray-900 whitespace-nowrap"
+                    onClick={handleLogoutUser}
+                  >
+                    {user?.name}
+                  </p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {user?.email}
+                  </p>
+                </div>
+                <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
+                  <Button
+                    type="button"
+                    onClick={handleToggleDropdown}
+                    ref={buttonRef}
+                  >
+                    {acronymName(user?.name)}
+                  </Button>
+                </div>
               </div>
               {dropDownOpen && (
                 <div
@@ -404,7 +464,7 @@ const JobOrderForm = () => {
               )}
             </div>
           </div>
-          <div className="min-h-screen bg-gray-50 py-4 px-20 no-print">
+          <div className="min-h-screen bg-gray-50 py-4 md:px-20 no-print">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-[95vw] mx-auto">
               <form onSubmit={handleSubmit}>
                 {/* Header */}
@@ -526,16 +586,41 @@ const JobOrderForm = () => {
                     </Button>
 
                     <Button
+                      ref={modalButtonRef}
                       type="submit"
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      <FaPrint /> Print Job Order
+                      <FaEye /> Preview
                     </Button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
+          <Modal isOpen={isOpen} className="w-5xl" ref={modalRef}>
+            <ModalHeader onClose={handlePreviewPrint}>
+              Previewing Job Order Data before print...
+            </ModalHeader>
+            <ModalBody>
+              <PreviewPrint data={jobOrderData} />
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-600 text-white"
+                onClick={handlePreviewPrint}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handlePrint}
+              >
+                <FaPrint /> Print Job Order
+              </Button>
+            </ModalFooter>
+          </Modal>
         </>
       )}
     </>

@@ -185,9 +185,9 @@ const Dashboard = () => {
 
   const spinner = () => {
     return (
-      <div>
+      <>
         <CgSpinner className="animate-spin" />
-      </div>
+      </>
     );
   };
 
@@ -251,10 +251,12 @@ const Dashboard = () => {
 
             <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
               <p>
-                <span className="font-medium">PMS:</span> {isLoading ? spinner() : cardData.total_pms}
+                <span className="font-medium">PMS:</span>{" "}
+                {isLoading ? spinner() : cardData.total_pms}
               </p>
               <p>
-                <span className="font-medium">Repair:</span> {isLoading ? spinner() : cardData.total_rr}
+                <span className="font-medium">Repair:</span>{" "}
+                {isLoading ? spinner() : cardData.total_rr}
               </p>
               <p>
                 <span className="font-medium">Warranty Claim:</span>{" "}
@@ -306,10 +308,12 @@ const Dashboard = () => {
 
             <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
               <p>
-                <span className="font-medium">PMS:</span> {isLoading ? spinner() : data.pmsAmount}
+                <span className="font-medium">PMS:</span>{" "}
+                {isLoading ? spinner() : data.pmsAmount}
               </p>
               <p>
-                <span className="font-medium">Repair:</span> {isLoading ? spinner() : data.repairAmount}
+                <span className="font-medium">Repair:</span>{" "}
+                {isLoading ? spinner() : data.repairAmount}
               </p>
               <p>
                 <span className="font-medium">Warranty Claim:</span>{" "}

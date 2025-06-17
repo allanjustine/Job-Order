@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import React, { forwardRef, useEffect } from "react";
 
 interface PrintJobOrderProps {
   data: {
@@ -231,7 +230,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
               </span>
               {data?.visualCheck.dent && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visualCheck.dentNotes}
+                  NOTE: {data?.visualCheck.dentNotes}
                 </p>
               )}
             </div>
@@ -254,7 +253,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
               </span>
               {data?.visualCheck.scratch && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visualCheck.scratchNotes}
+                  NOTE: {data?.visualCheck.scratchNotes}
                 </p>
               )}
             </div>
@@ -273,7 +272,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
               </span>
               {data?.visualCheck.broken && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visualCheck.brokenNotes}
+                  NOTE: {data?.visualCheck.brokenNotes}
                 </p>
               )}
             </div>
@@ -296,7 +295,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
               </span>
               {data?.visualCheck.missing && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {data?.visualCheck.missingNotes}
+                  NOTE: {data?.visualCheck.missingNotes}
                 </p>
               )}
             </div>
