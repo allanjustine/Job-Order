@@ -107,7 +107,8 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
         </div>
         <div>
           <p className="mb-2">
-            <strong className="text-gray-700">Date:</strong> {data?.date}
+            <strong className="text-gray-700">Date:</strong>{" "}
+            {format(data?.date, "MMM dd, yyyy hh:mm a")}
           </p>
           <p className="mb-2">
             <strong className="text-gray-700">Contact #:</strong>{" "}
@@ -118,7 +119,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
           </p>
           <p className="mb-2">
             <strong className="text-gray-700">Date Sold:</strong>{" "}
-            {data?.dateSold}
+            {format(data?.dateSold, "MMM dd, yyyy hh:mm a")}
           </p>
         </div>
       </div>
