@@ -9,7 +9,7 @@ export default function authenticatedPage(WrappedComponent: any) {
   function AuthenticatedPageComponent(props: any) {
     const { isLoading, isAuthenticated, isAdmin } = useAuth();
     const pathname = usePathname();
-    const isAdminPath = adminPaths.includes(pathname);
+    const isAdminPath = adminPaths.some((item) => pathname.startsWith(item));
 
     if (isLoading) return <GlobalLoader />;
 
