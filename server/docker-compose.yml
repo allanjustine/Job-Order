@@ -52,8 +52,8 @@ services:
   #   restart: unless-stopped
   #   container_name: job-order-reverb
 
-    networks:
-      - job-order
+    # networks:
+    #   - job-order
 
 networks:
   job-order:
