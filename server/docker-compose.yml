@@ -9,7 +9,7 @@ services:
     working_dir: /var/www/
     volumes:
 
-      - /home/webserver/systems/Job-Order/client/.env:/var/www/.env
+      - /home/webserver/systems/Job-Order/server/.env:/var/www/.env
       - ./:/var/www
       - ./docker-compose/nginx/default.conf:/etc/nginx/nginx.conf
 
