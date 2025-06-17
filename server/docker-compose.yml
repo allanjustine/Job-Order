@@ -8,9 +8,8 @@ services:
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
-     # - ./storage:/var/www/storage
-     # - ./bootstrap/cache:/var/www/bootstrap/cache
-      - /home/webserver/systems/Job-Order/.env:/var/www/.env
+
+      # - /home/webserver/systems/Job-Order/.env:/var/www/.env
       - ./:/var/www
       - ./docker-compose/nginx/default.conf:/etc/nginx/nginx.conf
 
@@ -36,25 +35,25 @@ services:
       - ./:/var/www
 
     networks:
-      - job-order
+       - job-order
 
-  job-order-reverb:
-    build:
-      context: ./
-      dockerfile: Dockerfile-reverb
-    ports:
-    - "8083:8083" # expose Reverb server
-    environment:
-    - APP_URL=${APP_URL}
-    - LARAVEL_REVERB_APP_KEY=${REVERB_APP_KEY}
-    - LARAVEL_REVERB_APP_SECRET=${REVERB_APP_SECRET}
-    depends_on:
-    - job-order-server
-    restart: unless-stopped
-    container_name: job-order-reverb
+  # job-order-reverb:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile-reverb
+  #   ports:
+  #   - "8083:8083" # expose Reverb server
+  #   environment:
+  #   - APP_URL=${APP_URL}
+  #   - LARAVEL_REVERB_APP_KEY=${REVERB_APP_KEY}
+  #   - LARAVEL_REVERB_APP_SECRET=${REVERB_APP_SECRET}
+  #   depends_on:
+  #   - job-order-server
+  #   restart: unless-stopped
+  #   container_name: job-order-reverb
 
-    networks:
-      - job-order
+  #   networks:
+  #     - job-order
 
 networks:
   job-order:
