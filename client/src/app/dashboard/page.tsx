@@ -29,10 +29,12 @@ import Input from "@/components/ui/input";
 import authenticatedPage from "@/lib/hoc/authenticatedPage";
 import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
+import { CgSpinner } from "react-icons/cg";
 
 const Dashboard = () => {
   const {
     data: jobOrders,
+    cardData,
     isLoading,
     error,
     pagination,
@@ -168,53 +170,61 @@ const Dashboard = () => {
   };
 
   const data = {
-    totalReceiptPrints: jobOrders.total_job_orders,
-    todaysPrints: jobOrders.todays_print,
-    weeklyPrints: jobOrders.this_week_print,
-    monthlyPrints: jobOrders.this_month_print,
-    totalBranchPrintedRecords: jobOrders.total_branch_prints,
-    totalLabor: phpCurrency(jobOrders.total_labor || 0),
-    totalPartsLubricants: phpCurrency(jobOrders.total_parts || 0),
-    totalOverAllAmount: phpCurrency(jobOrders.total_over_all_amount || 0),
-    repairAmount: phpCurrency(jobOrders.total_rr_amount || 0),
-    pmsAmount: phpCurrency(jobOrders.total_pms_amount || 0),
-    warrantyClaimAmount: phpCurrency(jobOrders.total_wc_amount || 0),
+    totalReceiptPrints: cardData.total_job_orders,
+    todaysPrints: cardData.todays_print,
+    weeklyPrints: cardData.this_week_print,
+    monthlyPrints: cardData.this_month_print,
+    totalBranchPrintedRecords: cardData.total_branch_prints,
+    totalLabor: phpCurrency(cardData.total_labor || 0),
+    totalPartsLubricants: phpCurrency(cardData.total_parts || 0),
+    totalOverAllAmount: phpCurrency(cardData.total_over_all_amount || 0),
+    repairAmount: phpCurrency(cardData.total_rr_amount || 0),
+    pmsAmount: phpCurrency(cardData.total_pms_amount || 0),
+    warrantyClaimAmount: phpCurrency(cardData.total_wc_amount || 0),
+  };
+
+  const spinner = () => {
+    return (
+      <div>
+        <CgSpinner className="animate-spin" />
+      </div>
+    );
   };
 
   const stats = [
     {
       label: "Today's Prints",
-      value: data.todaysPrints,
+      value: isLoading ? spinner() : data.todaysPrints,
       icon: Clock,
       color: "from-green-500 to-green-400",
     },
     {
       label: "Weekly Prints",
-      value: data.weeklyPrints,
+      value: isLoading ? spinner() : data.weeklyPrints,
       icon: Calendar,
       color: "from-purple-500 to-purple-400",
     },
     {
       label: "Monthly Prints",
-      value: data.monthlyPrints,
+      value: isLoading ? spinner() : data.monthlyPrints,
       icon: Calendar,
       color: "from-orange-500 to-orange-400",
     },
     {
       label: "Branch Printed Records",
-      value: data.totalBranchPrintedRecords,
+      value: isLoading ? spinner() : data.totalBranchPrintedRecords,
       icon: Home,
       color: "from-indigo-500 to-indigo-400",
     },
     {
       label: "Total Labor",
-      value: data.totalLabor,
+      value: isLoading ? spinner() : data.totalLabor,
       icon: Wrench,
       color: "from-emerald-500 to-emerald-400",
     },
     {
       label: "Total Parts & Lubricants",
-      value: data.totalPartsLubricants,
+      value: isLoading ? spinner() : data.totalPartsLubricants,
       icon: PillBottleIcon,
       color: "from-rose-500 to-rose-400",
     },
@@ -231,7 +241,7 @@ const Dashboard = () => {
                   Total Job Prints
                 </p>
                 <p className="text-2xl font-semibold text-gray-800">
-                  {jobOrders.total_job_orders}
+                  {isLoading ? spinner() : cardData.total_job_orders}
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-400 shadow-md">
@@ -241,15 +251,14 @@ const Dashboard = () => {
 
             <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
               <p>
-                <span className="font-medium">PMS:</span> {jobOrders.total_pms}
+                <span className="font-medium">PMS:</span> {isLoading ? spinner() : cardData.total_pms}
               </p>
               <p>
-                <span className="font-medium">Repair:</span>{" "}
-                {jobOrders.total_rr}
+                <span className="font-medium">Repair:</span> {isLoading ? spinner() : cardData.total_rr}
               </p>
               <p>
                 <span className="font-medium">Warranty Claim:</span>{" "}
-                {jobOrders.total_wc}
+                {isLoading ? spinner() : cardData.total_wc}
               </p>
             </div>
           </div>
@@ -287,7 +296,7 @@ const Dashboard = () => {
                   Total Amount
                 </p>
                 <p className="text-2xl font-semibold text-gray-800">
-                  {data.totalOverAllAmount}
+                  {isLoading ? spinner() : data.totalOverAllAmount}
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-gradient-to-br from-amber-500 to-amber-400 shadow-md">
@@ -297,14 +306,14 @@ const Dashboard = () => {
 
             <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
               <p>
-                <span className="font-medium">PMS:</span> {data.pmsAmount}
+                <span className="font-medium">PMS:</span> {isLoading ? spinner() : data.pmsAmount}
               </p>
               <p>
-                <span className="font-medium">Repair:</span> {data.repairAmount}
+                <span className="font-medium">Repair:</span> {isLoading ? spinner() : data.repairAmount}
               </p>
               <p>
                 <span className="font-medium">Warranty Claim:</span>{" "}
-                {data.warrantyClaimAmount}
+                {isLoading ? spinner() : data.warrantyClaimAmount}
               </p>
             </div>
           </div>
@@ -332,7 +341,7 @@ const Dashboard = () => {
             </Button>
           </div>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-600">
               Recent Print Job Orders
             </h2>
             <div className="relative w-full md:w-1/3">
@@ -349,7 +358,7 @@ const Dashboard = () => {
           <div className="overflow-x-auto">
             <DataTable
               columns={columns}
-              data={jobOrders?.job_orders?.data}
+              data={jobOrders}
               pagination
               paginationServer
               sortServer
@@ -402,7 +411,11 @@ const Dashboard = () => {
           <PreviewData data={viewData} />
         </ModalBody>
         <ModalFooter>
-          <Button className="bg-gray-400 hover:bg-gray-500 text-white" type="button" onClick={handleView(null)}>
+          <Button
+            className="bg-gray-400 hover:bg-gray-500 text-white"
+            type="button"
+            onClick={handleView(null)}
+          >
             Close
           </Button>
         </ModalFooter>

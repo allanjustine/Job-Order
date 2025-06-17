@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { FaPrint } from "react-icons/fa";
 import PrintJobOrder from "@/components/print-job";
 import { z } from "zod";
@@ -22,7 +22,6 @@ import {
   VehicleDocument,
   VehicleVisualCheck,
 } from "@/types/jobOrderFormType";
-import Image from "next/image";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 import acronymName from "@/utils/acronymName";
@@ -89,6 +88,9 @@ const JobOrderForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
   const router = useRouter();
+  const [dropDownOpen, setDropdownOpen] = useState<boolean>(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Set default date to today
   useState(() => {
@@ -241,6 +243,25 @@ const JobOrderForm = () => {
   };
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isPrint) return;
 
     window.onafterprint = () => {
@@ -259,7 +280,17 @@ const JobOrderForm = () => {
     try {
       const response = await api.post("/create-job-order", jobOrderData);
       if (response.status === 201) {
-        toast.success(response.data);
+        toast.success(response.data, {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "👍",
+          style: {
+            borderRadius: "15px",
+            background: "#333",
+            color: "#fff",
+            padding: "15px",
+          },
+        });
       }
     } catch (error) {
       console.error(error);
@@ -318,6 +349,9 @@ const JobOrderForm = () => {
       console.error(error);
     }
   };
+  const handleToggleDropdown = () => {
+    setDropdownOpen(!dropDownOpen);
+  };
 
   return (
     <>
@@ -326,8 +360,8 @@ const JobOrderForm = () => {
         <PrintJobOrder data={jobOrderData} />
       ) : (
         <>
-          <div className="flex items-center p-3 bg-white">
-            <div className="flex items-center justify-end w-full gap-3">
+          <div className="flex items-center p-5 bg-white">
+            <div className="flex items-center justify-end relative w-full gap-3">
               <div className="ml-3 overflow-hidden text-end">
                 <p
                   className="font-medium text-gray-900 whitespace-nowrap"
@@ -338,8 +372,36 @@ const JobOrderForm = () => {
                 <p className="text-sm text-gray-500 truncate">{user?.email}</p>
               </div>
               <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-                {acronymName(user?.name)}
+                <Button
+                  type="button"
+                  onClick={handleToggleDropdown}
+                  ref={buttonRef}
+                >
+                  {acronymName(user?.name)}
+                </Button>
               </div>
+              {dropDownOpen && (
+                <div
+                  className="absolute top-12 rounded-lg right-2 min-w-1/5 bg-white shadow-md border border-gray-300"
+                  ref={dropdownRef}
+                >
+                  <div className="flex flex-col">
+                    <div className="p-3 hover:bg-gray-100">
+                      <p className="font-bold text-gray-600">{user?.name}</p>
+                    </div>
+                    <hr className="text-gray-300" />
+                    <div className="p-3 hover:bg-gray-100">
+                      <button
+                        type="button"
+                        onClick={handleLogoutUser}
+                        className="p-0 text-sm text-left font-semibold text-gray-600 w-full"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="min-h-screen bg-gray-50 py-4 px-20 no-print">
