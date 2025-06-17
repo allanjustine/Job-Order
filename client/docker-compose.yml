@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  job-order:
+    build: .
+    container_name: job-order
+    restart: unless-stopped
+    ports:
+      - "1003:1003"
+    # networks:
+    #   - app-network
+    # depends_on:
+    #   - nginx
+
+#   nginx:
+#     image: nginx:alpine
+#     container_name: netsuite-nginx
+#     restart: unless-stopped
+#     volumes:
+#       - ./default.conf:/etc/nginx/conf.d/default.conf
+#       - ./public:/usr/share/nginx/html
+#     ports:
+#       - "1000:1000"
+#     networks:
+#       - app-network
+
+# networks:
+#   app-network:
+#     driver: bridge
