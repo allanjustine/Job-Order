@@ -10,6 +10,7 @@ interface PrintJobOrderProps {
     vehicleModel: string;
     chassis: string;
     dealer: string;
+    jobType: string;
     repairStart: string;
     repairEnd: string;
     date: string;
@@ -126,7 +127,7 @@ const PrintJobOrder = ({ data }: PrintJobOrderProps) => {
 
       {/* Type of Job */}
       <div className="mb-6 bg-gray-50 p-4 rounded">
-        <h3 className="font-bold text-lg text-blue-800 mb-2">TYPE OF JOB</h3>
+        <strong className="font-bold text-md text-gray-700 mb-2">Type of Job:</strong> {data?.jobType}
         <div className="grid grid-cols-2 gap-4">
           <p>
             <strong className="text-gray-700">Repair Job Start:</strong>{" "}
