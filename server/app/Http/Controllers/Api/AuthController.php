@@ -55,7 +55,7 @@ class AuthController extends Controller
             return response()->json("Invalid Credentials", 400);
         }
 
-        $request->session()->regenerateToken();
+        $request->session()->regenerate();
 
         return response()->json([
             "message"   => "Login successfully",
@@ -129,7 +129,7 @@ class AuthController extends Controller
 
         $request->session()->invalidate();
 
-        $request->session()->regenerate();
+        $request->session()->regenerateToken();
 
         return response()->json(
             "Logged out successfully",
