@@ -79,7 +79,7 @@ class JobOrderController extends Controller
             'scratch_note'          => $request->visualCheck["scratchNotes"],
         ]);
 
-        return response()->json("Created ! LALALALALALA", 201);
+        return response()->json("\"{$customer->name}\" Job Order has been printed successfully.", 201);
     }
 
     private function totalJobPrints()
@@ -165,7 +165,8 @@ class JobOrderController extends Controller
                 'partsRequests',
                 'document',
                 'visualCheck',
-                'customer.user.branch'
+                'customer.user.branch',
+                'customer.user.roles:id,name',
             )
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($subQuery) use ($search) {

@@ -10,8 +10,7 @@ class Customer extends Model
 
     public function jobOrders()
     {
-        return $this->hasMany(JobOrder::class)
-            ->chaperone();
+        return $this->hasMany(JobOrder::class);
     }
 
     public function user()

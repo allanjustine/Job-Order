@@ -395,9 +395,21 @@ const JobOrderForm = () => {
     setJobType("");
   };
 
-  const handleLogoutUser = async () => {
+  const handleLogoutUser = () => {
     try {
-      await handleLogout(router);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will redirect to login page!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await handleLogout(router);
+        }
+      });
     } catch (error) {
       console.error(error);
     }
