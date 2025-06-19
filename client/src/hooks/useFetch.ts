@@ -17,51 +17,46 @@ export default function useFetch(url: string) {
   const [cardData, setCardData] = useState<any>([]);
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
 
-  useEffect(() => {
-    const fetchJobOrderData = async () => {
-      const payload = {
-        page: pagination.page,
-        perPage: pagination.perPage,
-        sort: {
-          column: sort.column,
-          direction: sort.sortBy,
-        },
-        search: searchTerm,
-      };
-
-      setPagination((prev: PaginationType) => ({
-        ...prev,
-        isLoading: true,
-      }));
-
-      try {
-        const response = await api.get(url, {
-          params: {
-            ...payload,
-          },
-        });
-        setData(response?.data?.data?.data);
-        setCardData(response?.data);
-        setPagination((pagination: PaginationType) => ({
-          ...pagination,
-          total: response.data.data.total,
-          page: response.data.data.current_page,
-          perPage: response.data.data.per_page,
-        }));
-      } catch (error: any) {
-        console.error(error);
-        setError(error.response.data);
-      } finally {
-        setIsLoading(false);
-        setIsRefresh(false);
-        setIsSearching(false);
-        setPagination((prev: PaginationType) => ({
-          ...prev,
-          isLoading: false,
-        }));
-      }
+  const fetchJobOrderData = async () => {
+    const payload = {
+      page: pagination.page,
+      perPage: pagination.perPage,
+      sort: {
+        column: sort.column,
+        direction: sort.sortBy,
+      },
+      search: searchTerm,
     };
 
+    try {
+      const response = await api.get(url, {
+        params: {
+          ...payload,
+        },
+      });
+      setData(response?.data?.data?.data);
+      setCardData(response?.data);
+      setPagination((pagination: PaginationType) => ({
+        ...pagination,
+        total: response.data.data.total,
+        page: response.data.data.current_page,
+        perPage: response.data.data.per_page,
+      }));
+    } catch (error: any) {
+      console.error(error);
+      setError(error.response.data);
+    } finally {
+      setIsLoading(false);
+      setIsRefresh(false);
+      setIsSearching(false);
+      setPagination((prev: PaginationType) => ({
+        ...prev,
+        isLoading: false,
+      }));
+    }
+  };
+
+  useEffect(() => {
     fetchJobOrderData();
   }, [
     pagination.page,
@@ -69,7 +64,6 @@ export default function useFetch(url: string) {
     sort.column,
     sort.sortBy,
     searchTerm,
-    isRefresh,
   ]);
 
   const handleSort = (column: any, direction: any) => {
@@ -93,6 +87,7 @@ export default function useFetch(url: string) {
     setPagination((pagination: PaginationType) => ({
       ...pagination,
       page,
+      isLoading: true,
     }));
   };
 
@@ -109,6 +104,7 @@ export default function useFetch(url: string) {
 
   const handleRefresh = () => {
     setIsRefresh(true);
+    fetchJobOrderData();
   };
 
   return {

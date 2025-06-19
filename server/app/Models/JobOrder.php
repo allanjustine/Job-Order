@@ -27,14 +27,12 @@ class JobOrder extends Model
 
     public function jobRequests()
     {
-        return $this->hasMany(JobRequest::class)
-            ->chaperone();
+        return $this->hasMany(JobRequest::class);
     }
 
     public function partsRequests()
     {
-        return $this->hasMany(PartsRequest::class)
-            ->chaperone();
+        return $this->hasMany(PartsRequest::class);
     }
     public function document()
     {

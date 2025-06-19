@@ -30,6 +30,7 @@ import authenticatedPage from "@/lib/hoc/authenticatedPage";
 import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 const Dashboard = () => {
   const {
@@ -133,6 +134,21 @@ const Dashboard = () => {
           )}
         </span>
       ),
+    },
+    {
+      name: "PRINTED ON",
+      cell: (row: any) => (
+        <div>
+          <p>{format(row.created_at, "MMM dd, yyyy hh:mm a")}</p>
+          <span className="text-xs font-semibold">
+            {formatDistanceToNowStrict(row.created_at, {
+              addSuffix: true,
+            })}
+          </span>
+        </div>
+      ),
+      sortField: "created_at",
+      sortable: true,
     },
     {
       name: "ACTION",

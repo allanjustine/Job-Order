@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import Button from "./ui/button";
 import { sidebarData } from "@/constants/sidebarData";
+import Swal from "sweetalert2";
 
 export default function Sidebar({
   isSidebarOpen,
@@ -41,9 +42,21 @@ export default function Sidebar({
     };
   }, []);
 
-  const handleLogoutUser = async () => {
+  const handleLogoutUser = () => {
     try {
-      await handleLogout(router);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will redirect to login page!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await handleLogout(router);
+        }
+      });
       handleToggleDropdown();
     } catch (error) {
       console.error(error);
