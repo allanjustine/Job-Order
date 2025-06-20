@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\CustomersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\JobOrderController;
+use App\Http\Controllers\Api\JobOrderController;
 use App\Http\Controllers\Api\UsersController;
 
 Route::middleware('auth:sanctum')->group(
