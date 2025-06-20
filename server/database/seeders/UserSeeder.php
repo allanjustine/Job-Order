@@ -16,6 +16,8 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
         $users = [
             "name"          => "Head Office",
             "code"          => "HO",

@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 interface Credentials {
   branchCodeOrEmail: string;
   password: string;
@@ -6,7 +8,10 @@ interface Credentials {
 export interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
-  handleLogin: (credentials: Credentials, router: any) => Promise<void>;
+  handleLogin: (
+    credentials: Credentials,
+    router: any
+  ) => Promise<void | number>;
   handleLogout: (router: any) => Promise<void>;
   branches: any[];
   error: any;
@@ -14,4 +19,5 @@ export interface AuthContextType {
   errors: any;
   isLogin: boolean;
   isAdmin: boolean;
+  setIsLogin: Dispatch<SetStateAction<boolean>>;
 }

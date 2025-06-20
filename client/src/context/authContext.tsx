@@ -52,7 +52,6 @@ export const AuthContextProvider = ({ children }: any) => {
       }
     } finally {
       setIsLoading(false);
-      setIsLogin(false);
     }
   };
 
@@ -64,13 +63,22 @@ export const AuthContextProvider = ({ children }: any) => {
         fetchProfileData();
         router.push(response.data.url);
       }
+      return response.status;
     } catch (error: any) {
       console.error(error);
-      if (error.response.status === 422) {
-        setErrors(error.response.data);
-        return;
+
+      const status = error?.response?.status;
+
+      if (status === 422) {
+        setErrors(error.response.data.errors);
+        setError("Something went wrong. Please fix the errors.");
+      } else if (status === 404 || status === 400) {
+        setError(error.response.data);
+        setErrors({});
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+        setErrors({});
       }
-      setError(error.response.data);
     }
   };
 
@@ -78,6 +86,8 @@ export const AuthContextProvider = ({ children }: any) => {
     try {
       const response = await logout();
       if (response.status === 202) {
+        setError("");
+        setErrors({});
         fetchProfileData();
         router.push("/login");
       }
@@ -100,6 +110,7 @@ export const AuthContextProvider = ({ children }: any) => {
         errors,
         isLogin,
         isAdmin,
+        setIsLogin,
       }}
     >
       {children}

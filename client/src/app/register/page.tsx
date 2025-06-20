@@ -35,6 +35,7 @@ const RegisterPage = () => {
     try {
       const response = await api.post("/register", formInputs);
       if (response.status === 201) {
+        setFormInputs(FORM_INPUTS);
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -51,7 +52,7 @@ const RegisterPage = () => {
       console.error(error);
       if (error.response.status === 422) {
         setError("Something went wrong. Please fix the errors.");
-        setErrors(error.response.data);
+        setErrors(error.response.data.errors);
       }
     } finally {
       setIsLoading(false);
@@ -120,7 +121,7 @@ const RegisterPage = () => {
             <div>
               <Label>Branch</Label>
               <Select
-                error={errors.branch}
+                error={errors?.branch}
                 className="py-3"
                 value={formInputs.branch}
                 onChange={handleChange("branch")}
@@ -134,7 +135,7 @@ const RegisterPage = () => {
                   </option>
                 ))}
               </Select>
-              <ValidationText>{errors.branch[0]}</ValidationText>
+              <ValidationText>{errors?.branch?.[0]}</ValidationText>
             </div>
 
             <div>
@@ -144,7 +145,7 @@ const RegisterPage = () => {
                   className="py-3"
                   type="text"
                   placeholder="Enter your branch name"
-                  error={errors.branchName}
+                  error={errors?.branchName}
                   value={formInputs.branchName}
                   onChange={handleChange("branchName")}
                 />
@@ -164,7 +165,7 @@ const RegisterPage = () => {
                   </svg>
                 </div>
               </div>
-              <ValidationText>{errors.branchName[0]}</ValidationText>
+              <ValidationText>{errors?.branchName?.[0]}</ValidationText>
             </div>
 
             <div>
@@ -175,7 +176,7 @@ const RegisterPage = () => {
                   className="py-3"
                   type="text"
                   placeholder="Enter your branch code"
-                  error={errors.branchCode}
+                  error={errors?.branchCode}
                   value={formInputs.branchCode}
                   onChange={handleChange("branchCode")}
                 />
@@ -195,7 +196,7 @@ const RegisterPage = () => {
                   </svg>
                 </div>
               </div>
-              <ValidationText>{errors.branchCode[0]}</ValidationText>
+              <ValidationText>{errors?.branchCode?.[0]}</ValidationText>
             </div>
 
             <div>
@@ -206,7 +207,7 @@ const RegisterPage = () => {
                   className="py-3"
                   type="email"
                   placeholder="Enter your branch email"
-                  error={errors.email}
+                  error={errors?.email}
                   value={formInputs.email}
                   onChange={handleChange("email")}
                 />
@@ -226,7 +227,7 @@ const RegisterPage = () => {
                   </svg>
                 </div>
               </div>
-              <ValidationText>{errors.email[0]}</ValidationText>
+              <ValidationText>{errors?.email?.[0]}</ValidationText>
             </div>
 
             <div>
@@ -237,7 +238,7 @@ const RegisterPage = () => {
                   className="py-3"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  error={errors.password}
+                  error={errors?.password}
                   value={formInputs.password}
                   onChange={handleChange("password")}
                 />
@@ -280,7 +281,7 @@ const RegisterPage = () => {
                   </svg>
                 </button>
               </div>
-              <ValidationText>{errors.password[0]}</ValidationText>
+              <ValidationText>{errors?.password?.[0]}</ValidationText>
             </div>
             <div>
               <Label>Confirm Password</Label>
@@ -290,7 +291,7 @@ const RegisterPage = () => {
                   className="py-3"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter confirm password"
-                  error={errors.password}
+                  error={errors?.password}
                   value={formInputs.password_confirmation}
                   onChange={handleChange("password_confirmation")}
                 />
