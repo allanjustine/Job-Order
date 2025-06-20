@@ -30,14 +30,10 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validation = Validator::make($request->all(), [
+        $request->validate([
             'branchCodeOrEmail'     => ['required'],
             'password'              => ['required', 'min:4', 'max:16']
         ]);
-
-        if ($validation->fails()) {
-            return response()->json($validation->errors(), 422);
-        }
 
         $user = User::where('email', $request->branchCodeOrEmail)
             ->orWhere('code', $request->branchCodeOrEmail)
@@ -68,17 +64,13 @@ class AuthController extends Controller
      */
     public function store(Request $request)
     {
-        $validation = Validator::make($request->all(), [
+        $request->validate([
             "branchCode"        => ["required", "unique:users,code"],
             "branchName"        => ["required"],
             "branch"            => ["required", "exists:branches,id"],
             "email"             => ["required", "email", "unique:users,email"],
             "password"          => ["required", "min:4", "max:16", "confirmed"],
         ]);
-
-        if ($validation->fails()) {
-            return response()->json($validation->errors(), 422);
-        }
 
         $user = User::create([
             "name"                  => $request->branchName,

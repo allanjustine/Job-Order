@@ -4,12 +4,18 @@ import Unauthorized from "@/components/Unauthorized";
 import { useAuth } from "@/context/authContext";
 import { usePathname } from "next/navigation";
 import adminPaths from "@/data/admin-paths.json";
+import { useEffect } from "react";
 
 export default function authenticatedPage(WrappedComponent: any) {
   function AuthenticatedPageComponent(props: any) {
-    const { isLoading, isAuthenticated, isAdmin } = useAuth();
+    const { isLoading, isAuthenticated, isAdmin, setIsLogin, isLogin } =
+      useAuth();
     const pathname = usePathname();
     const isAdminPath = adminPaths.some((item) => pathname.startsWith(item));
+
+    useEffect(() => {
+      setIsLogin(false);
+    }, [isAuthenticated]);
 
     if (isLoading) return <GlobalLoader />;
 

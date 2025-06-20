@@ -22,7 +22,11 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await handleLogin(formInputs, router);
+      const status = await handleLogin(formInputs, router);
+
+      if (status === 202) {
+        setFormInputs(LOGIN_INPUTS);
+      }
     } catch (error: any) {
       console.error(error);
     } finally {
@@ -122,7 +126,7 @@ const LoginPage = () => {
                   </svg>
                 </div>
               </div>
-              <ValidationText>{errors?.branchCodeOrEmail}</ValidationText>
+              <ValidationText>{errors?.branchCodeOrEmail?.[0]}</ValidationText>
             </div>
 
             <div>
@@ -181,7 +185,7 @@ const LoginPage = () => {
                   </svg>
                 </button>
               </div>
-              <ValidationText>{errors?.password}</ValidationText>
+              <ValidationText>{errors?.password?.[0]}</ValidationText>
             </div>
 
             <div className="flex items-center justify-between">
