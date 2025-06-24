@@ -14,8 +14,9 @@ export default function authenticatedPage(WrappedComponent: any) {
     const isAdminPath = adminPaths.some((item) => pathname.startsWith(item));
 
     useEffect(() => {
+      if (!isAuthenticated && !isLogin) return;
       setIsLogin(false);
-    }, [isAuthenticated]);
+    }, [isAuthenticated, isLogin]);
 
     if (isLoading) return <GlobalLoader />;
 

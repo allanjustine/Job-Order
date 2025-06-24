@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 export default function Label({
   children,
@@ -15,11 +16,13 @@ export default function Label({
 }) {
   return (
     <label
-      className={clsx(
-        onCheck
-          ? "flex items-center gap-2 cursor-pointer hover:text-gray-500"
-          : "block text-sm font-medium text-gray-700 mb-1",
-        className
+      className={twMerge(
+        clsx(
+          onCheck
+            ? "flex items-center gap-2 cursor-pointer hover:text-gray-500"
+            : "block text-sm font-medium text-gray-700 mb-1",
+          className
+        )
       )}
     >
       {children} {required && <span className="text-red-500">*</span>}

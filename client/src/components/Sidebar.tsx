@@ -8,6 +8,7 @@ import { FaBars } from "react-icons/fa6";
 import Button from "./ui/button";
 import { sidebarData } from "@/constants/sidebarData";
 import Swal from "sweetalert2";
+import { FaSignOutAlt } from "react-icons/fa";
 
 export default function Sidebar({
   isSidebarOpen,
@@ -114,39 +115,53 @@ export default function Sidebar({
             <FaBars className="text-xl text-gray-400" />
           </button>
           <div className="flex items-center justify-end w-full gap-3 relative">
-            <div className="ml-3 overflow-hidden text-end">
-              <p className="font-medium text-gray-900 whitespace-nowrap">
-                {user?.name}
-              </p>
-              <p className="text-sm text-gray-500 truncate">{user?.email}</p>
-            </div>
-            <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-              <Button
-                type="button"
-                onClick={handleToggleDropdown}
-                ref={buttonRef}
-              >
+            <Button
+              type="button"
+              onClick={handleToggleDropdown}
+              ref={buttonRef}
+              className="p-0"
+            >
+              <div className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
                 {acronymName(user?.name)}
-              </Button>
-            </div>
+              </div>
+              <div className="overflow-hidden">
+                <p className="font-medium text-gray-900 whitespace-nowrap">
+                  {user?.name}
+                </p>
+              </div>
+            </Button>
             {dropDownOpen && (
               <div
                 className="absolute top-12 rounded-lg right-1 min-w-1/5 bg-white shadow-md border border-gray-300"
                 ref={dropdownRef}
               >
-                <div className="flex flex-col">
-                  <div className="p-3 hover:bg-gray-100">
-                    <p className="font-bold text-gray-600">{user?.name}</p>
+                <div className="flex flex-col relative">
+                  <div className="absolute -top-2 -rotate-45 right-3 w-0 h-0 border-l-[16px] border-t-[16px] border-l-transparent border-t-gray-200"></div>
+                  <div className="p-3 hover:bg-gray-100 rounded-lg">
+                    <div className="flex gap-2 items-center">
+                      <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
+                        {acronymName(user?.name)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-600">{user?.name}</p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <hr className="text-gray-300" />
-                  <div className="p-3 hover:bg-gray-100">
-                    <button
+                  <div className="p-3 hover:bg-gray-100 rounded-lg">
+                    <Button
                       type="button"
                       onClick={handleLogoutUser}
                       className="p-0 text-sm font-semibold text-gray-600 w-full text-left"
                     >
-                      Logout
-                    </button>
+                      <span className="flex items-center gap-2">
+                        <FaSignOutAlt />
+                        <span>Logout</span>
+                      </span>
+                    </Button>
                   </div>
                 </div>
               </div>

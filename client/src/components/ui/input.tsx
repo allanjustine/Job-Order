@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ChangeEvent } from "react";
+import { twMerge } from "tailwind-merge";
 
 export default function Input({
   error,
@@ -24,13 +25,15 @@ export default function Input({
   return (
     <input
       {...props}
-      className={clsx(
-        `${
-          props?.type === "checkbox"
-            ? "h-4 w-4 rounded border-gray-300 text-blue-600"
-            : "w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-        } ${error && "border-red-500"}`,
-        className
+      className={twMerge(
+        clsx(
+          `${
+            props?.type === "checkbox"
+              ? "h-4 w-4 rounded border-gray-300 text-blue-600"
+              : "w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+          } ${error && "border-red-500"}`,
+          className
+        )
       )}
     />
   );

@@ -50,6 +50,9 @@ importers:
       sweetalert2:
         specifier: ^11.22.0
         version: 11.22.0
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
       zod:
         specifier: ^3.25.58
         version: 3.25.60
@@ -800,6 +803,9 @@ packages:
   sweetalert2@11.22.0:
     resolution: {integrity: sha512-pSMuRGDULhh+wrFkO22O0YsIXxs8yFE0O+WVYXcqc/sTa1oRnf0JlR+vfQIRY1QM1UeFfnCjyw6DYnG75/oxiQ==}
 
+  tailwind-merge@3.3.1:
+    resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
+
   tailwindcss@4.1.8:
     resolution: {integrity: sha512-kjeW8gjdxasbmFKpVGrGd5T4i40mV5J2Rasw48QARfYeQ8YS9x02ON9SFWax3Qf616rt4Cp3nVNIj6Hd1mP3og==}
 
@@ -1459,6 +1465,8 @@ snapshots:
   stylis@4.3.2: {}
 
   sweetalert2@11.22.0: {}
+
+  tailwind-merge@3.3.1: {}
 
   tailwindcss@4.1.8: {}
 

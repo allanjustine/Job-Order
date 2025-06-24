@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ChangeEvent, ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 export default function Select({
   className,
@@ -17,11 +18,13 @@ export default function Select({
   return (
     <select
       {...props}
-      className={clsx(
-        `w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          error && "border-red-500"
-        }`,
-        className
+      className={twMerge(
+        clsx(
+          `w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+            error && "border-red-500"
+          }`,
+          className
+        )
       )}
     >
       {children}
