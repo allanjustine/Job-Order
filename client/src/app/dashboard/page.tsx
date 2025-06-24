@@ -49,7 +49,7 @@ const Dashboard = () => {
     handleSearch,
     handleRefresh,
   } = useFetch("/job-orders");
-  const [viewData, setViewData] = useState(null);
+  const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -426,7 +426,7 @@ const Dashboard = () => {
       </div>
 
       <Modal isOpen={isOpen} className="w-5xl" ref={modalRef}>
-        <ModalHeader onClose={handleView(null)}>Job Order Header</ModalHeader>
+        <ModalHeader onClose={handleView(null)}>Viewing {viewData?.customer.name}&apos;s Job Order</ModalHeader>
         <ModalBody>
           <PreviewData data={viewData} />
         </ModalBody>
