@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
-import Button from "./ui/button";
+import Button from "../ui/button";
 import { sidebarData } from "@/constants/sidebarData";
 import Swal from "sweetalert2";
 import { FaSignOutAlt } from "react-icons/fa";

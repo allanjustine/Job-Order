@@ -1,16 +1,16 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import Sidebar from "./Sidebar";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import adminPaths from "@/data/admin-paths.json";
+import Sidebar from "./Sidebar";
 
 export default function BaseContent({ children }: { children: ReactNode }) {
   const { isAuthenticated, isAdmin } = useAuth();
   const pathname = usePathname();
   const [isSidebarOpen, setIsOpenSidebar] = useState<boolean>(false);
-  const isDashboard = adminPaths.some((item) => pathname.startsWith(item));
+  const isSidebarActive = adminPaths.some((item) => pathname.startsWith(item));
 
   const handleToggleSidebar = () => {
     setIsOpenSidebar(!isSidebarOpen);
@@ -18,7 +18,7 @@ export default function BaseContent({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {isDashboard && isAuthenticated && isAdmin ? (
+      {isSidebarActive && isAuthenticated && isAdmin ? (
         <div className="flex overflow-hidden">
           <Sidebar
             isSidebarOpen={isSidebarOpen}
