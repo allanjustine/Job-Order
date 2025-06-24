@@ -41,7 +41,7 @@ function Modal({ isOpen, className, ref, children }: any) {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
       <div
         ref={ref}
-        className={clsx("bg-white w-2/6 rounded-md relative", className)}
+        className={clsx("bg-white min-w-sm w-2/6 rounded-md relative", className)}
       >
         <div>{children}</div>
       </div>

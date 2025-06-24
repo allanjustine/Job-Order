@@ -447,7 +447,6 @@ const JobOrderForm = () => {
                 <div className="ml-3 overflow-hidden text-end">
                   <p
                     className="font-medium text-gray-900 whitespace-nowrap"
-                    onClick={handleLogoutUser}
                   >
                     {user?.name}
                   </p>
