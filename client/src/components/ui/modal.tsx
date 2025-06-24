@@ -1,7 +1,6 @@
-import clsx from "clsx";
 import Button from "./button";
 import { FaX } from "react-icons/fa6";
-import { twMerge } from "tailwind-merge";
+import cn from "@/lib/utils";
 
 function ModalHeader({ onClose, className, children }: any) {
   return (
@@ -13,9 +12,7 @@ function ModalHeader({ onClose, className, children }: any) {
       >
         <FaX className="text-gray-600 text-sm" />
       </Button>
-      <span
-        className={twMerge(clsx("text-xl font-bold text-gray-600", className))}
-      >
+      <span className={cn("text-xl font-bold text-gray-600", className)}>
         {children}
       </span>
     </div>
@@ -44,9 +41,7 @@ function Modal({ isOpen, className, ref, children }: any) {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
       <div
         ref={ref}
-        className={twMerge(
-          clsx("bg-white min-w-sm w-2/6 rounded-md relative", className)
-        )}
+        className={cn("bg-white min-w-sm w-2/6 rounded-md relative", className)}
       >
         <div>{children}</div>
       </div>

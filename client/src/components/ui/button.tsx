@@ -1,6 +1,5 @@
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
 import { ReactNode } from "react";
+import cn from "@/lib/utils";
 
 export default function Button({
   children,
@@ -17,11 +16,9 @@ export default function Button({
   return (
     <button
       {...props}
-      className={twMerge(
-        clsx(
-          "px-6 py-2 rounded-md flex items-center gap-2 transition-all duration-300 ease-in-out",
-          props.className
-        )
+      className={cn(
+        "px-6 py-2 rounded-md flex items-center gap-2 transition-all duration-300 ease-in-out",
+        props.className
       )}
     >
       {children}
