@@ -124,15 +124,10 @@ export default function Sidebar({
               <div className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
                 {acronymName(user?.name)}
               </div>
-              <div className="overflow-hidden">
-                <p className="font-medium text-gray-900 whitespace-nowrap">
-                  {user?.name}
-                </p>
-              </div>
             </Button>
             {dropDownOpen && (
               <div
-                className="absolute top-12 rounded-lg right-1 min-w-1/5 bg-white shadow-md border border-gray-300"
+                className="absolute top-14 rounded-lg right-0 min-w-1/5 bg-white shadow-md border border-gray-300"
                 ref={dropdownRef}
               >
                 <div className="flex flex-col relative">
