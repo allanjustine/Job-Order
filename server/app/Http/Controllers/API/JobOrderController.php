@@ -13,71 +13,76 @@ use App\Models\PartsRequest;
 use App\Models\User;
 use App\Models\VisualCheck;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class JobOrderController extends Controller
 {
     public function store(Request $request)
     {
-        $customer = Customer::create([
-            'user_id'               => Auth::id(),
-            'name'                  => $request->customerName,
-            'address'               => $request->address,
-            'contact_number'        => $request->contact
-        ]);
-
-        $jobOrder = JobOrder::create([
-            'customer_id'           => $customer->id,
-            'chassis'               => $request->chassis,
-            'date'                  => $request->date,
-            'date_sold'             => $request->dateSold,
-            'dealer'                => $request->dealer,
-            'type_of_job'           => $request->jobType,
-            'mileage'               => $request->mileage,
-            'repair_job_end'        => $request->repairEnd,
-            'repair_job_start'      => $request->repairStart,
-            'vehicle_model'         => $request->vehicleModel,
-            'service_advisor'       => $request->serviceAdvisor,
-            'branch_manager'        => $request->branchManager,
-        ]);
-
-        foreach ($request->jobRequests as $jobRequest) {
-            JobRequest::create([
-                'job_order_id'      => $jobOrder->id,
-                'cost'              => $jobRequest["cost"],
-                'job_request'       => $jobRequest["request"]
+        $customer = DB::transaction(function () use ($request) {
+            $customer = Customer::create([
+                'user_id'               => Auth::id(),
+                'name'                  => $request->customerName,
+                'address'               => $request->address,
+                'contact_number'        => $request->contact
             ]);
-        }
 
-        foreach ($request->partsRequests as $partRequest) {
-            PartsRequest::create([
-                'job_order_id'      => $jobOrder->id,
-                'parts_name'        => $partRequest["name"],
-                'parts_number'      => $partRequest["partNo"],
-                'price'             => $partRequest["price"],
-                'quantity'          => $partRequest["quantity"],
+            $jobOrder = JobOrder::create([
+                'customer_id'           => $customer->id,
+                'chassis'               => $request->chassis,
+                'date'                  => $request->date,
+                'date_sold'             => $request->dateSold,
+                'dealer'                => $request->dealer,
+                'type_of_job'           => $request->jobType,
+                'mileage'               => $request->mileage,
+                'repair_job_end'        => $request->repairEnd,
+                'repair_job_start'      => $request->repairStart,
+                'vehicle_model'         => $request->vehicleModel,
+                'service_advisor'       => $request->serviceAdvisor,
+                'branch_manager'        => $request->branchManager,
             ]);
-        }
 
-        Document::create([
-            'job_order_id'          => $jobOrder->id,
-            'owner_manual'          => $request->documents["ownerManual"],
-            'owner_toolkit'         => $request->documents["ownerToolKit"],
-            'warranty_guide_book'   => $request->documents["warrantyGuideBook"],
-            'others'                => $request->documents["others"],
-            'others_text'           => $request->documents["othersText"]
-        ]);
+            foreach ($request->jobRequests as $jobRequest) {
+                JobRequest::create([
+                    'job_order_id'      => $jobOrder->id,
+                    'cost'              => $jobRequest["cost"],
+                    'job_request'       => $jobRequest["request"]
+                ]);
+            }
 
-        VisualCheck::create([
-            'job_order_id'          => $jobOrder->id,
-            'broken'                => $request->visualCheck["broken"],
-            'dent'                  => $request->visualCheck["dent"],
-            'missing'               => $request->visualCheck["missing"],
-            'scratch'               => $request->visualCheck["scratch"],
-            'broken_note'           => $request->visualCheck["brokenNotes"],
-            'dent_note'             => $request->visualCheck["dentNotes"],
-            'missing_note'          => $request->visualCheck["missingNotes"],
-            'scratch_note'          => $request->visualCheck["scratchNotes"],
-        ]);
+            foreach ($request->partsRequests as $partRequest) {
+                PartsRequest::create([
+                    'job_order_id'      => $jobOrder->id,
+                    'parts_name'        => $partRequest["name"],
+                    'parts_number'      => $partRequest["partNo"],
+                    'price'             => $partRequest["price"],
+                    'quantity'          => $partRequest["quantity"],
+                ]);
+            }
+
+            Document::create([
+                'job_order_id'          => $jobOrder->id,
+                'owner_manual'          => $request->documents["ownerManual"],
+                'owner_toolkit'         => $request->documents["ownerToolKit"],
+                'warranty_guide_book'   => $request->documents["warrantyGuideBook"],
+                'others'                => $request->documents["others"],
+                'others_text'           => $request->documents["othersText"]
+            ]);
+
+            VisualCheck::create([
+                'job_order_id'          => $jobOrder->id,
+                'broken'                => $request->visualCheck["broken"],
+                'dent'                  => $request->visualCheck["dent"],
+                'missing'               => $request->visualCheck["missing"],
+                'scratch'               => $request->visualCheck["scratch"],
+                'broken_note'           => $request->visualCheck["brokenNotes"],
+                'dent_note'             => $request->visualCheck["dentNotes"],
+                'missing_note'          => $request->visualCheck["missingNotes"],
+                'scratch_note'          => $request->visualCheck["scratchNotes"],
+            ]);
+
+            return $customer;
+        });
 
         return response()->json("\"{$customer->name}\" Job Order has been printed successfully.", 201);
     }
