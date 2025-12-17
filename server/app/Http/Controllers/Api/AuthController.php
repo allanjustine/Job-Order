@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         return response()->json([
             "message"   => "Login successfully",
-            "url"       => $user->isAdmin() ? "/dashboard" : "/job-order-form"
+            "url"       => $user->isAdmin() ? "/admin/dashboard" : "/dashboard"
         ], 202);
     }
 

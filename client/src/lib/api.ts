@@ -29,7 +29,7 @@ api.interceptors.response.use(
     }
 
     if (
-      error.response.status === 401 &&
+      error.response?.status === 401 &&
       isExpiredOrUnauthorized &&
       !isAlertShown
     ) {

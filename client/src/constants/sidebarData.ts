@@ -1,8 +1,8 @@
-import { Gauge, UserCog, Users } from "lucide-react";
+import { Gauge, UserCog, Users, NotebookTextIcon } from "lucide-react";
 
 export const sidebarData = [
   {
-    href: "/dashboard",
+    href: "/admin/dashboard",
     icon: Gauge,
     name: "Dashboard",
   },
@@ -15,5 +15,10 @@ export const sidebarData = [
     href: "/admin/customers",
     icon: UserCog,
     name: "Customers",
+  },
+  {
+    href: "/admin/reports",
+    icon: NotebookTextIcon,
+    name: "Reports",
   },
 ];
