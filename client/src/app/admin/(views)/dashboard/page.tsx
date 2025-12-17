@@ -78,11 +78,10 @@ const Dashboard = () => {
 
   const columns = [
     {
-      name: "ID",
+      name: "JO NUMBER",
       sortable: true,
       selector: (row: any) => row.id,
       sortField: "id",
-      width: "80px",
     },
     {
       name: "BRANCH",

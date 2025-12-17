@@ -33,12 +33,11 @@ const Reports = () => {
 
   const columns = [
     {
-      name: "ID",
+      name: "JO NUMBER",
       selector: (row: any) => row.id,
       
       sortable: true,
       sortField: "id",
-      width: "80px",
     },
     {
       name: "BRANCH NAME",
