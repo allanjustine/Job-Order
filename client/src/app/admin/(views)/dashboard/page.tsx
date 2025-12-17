@@ -11,6 +11,8 @@ import {
   Search,
   SearchSlash,
   Wrench,
+  BikeIcon,
+  CarFrontIcon,
 } from "lucide-react";
 import { FaCircleNotch, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -237,13 +239,13 @@ const Dashboard = () => {
     {
       label: "Total Motorcycle Jobs",
       value: isLoading ? spinner() : data.totalLabor,
-      icon: Wrench,
+      icon: BikeIcon,
       color: "from-emerald-500 to-emerald-400",
     },
     {
       label: "Total Trimotors Jobs",
       value: isLoading ? spinner() : data.totalPartsLubricants,
-      icon: PillBottleIcon,
+      icon: CarFrontIcon,
       color: "from-rose-500 to-rose-400",
     },
   ];
