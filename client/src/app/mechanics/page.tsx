@@ -14,7 +14,7 @@ import {
   FaRotateRight,
 } from "react-icons/fa6";
 
-const Reports = () => {
+const Customers = () => {
   const {
     data: customers,
     isLoading,
@@ -35,60 +35,27 @@ const Reports = () => {
     {
       name: "ID",
       selector: (row: any) => row.id,
-      
       sortable: true,
       sortField: "id",
       width: "80px",
     },
     {
-      name: "BRANCH NAME",
-      cell: (row: any) => (
-        <div>
-          {row.user.name}{" "}
-          <span className="font-bold text-gray-600">({row.user.code})</span>
-        </div>
-      ),
-    },
-    {
-      name: "CUSTOMER NAME",
+      name: "NAME",
       selector: (row: any) => row.name,
       sortable: true,
       sortField: "name",
     },
     {
-      name: "JOB FORM",
-      selector: (row: any) => row.address,
+      name: "BRANCH CODE",
+      selector: (row: any) => row.user.code,
       sortable: true,
-      sortField: "address",
+      sortField: "branch_code",
     },
     {
-      name: "JOB REQUEST",
-      selector: (row: any) => row.address,
+      name: "NUMBER OF JOBS",
+      selector: (row: any) => row.branch_code,
       sortable: true,
-      sortField: "address",
-    },
-    {
-      name: "CONTACT NUMBER",
-      selector: (row: any) => row.contact_number,
-      sortable: true,
-      sortField: "contact_number",
-    },
-    {
-      name: "CREATED AT",
-      cell: (row: any) => (
-        <>
-          <div className="flex flex-col">
-            <span className="text-sm">
-              {format(row.created_at, "MMM dd, yyyy hh:mm a")}
-            </span>
-            <span className="text-gray-500 text-xs font-bold">
-              {formatDistanceToNowStrict(row.created_at, { addSuffix: true })}
-            </span>
-          </div>
-        </>
-      ),
-      sortable: true,
-      sortField: "created_at",
+      sortField: "branch_code",
     },
   ];
 
@@ -118,7 +85,7 @@ const Reports = () => {
               </Button>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Reports</h2>
+              <h2 className="text-xl font-semibold text-gray-600">Mechanics</h2>
               <div className="relative w-full md:w-1/3">
                 <Input
                   type="search"
@@ -183,4 +150,4 @@ const Reports = () => {
   );
 };
 
-export default authenticatedPage(Reports);
+export default authenticatedPage(Customers);

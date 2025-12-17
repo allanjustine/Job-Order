@@ -87,10 +87,10 @@ const Dashboard = () => {
       selector: (row: any) => row.customer?.user?.branch?.branch_name,
     },
     {
-      name: "CHASSIS",
+      name: "CUSTOMER NAME",
       sortable: true,
-      selector: (row: any) => row.chassis,
-      sortField: "chassis",
+      selector: (row: any) => row.customer?.name,
+      sortField: "customer.name",
     },
     {
       name: "TYPE OF JOB",
@@ -115,7 +115,7 @@ const Dashboard = () => {
       sortField: "type_of_job",
     },
     {
-      name: "SERVICE ADVISOR",
+      name: "MECHANIC",
       sortable: true,
       selector: (row: any) => row.service_advisor,
       sortField: "service_advisor",
@@ -235,13 +235,13 @@ const Dashboard = () => {
       color: "from-indigo-500 to-indigo-400",
     },
     {
-      label: "Total Labor",
+      label: "Total Motorcycle Jobs",
       value: isLoading ? spinner() : data.totalLabor,
       icon: Wrench,
       color: "from-emerald-500 to-emerald-400",
     },
     {
-      label: "Total Parts & Lubricants",
+      label: "Total Trimotors Jobs",
       value: isLoading ? spinner() : data.totalPartsLubricants,
       icon: PillBottleIcon,
       color: "from-rose-500 to-rose-400",

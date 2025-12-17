@@ -3,15 +3,15 @@
 import useFetch from "@/hooks/useFetch";
 import { useRouter } from 'next/navigation';
 import {
-  Calendar,
-  Clock,
-  Home,
   PhilippinePeso,
   PillBottleIcon,
   Printer,
   Search,
   SearchSlash,
   Wrench,
+  ChevronDown,
+  CarFrontIcon,
+  BikeIcon,
 } from "lucide-react";
 import { FaCircleNotch, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -53,8 +53,10 @@ const Dashboard = () => {
   } = useFetch("/job-orders");
   const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,6 +69,14 @@ const Dashboard = () => {
         setIsOpen(false);
         setViewData(null);
       }
+
+      // Close dropdown when clicking outside
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -75,6 +85,15 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleDropdownSelect = (type: string) => {
+    if (type === 'motorcycle') {
+      router.push("/job-order-form");
+    } else if (type === 'trimotors') {
+      router.push("/trimotors-job-order-form");
+    }
+    setIsDropdownOpen(false);
+  };
 
   const columns = [
     {
@@ -89,10 +108,10 @@ const Dashboard = () => {
       selector: (row: any) => row.customer?.user?.branch?.branch_name,
     },
     {
-      name: "CHASSIS",
+      name: "CUSTOMER NAME",
       sortable: true,
-      selector: (row: any) => row.chassis,
-      sortField: "chassis",
+      selector: (row: any) => row.customer_name,
+      sortField: "customer_name",
     },
     {
       name: "TYPE OF JOB",
@@ -117,7 +136,7 @@ const Dashboard = () => {
       sortField: "type_of_job",
     },
     {
-      name: "SERVICE ADVISOR",
+      name: "MECHANIC",
       sortable: true,
       selector: (row: any) => row.service_advisor,
       sortField: "service_advisor",
@@ -243,24 +262,41 @@ const Dashboard = () => {
                 <p className="text-blue-100 opacity-90 mb-6">
                   Manage and track all job orders efficiently. Create new job orders or view existing ones.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                
+                {/* Single Button with Dropdown */}
+                <div ref={dropdownRef} className="relative inline-block">
                   <Button
                     type="button"
-                    onClick={() => router.push("/job-order-form")}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <Wrench className="w-5 h-5" />
-                    Motorcycle Job Order Form
+                    Create Job Order
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </Button>
 
-                  <Button
-                    type="button"
-                    onClick={() => router.push("/trimotors-job-order-form")}
-                    className="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <Wrench className="w-5 h-5" />
-                    Trimotors Job Order Form
-                  </Button>
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-full min-w-[220px] bg-white rounded-lg shadow-lg z-10 overflow-hidden border border-gray-200">
+                      <button
+                        onClick={() => handleDropdownSelect('motorcycle')}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
+                      >
+                        <BikeIcon className="w-4 h-4 text-blue-600" />
+                        Motorcycle Job Order Form
+                      </button>
+                      
+                      <div className="border-t border-gray-200"></div>
+                      
+                      <button
+                        onClick={() => handleDropdownSelect('trimotors')}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
+                      >
+                        <CarFrontIcon className="w-4 h-4 text-blue-600" />
+                        Trimotors Job Order Form
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               

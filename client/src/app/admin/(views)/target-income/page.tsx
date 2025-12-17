@@ -41,7 +41,7 @@ const Reports = () => {
       width: "80px",
     },
     {
-      name: "BRANCH NAME",
+      name: "BRANCH CODE",
       cell: (row: any) => (
         <div>
           {row.user.name}{" "}
@@ -50,29 +50,18 @@ const Reports = () => {
       ),
     },
     {
-      name: "CUSTOMER NAME",
+      name: "TARGET INCOME",
       selector: (row: any) => row.name,
       sortable: true,
       sortField: "name",
     },
     {
-      name: "JOB FORM",
+      name: "SHOP INCOME",
       selector: (row: any) => row.address,
       sortable: true,
       sortField: "address",
     },
-    {
-      name: "JOB REQUEST",
-      selector: (row: any) => row.address,
-      sortable: true,
-      sortField: "address",
-    },
-    {
-      name: "CONTACT NUMBER",
-      selector: (row: any) => row.contact_number,
-      sortable: true,
-      sortField: "contact_number",
-    },
+
     {
       name: "CREATED AT",
       cell: (row: any) => (
@@ -118,7 +107,7 @@ const Reports = () => {
               </Button>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Reports</h2>
+              <h2 className="text-xl font-semibold text-gray-600">Target Income</h2>
               <div className="relative w-full md:w-1/3">
                 <Input
                   type="search"
