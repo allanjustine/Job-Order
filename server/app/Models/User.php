@@ -68,7 +68,7 @@ class User extends Authenticatable
 
     public function getRedirectUrlAttribute()
     {
-        return $this->isAdmin() ? "/dashboard" : "/job-order-form";
+        return $this->isAdmin() ? "/admin/dashboard" : "/dashboard";
     }
 
     public function getIsAdminAttribute()

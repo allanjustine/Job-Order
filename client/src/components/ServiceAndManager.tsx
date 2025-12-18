@@ -10,7 +10,7 @@ export default function ServiceAndManager({
     <>
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div>
-          <Label required> Service Advisor</Label>
+          <Label required> Salesrep/Service Advisor</Label>
           <Input
             type="text"
             value={signatures.serviceAdvisor}
@@ -26,7 +26,7 @@ export default function ServiceAndManager({
           )}
         </div>
         <div>
-          <Label required>Branch Manager</Label>
+          <Label required>BM/BS</Label>
           <Input
             type="text"
             value={signatures.branchManager}

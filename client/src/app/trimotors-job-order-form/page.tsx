@@ -2,21 +2,17 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { FaPrint, FaSignOutAlt } from "react-icons/fa";
-import PrintJobOrder from "@/components/print-job";
 import { z } from "zod";
 import { FaEye, FaRotate } from "react-icons/fa6";
 import Button from "@/components/ui/button";
 import Swal from "sweetalert2";
 import CustomerGrid from "@/components/CustomerGrid";
-import JobDetailsGrid from "@/components/JobDetailsGrid";
-import MotorEngineGrid from "@/components/MotorEngineGrid";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
 import ServiceAndManager from "@/components/ServiceAndManager";
 import NextSchedule from "@/components/NextSchedule";
-import MotorcycleDiagnosis from "@/components/MotorcycleDiagnosis";
-import { DiagnosisKeys, DiagnosisState } from "@/types/jobOrderFormType";
-import { JobRequest, PartsReplacement, JobAmountsType, PartsAmountsType } from "@/types/jobOrderFormType";
+import TrimotorsDiagnosis from "@/components/TrimotorsDiagnosis";
+import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobRequestType, TrimotorsJobAmountType } from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 import acronymName from "@/utils/acronymName";
@@ -32,7 +28,9 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@/components/ui/modal";
-import PreviewPrint from "@/components/PreviewPrint";
+import TrimotorsPreviewPrint from "@/components/TrimotorsPreviewPrint";
+import TrimotorsPrintJobOrder from "@/components/trimotors-print-job";
+import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -42,7 +40,7 @@ const formSchema = z.object({
   purchaseDate: z.string().min(1, "Purchase date is required"),
 });
 
-const JobOrderForm = () => {
+const TrimotorsJobOrderForm = () => {
   // Form state
   const { user, handleLogout } = useAuth();
   const [customerName, setCustomerName] = useState("");
@@ -67,8 +65,7 @@ const JobOrderForm = () => {
   const [generalRemarks, setGeneralRemarks] = useState("");
   
   // Amounts state
-  const [jobAmounts, setJobAmounts] = useState<JobAmountsType>({});
-  const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
+  const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
 
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
@@ -78,67 +75,89 @@ const JobOrderForm = () => {
     branchManager: "",
   });
 
-  const [jobRequest, setJobRequest] = useState<JobRequest>({
-    coupon: false,
-    changeOil: false,
-    overhaul: false,
-    chainSprocket: false,
-    carburetor: false,
-    brakeSystem: false,
-    steeringSystem: false,
-    suspensionSystem: false,
-    wheelsSpokes: false,
-    wheelAdjustment: false,
-    batteryCharging: false,
-    minorElectrical: false,
-    majorElectrical: false,
-    installAccessories: false,
-    generalCheckup: false,
-    warrantyRepair: false,
-    others: false,
-    othersText: "",
+  const [jobRequest, setJobRequest] = useState<TrimotorsJobRequestType>({
+      vehicleWashing: false,
+      airFilter: false,
+      breather: false,
+      checkLights: false,
+      oilStrainer: false,
+      checkSteering: false,
+      cleanSpark: false,
+      checkValve: false,
+      checkFuel: false,
+      checkBattery: false,
+      tireRotation: false,
+      replaceProp: false,
+      replaceOil: false,
+      checkCabies: false,
+      checkShock: false,
+      checkBrake: false,
+      deCarbonising: false,
+      checkBrakeLiner: false,
+      replaceEngine: false,
+      replaceDifferential: false,
+      greaseSteering: false,
+      greaseFront: false,
+      greaseNipple: false,
+      greasePropeller: false,
+      greaseGear: false,
+      greaseFare: false,
+      speedometer: false,
+      petroleum: false,
+      others: false,
+      othersText: " ",
   });
 
-  const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
-    engineOil: false,
-    drainPlugWasher: false,
-    tappetORing: false,
-    sparkPlug: false,
-    airCleanerElement: false,
-    brakeShoePads: false,
-    gaskets: false,
-    battery: false,
-    chainSprocketBelt: false,
-    fuelHose: false,
-    tiresTubesFlaps: false,
-    bulbs: false,
-    bearings: false,
-    springs: false,
-    rubberPartsOilSeal: false,
-    plasticParts: false,
-    brakeFluid: false,
-    coolant: false,
-    partsOthers: false,
-    partsOthersText: "",
-  });
 
-  const [diagnosis, setDiagnosis] = useState<Record<DiagnosisKeys, DiagnosisState>>({
-    lights: { status: null, remarks: "" },
-    horn: { status: null, remarks: "" },
-    switches: { status: null, remarks: "" },
-    brakes: { status: null, remarks: "" },
-    tires: { status: null, remarks: "" },
-    spokesWheels: { status: null, remarks: "" },
-    driveChain: { status: null, remarks: "" },
-    steering: { status: null, remarks: "" },
-    suspension: { status: null, remarks: "" },
-    idleSpeed: { status: null, remarks: "" },
-    sideMain: { status: null, remarks: "" },
-    engineOil: { status: null, remarks: "" },
-    coolantLevel: { status: null, remarks: "" },
-    brakeFluid: { status: null, remarks: "" },
+  const [diagnosis, setDiagnosis] = useState<Record<TrimotorsDiagnosisKeys, DiagnosisState>>({
+    windhsield: { status: null, remarks: "" },
+    wipeArm: { status: null, remarks: "" },
+    frontIndicator: { status: null, remarks: "" },
+    frontHeadLamp: { status: null, remarks: "" },
+    housingScudo: { status: null, remarks: "" },
+    housingHeadlamp: { status: null, remarks: "" },
+    frontFender: { status: null, remarks: "" },
+    mudFlapFront: { status: null, remarks: "" },
+    scudoFront: { status: null, remarks: "" },
+    frontEmblem: { status: null, remarks: "" },
+    tailLamp: { status: null, remarks: "" },
+    bumper: { status: null, remarks: "" },
+    mudFlapRear: { status: null, remarks: "" },
+    rearDoor: { status: null, remarks: "" },
+    rearEmblem: { status: null, remarks: "" },
+    tailEnd: { status: null, remarks: "" },
+    leftBeading: { status: null, remarks: "" },
+    leftBodyPaint: { status: null, remarks: "" },
+    mudGuard: { status: null, remarks: "" },
+    rightBeading: { status: null, remarks: "" },
+    rightBodyPaint: { status: null, remarks: "" },
+    checkHoles: { status: null, remarks: "" },
+    damageStitching: { status: null, remarks: "" },
+    coverHood: { status: null, remarks: "" },
+    tapeHood: { status: null, remarks: "" },
+    alumninum: { status: null, remarks: "" },
+    nailScrew: { status: null, remarks: "" },
+    dashboard: { status: null, remarks: "" },
+    seatsDriver: { status: null, remarks: "" },
+    seatsPassenger: { status: null, remarks: "" },
+    seatBelts: { status: null, remarks: "" },
+    handleLeather: { status: null, remarks: "" },
+    rubberMatting: { status: null, remarks: "" },
+    underseatCover: { status: null, remarks: "" },
+    headlamp: { status: null, remarks: "" },
+    beam: { status: null, remarks: "" },
+    signalLamp: { status: null, remarks: "" },
+    hazardlamp: { status: null, remarks: "" },
+    wiper: { status: null, remarks: "" },
+    interiorLamp: { status: null, remarks: "" },
+    gaugeLamp: { status: null, remarks: "" },
+    carCharger: { status: null, remarks: "" },
+    tools: { status: null, remarks: "" },
     battery: { status: null, remarks: "" },
-    cableOperation: { status: null, remarks: "" }
+    jack: { status: null, remarks: "" },
+    spareTire: { status: null, remarks: "" },
+    sideMirror: { status: null, remarks: "" },
+    warrantyBooklet: { status: null, remarks: "" }
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -152,15 +171,8 @@ const JobOrderForm = () => {
   const modalButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handler functions for amount changes
-  const handleJobAmountChange = (key: keyof JobAmountsType, value: number) => {
+  const handleJobAmountChange = (key: keyof TrimotorsJobAmountType, value: number) => {
     setJobAmounts(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handlePartsAmountChange = (key: keyof PartsAmountsType, value: number) => {
-    setPartsAmounts(prev => ({
       ...prev,
       [key]: value
     }));
@@ -171,11 +183,6 @@ const JobOrderForm = () => {
     return Object.values(jobAmounts).reduce((total, amount) => total + (amount || 0), 0);
   }, [jobAmounts]);
 
-  const partsTotal = useMemo(() => {
-    return Object.values(partsAmounts).reduce((total, amount) => total + (amount || 0), 0);
-  }, [partsAmounts]);
-
-  const overallTotal = useMemo(() => jobTotal + partsTotal, [jobTotal, partsTotal]);
 
   // Clean up amounts when checkboxes are unchecked
   useEffect(() => {
@@ -183,9 +190,9 @@ const JobOrderForm = () => {
     
     // Remove amount entries for unchecked jobRequest
     Object.keys(updatedAmounts).forEach(key => {
-      const typedKey = key as keyof JobAmountsType;
+      const typedKey = key as keyof TrimotorsJobAmountType;
       // Check if the key exists in jobRequest and if it's false (exclude 'others' which is handled separately)
-      if (typedKey !== 'others' && !jobRequest[typedKey as keyof JobRequest]) {
+      if (typedKey !== 'others' && !jobRequest[typedKey as keyof TrimotorsJobRequestType]) {
         delete updatedAmounts[typedKey];
       }
     });
@@ -193,20 +200,7 @@ const JobOrderForm = () => {
     setJobAmounts(updatedAmounts);
   }, [jobRequest]);
 
-  useEffect(() => {
-    const updatedAmounts = { ...partsAmounts };
-    
-    // Remove amount entries for unchecked parts (exclude 'partsOthers' which is handled separately)
-    Object.keys(updatedAmounts).forEach(key => {
-      const typedKey = key as keyof PartsAmountsType;
-      if (typedKey !== 'partsOthers' && !partsReplacement[typedKey as keyof PartsReplacement]) {
-        delete updatedAmounts[typedKey];
-      }
-    });
-    
-    setPartsAmounts(updatedAmounts);
-  }, [partsReplacement]);
-
+ 
   // Form validation
   const validateForm = () => {
     try {
@@ -270,7 +264,7 @@ const JobOrderForm = () => {
   }, []);
 
   // Prepare data for printing
-  const jobOrderData = {
+  const TrimotorsjobOrderData = {
     branch: branch || "Main Branch",
     customerName,
     date,
@@ -282,7 +276,6 @@ const JobOrderForm = () => {
     repairStart,
     repairEnd,
     fuelLevel,
-    mechanic,
     motorcycleUnit,
     remarks,
     engineUnit,
@@ -291,13 +284,12 @@ const JobOrderForm = () => {
     diagnosis,
     jobRequest,
     jobAmounts,
-    partsAmounts,
-    partsReplacement,
     nextScheduleDate,
     nextScheduleKms,
     generalRemarks,
     serviceAdvisor: signatures.serviceAdvisor,
     branchManager: signatures.branchManager,
+    mechanic,
   };
 
   useEffect(() => {
@@ -336,7 +328,7 @@ const JobOrderForm = () => {
 
   const handleSavePrint = async () => {
     try {
-      const response = await api.post("/create-job-order", jobOrderData);
+      const response = await api.post("/create-job-order", TrimotorsjobOrderData);
       if (response.status === 201) {
         toast.success(response.data, {
           position: "bottom-center",
@@ -393,72 +385,92 @@ const JobOrderForm = () => {
     
     // Reset amounts
     setJobAmounts({});
-    setPartsAmounts({});
+
     
     // Reset job request
     setJobRequest({
-      coupon: false,
-      changeOil: false,
-      overhaul: false,
-      chainSprocket: false,
-      carburetor: false,
-      brakeSystem: false,
-      steeringSystem: false,
-      suspensionSystem: false,
-      wheelsSpokes: false,
-      wheelAdjustment: false,
-      batteryCharging: false,
-      minorElectrical: false,
-      majorElectrical: false,
-      installAccessories: false,
-      generalCheckup: false,
-      warrantyRepair: false,
+      vehicleWashing: false,
+      airFilter: false,
+      breather: false,
+      checkLights: false,
+      oilStrainer: false,
+      checkSteering: false,
+      cleanSpark: false,
+      checkValve: false,
+      checkFuel: false,
+      checkBattery: false,
+      tireRotation: false,
+      replaceProp: false,
+      replaceOil: false,
+      checkCabies: false,
+      checkShock: false,
+      checkBrake: false,
+      deCarbonising: false,
+      checkBrakeLiner: false,
+      replaceEngine: false,
+      replaceDifferential: false,
+      greaseSteering: false,
+      greaseFront: false,
+      greaseNipple: false,
+      greasePropeller: false,
+      greaseGear: false,
+      greaseFare: false,
+      speedometer: false,
+      petroleum: false,
       others: false,
-      othersText: "",
-    });
-    
-    // Reset parts replacement
-    setPartsReplacement({
-      engineOil: false,
-      drainPlugWasher: false,
-      tappetORing: false,
-      sparkPlug: false,
-      airCleanerElement: false,
-      brakeShoePads: false,
-      gaskets: false,
-      battery: false,
-      chainSprocketBelt: false,
-      fuelHose: false,
-      tiresTubesFlaps: false,
-      bulbs: false,
-      bearings: false,
-      springs: false,
-      rubberPartsOilSeal: false,
-      plasticParts: false,
-      brakeFluid: false,
-      coolant: false,
-      partsOthers: false,
-      partsOthersText: "",
+      othersText: " ",
     });
     
     // Reset diagnosis
     setDiagnosis({
-      lights: { status: null, remarks: "" },
-      horn: { status: null, remarks: "" },
-      switches: { status: null, remarks: "" },
-      brakes: { status: null, remarks: "" },
-      tires: { status: null, remarks: "" },
-      spokesWheels: { status: null, remarks: "" },
-      driveChain: { status: null, remarks: "" },
-      steering: { status: null, remarks: "" },
-      suspension: { status: null, remarks: "" },
-      idleSpeed: { status: null, remarks: "" },
-      sideMain: { status: null, remarks: "" },
-      engineOil: { status: null, remarks: "" },
-      coolantLevel: { status: null, remarks: "" },
-      brakeFluid: { status: null, remarks: "" },
+      windhsield: { status: null, remarks: "" },
+      wipeArm: { status: null, remarks: "" },
+      frontIndicator: { status: null, remarks: "" },
+      frontHeadLamp: { status: null, remarks: "" },
+      housingScudo: { status: null, remarks: "" },
+      housingHeadlamp: { status: null, remarks: "" },
+      frontFender: { status: null, remarks: "" },
+      mudFlapFront: { status: null, remarks: "" },
+      scudoFront: { status: null, remarks: "" },
+      frontEmblem: { status: null, remarks: "" },
+      tailLamp: { status: null, remarks: "" },
+      bumper: { status: null, remarks: "" },
+      mudFlapRear: { status: null, remarks: "" },
+      rearDoor: { status: null, remarks: "" },
+      rearEmblem: { status: null, remarks: "" },
+      tailEnd: { status: null, remarks: "" },
+      leftBeading: { status: null, remarks: "" },
+      leftBodyPaint: { status: null, remarks: "" },
+      mudGuard: { status: null, remarks: "" },
+      rightBeading: { status: null, remarks: "" },
+      rightBodyPaint: { status: null, remarks: "" },
+      checkHoles: { status: null, remarks: "" },
+      damageStitching: { status: null, remarks: "" },
+      coverHood: { status: null, remarks: "" },
+      tapeHood: { status: null, remarks: "" },
+      alumninum: { status: null, remarks: "" },
+      nailScrew: { status: null, remarks: "" },
+      dashboard: { status: null, remarks: "" },
+      seatsDriver: { status: null, remarks: "" },
+      seatsPassenger: { status: null, remarks: "" },
+      seatBelts: { status: null, remarks: "" },
+      handleLeather: { status: null, remarks: "" },
+      rubberMatting: { status: null, remarks: "" },
+      underseatCover: { status: null, remarks: "" },
+      headlamp: { status: null, remarks: "" },
+      beam: { status: null, remarks: "" },
+      signalLamp: { status: null, remarks: "" },
+      hazardlamp: { status: null, remarks: "" },
+      wiper: { status: null, remarks: "" },
+      interiorLamp: { status: null, remarks: "" },
+      gaugeLamp: { status: null, remarks: "" },
+      carCharger: { status: null, remarks: "" },
+      tools: { status: null, remarks: "" },
       battery: { status: null, remarks: "" },
-      cableOperation: { status: null, remarks: "" }
+      jack: { status: null, remarks: "" },
+      spareTire: { status: null, remarks: "" },
+      sideMirror: { status: null, remarks: "" },
+      warrantyBooklet: { status: null, remarks: "" }
     });
     
     // Reset signatures
@@ -508,7 +520,7 @@ const JobOrderForm = () => {
     <>
       {/* Print View (hidden until printing) */}
       {isPrint ? (
-        <PrintJobOrder data={jobOrderData} />
+        <TrimotorsPrintJobOrder data={TrimotorsjobOrderData} />
       ) : (
         <>
           <div className="flex items-center p-5 bg-white">
@@ -581,7 +593,7 @@ const JobOrderForm = () => {
                 {/* Header */}
                 <div className="text-center mb-6 border-b-1 border-gray-300 pb-4">
                   <img
-                    src="/logo.png"
+                    src="/trimotors-logo.png"
                     alt="Company Logo"
                     className="mx-auto mb-3 w-32 h-auto"
                   />
@@ -626,29 +638,12 @@ const JobOrderForm = () => {
                   setMechanic={setMechanic}
                 />
 
-                <p className="block text-lg font-bold text-gray-900 mb-1">
-                  MOTORCYCLE AND ENGINE UNIT
-                </p>
-
-                {/* Repair Dates - Full width */}
-                <MotorEngineGrid
-                  motorcycleUnit={motorcycleUnit}
-                  remarks={remarks}
-                  engineUnit={engineUnit}
-                  engineCondition={engineCondition}
-                  contentUbox={contentUbox}
-                  setMotorcycleUnit={setMotorcycleUnit}
-                  setRemarks={setRemarks}
-                  setEngineUnit={setEngineUnit}
-                  setEngineCondition={setEngineCondition}
-                  setContentUbox={setContentUbox}
-                />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
-                  MOTORCYCLE'S DIAGNOSIS
+                  TRIMOTORS' DIAGNOSIS
                 </p>
 
-                <MotorcycleDiagnosis
+                <TrimotorsDiagnosis
                   diagnosis={diagnosis}
                   setDiagnosis={setDiagnosis}
                 />
@@ -656,19 +651,14 @@ const JobOrderForm = () => {
                   JOB ORDER
                 </p>
 
-                {/* Documents and Visual Check - Side by side */}
-                <JobDetailsGrid
+                {/* Documents and Visual Check - Side by side 
+                */}
+                <TrimotorsJobRequest
                   jobRequest={jobRequest}
                   setJobRequest={setJobRequest}
-                  partsReplacement={partsReplacement}
-                  setPartsReplacement={setPartsReplacement}
                   jobAmounts={jobAmounts}
                   handleJobAmountChange={handleJobAmountChange}
-                  partsAmounts={partsAmounts}
-                  handlePartsAmountChange={handlePartsAmountChange}
                   jobTotal={jobTotal}
-                  partsTotal={partsTotal}
-                  overallTotal={overallTotal}
                 />
 
                 <NextSchedule
@@ -713,7 +703,7 @@ const JobOrderForm = () => {
               Previewing Job Order Data before print...
             </ModalHeader>
             <ModalBody>
-              <PreviewPrint data={jobOrderData} />
+              <TrimotorsPreviewPrint data={TrimotorsjobOrderData} />
             </ModalBody>
             <ModalFooter>
               <Button
@@ -738,4 +728,4 @@ const JobOrderForm = () => {
   );
 };
 
-export default authenticatedPage(JobOrderForm);
+export default authenticatedPage(TrimotorsJobOrderForm);

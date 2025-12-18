@@ -1,17 +1,18 @@
 "use client";
 
 import useFetch from "@/hooks/useFetch";
-import { useRouter } from 'next/navigation';
 import {
+  Calendar,
+  Clock,
+  Home,
   PhilippinePeso,
   PillBottleIcon,
   Printer,
   Search,
   SearchSlash,
   Wrench,
-  ChevronDown,
-  CarFrontIcon,
   BikeIcon,
+  CarFrontIcon,
 } from "lucide-react";
 import { FaCircleNotch, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -32,7 +33,6 @@ import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import Image from "next/image";
 
 const Dashboard = () => {
   const {
@@ -53,10 +53,8 @@ const Dashboard = () => {
   } = useFetch("/job-orders");
   const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,14 +67,6 @@ const Dashboard = () => {
         setIsOpen(false);
         setViewData(null);
       }
-
-      // Close dropdown when clicking outside
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -85,15 +75,6 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const handleDropdownSelect = (type: string) => {
-    if (type === 'motorcycle') {
-      router.push("/job-order-form");
-    } else if (type === 'trimotors') {
-      router.push("/trimotors-job-order-form");
-    }
-    setIsDropdownOpen(false);
-  };
 
   const columns = [
     {
@@ -109,8 +90,8 @@ const Dashboard = () => {
     {
       name: "CUSTOMER NAME",
       sortable: true,
-      selector: (row: any) => row.customer_name,
-      sortField: "customer_name",
+      selector: (row: any) => row.customer?.name,
+      sortField: "customer.name",
     },
     {
       name: "TYPE OF JOB",
@@ -231,79 +212,46 @@ const Dashboard = () => {
 
   const stats = [
     {
-      label: "Monthly Target Income",
+      label: "Today's Prints",
+      value: isLoading ? spinner() : data.todaysPrints,
+      icon: Clock,
+      color: "from-green-500 to-green-400",
+    },
+    {
+      label: "Weekly Prints",
+      value: isLoading ? spinner() : data.weeklyPrints,
+      icon: Calendar,
+      color: "from-purple-500 to-purple-400",
+    },
+    {
+      label: "Monthly Prints",
+      value: isLoading ? spinner() : data.monthlyPrints,
+      icon: Calendar,
+      color: "from-orange-500 to-orange-400",
+    },
+    {
+      label: "Branch Printed Records",
+      value: isLoading ? spinner() : data.totalBranchPrintedRecords,
+      icon: Home,
+      color: "from-indigo-500 to-indigo-400",
+    },
+    {
+      label: "Total Motorcycle Jobs",
       value: isLoading ? spinner() : data.totalLabor,
-      icon: Wrench,
+      icon: BikeIcon,
       color: "from-emerald-500 to-emerald-400",
     },
     {
-      label: "Monthly Shop Income",
+      label: "Total Trimotors Jobs",
       value: isLoading ? spinner() : data.totalPartsLubricants,
-      icon: PillBottleIcon,
+      icon: CarFrontIcon,
       color: "from-rose-500 to-rose-400",
     },
   ];
 
-  const router = useRouter();
-
   return (
     <>
       <div className="p-6">
-        {/* Welcome Card with Buttons and Picture Space */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              {/* Left side: Welcome text and buttons */}
-              <div>
-                <h1 className="text-3xl font-bold mb-2">
-                  Welcome to Job Order System
-                </h1>
-                <p className="text-blue-100 opacity-90 mb-6">
-                  Manage and track all job orders efficiently. Create new job orders or view existing ones.
-                </p>
-                
-                {/* Single Button with Dropdown */}
-                <div ref={dropdownRef} className="relative inline-block">
-                  <Button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <Wrench className="w-5 h-5" />
-                    Create Job Order
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                  </Button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-full min-w-[220px] bg-white rounded-lg shadow-lg z-10 overflow-hidden border border-gray-200">
-                      <button
-                        onClick={() => handleDropdownSelect('motorcycle')}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
-                      >
-                        <BikeIcon className="w-4 h-4 text-blue-600" />
-                        Motorcycle Job Order Form
-                      </button>
-                      
-                      <div className="border-t border-gray-200"></div>
-                      
-                      <button
-                        onClick={() => handleDropdownSelect('trimotors')}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
-                      >
-                        <CarFrontIcon className="w-4 h-4 text-blue-600" />
-                        Trimotors Job Order Form
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
             <div className="flex items-start justify-between">
@@ -394,7 +342,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Data Table Section */}
         <div className="bg-white mt-10 p-6 rounded-2xl shadow-md border border-gray-200">
           <div className="mb-2 flex justify-end">
             <Button
