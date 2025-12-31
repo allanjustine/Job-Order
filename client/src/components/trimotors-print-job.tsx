@@ -90,21 +90,21 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
     <div
       className="p-1 font-sans bg-white text-black leading-tight border-2 border-black-100"
       style={{
-        fontSize: "8pt",
+        fontSize: "6pt",
         maxWidth: "210mm",
         minHeight: "258mm",
         margin: "0",
-        lineHeight: "0.10",
+        lineHeight: "0.8",
       }}
     >
       {/* Honda Header */}
       <div className="flex flex-col justify-center items-center mb-1">
         <img src="/smct-header.jpg" alt="Company Logo" className="h-8 w-auto mx-auto" />
-        <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "8pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
+        <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "6pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
       </div>
 
       {/* Vehicle Information - Compact Grid */}
-      <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
+      <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1" style={{ fontSize: "6pt", lineHeight: "0.8" }}>
         <div className="flex">
           <span className="font-bold w-32">Date:</span>
           <span className="border-b border-black flex-1">{format(new Date(data.date), "MM/dd/yyyy")}</span>
@@ -156,7 +156,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       </div>
 
       {/* Motorcycle Unit & Engine Unit - Two Column Side by Side */}
-      <div className="mb-2 grid grid-cols-1 gap-2" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
+      <div className="mb-2 grid grid-cols-1 gap-2" style={{ fontSize: "6pt", lineHeight: "0.8" }}>
         <div className="border border-black p-0.5">
           <div className="font-bold mb-1">MOTORCYCLE UNIT:</div>
           <div className="mb-1" style={{ fontSize: "6pt", lineHeight: "0.6" }}>
@@ -184,7 +184,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           TRIMOTORS' DIAGNOSIS
         </h3>
-        <table className="w-full border-collapse border border-black my-0" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
+        <table className="w-full border-collapse border border-black my-0" style={{ fontSize: "6pt", lineHeight: "0.8" }}>
           <thead>
             <tr className="bg-gray-40">
               <th className="border border-black p-0.5 text-center"></th>
@@ -243,7 +243,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       </div>
 
       {/* JOB ORDER - Two Column Layout */}
-      <div className="mb-1 text-xs" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
+      <div className="mb-1 text-xs" style={{ fontSize: "6pt", lineHeight: "0.8" }}>
         <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
           JOB ORDER
         </h3>
@@ -548,7 +548,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
           <span> or </span>
           <span className="border-b border-black w-25 inline-block">{data.nextScheduleKms}</span>
           <span> kms </span>
-          <span className="text-xs ml-2">(whichever comes first)</span>
+          <span className="text-xxs ml-2">(whichever comes first)</span>
         </div>
 
         {/* General Remarks */}
@@ -559,25 +559,25 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       </div>
 
       {/* Signatures */}
-      <div className="mt-0.5 grid grid-cols-3 gap-2 text-xs" style={{fontSize: '8pt', lineHeight: '0.8'}}>
+      <div className="mt-0.5 grid grid-cols-3 gap-2 text-xs" style={{fontSize: '6pt', lineHeight: '0.8'}}>
         <div className="text-center  p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Prepared by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.serviceAdvisor}</p>
+          <div className=" mb-1 pb-1 h-3"></div>
+          <p className="text-xxs text-left" style={{fontSize: '7pt'}}>Prepared by:</p>
+          <p className="underline" style={{fontStyle:'underline',fontSize: '7pt'}}>{data.serviceAdvisor}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}} >(Signature Over Printed Name)</p>
           <p className="text-xxs">Salesrep/Service Advisor</p>
         </div>
         <div className="text-center p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Checked by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.branchManager}</p>
+          <div className=" mb-1 pb-1 h-3"></div>
+          <p className="text-xxs text-left" style={{fontSize: '7pt'}}>Checked by:</p>
+          <p className="underline" style={{fontStyle:'underline',fontSize: '7pt'}}>{data.branchManager}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">BM/BS</p>
         </div>
         <div className="text-center  p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Performed by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.customerName}</p>
+          <div className=" mb-1 pb-1 h-3"></div>
+          <p className="text-xxs text-left" style={{fontSize: '7pt'}}>Performed by:</p>
+          <p className="underline" style={{fontStyle:'underline',fontSize: '7pt'}}>{data.customerName}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">Customer</p>
         </div>
