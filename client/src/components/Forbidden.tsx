@@ -1,6 +1,11 @@
+"use client";
+
+import { useAuth } from "@/context/authContext";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Forbidden() {
+  const { user, isLoading } = useAuth();
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white">
       <div className="max-w-md w-full rounded-xl overflow-hidden">
@@ -29,12 +34,18 @@ export default function Forbidden() {
             </p>
           </div>
           <div className="space-y-4">
-            <Link
-              href="/"
-              className="block w-full px-4 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200"
-            >
-              Back to Home page
-            </Link>
+            {isLoading ? (
+              <div className="block w-full px-4 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200">
+                <Loader2 className="animate-spin mx-auto" />
+              </div>
+            ) : (
+              <Link
+                href={user?.redirect_url}
+                className="block w-full px-4 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200"
+              >
+                Back to dashboard
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -51,6 +52,42 @@ class UsersController extends Controller
         ]);
 
         return response()->json(await($data), 200);
+    }
+
+    public function userSelectionOptions()
+    {
+        $type = request('type', null);
+
+        $users = User::where(
+            fn($query)
+            =>
+            $query->whereNot('id', Auth::id())
+                ->whereDoesntHaveRelation('roles', 'name', RoleName::ADMIN?->value)
+        )
+            ->when(
+                $type === 'target-income',
+                fn($query)
+                =>
+                $query->whereDoesntHave(
+                    'targetIncomes',
+                    fn($user)
+                    =>
+                    $user->whereMonth('month_of', now()->month)
+                        ->whereYear('month_of', now()->year)
+                )
+            )
+            ->when(
+                $type === 'area-manager',
+                fn($query)
+                =>
+                $query->doesntHave('areaManagers')
+            )
+            ->get(['id', 'name', 'code']);
+
+        return response()->json([
+            'message' => 'User selection options retrieved successfully.',
+            'data'    => $users->makeHidden(['roles', 'is_admin', 'redirect_url']),
+        ], 200);
     }
 
     /**

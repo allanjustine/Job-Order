@@ -4,7 +4,7 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
-import authenticatedPage from "@/lib/hoc/authenticatedPage";
+import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { Search, SearchSlash } from "lucide-react";
 import DataTable from "react-data-table-component";
@@ -182,4 +182,4 @@ const Reports = () => {
   );
 };
 
-export default authenticatedPage(Reports);
+export default withAuthPage(Reports);

@@ -180,7 +180,7 @@ export type DiagnosisKeys =
   | "cableOperation";
 
 export type TrimotorsDiagnosisKeys = 
-  | "windhsield" | "wipeArm"  | "frontIndicator" | "frontHeadLamp"  | "housingScudo"  | "housingHeadlamp" | "frontFender" | "mudFlapFront" | "scudoFront" | "frontEmblem"
+  | "windshield" | "wipeArm"  | "frontIndicator" | "frontHeadLamp"  | "housingScudo"  | "housingHeadlamp" | "frontFender" | "mudFlapFront" | "scudoFront" | "frontEmblem"
   | "tailLamp" | "bumper" | "mudFlapRear" | "rearDoor" | "rearEmblem" | "tailEnd"
   | "leftBeading" | "leftBodyPaint"
   | "mudGuard" | "rightBeading" | "rightBodyPaint"

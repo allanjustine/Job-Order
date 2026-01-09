@@ -4,19 +4,27 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
-import authenticatedPage from "@/lib/hoc/authenticatedPage";
-import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash } from "lucide-react";
+import withAuthPage from "@/lib/hoc/with-auth-page";
+import { PenIcon, Search, SearchSlash, Trash, UserPlus } from "lucide-react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
   FaMagnifyingGlass,
   FaRotateRight,
 } from "react-icons/fa6";
+import AddMechanic from "../../components/mechanics/add-mechanic";
+import { Activity, useState } from "react";
+import Swal from "sweetalert2";
+import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import EditMechanic from "../../components/mechanics/edit-mechanic";
 
-const Customers = () => {
+const Mechanics = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
+  const [selectedMechanic, setSelectedMechanic] = useState<any>(null);
   const {
-    data: customers,
+    data: mechanics,
     isLoading,
     error,
     pagination,
@@ -29,7 +37,8 @@ const Customers = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
-  } = useFetch("/customers");
+    fetchData,
+  } = useFetch("/mechanics");
 
   const columns = [
     {
@@ -46,30 +55,106 @@ const Customers = () => {
       sortField: "name",
     },
     {
-      name: "BRANCH CODE",
-      selector: (row: any) => row.user.code,
+      name: "BRANCH",
+      selector: (row: any) => `(${row.user.code}) - ${row.user.name}`,
       sortable: true,
-      sortField: "branch_code",
+      sortField: "user.name",
     },
     {
       name: "NUMBER OF JOBS",
-      selector: (row: any) => row.branch_code,
+      selector: (row: any) => row.job_orders_count,
       sortable: true,
-      sortField: "branch_code",
+      sortField: "job_orders_count",
+    },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white p-2"
+            onClick={() => {
+              setIsOpenEdit(true);
+              setSelectedMechanic(row);
+            }}
+          >
+            <PenIcon className="size-5" />
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDeleteMechanics(row?.id)}
+            className="bg-red-500 hover:bg-red-600 text-white p-2"
+          >
+            <Trash className="size-5" />
+          </Button>
+        </div>
+      ),
     },
   ];
+
+  function handleDeleteMechanics(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to recover this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.delete(`/mechanics/${id}`);
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
 
   return (
     <>
       <div className="p-6">
         <div className="bg-white rounded-md border border-gray-300 shadow">
           <div className="p-6">
-            <div className="mb-2 flex justify-end">
+            <div className="mb-2 flex justify-between items-center">
               <Button
                 type="button"
                 disabled={isRefresh}
                 className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
-                  isRefresh && "!bg-blue-400 !cursor-not-allowed"
+                  isRefresh && "bg-blue-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
               >
@@ -82,6 +167,13 @@ const Customers = () => {
                     <FaRotateRight /> Refresh
                   </>
                 )}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                <UserPlus /> Add Mechanic
               </Button>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
@@ -99,7 +191,7 @@ const Customers = () => {
             <div className="overflow-x-auot">
               <DataTable
                 columns={columns}
-                data={customers}
+                data={mechanics}
                 pagination
                 paginationServer
                 sortServer
@@ -137,7 +229,7 @@ const Customers = () => {
                         </span>
                       </>
                     ) : (
-                      "No customers yet."
+                      "No mechanics yet."
                     )}
                   </div>
                 }
@@ -146,8 +238,23 @@ const Customers = () => {
           </div>
         </div>
       </div>
+      <Activity mode={isOpen ? "visible" : "hidden"}>
+        <AddMechanic
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          fetchData={fetchData}
+        />
+      </Activity>
+      <Activity mode={isOpenEdit ? "visible" : "hidden"}>
+        <EditMechanic
+          isOpen={isOpenEdit}
+          setIsOpen={setIsOpenEdit}
+          fetchData={fetchData}
+          selectedMechanic={selectedMechanic}
+        />
+      </Activity>
     </>
   );
 };
 
-export default authenticatedPage(Customers);
+export default withAuthPage(Mechanics);

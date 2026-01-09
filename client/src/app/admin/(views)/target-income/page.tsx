@@ -4,19 +4,37 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
-import authenticatedPage from "@/lib/hoc/authenticatedPage";
+import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash } from "lucide-react";
+import {
+  CircleFadingPlus,
+  PenIcon,
+  Search,
+  SearchSlash,
+  Trash,
+} from "lucide-react";
+import { Activity, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
   FaMagnifyingGlass,
   FaRotateRight,
 } from "react-icons/fa6";
+import AddTargetIncome from "../../components/target-income/add-target-income";
+import EditTargetIncome from "../../components/target-income/edit-target-income";
+import phpCurrency from "@/utils/phpCurrency";
+import { formatDateAndTime } from "@/utils/format-date-and-time";
+import { diffForHumans } from "@/utils/diff-for-humans";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import { api } from "@/lib/api";
 
 const Reports = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
+  const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
   const {
-    data: customers,
+    data: targetIncomes,
     isLoading,
     error,
     pagination,
@@ -29,49 +47,50 @@ const Reports = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
-  } = useFetch("/customers");
+    fetchData,
+  } = useFetch("/target-incomes");
 
   const columns = [
     {
       name: "ID",
       selector: (row: any) => row.id,
-      
+
       sortable: true,
       sortField: "id",
       width: "80px",
     },
     {
-      name: "BRANCH CODE",
+      name: "BRANCH",
       cell: (row: any) => (
         <div>
-          {row.user.name}{" "}
-          <span className="font-bold text-gray-600">({row.user.code})</span>
+          <span className="font-bold text-gray-600">
+            ({row.user.code}) - {row.user.name}
+          </span>
         </div>
       ),
     },
     {
       name: "TARGET INCOME",
-      selector: (row: any) => row.name,
+      cell: (row: any) => (
+        <span className="font-semibold">{phpCurrency(row.target_income)}</span>
+      ),
       sortable: true,
-      sortField: "name",
+      sortField: "target_income",
     },
     {
       name: "SHOP INCOME",
-      selector: (row: any) => row.address,
-      sortable: true,
-      sortField: "address",
+      cell: (row: any) => (
+        <span className="font-semibold">{phpCurrency(row.shop_income)}</span>
+      ),
     },
-
     {
       name: "CREATED AT",
       cell: (row: any) => (
         <>
           <div className="flex flex-col">
-            <span className="text-sm">
-              {format(row.created_at, "MMM dd, yyyy hh:mm a")}
-            </span>
+            <span className="text-sm">{formatDateAndTime(row.created_at)}</span>
             <span className="text-gray-500 text-xs font-bold">
-              {formatDistanceToNowStrict(row.created_at, { addSuffix: true })}
+              {diffForHumans(row.created_at)}
             </span>
           </div>
         </>
@@ -79,19 +98,95 @@ const Reports = () => {
       sortable: true,
       sortField: "created_at",
     },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white p-2"
+            onClick={() => {
+              setIsOpenEdit(true);
+              setSelectedTargetIncome(row);
+            }}
+          >
+            <PenIcon className="size-5" />
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDeleteTargetIncomes(row?.id)}
+            className="bg-red-500 hover:bg-red-600 text-white p-2"
+          >
+            <Trash className="size-5" />
+          </Button>
+        </div>
+      ),
+    },
   ];
+
+  function handleDeleteTargetIncomes(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to recover this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.delete(`/target-incomes/${id}`);
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
 
   return (
     <>
       <div className="p-6">
         <div className="bg-white rounded-md border border-gray-300 shadow">
           <div className="p-6">
-            <div className="mb-2 flex justify-end">
+            <div className="mb-2 flex justify-between items-center">
               <Button
                 type="button"
                 disabled={isRefresh}
                 className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
-                  isRefresh && "!bg-blue-400 !cursor-not-allowed"
+                  isRefresh && "bg-blue-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
               >
@@ -105,9 +200,19 @@ const Reports = () => {
                   </>
                 )}
               </Button>
+
+              <Button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                <CircleFadingPlus /> Add Target Income
+              </Button>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Target Income</h2>
+              <h2 className="text-xl font-semibold text-gray-600">
+                Target Income
+              </h2>
               <div className="relative w-full md:w-1/3">
                 <Input
                   type="search"
@@ -121,7 +226,7 @@ const Reports = () => {
             <div className="overflow-x-auot">
               <DataTable
                 columns={columns}
-                data={customers}
+                data={targetIncomes}
                 pagination
                 paginationServer
                 sortServer
@@ -159,7 +264,7 @@ const Reports = () => {
                         </span>
                       </>
                     ) : (
-                      "No customers yet."
+                      "No target incomes yet."
                     )}
                   </div>
                 }
@@ -168,8 +273,23 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      <Activity mode={isOpen ? "visible" : "hidden"}>
+        <AddTargetIncome
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          fetchData={fetchData}
+        />
+      </Activity>
+      <Activity mode={isOpenEdit ? "visible" : "hidden"}>
+        <EditTargetIncome
+          isOpen={isOpenEdit}
+          setIsOpen={setIsOpenEdit}
+          fetchData={fetchData}
+          selectedTargetIncome={selectedTargetIncome}
+        />
+      </Activity>
     </>
   );
 };
 
-export default authenticatedPage(Reports);
+export default withAuthPage(Reports);

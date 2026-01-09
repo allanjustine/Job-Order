@@ -1,7 +1,8 @@
-import { FcEngineering } from "react-icons/fc";
+import { useEffect, useState } from "react";
 import Input from "./ui/input";
 import Label from "./ui/label";
-import { Fuel } from "lucide-react";
+import Select from "./ui/select";
+import { api } from "@/lib/api";
 
 export default function CustomerGrid({
   errors,
@@ -30,6 +31,26 @@ export default function CustomerGrid({
   setFuelLevel,
   setMechanic,
 }: any) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [mechanics, setMechanics] = useState<any>([]);
+  useEffect(() => {
+    async function fetchMechanics() {
+      setIsLoading(true);
+      try {
+        const response = await api.get("/branch-mechanics");
+        if (response.status === 200) {
+          setMechanics(response.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchMechanics();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <div className="col-span-1">
@@ -51,6 +72,7 @@ export default function CustomerGrid({
           error={errors.branch}
           value={branch}
           onChange={(e) => setBranch(e.target.value)}
+          readOnly
         />
         {errors.branch && (
           <p className="text-red-500 text-xs mt-1">{errors.branch}</p>
@@ -143,8 +165,10 @@ export default function CustomerGrid({
       <div className="col-span-1">
         <Label required>Repair Start Time</Label>
         <Input
-          type="text"
-          error={errors.repairTime}
+          type="time"
+          error={errors.repairStart}
+          min="08:00"
+          max="18:00"
           value={repairStart}
           onChange={(e) => setRepairStart(e.target.value)}
         />
@@ -152,11 +176,13 @@ export default function CustomerGrid({
           <p className="text-red-500 text-xs mt-1">{errors.repairStart}</p>
         )}
       </div>
-        <div className="col-span-1">
+      <div className="col-span-1">
         <Label required>Repair End Time</Label>
         <Input
-          type="text"
+          type="time"
           error={errors.repairEnd}
+          min={repairStart || "08:00"}
+          max="18:00"
           value={repairEnd}
           onChange={(e) => setRepairEnd(e.target.value)}
         />
@@ -164,21 +190,35 @@ export default function CustomerGrid({
           <p className="text-red-500 text-xs mt-1">{errors.repairEnd}</p>
         )}
       </div>
-      
+
       <div className="col-span-1">
         <Label required>Mechanic Name</Label>
-        <Input
-          type="text"
-          error={errors.mechanic}
-          value={mechanic}
-          onChange={(e) => setMechanic(e.target.value)}
-        />
+        {isLoading ? (
+          "Loading mechanics..."
+        ) : (
+          <Select
+            value={mechanic}
+            required
+            onChange={(e) => setMechanic(e.target.value)}
+          >
+            <option value="" disabled>
+              Select Mechanic
+            </option>
+            {mechanics.length > 0 ? (
+              mechanics.map((mechanic: any, index: number) => (
+                <option value={`${mechanic.id}_${mechanic.name}`} key={index}>
+                  {mechanic.name}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>No mechanics found</option>
+            )}
+          </Select>
+        )}
         {errors.mechanic && (
           <p className="text-red-500 text-xs mt-1">{errors.mechanic}</p>
         )}
       </div>
-
     </div>
-    
   );
 }

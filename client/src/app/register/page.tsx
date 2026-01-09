@@ -11,7 +11,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/authContext";
 import Swal from "sweetalert2";
-import guestPage from "@/lib/hoc/guestPage";
+import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
 import { Lock } from "lucide-react";
 
@@ -326,4 +326,4 @@ const RegisterPage = () => {
   );
 };
 
-export default guestPage(RegisterPage);
+export default withoutAuthPage(RegisterPage);

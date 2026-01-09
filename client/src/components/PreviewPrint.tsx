@@ -126,7 +126,7 @@ const formatCurrency = (amount: number | undefined): string => {
         </div>
         <div className="flex">
           <span className="font-bold w-40">Mechanic Name:</span>
-          <span className="border-b border-black flex-1">{data.mechanic}</span>
+          <span className="border-b border-black flex-1">{data.mechanic.split("_")[1]}</span>
         </div>
       </div>
 

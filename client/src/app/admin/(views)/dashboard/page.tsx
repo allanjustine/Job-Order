@@ -4,20 +4,17 @@ import useFetch from "@/hooks/useFetch";
 import {
   Calendar,
   Clock,
-  Home,
   PhilippinePeso,
-  PillBottleIcon,
   Printer,
   Search,
   SearchSlash,
-  Wrench,
   BikeIcon,
   CarFrontIcon,
+  UserCog,
 } from "lucide-react";
-import { FaCircleNotch, FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
-import { TYPE_OF_JOB } from "@/constants/typeOfJob";
 import Button from "@/components/ui/button";
 import {
   Modal,
@@ -26,13 +23,53 @@ import {
   ModalHeader,
 } from "@/components/ui/modal";
 import PreviewData from "@/components/PreviewData";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Input from "@/components/ui/input";
-import authenticatedPage from "@/lib/hoc/authenticatedPage";
+import withAuthPage from "@/lib/hoc/with-auth-page";
 import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
-import { format, formatDistanceToNowStrict } from "date-fns";
+import Swal from "sweetalert2";
+import { api } from "@/lib/api";
+import { formatDateAndTime } from "@/utils/format-date-and-time";
+import { diffForHumans } from "@/utils/diff-for-humans";
+
+interface StatItem {
+  total_job_prints: {
+    total: number;
+    total_motors: number;
+    total_trimotors: number;
+  };
+  today_prints: number;
+  weekly_prints: number;
+  monthly_prints: number;
+  total_mechanics: number;
+  total_motorcycle_jobs: number;
+  total_trimotors_job: number;
+  total_amount: number;
+  total_job_motor_print: number;
+  total_job_trimotor_print: number;
+  top_over_all_job_orders: {
+    category: string;
+    amount: number;
+  }[];
+  top_area_manager_job_orders: {
+    category: string;
+    amount: number;
+    branch: {
+      name: string;
+      code: string;
+    };
+  }[];
+  top_branch_job_orders: {
+    category: string;
+    amount: number;
+    branch: {
+      name: string;
+      code: string;
+    };
+  }[];
+}
 
 const Dashboard = () => {
   const {
@@ -50,11 +87,72 @@ const Dashboard = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
-  } = useFetch("/job-orders");
+  } = useFetch("/admin-job-orders");
   const [viewData, setViewData] = useState<any>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [adminStats, setAdminStats] = useState<StatItem>({
+    total_job_prints: {
+      total: 0,
+      total_motors: 0,
+      total_trimotors: 0,
+    },
+    today_prints: 0,
+    weekly_prints: 0,
+    monthly_prints: 0,
+    total_mechanics: 0,
+    total_motorcycle_jobs: 0,
+    total_trimotors_job: 0,
+    total_amount: 0,
+    total_job_motor_print: 0,
+    total_job_trimotor_print: 0,
+    top_over_all_job_orders: [
+      {
+        category: "",
+        amount: 0,
+      },
+    ],
+    top_area_manager_job_orders: [
+      {
+        category: "",
+        amount: 0,
+        branch: {
+          name: "",
+          code: "",
+        },
+      },
+    ],
+    top_branch_job_orders: [
+      {
+        category: "",
+        amount: 0,
+        branch: {
+          name: "",
+          code: "",
+        },
+      },
+    ],
+  });
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    async function fetchAdminStats() {
+      try {
+        const response = await api.get("/admin-stats");
+
+        if (response.status === 200) {
+          setAdminStats(response.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+
+    fetchAdminStats();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,110 +174,51 @@ const Dashboard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    Swal.close();
+  }, []);
+
   const columns = [
     {
       name: "JO NUMBER",
       sortable: true,
-      selector: (row: any) => row.id,
-      sortField: "id",
-    },
-    {
-      name: "BRANCH",
-      selector: (row: any) => row.customer?.user?.branch?.branch_name,
+      selector: (row: any) => row.job_order_number,
+      sortField: "job_order_number",
     },
     {
       name: "CUSTOMER NAME",
+      selector: (row: any) => row.customer.name,
       sortable: true,
-      selector: (row: any) => row.customer?.name,
       sortField: "customer.name",
     },
     {
-      name: "TYPE OF JOB",
-      sortable: true,
-      cell: (row: { type_of_job: keyof typeof TYPE_OF_JOB }) => (
-        <span
-          className={`rounded-full px-2.5 py-0.5 font-medium 
-          ${
-            row.type_of_job === "coupon"
-              ? "bg-green-100 text-green-700"
-              : row.type_of_job === "changeOil"
-              ? "bg-blue-100  text-blue-700"
-              : row.type_of_job === "overhaul"
-              ? "bg-blue-100  text-violet-700"
-              : "bg-orange-100 text-orange-700"
-          }
-        `}
-        >
-          {TYPE_OF_JOB[row.type_of_job]}
-        </span>
-      ),
-      sortField: "type_of_job",
-    },
-    {
       name: "MECHANIC",
+      selector: (row: any) => row.mechanic.name,
       sortable: true,
-      selector: (row: any) => row.service_advisor,
-      sortField: "service_advisor",
+      sortField: "mechanic.name",
     },
     {
       name: "TOTAL AMOUNT",
-      selector: (row: any) => (
+      cell: (row: any) => (
         <span className="font-bold text-md text-gray-600">
-          {phpCurrency(
-            row.job_requests.reduce(
-              (sum: any, item: any) => sum + item.cost,
-              0
-            ) +
-              row.parts_requests.reduce(
-                (sum: any, item: any) => sum + item.sub_total_price,
-                0
-              )
-          )}
+          {phpCurrency(Number(row?.total_amount))}
         </span>
       ),
+      sortable: true,
+      sortField: "total_amount",
     },
     {
       name: "PRINTED ON",
       cell: (row: any) => (
         <div>
-          <p>{format(row.created_at, "MMM dd, yyyy hh:mm a")}</p>
+          <p>{formatDateAndTime(row.created_at)}</p>
           <span className="text-xs font-semibold">
-            {formatDistanceToNowStrict(row.created_at, {
-              addSuffix: true,
-            })}
+            {diffForHumans(row.created_at)}
           </span>
         </div>
       ),
       sortField: "created_at",
       sortable: true,
-    },
-    {
-      name: "ACTION",
-      cell: (row: any) => (
-        <div className="flex gap-1">
-          <button
-            ref={buttonRef}
-            type="button"
-            onClick={handleView(row)}
-            className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg"
-          >
-            <FaEye />
-          </button>
-          <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg"
-          >
-            <FaEdit />
-          </button>
-          <button
-            type="button"
-            className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
-          >
-            <FaTrash />
-          </button>
-        </div>
-      ),
-      width: "130px",
     },
   ];
 
@@ -189,17 +228,16 @@ const Dashboard = () => {
   };
 
   const data = {
-    totalReceiptPrints: cardData.total_job_orders,
-    todaysPrints: cardData.todays_print,
-    weeklyPrints: cardData.this_week_print,
-    monthlyPrints: cardData.this_month_print,
-    totalBranchPrintedRecords: cardData.total_branch_prints,
-    totalLabor: phpCurrency(cardData.total_labor || 0),
-    totalPartsLubricants: phpCurrency(cardData.total_parts || 0),
-    totalOverAllAmount: phpCurrency(cardData.total_over_all_amount || 0),
-    repairAmount: phpCurrency(cardData.total_rr_amount || 0),
-    pmsAmount: phpCurrency(cardData.total_pms_amount || 0),
-    warrantyClaimAmount: phpCurrency(cardData.total_wc_amount || 0),
+    totalReceiptPrints: adminStats.total_job_prints.total,
+    todaysPrints: adminStats.today_prints,
+    weeklyPrints: adminStats.weekly_prints,
+    monthlyPrints: adminStats.monthly_prints,
+    totalMechanics: adminStats.total_mechanics,
+    totalMotorcycleJobs: phpCurrency(adminStats.total_motorcycle_jobs || 0),
+    totalTrimotorsJobs: phpCurrency(adminStats.total_trimotors_job || 0),
+    totalOverAllAmount: phpCurrency(Number(adminStats.total_amount) || 0),
+    total_job_motor_print: adminStats.total_job_prints.total_motors,
+    total_job_trimotor_print: adminStats.total_job_prints.total_trimotors,
   };
 
   const spinner = () => {
@@ -213,37 +251,37 @@ const Dashboard = () => {
   const stats = [
     {
       label: "Today's Prints",
-      value: isLoading ? spinner() : data.todaysPrints,
+      value: isLoadingStats ? spinner() : data.todaysPrints,
       icon: Clock,
       color: "from-green-500 to-green-400",
     },
     {
       label: "Weekly Prints",
-      value: isLoading ? spinner() : data.weeklyPrints,
+      value: isLoadingStats ? spinner() : data.weeklyPrints,
       icon: Calendar,
       color: "from-purple-500 to-purple-400",
     },
     {
       label: "Monthly Prints",
-      value: isLoading ? spinner() : data.monthlyPrints,
+      value: isLoadingStats ? spinner() : data.monthlyPrints,
       icon: Calendar,
       color: "from-orange-500 to-orange-400",
     },
     {
-      label: "Branch Printed Records",
-      value: isLoading ? spinner() : data.totalBranchPrintedRecords,
-      icon: Home,
+      label: "Total Mechanics",
+      value: isLoadingStats ? spinner() : data.totalMechanics,
+      icon: UserCog,
       color: "from-indigo-500 to-indigo-400",
     },
     {
       label: "Total Motorcycle Jobs",
-      value: isLoading ? spinner() : data.totalLabor,
+      value: isLoadingStats ? spinner() : data.totalMotorcycleJobs,
       icon: BikeIcon,
       color: "from-emerald-500 to-emerald-400",
     },
     {
       label: "Total Trimotors Jobs",
-      value: isLoading ? spinner() : data.totalPartsLubricants,
+      value: isLoadingStats ? spinner() : data.totalTrimotorsJobs,
       icon: CarFrontIcon,
       color: "from-rose-500 to-rose-400",
     },
@@ -260,26 +298,21 @@ const Dashboard = () => {
                   Total Job Prints
                 </p>
                 <p className="text-2xl font-semibold text-gray-800">
-                  {isLoading ? spinner() : cardData.total_job_orders}
+                  {isLoadingStats ? spinner() : data.totalReceiptPrints}
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-400 shadow-md">
+              <div className="p-3 rounded-lg bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
                 <Printer className="w-5 h-5 text-white" />
               </div>
             </div>
-
             <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
               <p>
-                <span className="font-medium">PMS:</span>{" "}
-                {isLoading ? spinner() : cardData.total_pms}
+                <span className="font-medium">Motocycle:</span>{" "}
+                {isLoadingStats ? spinner() : data.total_job_motor_print}
               </p>
               <p>
-                <span className="font-medium">Repair:</span>{" "}
-                {isLoading ? spinner() : cardData.total_rr}
-              </p>
-              <p>
-                <span className="font-medium">Warranty Claim:</span>{" "}
-                {isLoading ? spinner() : cardData.total_wc}
+                <span className="font-medium">Trimotors:</span>{" "}
+                {isLoadingStats ? spinner() : data.total_job_trimotor_print}
               </p>
             </div>
           </div>
@@ -301,7 +334,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div
-                    className={`p-3 rounded-lg bg-gradient-to-br ${item.color} shadow-md`}
+                    className={`p-3 rounded-lg bg-linear-to-br ${item.color} shadow-md`}
                   >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
@@ -317,119 +350,261 @@ const Dashboard = () => {
                   Total Amount
                 </p>
                 <p className="text-2xl font-semibold text-gray-800">
-                  {isLoading ? spinner() : data.totalOverAllAmount}
+                  {isLoadingStats ? spinner() : data.totalOverAllAmount}
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-gradient-to-br from-amber-500 to-amber-400 shadow-md">
+              <div className="p-3 rounded-lg bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
                 <PhilippinePeso className="w-5 h-5 text-white" />
               </div>
-            </div>
-
-            <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-              <p>
-                <span className="font-medium">PMS:</span>{" "}
-                {isLoading ? spinner() : data.pmsAmount}
-              </p>
-              <p>
-                <span className="font-medium">Repair:</span>{" "}
-                {isLoading ? spinner() : data.repairAmount}
-              </p>
-              <p>
-                <span className="font-medium">Warranty Claim:</span>{" "}
-                {isLoading ? spinner() : data.warrantyClaimAmount}
-              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white mt-10 p-6 rounded-2xl shadow-md border border-gray-200">
-          <div className="mb-2 flex justify-end">
-            <Button
-              type="button"
-              disabled={isRefresh}
-              className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
-                isRefresh && "!bg-blue-400 !cursor-not-allowed"
-              }`}
-              onClick={handleRefresh}
-            >
-              {isRefresh ? (
-                <>
-                  <FaCircleNotch className="animate-spin" /> Refreshing...
-                </>
-              ) : (
-                <>
-                  <FaRotateRight /> Refresh
-                </>
-              )}
-            </Button>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <h2 className="text-xl font-semibold text-gray-600">
-              Recent Print Job Orders
-            </h2>
-            <div className="relative w-full md:w-1/3">
-              <Input
-                type="search"
-                placeholder="Search..."
-                onChange={handleSearch}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-10">
+          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+            <div className="mb-2 flex justify-end">
+              <Button
+                type="button"
+                disabled={isRefresh}
+                className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
+                  isRefresh && "bg-blue-400! cursor-not-allowed!"
+                }`}
+                onClick={handleRefresh}
+              >
+                {isRefresh ? (
+                  <>
+                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <FaRotateRight /> Refresh
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+              <h2 className="text-xl font-semibold text-gray-600">
+                Recent Print Job Orders
+              </h2>
+              <div className="relative w-full md:w-1/3">
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <DataTable
+                columns={columns}
+                data={jobOrders}
+                pagination
+                paginationServer
+                sortServer
+                onSort={handleSort}
+                paginationTotalRows={pagination.total}
+                onChangeRowsPerPage={handleRowsPerPageChange}
+                onChangePage={handlePageChange}
+                paginationPerPage={pagination.perPage}
+                striped
+                highlightOnHover
+                progressPending={isLoading || isRefresh || isSearching}
+                progressComponent={
+                  <div className="py-5 font-bold text-gray-600 text-xl">
+                    {isSearching ? (
+                      <div className="flex items-center gap-1">
+                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
+                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
+                        ...
+                      </div>
+                    ) : (
+                      "Loading..."
+                    )}
+                  </div>
+                }
+                persistTableHead
+                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+                defaultSortAsc={sort.sortBy}
+                defaultSortFieldId={sort.column}
+                noDataComponent={
+                  <div className="py-5 font-bold text-gray-600 text-xl">
+                    {searchTerm ? (
+                      <>
+                        <span className="flex gap-1 items-center">
+                          <SearchSlash /> No results for "{searchTerm}"
+                        </span>
+                      </>
+                    ) : (
+                      "No job orders yet."
+                    )}
+                  </div>
+                }
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
           </div>
-
-          <div className="overflow-x-auto">
-            <DataTable
-              columns={columns}
-              data={jobOrders}
-              pagination
-              paginationServer
-              sortServer
-              onSort={handleSort}
-              paginationTotalRows={pagination.total}
-              onChangeRowsPerPage={handleRowsPerPageChange}
-              onChangePage={handlePageChange}
-              paginationPerPage={pagination.perPage}
-              striped
-              highlightOnHover
-              progressPending={isLoading || isRefresh || isSearching}
-              progressComponent={
-                <div className="py-5 font-bold text-gray-600 text-xl">
-                  {isSearching ? (
-                    <div className="flex items-center gap-1">
-                      <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                      {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                      ...
-                    </div>
-                  ) : (
-                    "Loading..."
-                  )}
-                </div>
-              }
-              persistTableHead
-              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-              defaultSortAsc={sort.sortBy}
-              defaultSortFieldId={sort.column}
-              noDataComponent={
-                <div className="py-5 font-bold text-gray-600 text-xl">
-                  {searchTerm ? (
-                    <>
-                      <span className="flex gap-1 items-center">
-                        <SearchSlash /> No results for "{searchTerm}"
-                      </span>
-                    </>
-                  ) : (
-                    "No job orders yet."
-                  )}
-                </div>
-              }
-            />
+          <div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 h-fit">
+            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
+              <div className="text-center text-md font-bold text-gray-500 mb-3">
+                Top 10 Overall Job Orders
+              </div>
+              <div className="flex flex-col space-y-2">
+                {isLoadingStats ? (
+                  <>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        key={index}
+                        style={{ animationDelay: `${index * 0.2}s` }}
+                      ></div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {adminStats.top_over_all_job_orders.length > 0 ? (
+                      adminStats.top_over_all_job_orders.map(
+                        (item, index: number) => (
+                          <div
+                            className="w-full p-5 rounded-lg bg-blue-200 hover:bg-blue-300 h-12 flex justify-between items-center"
+                            key={index}
+                            title={item.category}
+                          >
+                            <span className="text-gray-500 font-semibold text-xs line-clamp-1">
+                              {item.category}
+                            </span>
+                            <span className="text-md font-bold text-gray-800">
+                              {phpCurrency(item.amount)}
+                            </span>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <p className="text-center text-md font-semibold text-gray-600">
+                        No data yet.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
+              <div className="text-center text-md font-bold text-gray-500 mb-3">
+                Top 10 Branch Job Orders
+              </div>
+              <div className="flex flex-col space-y-2">
+                {isLoadingStats ? (
+                  <>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        key={index}
+                        style={{ animationDelay: `${index * 0.2}s` }}
+                      ></div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {adminStats.top_branch_job_orders.length > 0 ? (
+                      adminStats.top_branch_job_orders.map(
+                        (item, index: number) => (
+                          <div
+                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-12 flex justify-between items-center"
+                            title={item.category}
+                            key={index}
+                          >
+                            <div className="flex-col flex">
+                              <span
+                                className="text-gray-500 font-semibold line-clamp-1 text-sm"
+                                title={item.branch.name}
+                              >
+                                {`(${item.branch.code}) - ${item.branch.name}`}
+                              </span>
+                              <span
+                                className="text-gray-600 text-xs line-clamp-1"
+                                title={item.category}
+                              >
+                                {item.category}
+                              </span>
+                            </div>
+                            <span className="text-md font-bold text-gray-800">
+                              {phpCurrency(item.amount)}
+                            </span>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <p className="text-center text-md font-semibold text-gray-600">
+                        No data yet.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
+              <div className="text-center text-md font-bold text-gray-500 mb-3">
+                Top 10 Area Manager Job Orders
+              </div>
+              <div className="flex flex-col space-y-2">
+                {isLoadingStats ? (
+                  <>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        key={index}
+                        style={{ animationDelay: `${index * 0.2}s` }}
+                      ></div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {adminStats.top_area_manager_job_orders.length > 0 ? (
+                      adminStats.top_area_manager_job_orders.map(
+                        (item, index: number) => (
+                          <div
+                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-12 flex justify-between items-center"
+                            title={item.category}
+                            key={index}
+                          >
+                            <div className="flex-col flex">
+                              <span
+                                className="text-gray-500 font-semibold line-clamp-1 text-sm"
+                                title={item.branch.name}
+                              >
+                                {`(${item.branch.code}) - ${item.branch.name}`}
+                              </span>
+                              <span
+                                className="text-gray-600 text-xs line-clamp-1"
+                                title={item.category}
+                              >
+                                {item.category}
+                              </span>
+                            </div>
+                            <span className="text-md font-bold text-gray-800">
+                              {phpCurrency(item.amount)}
+                            </span>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <p className="text-center text-md font-semibold text-gray-600">
+                        No data yet.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <Modal isOpen={isOpen} className="w-5xl" ref={modalRef}>
-        <ModalHeader onClose={handleView(null)}>Viewing {viewData?.customer.name}&apos;s Job Order</ModalHeader>
+        <ModalHeader onClose={handleView(null)}>
+          Viewing {viewData?.customer.name}&apos;s Job Order
+        </ModalHeader>
         <ModalBody>
           <PreviewData data={viewData} />
         </ModalBody>
@@ -447,4 +622,4 @@ const Dashboard = () => {
   );
 };
 
-export default authenticatedPage(Dashboard);
+export default withAuthPage(Dashboard);

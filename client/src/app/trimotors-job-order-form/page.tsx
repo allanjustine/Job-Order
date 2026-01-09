@@ -12,11 +12,15 @@ import toast from "react-hot-toast";
 import ServiceAndManager from "@/components/ServiceAndManager";
 import NextSchedule from "@/components/NextSchedule";
 import TrimotorsDiagnosis from "@/components/TrimotorsDiagnosis";
-import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobRequestType, TrimotorsJobAmountType } from "@/types/jobOrderFormType";
+import {
+  TrimotorsDiagnosisKeys,
+  DiagnosisState,
+  TrimotorsJobRequestType,
+  TrimotorsJobAmountType,
+} from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
-import { useRouter } from "next/navigation";
 import acronymName from "@/utils/acronymName";
-import authenticatedPage from "@/lib/hoc/authenticatedPage";
+import withAuthPage from "@/lib/hoc/with-auth-page";
 import dap from "@/assets/images/dap.jpg";
 import dsm from "@/assets/images/dsm.png";
 import smct from "@/assets/images/smct_branch.png";
@@ -31,6 +35,8 @@ import {
 import TrimotorsPreviewPrint from "@/components/TrimotorsPreviewPrint";
 import TrimotorsPrintJobOrder from "@/components/trimotors-print-job";
 import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
+import FormHeader from "@/components/form-header";
+import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -45,7 +51,7 @@ const TrimotorsJobOrderForm = () => {
   const { user, handleLogout } = useAuth();
   const [customerName, setCustomerName] = useState("");
   const [date, setDate] = useState("");
-  const [branch, setBranch] = useState("");
+  const [branch, setBranch] = useState(`(${user?.code}) - ${user?.name}`);
   const [contact, setContact] = useState("");
   const [model, setModel] = useState("");
   const [engineFrameNo, setEngineFrameNo] = useState("");
@@ -63,7 +69,7 @@ const TrimotorsJobOrderForm = () => {
   const [nextScheduleDate, setNextScheduleDate] = useState("");
   const [nextScheduleKms, setNextScheduleKms] = useState("");
   const [generalRemarks, setGeneralRemarks] = useState("");
-  
+
   // Amounts state
   const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
 
@@ -76,41 +82,42 @@ const TrimotorsJobOrderForm = () => {
   });
 
   const [jobRequest, setJobRequest] = useState<TrimotorsJobRequestType>({
-      vehicleWashing: false,
-      airFilter: false,
-      breather: false,
-      checkLights: false,
-      oilStrainer: false,
-      checkSteering: false,
-      cleanSpark: false,
-      checkValve: false,
-      checkFuel: false,
-      checkBattery: false,
-      tireRotation: false,
-      replaceProp: false,
-      replaceOil: false,
-      checkCabies: false,
-      checkShock: false,
-      checkBrake: false,
-      deCarbonising: false,
-      checkBrakeLiner: false,
-      replaceEngine: false,
-      replaceDifferential: false,
-      greaseSteering: false,
-      greaseFront: false,
-      greaseNipple: false,
-      greasePropeller: false,
-      greaseGear: false,
-      greaseFare: false,
-      speedometer: false,
-      petroleum: false,
-      others: false,
-      othersText: " ",
+    vehicleWashing: false,
+    airFilter: false,
+    breather: false,
+    checkLights: false,
+    oilStrainer: false,
+    checkSteering: false,
+    cleanSpark: false,
+    checkValve: false,
+    checkFuel: false,
+    checkBattery: false,
+    tireRotation: false,
+    replaceProp: false,
+    replaceOil: false,
+    checkCabies: false,
+    checkShock: false,
+    checkBrake: false,
+    deCarbonising: false,
+    checkBrakeLiner: false,
+    replaceEngine: false,
+    replaceDifferential: false,
+    greaseSteering: false,
+    greaseFront: false,
+    greaseNipple: false,
+    greasePropeller: false,
+    greaseGear: false,
+    greaseFare: false,
+    speedometer: false,
+    petroleum: false,
+    others: false,
+    othersText: "",
   });
 
-
-  const [diagnosis, setDiagnosis] = useState<Record<TrimotorsDiagnosisKeys, DiagnosisState>>({
-    windhsield: { status: null, remarks: "" },
+  const [diagnosis, setDiagnosis] = useState<
+    Record<TrimotorsDiagnosisKeys, DiagnosisState>
+  >({
+    windshield: { status: null, remarks: "" },
     wipeArm: { status: null, remarks: "" },
     frontIndicator: { status: null, remarks: "" },
     frontHeadLamp: { status: null, remarks: "" },
@@ -157,12 +164,11 @@ const TrimotorsJobOrderForm = () => {
     jack: { status: null, remarks: "" },
     spareTire: { status: null, remarks: "" },
     sideMirror: { status: null, remarks: "" },
-    warrantyBooklet: { status: null, remarks: "" }
+    warrantyBooklet: { status: null, remarks: "" },
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
-  const router = useRouter();
   const [dropDownOpen, setDropdownOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -171,36 +177,43 @@ const TrimotorsJobOrderForm = () => {
   const modalButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handler functions for amount changes
-  const handleJobAmountChange = (key: keyof TrimotorsJobAmountType, value: number) => {
-    setJobAmounts(prev => ({
+  const handleJobAmountChange = (
+    key: keyof TrimotorsJobAmountType,
+    value: number
+  ) => {
+    setJobAmounts((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
   // Calculate totals
   const jobTotal = useMemo(() => {
-    return Object.values(jobAmounts).reduce((total, amount) => total + (amount || 0), 0);
+    return Object.values(jobAmounts).reduce(
+      (total, amount) => total + (amount || 0),
+      0
+    );
   }, [jobAmounts]);
-
 
   // Clean up amounts when checkboxes are unchecked
   useEffect(() => {
     const updatedAmounts = { ...jobAmounts };
-    
+
     // Remove amount entries for unchecked jobRequest
-    Object.keys(updatedAmounts).forEach(key => {
+    Object.keys(updatedAmounts).forEach((key) => {
       const typedKey = key as keyof TrimotorsJobAmountType;
       // Check if the key exists in jobRequest and if it's false (exclude 'others' which is handled separately)
-      if (typedKey !== 'others' && !jobRequest[typedKey as keyof TrimotorsJobRequestType]) {
+      if (
+        typedKey !== "others" &&
+        !jobRequest[typedKey as keyof TrimotorsJobRequestType]
+      ) {
         delete updatedAmounts[typedKey];
       }
     });
-    
+
     setJobAmounts(updatedAmounts);
   }, [jobRequest]);
 
- 
   // Form validation
   const validateForm = () => {
     try {
@@ -228,6 +241,7 @@ const TrimotorsJobOrderForm = () => {
   // Set default date to today
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
+
     setDate(today);
   }, []);
 
@@ -326,9 +340,53 @@ const TrimotorsJobOrderForm = () => {
     };
   }, [isPrint]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  const itemsData = trimotorsJobItems
+    .filter((item) => jobRequest[item.key as keyof TrimotorsJobRequestType])
+    .map((item) => ({
+      category: item.key === "others" ? jobRequest.othersText : item.label,
+      amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
+    }));
+
+  const itemToStore = {
+    customer: {
+      name: customerName,
+      contact_number: contact,
+    },
+    job_order: {
+      job_order_type: "trimotors",
+      date: date,
+      branch_manager: signatures.branchManager,
+      general_remarks: generalRemarks,
+      mechanic_id: mechanic.split("_")[0],
+      repair_end: repairEnd,
+      repair_start: repairStart,
+      service_advisor: signatures.serviceAdvisor,
+      fuel_level: fuelLevel,
+      model: model,
+      mileage: mileage,
+      engine_number: engineFrameNo,
+    },
+    job_order_details: itemsData,
+  };
+
+  console.log(itemsData);
+
   const handleSavePrint = async () => {
     try {
-      const response = await api.post("/create-job-order", TrimotorsjobOrderData);
+      const response = await api.post("/create-job-order", itemToStore);
       if (response.status === 201) {
         toast.success(response.data, {
           position: "bottom-center",
@@ -382,11 +440,11 @@ const TrimotorsJobOrderForm = () => {
     setNextScheduleDate("");
     setNextScheduleKms("");
     setGeneralRemarks("");
-    
+    setMechanic("");
+
     // Reset amounts
     setJobAmounts({});
 
-    
     // Reset job request
     setJobRequest({
       vehicleWashing: false,
@@ -418,12 +476,12 @@ const TrimotorsJobOrderForm = () => {
       speedometer: false,
       petroleum: false,
       others: false,
-      othersText: " ",
+      othersText: "",
     });
-    
+
     // Reset diagnosis
     setDiagnosis({
-      windhsield: { status: null, remarks: "" },
+      windshield: { status: null, remarks: "" },
       wipeArm: { status: null, remarks: "" },
       frontIndicator: { status: null, remarks: "" },
       frontHeadLamp: { status: null, remarks: "" },
@@ -470,15 +528,15 @@ const TrimotorsJobOrderForm = () => {
       jack: { status: null, remarks: "" },
       spareTire: { status: null, remarks: "" },
       sideMirror: { status: null, remarks: "" },
-      warrantyBooklet: { status: null, remarks: "" }
+      warrantyBooklet: { status: null, remarks: "" },
     });
-    
+
     // Reset signatures
     setSignatures({
       serviceAdvisor: "",
       branchManager: "",
     });
-    
+
     // Reset errors
     setErrors({});
   };
@@ -495,7 +553,7 @@ const TrimotorsJobOrderForm = () => {
         confirmButtonText: "Yes, logout!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await handleLogout(router);
+          await handleLogout();
         }
       });
       handleToggleDropdown();
@@ -503,7 +561,7 @@ const TrimotorsJobOrderForm = () => {
       console.error(error);
     }
   };
-  
+
   const handleToggleDropdown = () => {
     setDropdownOpen(!dropDownOpen);
   };
@@ -549,11 +607,11 @@ const TrimotorsJobOrderForm = () => {
               </div>
               {dropDownOpen && (
                 <div
-                  className="absolute top-14 rounded-lg right-0 min-w-1/5 bg-white shadow-md border border-gray-300"
+                  className="absolute top-14 rounded-lg right-0 min-w-1/5 bg-white shadow-md border border-gray-300 z-99999"
                   ref={dropdownRef}
                 >
                   <div className="flex flex-col relative">
-                    <div className="absolute -top-2 -rotate-45 right-3 w-0 h-0 border-l-[16px] border-t-[16px] border-l-transparent border-t-gray-200"></div>
+                    <div className="absolute -top-2 -rotate-45 right-3 w-0 h-0 border-l-16 border-t-16 border-l-transparent border-t-gray-200"></div>
                     <div className="p-3 hover:bg-gray-100 rounded-lg">
                       <div className="flex gap-2 items-center">
                         <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
@@ -589,9 +647,10 @@ const TrimotorsJobOrderForm = () => {
           </div>
           <div className="min-h-screen bg-gray-50 py-4 md:px-20 no-print">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-[80vw] mx-auto">
+              <FormHeader category="motors" />
               <form onSubmit={handleSubmit}>
                 {/* Header */}
-                <div className="text-center mb-6 border-b-1 border-gray-300 pb-4">
+                <div className="text-center mb-6 border-b border-gray-300 pb-4">
                   <img
                     src="/trimotors-logo.png"
                     alt="Company Logo"
@@ -638,7 +697,6 @@ const TrimotorsJobOrderForm = () => {
                   setMechanic={setMechanic}
                 />
 
-
                 <p className="block text-lg font-bold text-gray-900 mb-1">
                   TRIMOTORS' DIAGNOSIS
                 </p>
@@ -651,8 +709,8 @@ const TrimotorsJobOrderForm = () => {
                   JOB ORDER
                 </p>
 
-                {/* Documents and Visual Check - Side by side 
-                */}
+                {/* Documents and Visual Check - Side by side
+                 */}
                 <TrimotorsJobRequest
                   jobRequest={jobRequest}
                   setJobRequest={setJobRequest}
@@ -728,4 +786,4 @@ const TrimotorsJobOrderForm = () => {
   );
 };
 
-export default authenticatedPage(TrimotorsJobOrderForm);
+export default withAuthPage(TrimotorsJobOrderForm);

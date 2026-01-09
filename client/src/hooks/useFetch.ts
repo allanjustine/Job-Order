@@ -17,7 +17,7 @@ export default function useFetch(url: string) {
   const [cardData, setCardData] = useState<any>([]);
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
 
-  const fetchJobOrderData = async () => {
+  const fetchData = async () => {
     const payload = {
       page: pagination.page,
       perPage: pagination.perPage,
@@ -57,7 +57,7 @@ export default function useFetch(url: string) {
   };
 
   useEffect(() => {
-    fetchJobOrderData();
+    fetchData();
   }, [
     pagination.page,
     pagination.perPage,
@@ -104,7 +104,7 @@ export default function useFetch(url: string) {
 
   const handleRefresh = () => {
     setIsRefresh(true);
-    fetchJobOrderData();
+    fetchData();
   };
 
   return {
@@ -123,5 +123,6 @@ export default function useFetch(url: string) {
     handleRefresh,
     handlePageChange,
     handleRowsPerPageChange,
+    fetchData,
   };
 }

@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Input from "@/components/ui/input";
 import Label from "@/components/ui/label";
 import { LOGIN_INPUTS } from "@/constants/formInputs";
 import { LoginInputType } from "@/types/formInputType";
 import { useAuth } from "@/context/authContext";
 import Link from "next/link";
-import guestPage from "@/lib/hoc/guestPage";
+import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
 import { Lock } from "lucide-react";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
-  const router = useRouter();
   const { handleLogin, error, errors } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formInputs, setFormInputs] = useState<LoginInputType>(LOGIN_INPUTS);
@@ -23,7 +22,7 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const status = await handleLogin(formInputs, router);
+      const status = await handleLogin(formInputs);
 
       if (status === 202) {
         setFormInputs(LOGIN_INPUTS);
@@ -46,6 +45,15 @@ const LoginPage = () => {
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  function handleForgotPassword() {
+    Swal.fire({
+      icon: "info",
+      title: "Forgot Password",
+      text: "Please contact the system administrator to reset your password.",
+      confirmButtonText: "Done",
+    });
+  }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
@@ -171,12 +179,13 @@ const LoginPage = () => {
                 </Label>
               </div>
               <div className="text-sm">
-                <Link
-                  href="/login"
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -227,4 +236,4 @@ const LoginPage = () => {
   );
 };
 
-export default guestPage(LoginPage);
+export default withoutAuthPage(LoginPage);

@@ -1,4 +1,12 @@
-import { Gauge, UserCog, Users, NotebookTextIcon, HandCoinsIcon, UserLockIcon } from "lucide-react";
+import {
+  Gauge,
+  UserCog,
+  Users,
+  NotebookTextIcon,
+  HandCoinsIcon,
+  UserCheck,
+  ShieldUser,
+} from "lucide-react";
 
 export const sidebarData = [
   {
@@ -13,18 +21,23 @@ export const sidebarData = [
   },
   {
     href: "/admin/customers",
-    icon: UserCog,
+    icon: UserCheck,
     name: "Customers",
   },
   {
     href: "/admin/mechanics",
-    icon: UserLockIcon,
+    icon: UserCog,
     name: "Mechanics",
   },
   {
     href: "/admin/target-income",
     icon: HandCoinsIcon,
     name: "Target Income",
+  },
+  {
+    href: "/admin/area-managers",
+    icon: ShieldUser,
+    name: "Area Managers",
   },
   {
     href: "/admin/reports",

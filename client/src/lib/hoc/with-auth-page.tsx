@@ -12,7 +12,9 @@ export default function withAuthPage(WrappedComponent: any) {
 
     if (isLoading && !user) return <GlobalLoader />;
 
-    if (!isAuthenticated && !user) return redirect("/login");
+    if (!isAuthenticated && !user) {
+      redirect("/login");
+    }
 
     if (!isAdmin && isAdminPath) return <Forbidden />;
 
