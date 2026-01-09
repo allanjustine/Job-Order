@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\TypeOfJob;
+use App\Enums\JobOrderType;
 use Illuminate\Database\Eloquent\Model;
 
 class JobOrder extends Model
@@ -12,11 +12,9 @@ class JobOrder extends Model
     protected function casts(): array
     {
         return [
-            'repair_job_end'    => 'datetime',
-            'repair_job_start'  => 'datetime',
-            'date'              => 'datetime',
-            'date_sold'         => 'datetime',
-            'type_of_job'       => TypeOfJob::class
+            'next_schedule_date' => 'datetime',
+            'date'               => 'datetime',
+            'job_order_type'     => JobOrderType::class,
         ];
     }
 
@@ -25,21 +23,13 @@ class JobOrder extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function jobRequests()
+    public function jobOrderDetails()
     {
-        return $this->hasMany(JobRequest::class);
+        return $this->hasMany(JobOrderDetail::class);
     }
 
-    public function partsRequests()
+    public function mechanic()
     {
-        return $this->hasMany(PartsRequest::class);
-    }
-    public function document()
-    {
-        return $this->hasOne(Document::class);
-    }
-    public function visualCheck()
-    {
-        return $this->hasOne(VisualCheck::class);
+        return $this->belongsTo(Mechanic::class);
     }
 }

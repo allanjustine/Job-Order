@@ -18,7 +18,7 @@ export default function Label({
       className={cn(
         onCheck
           ? "flex items-center gap-2 cursor-pointer hover:text-gray-500"
-          : "block text-sm font-medium text-gray-700 mb-1",
+          : "block text-sm font-semibold text-gray-500 mb-1",
         className
       )}
     >

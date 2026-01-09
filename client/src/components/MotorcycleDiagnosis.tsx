@@ -1,83 +1,93 @@
 "use client";
 
-import { DiagnosisKeys, DiagnosisState, DiagnosisStatus } from "@/types/jobOrderFormType";
-
+import {
+  DiagnosisKeys,
+  DiagnosisState,
+  DiagnosisStatus,
+} from "@/types/jobOrderFormType";
 
 export interface MotorcycleDiagnosisProps {
-diagnosis: Record<DiagnosisKeys, DiagnosisState>;
-setDiagnosis: React.Dispatch<React.SetStateAction<Record<DiagnosisKeys, DiagnosisState>>>;
+  diagnosis: Record<DiagnosisKeys, DiagnosisState>;
+  setDiagnosis: React.Dispatch<
+    React.SetStateAction<Record<DiagnosisKeys, DiagnosisState>>
+  >;
 }
 
 export default function MotorcycleDiagnosis({
   diagnosis,
   setDiagnosis,
 }: MotorcycleDiagnosisProps) {
-
   // Handler for checkbox button changes
   const handleStatusChange = (unit: DiagnosisKeys, status: DiagnosisStatus) => {
-    setDiagnosis(prev => ({
+    setDiagnosis((prev) => ({
       ...prev,
       [unit]: {
         ...prev[unit],
-        status: prev[unit].status === status ? null : status 
-      }
+        status: prev[unit].status === status ? null : status,
+      },
     }));
   };
 
   const handleRemarksChange = (unit: DiagnosisKeys, value: string) => {
-    setDiagnosis(prev => ({
+    setDiagnosis((prev) => ({
       ...prev,
       [unit]: {
         ...prev[unit],
-        remarks: value
-      }
+        remarks: value,
+      },
     }));
   };
 
   const renderRow = (label: string, unitKey: DiagnosisKeys) => (
     <tr className="border-t border-gray-200 hover:bg-gray-50">
-      <td className="p-1 border-r border-gray-200 text-md whitespace-nowrap">{label}</td>
-      
+      <td className="p-1 border-r border-gray-200 text-md whitespace-nowrap">
+        {label}
+      </td>
+
       {/* OK checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'ok'}
-          onChange={() => handleStatusChange(unitKey, 'ok')}
+          checked={diagnosis[unitKey].status === "ok"}
+          onChange={() => handleStatusChange(unitKey, "ok")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       {/* NG checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'ng'}
-          onChange={() => handleStatusChange(unitKey, 'ng')}
+          checked={diagnosis[unitKey].status === "ng"}
+          onChange={() => handleStatusChange(unitKey, "ng")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       {/* NA checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'na'}
-          onChange={() => handleStatusChange(unitKey, 'na')}
+          checked={diagnosis[unitKey].status === "na"}
+          onChange={() => handleStatusChange(unitKey, "na")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       <td className="p-1">
         <input
           type="text"
           value={diagnosis[unitKey].remarks}
           onChange={(e) => handleRemarksChange(unitKey, e.target.value)}
-          className="w-full px-1.5 py-0.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className={`w-full px-1.5 py-0.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+            !diagnosis[unitKey].status && "bg-gray-100 cursor-not-allowed"
+          }`}
           placeholder="..."
+          disabled={!diagnosis[unitKey].status}
+          required={!!diagnosis[unitKey].status}
         />
       </td>
     </tr>
@@ -103,9 +113,7 @@ export default function MotorcycleDiagnosis({
                 <th className="p-1 text-center font-semibold border-r border-gray-300 w-10 text-sm">
                   N/A
                 </th>
-                <th className="p-1 text-left font-semibold text-sm">
-                  Remarks
-                </th>
+                <th className="p-1 text-left font-semibold text-sm">Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -138,9 +146,7 @@ export default function MotorcycleDiagnosis({
                 <th className="p-1 text-center font-semibold border-r border-gray-300 w-10 text-sm">
                   N/A
                 </th>
-                <th className="p-1 text-left font-semibold text-sm">
-                  Remarks
-                </th>
+                <th className="p-1 text-left font-semibold text-sm">Remarks</th>
               </tr>
             </thead>
             <tbody>

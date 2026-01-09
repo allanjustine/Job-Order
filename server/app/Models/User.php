@@ -75,4 +75,24 @@ class User extends Authenticatable
     {
         return $this->isAdmin();
     }
+
+    public function jobOrders()
+    {
+        return $this->hasManyThrough(JobOrder::class, Customer::class);
+    }
+
+    public function targetIncomes()
+    {
+        return $this->hasMany(TargetIncome::class);
+    }
+
+    public function mechanics()
+    {
+        return $this->hasMany(Mechanic::class);
+    }
+
+    public function areaManagers()
+    {
+        return $this->belongsToMany(AreaManager::class);
+    }
 }

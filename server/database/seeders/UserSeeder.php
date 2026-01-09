@@ -6,6 +6,7 @@ use App\Enums\RoleName;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -18,15 +19,34 @@ class UserSeeder extends Seeder
     {
         app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
+        $password = Hash::make('password');
+
         $users = [
-            "name"          => "Head Office",
-            "code"          => "HO",
-            "email"         => "admin@gmail.com",
-            "password"      => "Smct123456",
-            "branch_id"     => 1,
+            [
+                "name"          => "Administrator",
+                "code"          => "admin",
+                "email"         => "admin@gmail.com",
+                "password"      => $password,
+                "branch_id"     => 1,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ],
+            [
+                "name"          => "Testing User",
+                "code"          => "TEST",
+                "email"         => "test@gmail.com",
+                "password"      => $password,
+                "branch_id"     => 2,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ]
         ];
 
-        $user = User::create($users);
+        User::query()
+            ->insert($users);
+
+        $user = User::query()
+            ->get();
 
         $roles = [
             [
@@ -40,7 +60,7 @@ class UserSeeder extends Seeder
                 "guard_name"        => "web",
                 "created_at"        => now(),
                 "updated_at"        => now(),
-            ]
+            ],
         ];
 
         $permissions = [
@@ -58,23 +78,30 @@ class UserSeeder extends Seeder
             ]
         ];
 
-        Permission::insert($permissions);
+        Permission::query()
+            ->insert($permissions);
 
-        Role::insert($roles);
+        Role::query()
+            ->insert($roles);
 
-        $adminPermissions = Permission::where("name", RoleName::ADMIN_ACCESS?->value)
+        $adminPermissions = Permission::query()
+            ->where("name", RoleName::ADMIN_ACCESS?->value)
             ->first();
-        $employeePermissions = Permission::where("name", RoleName::EMPLOYEE_ACCESS?->value)
+        $employeePermissions = Permission::query()
+            ->where("name", RoleName::EMPLOYEE_ACCESS?->value)
             ->first();
 
-        $adminRole = Role::where("name", RoleName::ADMIN?->value)
+        $adminRole = Role::query()
+            ->where("name", RoleName::ADMIN?->value)
             ->first();
-        $employeeRole = Role::where("name", RoleName::EMPLOYEE?->value)
+        $employeeRole = Role::query()
+            ->where("name", RoleName::EMPLOYEE?->value)
             ->first();
 
         $adminRole->syncPermissions([$adminPermissions, $employeePermissions]);
         $employeeRole->syncPermissions([$employeePermissions]);
 
-        $user->assignRole($adminRole, $employeeRole);
+        $user->first()->assignRole($adminRole);
+        $user->last()->assignRole($employeeRole);
     }
 }

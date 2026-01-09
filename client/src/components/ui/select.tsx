@@ -13,6 +13,8 @@ export default function Select({
   value?: string | number;
   onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
   defaultValue?: string | number;
+  required?: boolean;
+  multiple?: boolean;
 }) {
   return (
     <select

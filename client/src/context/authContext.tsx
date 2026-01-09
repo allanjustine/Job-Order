@@ -14,7 +14,6 @@ export const AuthContextProvider = ({ children }: any) => {
   const [error, setError] = useState<any>("");
   const [user, setUser] = useState<any | null>(null);
   const [errors, setErrors] = useState<any>({});
-  const [isLogin, setIsLogin] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -49,19 +48,19 @@ export const AuthContextProvider = ({ children }: any) => {
       console.error(error);
       if (error.response.status === 401) {
         setIsAuthenticated(false);
+        setUser(null);
+        setIsAdmin(false);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogin = async (credentials: any, router: any) => {
+  const handleLogin = async (credentials: any) => {
     try {
       const response = await login(credentials);
       if (response.status === 202) {
-        setIsLogin(true);
         fetchProfileData();
-        router.push(response.data.url);
       }
       return response.status;
     } catch (error: any) {
@@ -73,7 +72,7 @@ export const AuthContextProvider = ({ children }: any) => {
         setErrors(error.response.data.errors);
         setError("Something went wrong. Please fix the errors.");
       } else if (status === 404 || status === 400) {
-        setError(error.response.data);
+        setError(error.response?.data?.message);
         setErrors({});
       } else {
         setError("An unexpected error occurred. Please try again.");
@@ -82,14 +81,13 @@ export const AuthContextProvider = ({ children }: any) => {
     }
   };
 
-  const handleLogout = async (router: any) => {
+  const handleLogout = async () => {
     try {
       const response = await logout();
       if (response.status === 202) {
         setError("");
         setErrors({});
         fetchProfileData();
-        router.push("/login");
       }
     } catch (error: any) {
       console.error(error);
@@ -108,9 +106,7 @@ export const AuthContextProvider = ({ children }: any) => {
         error,
         user,
         errors,
-        isLogin,
         isAdmin,
-        setIsLogin,
       }}
     >
       {children}

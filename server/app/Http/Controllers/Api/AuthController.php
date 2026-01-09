@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\RoleName;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -28,30 +27,11 @@ class AuthController extends Controller
         //
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request, AuthService $authService)
     {
-        $request->validate([
-            'branchCodeOrEmail'     => ['required'],
-            'password'              => ['required', 'min:4', 'max:16']
-        ]);
+        $request->validated();
 
-        $user = User::where('email', $request->branchCodeOrEmail)
-            ->orWhere('code', $request->branchCodeOrEmail)
-            ->first();
-
-        if (!$user) {
-            return response()->json("Branch code or email does not exist", 404);
-        }
-
-
-        if (!Auth::guard('web')->attempt([
-            'email' => filter_var($request->branchCodeOrEmail, FILTER_VALIDATE_EMAIL) ? $request->branchCodeOrEmail : $user->email,
-            'password' => $request->password
-        ])) {
-            return response()->json("Invalid Credentials", 400);
-        }
-
-        $request->session()->regenerate();
+        $user = $authService->authenticate($request);
 
         return response()->json([
             "message"   => "Login successfully",
@@ -62,28 +42,11 @@ class AuthController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RegisterRequest $request, AuthService $authService)
     {
-        $request->validate([
-            "branchCode"        => ["required", "unique:users,code"],
-            "branchName"        => ["required"],
-            "branch"            => ["required", "exists:branches,id"],
-            "email"             => ["required", "email", "unique:users,email"],
-            "password"          => ["required", "min:4", "max:16", "confirmed"],
-        ]);
+        $request->validated();
 
-        $user = User::create([
-            "name"                  => $request->branchName,
-            "code"                  => $request->branchCode,
-            "branch_id"             => $request->branch,
-            "email"                 => $request->email,
-            "password"              => $request->password,
-        ]);
-
-        $employeeRole = Role::where("name", RoleName::EMPLOYEE?->value)
-            ->first();
-
-        $user->assignRole($employeeRole);
+        $authService->store($request);
 
         return response()->json("Successfully registered. You can login your account now.", 201);
     }
@@ -123,9 +86,6 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return response()->json(
-            "Logged out successfully",
-            202
-        );
+        return response()->json("Logged out successfully", 202);
     }
 }

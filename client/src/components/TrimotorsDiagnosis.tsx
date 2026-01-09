@@ -1,89 +1,106 @@
 "use client";
 
-import { TrimotorsDiagnosisKeys, DiagnosisState, DiagnosisStatus } from "@/types/jobOrderFormType";
+import {
+  TrimotorsDiagnosisKeys,
+  DiagnosisState,
+  DiagnosisStatus,
+} from "@/types/jobOrderFormType";
 
 export interface TrimotorsDiagnosisProps {
   diagnosis: Record<TrimotorsDiagnosisKeys, DiagnosisState>;
-  setDiagnosis: React.Dispatch<React.SetStateAction<Record<TrimotorsDiagnosisKeys, DiagnosisState>>>;
+  setDiagnosis: React.Dispatch<
+    React.SetStateAction<Record<TrimotorsDiagnosisKeys, DiagnosisState>>
+  >;
 }
 
 export default function TrimotorsDiagnosis({
   diagnosis,
   setDiagnosis,
 }: TrimotorsDiagnosisProps) {
-
   // Handler for checkbox button changes
-  const handleStatusChange = (unit: TrimotorsDiagnosisKeys, status: DiagnosisStatus) => {
-    setDiagnosis(prev => ({
+  const handleStatusChange = (
+    unit: TrimotorsDiagnosisKeys,
+    status: DiagnosisStatus
+  ) => {
+    setDiagnosis((prev) => ({
       ...prev,
       [unit]: {
         ...prev[unit],
-        status: prev[unit].status === status ? null : status 
-      }
+        status: prev[unit].status === status ? null : status,
+      },
     }));
   };
 
   const handleRemarksChange = (unit: TrimotorsDiagnosisKeys, value: string) => {
-    setDiagnosis(prev => ({
+    setDiagnosis((prev) => ({
       ...prev,
       [unit]: {
         ...prev[unit],
-        remarks: value
-      }
+        remarks: value,
+      },
     }));
   };
 
-  const renderRow = (label: string, unitKey: TrimotorsDiagnosisKeys, showGroupLabel: boolean = false, groupName: string = "") => (
+  const renderRow = (
+    label: string,
+    unitKey: TrimotorsDiagnosisKeys,
+    showGroupLabel: boolean = false,
+    groupName: string = ""
+  ) => (
     <tr className="border-t border-gray-200 hover:bg-gray-50">
       {/* Group Column */}
       <td className="p-1 border-r border-gray-200 text-md whitespace-nowrap font-medium bg-gray-50">
-        {showGroupLabel && (
-          <span className="text-gray-700">{groupName}</span>
-        )}
+        {showGroupLabel && <span className="text-gray-700">{groupName}</span>}
       </td>
-      
-      <td className="p-1 border-r border-gray-200 text-md whitespace-nowrap">{label}</td>
-      
+
+      <td className="p-1 border-r border-gray-200 text-md whitespace-nowrap">
+        {label}
+      </td>
+
       {/* OK checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'ok'}
-          onChange={() => handleStatusChange(unitKey, 'ok')}
+          checked={diagnosis[unitKey].status === "ok"}
+          onChange={() => handleStatusChange(unitKey, "ok")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       {/* NG checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'ng'}
-          onChange={() => handleStatusChange(unitKey, 'ng')}
+          checked={diagnosis[unitKey].status === "ng"}
+          onChange={() => handleStatusChange(unitKey, "ng")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       {/* NA checkbox Button */}
       <td className="p-1 text-center border-r border-gray-200 w-10">
         <input
           type="checkbox"
           name={`${unitKey}-status`}
-          checked={diagnosis[unitKey].status === 'na'}
-          onChange={() => handleStatusChange(unitKey, 'na')}
+          checked={diagnosis[unitKey].status === "na"}
+          onChange={() => handleStatusChange(unitKey, "na")}
           className="h-3 w-3 cursor-pointer"
         />
       </td>
-      
+
       <td className="p-1">
         <input
           type="text"
           value={diagnosis[unitKey].remarks}
           onChange={(e) => handleRemarksChange(unitKey, e.target.value)}
-          className="w-full px-1.5 py-0.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className={`w-full px-1.5 py-0.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+            !diagnosis[unitKey].status && "bg-gray-100 cursor-not-allowed"
+          }`}
           placeholder="..."
+          disabled={!diagnosis[unitKey].status}
+          required={!!diagnosis[unitKey].status}
         />
       </td>
     </tr>
@@ -97,8 +114,7 @@ export default function TrimotorsDiagnosis({
           <table className="w-full text-sm border border-gray-300">
             <thead>
               <tr className="bg-gray-100 border-b border-gray-300">
-                <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap">
-                </th>
+                <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap"></th>
                 <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap">
                   Units
                 </th>
@@ -111,13 +127,11 @@ export default function TrimotorsDiagnosis({
                 <th className="p-1 text-center font-semibold border-r border-gray-300 w-10 text-sm">
                   N/A
                 </th>
-                <th className="p-1 text-left font-semibold text-sm">
-                  Remarks
-                </th>
+                <th className="p-1 text-left font-semibold text-sm">Remarks</th>
               </tr>
             </thead>
             <tbody>
-              {renderRow("Windshield", "windhsield", true, "BODY FRONT")}
+              {renderRow("Windshield", "windshield", true, "BODY FRONT")}
               {renderRow("Wipe Arm", "wipeArm", false, "")}
               {renderRow("Front Indicator L/R", "frontIndicator", false, "")}
               {renderRow("Headlamp", "frontHeadLamp", false, "")}
@@ -138,7 +152,12 @@ export default function TrimotorsDiagnosis({
               {renderRow("Mud Guard", "mudGuard", true, "BODY RIGHT SIDE")}
               {renderRow("Beading", "rightBeading", false, "")}
               {renderRow("Right Side Body Paint", "rightBodyPaint", false, "")}
-              {renderRow("Check for Holes/Torn", "checkHoles", true, "HOOD FITMENT")}
+              {renderRow(
+                "Check for Holes/Torn",
+                "checkHoles",
+                true,
+                "HOOD FITMENT"
+              )}
               {renderRow("Damage Stitching", "damageStitching", false, "")}
               {renderRow("Cover Hood Top", "coverHood", false, "")}
             </tbody>
@@ -150,8 +169,7 @@ export default function TrimotorsDiagnosis({
           <table className="w-full text-sm border border-gray-300">
             <thead>
               <tr className="bg-gray-100 border-b border-gray-300">
-                <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap">
-                </th>
+                <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap"></th>
                 <th className="p-1 text-left font-semibold border-r border-gray-300 text-sm whitespace-nowrap">
                   Units
                 </th>
@@ -164,9 +182,7 @@ export default function TrimotorsDiagnosis({
                 <th className="p-1 text-center font-semibold border-r border-gray-300 w-10 text-sm">
                   N/A
                 </th>
-                <th className="p-1 text-left font-semibold text-sm">
-                  Remarks
-                </th>
+                <th className="p-1 text-left font-semibold text-sm">Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -187,7 +203,12 @@ export default function TrimotorsDiagnosis({
               {renderRow("Wiper Motor", "wiper", false, "")}
               {renderRow("Lamps (Interior/Engine)", "interiorLamp", false, "")}
               {renderRow("Gauge Lamps", "gaugeLamp", false, "")}
-              {renderRow("Car Charger w/ Cap", "carCharger", true, "ACCESSORIES")}
+              {renderRow(
+                "Car Charger w/ Cap",
+                "carCharger",
+                true,
+                "ACCESSORIES"
+              )}
               {renderRow("Tools", "tools", false, "")}
               {renderRow("Battery", "battery", false, "")}
               {renderRow("Jack", "jack", false, "")}

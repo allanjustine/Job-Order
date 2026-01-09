@@ -9,17 +9,20 @@ export default function Input({
   error?: boolean | null | string;
   value?: string | number;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   placeholder?: string;
   required?: boolean;
   hidden?: boolean;
   checked?: boolean;
   disabled?: boolean;
-  min?: string;
+  min?: string | number;
   step?: string;
   className?: string;
   name?: string;
   id?: string;
+  readOnly?: boolean;
+  max?: string | number;
 }) {
   return (
     <input

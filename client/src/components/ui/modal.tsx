@@ -2,9 +2,9 @@ import Button from "./button";
 import { FaX } from "react-icons/fa6";
 import cn from "@/lib/utils";
 
-function ModalHeader({ onClose, className, children }: any) {
+function ModalHeader({ onClose, className, centerText, children }: any) {
   return (
-    <div className="p-4">
+    <div className={`p-4 ${centerText && "text-center"}`}>
       <Button
         type="button"
         className="absolute top-3 right-0"
@@ -21,7 +21,7 @@ function ModalHeader({ onClose, className, children }: any) {
 
 function ModalFooter({ children }: any) {
   return (
-    <div className="py-2 px-5 flex justify-end">
+    <div className="py-2 px-3 flex justify-end">
       <div className="flex gap-2">{children}</div>
     </div>
   );

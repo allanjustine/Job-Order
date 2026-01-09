@@ -2,7 +2,7 @@
 
 import GlobalLoader from "@/components/GlobalLoaders";
 import { useAuth } from "@/context/authContext";
-import guestPage from "@/lib/hoc/guestPage";
+import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -43,7 +43,7 @@ const Home = () => {
                   href={user?.redirect_url}
                   className="text-lg px-8 py-6 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-700"
                 >
-                  Get Started
+                  Dashboard
                 </Link>
               ) : (
                 <Link
@@ -61,4 +61,4 @@ const Home = () => {
   );
 };
 
-export default guestPage(Home);
+export default withoutAuthPage(Home);

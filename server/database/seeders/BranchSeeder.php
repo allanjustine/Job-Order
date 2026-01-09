@@ -46,6 +46,7 @@ class BranchSeeder extends Seeder
             ],
         ];
 
-        Branch::insert($branches);
+        Branch::query()
+            ->insert($branches);
     }
 }

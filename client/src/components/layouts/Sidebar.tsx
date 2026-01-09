@@ -2,7 +2,7 @@ import { useAuth } from "@/context/authContext";
 import acronymName from "@/utils/acronymName";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import Button from "../ui/button";
@@ -18,7 +18,6 @@ export default function Sidebar({
   handleToggleSidebar: () => void;
 }) {
   const { handleLogout, user } = useAuth();
-  const router = useRouter();
   const [dropDownOpen, setDropdownOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,7 @@ export default function Sidebar({
         confirmButtonText: "Yes, logout!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await handleLogout(router);
+          await handleLogout();
         }
       });
       handleToggleDropdown();
@@ -73,11 +72,11 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`bg-white shadow transition-all z-50 duration-300 ease-in-out overflow-hidden flex-shrink-0 ${
+      className={`bg-white shadow transition-all z-50 duration-300 ease-in-out overflow-hidden shrink-0 ${
         isSidebarOpen ? "w-64" : "w-20"
       }`}
     >
-      <div className="p-4 flex items-center justify-center border-b border-gray-300">
+      <div className="p-4 flex items-center justify-center border-b border-gray-300 h-18">
         <Image src="/logo.png" alt="Logo" width={150} height={150} />
       </div>
       <nav className="p-1">
@@ -85,6 +84,7 @@ export default function Sidebar({
           {sidebarData.map((item, index) => (
             <li className="flex items-center w-full" key={index}>
               <Link
+                title={!isSidebarOpen ? item.name : ""}
                 className={`flex items-center gap-4 hover:bg-blue-100 transition-all w-full ${
                   !isSidebarOpen && "justify-center"
                 } p-3 rounded-lg text-blue-700 ${
@@ -103,7 +103,7 @@ export default function Sidebar({
       </nav>
       <div
         className={`absolute top-0 transition-all shadow duration-300 z-50 ease-in-out right-0 p-4 bg-white ${
-          isSidebarOpen ? "left-[257px]" : "left-[81px]"
+          isSidebarOpen ? "left-64.25" : "left-20.25"
         }`}
       >
         <div className="flex items-center">
@@ -127,11 +127,11 @@ export default function Sidebar({
             </Button>
             {dropDownOpen && (
               <div
-                className="absolute top-14 rounded-lg right-0 min-w-1/5 bg-white shadow-md border border-gray-300"
+                className="absolute top-14 rounded-lg right-0 min-w-1/5 bg-white shadow-md border border-gray-300 z-99999"
                 ref={dropdownRef}
               >
                 <div className="flex flex-col relative">
-                  <div className="absolute -top-2 -rotate-45 right-3 w-0 h-0 border-l-[16px] border-t-[16px] border-l-transparent border-t-gray-200"></div>
+                  <div className="absolute -top-2 -rotate-45 right-3 w-0 h-0 border-l-16 border-t-16 border-l-transparent border-t-gray-200"></div>
                   <div className="p-3 hover:bg-gray-100 rounded-lg">
                     <div className="flex gap-2 items-center">
                       <div className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">

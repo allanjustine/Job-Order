@@ -36,6 +36,7 @@ interface TrimotorsPrintJobOrderProps {
 }
 
 const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
+  console.log(data);
   
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
   
@@ -151,7 +152,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
         </div>
         <div className="flex">
           <span className="font-bold w-40">Mechanic Name:</span>
-          <span className="border-b border-black flex-1">{data.mechanic}</span>
+          <span className="border-b border-black flex-1">{data.mechanic.split("_")[1]}</span>
         </div>
       </div>
 
