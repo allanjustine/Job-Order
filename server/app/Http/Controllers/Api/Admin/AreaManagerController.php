@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateAreaManagerRequest;
 use App\Models\AreaManager;
 use App\Services\AreaManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AreaManagerController extends Controller
 {
@@ -20,6 +21,18 @@ class AreaManagerController extends Controller
 
         return response()->json([
             'message' => 'AreaManagers retrieved successfully.',
+            'data'    => $areaManagers
+        ], 200);
+    }
+
+    public function areaManagerSelectionOptions()
+    {
+        $areaManagers = AreaManager::query()
+            ->whereNot('id', Auth::id())
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'message' => 'Area Managers retrieved successfully.',
             'data'    => $areaManagers
         ], 200);
     }

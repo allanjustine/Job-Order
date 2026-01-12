@@ -5,7 +5,10 @@ import { PaginationType } from "@/types/paginationType";
 import { SortType } from "@/types/sortType";
 import { useEffect, useRef, useState } from "react";
 
-export default function useFetch(url: string) {
+export default function useFetch(
+  url: string,
+  { filterItem, filterBy }: { filterItem?: string; filterBy?: string } = {}
+) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
   const [error, setError] = useState<any>(null);
@@ -15,6 +18,7 @@ export default function useFetch(url: string) {
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [cardData, setCardData] = useState<any>([]);
+  const [defaultSearch, setDefaultSearch] = useState<string>("");
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
 
   const fetchData = async () => {
@@ -26,6 +30,8 @@ export default function useFetch(url: string) {
         direction: sort.sortBy,
       },
       search: searchTerm,
+      filter_item: filterItem,
+      filter_by: filterBy,
     };
 
     try {
@@ -64,6 +70,8 @@ export default function useFetch(url: string) {
     sort.column,
     sort.sortBy,
     searchTerm,
+    filterItem,
+    filterBy,
   ]);
 
   const handleSort = (column: any, direction: any) => {
@@ -96,6 +104,8 @@ export default function useFetch(url: string) {
 
     const { value } = e.target;
 
+    setDefaultSearch(value);
+
     debouncedSearchTerm.current = setTimeout(() => {
       setSearchTerm(value);
       setIsSearching(true);
@@ -117,12 +127,15 @@ export default function useFetch(url: string) {
     searchTerm,
     pagination,
     isSearching,
+    defaultSearch,
     handleSort,
     setIsRefresh,
     handleSearch,
     handleRefresh,
+    setSearchTerm,
     handlePageChange,
     handleRowsPerPageChange,
+    setDefaultSearch,
     fetchData,
   };
 }

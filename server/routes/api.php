@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\JobOrderController;
 use App\Http\Controllers\Api\Admin\MechanicController;
+use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\UserDashboardController;
@@ -30,8 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::resource('area-managers', AreaManagerController::class);
+        Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
+        Route::get('reports', [ReportController::class, 'index']);
+        Route::get('export-reports', [ReportController::class, 'exportData']);
     });
 
     // EMPLOYEE ROLE ROUTES
