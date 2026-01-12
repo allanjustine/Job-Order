@@ -198,7 +198,7 @@ const Reports = () => {
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
               <h2 className="text-xl font-semibold text-gray-600">
-                Area Manager
+                Area Managers
               </h2>
               <div className="relative w-full md:w-1/3">
                 <Input

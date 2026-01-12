@@ -15,6 +15,7 @@ export default function Select({
   defaultValue?: string | number;
   required?: boolean;
   multiple?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <select

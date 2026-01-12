@@ -23,6 +23,7 @@ export default function Input({
   id?: string;
   readOnly?: boolean;
   max?: string | number;
+  ref?: any;
 }) {
   return (
     <input

@@ -121,8 +121,8 @@ class AdminDashboardService
 
             return $jobOrderDetails->map(fn($items, $category) => [
                 'category' => $category,
-                'amount' => $items->sum('amount'),
-                'branch' => [
+                'amount'   => $items->sum('amount'),
+                'branch'   => [
                     'name' => $items->first()->jobOrder?->customer?->user?->name,
                     'code' => $items->first()->jobOrder?->customer?->user?->code
                 ]
@@ -158,11 +158,12 @@ class AdminDashboardService
                 ->groupBy('category');
 
             return $jobOrderDetails->map(fn($items, $category) => [
-                'category' => $category,
-                'amount' => $items->sum('amount'),
-                'branch' => [
-                    'name' => $items->first()->jobOrder?->customer?->user?->name,
-                    'code' => $items->first()->jobOrder?->customer?->user?->code
+                'category'          => $category,
+                'area_manager_name' => $item->name,
+                'amount'            => $items->sum('amount'),
+                'branch'            => [
+                    'name'          => $items->first()->jobOrder?->customer?->user?->name,
+                    'code'          => $items->first()->jobOrder?->customer?->user?->code
                 ]
             ])
                 ->sortByDesc('amount')

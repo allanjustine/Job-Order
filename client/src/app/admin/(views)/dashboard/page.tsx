@@ -55,6 +55,7 @@ interface StatItem {
   }[];
   top_area_manager_job_orders: {
     category: string;
+    area_manager_name: string;
     amount: number;
     branch: {
       name: string;
@@ -115,6 +116,7 @@ const Dashboard = () => {
     top_area_manager_job_orders: [
       {
         category: "",
+        area_manager_name: "",
         amount: 0,
         branch: {
           name: "",
@@ -455,7 +457,7 @@ const Dashboard = () => {
                   <>
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        className="w-full p-5 rounded-lg bg-slate-200 h-12 flex justify-between items-center animate-pulse"
                         key={index}
                         style={{ animationDelay: `${index * 0.2}s` }}
                       ></div>
@@ -498,7 +500,7 @@ const Dashboard = () => {
                   <>
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        className="w-full p-5 rounded-lg bg-slate-200 h-12 flex justify-between items-center animate-pulse"
                         key={index}
                         style={{ animationDelay: `${index * 0.2}s` }}
                       ></div>
@@ -552,7 +554,7 @@ const Dashboard = () => {
                   <>
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
+                        className="w-full p-5 rounded-lg bg-slate-200 h-17 flex justify-between items-center animate-pulse"
                         key={index}
                         style={{ animationDelay: `${index * 0.2}s` }}
                       ></div>
@@ -564,11 +566,17 @@ const Dashboard = () => {
                       adminStats.top_area_manager_job_orders.map(
                         (item, index: number) => (
                           <div
-                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-12 flex justify-between items-center"
+                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-17 flex justify-between items-center"
                             title={item.category}
                             key={index}
                           >
                             <div className="flex-col flex">
+                              <span
+                                className="text-gray-500 font-semibold line-clamp-1 text-md"
+                                title={item.area_manager_name}
+                              >
+                                {item.area_manager_name}
+                              </span>
                               <span
                                 className="text-gray-500 font-semibold line-clamp-1 text-sm"
                                 title={item.branch.name}
