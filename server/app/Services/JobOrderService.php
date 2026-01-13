@@ -58,6 +58,9 @@ class JobOrderService
 
     public function store($request, $user)
     {
+        \Log::info($request->customer);
+        \Log::info($request->job_order);
+        \Log::info($request->job_order_details);
         $customer = DB::transaction(function () use ($request, $user) {
             $lastJobOrderNumber = $user
                 ->jobOrders()
