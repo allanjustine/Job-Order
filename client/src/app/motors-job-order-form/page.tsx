@@ -392,8 +392,10 @@ const JobOrderForm = () => {
   }, [isPrint]);
 
   const itemToStore = {
-    name: customerName,
-    contact_number: contact,
+    customer: {
+      name: customerName,
+      contact_number: contact,
+    },
     job_order: {
       job_order_type: "motors",
       date: date,

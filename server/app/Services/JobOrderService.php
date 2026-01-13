@@ -67,10 +67,7 @@ class JobOrderService
 
             $customer = $user
                 ->customers()
-                ->create([
-                    'name'           => "Test Waw",
-                    'contact_number' => "122222222"
-                ]);
+                ->create($request->customer);
 
             $job_order = $customer
                 ->jobOrders()
