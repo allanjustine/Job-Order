@@ -68,8 +68,8 @@ class JobOrderService
             $customer = $user
                 ->customers()
                 ->create([
-                    'name'           => Str::title($request->name),
-                    'contact_number' => $request->contact_number
+                    'name'           => "Test Waw",
+                    'contact_number' => "122222222"
                 ]);
 
             $job_order = $customer
