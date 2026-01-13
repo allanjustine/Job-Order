@@ -7,7 +7,7 @@ const api = axios.create({
   headers: {
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
-    "Content-Type": undefined,
+    "Content-Type": "application/json",
   },
 });
 
