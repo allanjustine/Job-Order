@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\Admin\MechanicController;
 use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
 use App\Http\Controllers\Api\UsersController;
-use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\Api\UserDashboardController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
