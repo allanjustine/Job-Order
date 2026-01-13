@@ -22,10 +22,7 @@ class StoreJobOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer.name'           => ['required'],
-            'customer.contact_number' => ['required'],
-            'job_order'               => ['required', 'array'],
-            'job_order_details'       => ['required', 'array'],
+            //
         ];
     }
 }

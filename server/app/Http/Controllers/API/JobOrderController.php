@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreJobOrderRequest;
-use App\Models\Customer;
 use App\Services\JobOrderService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class JobOrderController extends Controller
@@ -21,7 +20,7 @@ class JobOrderController extends Controller
         ]);
     }
 
-    public function store(StoreJobOrderRequest $request, JobOrderService $jobOrderService)
+    public function store(Request $request, JobOrderService $jobOrderService)
     {
         $user = Auth::user();
 
