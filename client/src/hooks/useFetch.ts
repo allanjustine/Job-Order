@@ -3,7 +3,9 @@ import { SORT } from "@/constants/sort";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/paginationType";
 import { SortType } from "@/types/sortType";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Swal from "sweetalert2";
 
 export default function useFetch(
   url: string,
@@ -20,6 +22,7 @@ export default function useFetch(
   const [cardData, setCardData] = useState<any>([]);
   const [defaultSearch, setDefaultSearch] = useState<string>("");
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
+  const router = useRouter();
 
   const fetchData = async () => {
     const payload = {
@@ -51,6 +54,20 @@ export default function useFetch(
     } catch (error: any) {
       console.error(error);
       setError(error.response.data);
+      if (error.response.status === 401) {
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired!",
+          text: "Please login again.",
+          confirmButtonText: "Back to Login",
+          allowOutsideClick: false,
+          confirmButtonColor: "#3085d6",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.replace("/login");
+          }
+        });
+      }
     } finally {
       setIsLoading(false);
       setIsRefresh(false);
@@ -72,6 +89,7 @@ export default function useFetch(
     searchTerm,
     filterItem,
     filterBy,
+    router,
   ]);
 
   const handleSort = (column: any, direction: any) => {
