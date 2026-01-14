@@ -91,73 +91,29 @@ class ReportService
         $filter_item = request('filter_item', '');
         $filter_by = request('filter_by', 'all');
 
-        if ($filter_by === 'all') {
-            $jobOrderDetails = JobOrderDetail::query()
-                ->get()
-                ->groupBy('category');
-
-            return $jobOrderDetails->map(fn($items, $category) => [
+        return JobOrderDetail::query()
+            ->when(
+                $filter_by === 'branch',
+                fn($query)
+                =>
+                $query->whereRelation('jobOrder.customer', 'user_id', $filter_item)
+            )
+            ->when(
+                $filter_by === 'area_manager',
+                fn($query)
+                =>
+                $query->whereRelation('jobOrder.customer.user.areaManagers', 'area_manager_id', $filter_item)
+            )
+            ->get()
+            ->groupBy('category')
+            ->map(fn($items, $category) => [
                 'Job Request & Parts Replacement' => $category,
-                'Total Incom'                     => $items->sum('amount'),
+                'Total Income'                    => $items->sum('amount'),
                 'Total Job Request'               => $items->count()
             ])
-                ->sortByDesc('count')
-                ->filter()
-                ->values();
-        }
-
-        if ($filter_by === 'branch') {
-            $customerIds = Customer::query()
-                ->where('user_id', $filter_item)
-                ->pluck('id');
-
-            $jobOrderIds = JobOrder::query()
-                ->whereIn('customer_id', $customerIds)
-                ->pluck('id');
-
-            $jobOrderDetails = JobOrderDetail::query()
-                ->whereIn('job_order_id', $jobOrderIds)
-                ->get()
-                ->groupBy('category');
-
-            return $jobOrderDetails->map(fn($items, $category) => [
-                'Job Request & Parts Replacement' => $category,
-                'Total Incom'                     => $items->sum('amount'),
-                'Total Job Request'               => $items->count()
-            ])
-                ->sortByDesc('count')
-                ->filter()
-                ->values();
-        }
-
-        if ($filter_by === 'area_manager') {
-            $areaManager = AreaManager::query()
-                ->where('id', $filter_item)
-                ->first();
-
-            $userIds = $areaManager->users->pluck('id');
-
-            $customerIds = Customer::query()
-                ->whereIn('user_id', $userIds)
-                ->pluck('id');
-
-            $jobOrderIds = JobOrder::query()
-                ->whereIn('customer_id', $customerIds)
-                ->pluck('id');
-
-            $jobOrderDetails = JobOrderDetail::query()
-                ->whereIn('job_order_id', $jobOrderIds)
-                ->get()
-                ->groupBy('category');
-
-            return $jobOrderDetails->map(fn($items, $category) => [
-                'Job Request & Parts Replacement' => $category,
-                'Total Incom'                     => $items->sum('amount'),
-                'Total Job Request'               => $items->count()
-            ])
-                ->sortByDesc('count')
-                ->filter()
-                ->values();
-        }
+            ->sortByDesc('Total Job Request')
+            ->filter()
+            ->take(10)
+            ->values();
     }
 }

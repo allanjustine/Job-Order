@@ -363,7 +363,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-10">
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 h-fit">
             <div className="mb-2 flex justify-end">
               <Button
                 type="button"

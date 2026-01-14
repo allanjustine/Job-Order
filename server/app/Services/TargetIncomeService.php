@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\JobOrder;
 use App\Models\TargetIncome;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class TargetIncomeService
 {
@@ -40,12 +41,8 @@ class TargetIncomeService
             ->paginate($per_page, ['id', 'target_income', 'month_of', 'user_id', 'created_at']);
 
         $targetIncome->getCollection()->transform(function ($target) {
-            $customerIds = Customer::query()
-                ->where('user_id', $target->user_id)
-                ->pluck('id');
-
             $jobOrderIncome = JobOrder::query()
-                ->whereIn('customer_id', $customerIds)
+                ->whereRelation('customer.user', 'id', $target->user_id)
                 ->withSum([
                     'jobOrderDetails'
                     =>
@@ -58,7 +55,7 @@ class TargetIncomeService
                 ->sum('job_order_details_sum_amount');
 
             return [
-                'id'            => $target->id,
+                'ida'            => $target->id,
                 'user'          => [
                     'id'        => $target->user_id,
                     'name'      => $target->user->name,

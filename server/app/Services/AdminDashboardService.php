@@ -96,8 +96,8 @@ class AdminDashboardService
             'amount'   => $items->sum('amount'),
         ])
             ->sortByDesc('amount')
-            ->take(10)
             ->filter()
+            ->take(10)
             ->values();
     }
 
@@ -129,9 +129,10 @@ class AdminDashboardService
             ])
                 ->sortByDesc('amount')
                 ->first();
-        })->sortByDesc('amount')
-            ->take(10)
+        })
+            ->sortByDesc('amount')
             ->filter()
+            ->take(10)
             ->values();
     }
 
@@ -169,8 +170,8 @@ class AdminDashboardService
                 ->sortByDesc('amount')
                 ->first();
         })->sortByDesc('amount')
-            ->take(10)
             ->filter()
+            ->take(10)
             ->values();
     }
 
