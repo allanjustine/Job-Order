@@ -14,21 +14,17 @@ class UserDashboardService
 {
     private function totalJobPrints()
     {
-        $customerIds = Customer::query()
-            ->where('user_id', Auth::id())
-            ->pluck('id');
-
         $total = JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->count();
 
         $totalMotors = JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->where('job_order_type', JobOrderType::MOTORS?->value)
             ->count();
 
         $totalTrimotors = JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->where('job_order_type', JobOrderType::TRIMOTORS?->value)
             ->count();
 
@@ -57,12 +53,8 @@ class UserDashboardService
 
     private function monthlyShopIncome()
     {
-        $customerIds = Customer::query()
-            ->where('user_id', Auth::id())
-            ->pluck('id');
-
         return JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->withSum([
                 'jobOrderDetails'
                 =>
@@ -77,12 +69,8 @@ class UserDashboardService
 
     private function totalAmount()
     {
-        $customerIds = Customer::query()
-            ->where('user_id', Auth::id())
-            ->pluck('id');
-
         return JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->withSum('jobOrderDetails', 'amount')
             ->get()
             ->sum('job_order_details_sum_amount');
@@ -97,23 +85,15 @@ class UserDashboardService
 
     public function getTopJobOrders()
     {
-        $customerIds = Customer::query()
-            ->where('user_id', Auth::id())
-            ->pluck('id');
-
-        $jobOrders = JobOrder::query()
-            ->whereIn('customer_id', $customerIds)
-            ->pluck('id');
-
-        $jobOrderDetails = JobOrderDetail::query()
-            ->whereIn('job_order_id', $jobOrders)
+        return JobOrderDetail::query()
+            ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get()
-            ->groupBy('category');
-
-        return $jobOrderDetails->map(fn($items, $category) => [
-            'category' => $category,
-            'amount'   => $items->sum('amount'),
-        ])->sortByDesc('amount')
+            ->groupBy('category')
+            ->map(fn($items, $category) => [
+                'category' => $category,
+                'amount'   => $items->sum('amount'),
+            ])
+            ->sortByDesc('amount')
             ->take(5)
             ->values();
     }
@@ -121,6 +101,7 @@ class UserDashboardService
     private function targetData()
     {
         $percentage = ($this->monthlyShopIncome() <= 0 || $this->monthlyTargetIncome() <= 0) ? 0 : number_format(($this->monthlyShopIncome() / $this->monthlyTargetIncome()) * 100, 2);
+
         return [
             'total_remaining_target' => $this->monthlyTargetIncome() - $this->monthlyShopIncome(),
             'target_percentage'      => $this->monthlyTargetIncome() === 0 ? "0.00%" : "{$percentage}%"
