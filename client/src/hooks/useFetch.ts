@@ -87,7 +87,6 @@ export default function useFetch(
     searchTerm,
     filterItem,
     filterBy,
-    router,
   ]);
 
   const handleSort = (column: any, direction: any) => {
