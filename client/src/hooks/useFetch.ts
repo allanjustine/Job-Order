@@ -3,7 +3,6 @@ import { SORT } from "@/constants/sort";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/paginationType";
 import { SortType } from "@/types/sortType";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -22,7 +21,6 @@ export default function useFetch(
   const [cardData, setCardData] = useState<any>([]);
   const [defaultSearch, setDefaultSearch] = useState<string>("");
   const debouncedSearchTerm = useRef<NodeJS.Timeout>(null);
-  const router = useRouter();
 
   const fetchData = async () => {
     const payload = {
@@ -64,7 +62,7 @@ export default function useFetch(
           confirmButtonColor: "#3085d6",
         }).then((result) => {
           if (result.isConfirmed) {
-            router.replace("/login");
+            window.location.reload();
           }
         });
       }
