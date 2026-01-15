@@ -81,7 +81,6 @@ const Reports = () => {
     }
     setDefaultSearch("");
     setSearchTerm("");
-    setFilterItem("");
   }, [filterBy]);
 
   const columns = [
@@ -158,6 +157,10 @@ const Reports = () => {
 
   const handleSelectFilter = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
+
+    if (value !== "all") {
+      setFilterItem("");
+    }
 
     setFilterBy(value);
   };
