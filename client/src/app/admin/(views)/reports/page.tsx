@@ -77,6 +77,7 @@ const Reports = () => {
   useEffect(() => {
     if (filterBy === "all") {
       handleRefresh();
+      setFilterItem("all");
     }
     setDefaultSearch("");
     setSearchTerm("");
@@ -346,8 +347,8 @@ const Reports = () => {
                 <Activity
                   mode={
                     ["branch", "area_manager", "all"].includes(filterBy) &&
-                    reports.length > 0 &&
-                    filterItem
+                    filterItem &&
+                    reports.length > 0
                       ? "visible"
                       : "hidden"
                   }
