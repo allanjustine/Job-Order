@@ -346,7 +346,8 @@ const Reports = () => {
                 <Activity
                   mode={
                     ["branch", "area_manager", "all"].includes(filterBy) &&
-                    reports.length > 0
+                    reports.length > 0 &&
+                    filterItem
                       ? "visible"
                       : "hidden"
                   }
