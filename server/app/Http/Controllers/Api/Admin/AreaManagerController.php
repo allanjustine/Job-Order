@@ -28,7 +28,6 @@ class AreaManagerController extends Controller
     public function areaManagerSelectionOptions()
     {
         $areaManagers = AreaManager::query()
-            ->whereNot('id', Auth::id())
             ->get(['id', 'name']);
 
         return response()->json([
