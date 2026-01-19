@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\UserDashboardController;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -48,6 +49,15 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('branch-mechanics', [MechanicController::class, 'branchMechanic']);
         Route::get('branch-stats', [UserDashboardController::class, 'index']);
+        Route::get('get-job-order-number', function () {
+            $lastJobOrderNumber = Auth::user()->jobOrders()->max('job_order_number') ?? 0;
+
+            $jobOrderNumber = sprintf('%07d', $lastJobOrderNumber + 1);
+
+            return response()->json([
+                'job_order_number' => $jobOrderNumber
+            ], 200);
+        });
     });
 
     // GLOBAL AUTHENTICATED ROUTES
