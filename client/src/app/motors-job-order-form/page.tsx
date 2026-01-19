@@ -165,6 +165,23 @@ const JobOrderForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
+  const [jobOrderNumber, setJobOrderNumber] = useState("");
+
+  useEffect(() => {
+    const fetchJobOrderNumber = async () => {
+      try {
+        const response = await api.get("/get-job-order-number");
+
+        if (response.status === 200) {
+          setJobOrderNumber(response.data.job_order_number);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchJobOrderNumber();
+  }, []);
 
   // Handler functions for amount changes
   const handleJobAmountChange = (key: keyof JobAmountsType, value: number) => {
@@ -176,7 +193,7 @@ const JobOrderForm = () => {
 
   const handlePartsAmountChange = (
     key: keyof PartsAmountsType,
-    value: number
+    value: number,
   ) => {
     setPartsAmounts((prev) => ({
       ...prev,
@@ -188,20 +205,20 @@ const JobOrderForm = () => {
   const jobTotal = useMemo(() => {
     return Object.values(jobAmounts).reduce(
       (total, amount) => total + (amount || 0),
-      0
+      0,
     );
   }, [jobAmounts]);
 
   const partsTotal = useMemo(() => {
     return Object.values(partsAmounts).reduce(
       (total, amount) => total + (amount || 0),
-      0
+      0,
     );
   }, [partsAmounts]);
 
   const overallTotal = useMemo(
     () => jobTotal + partsTotal,
-    [jobTotal, partsTotal]
+    [jobTotal, partsTotal],
   );
 
   // Clean up amounts when checkboxes are unchecked
@@ -355,6 +372,7 @@ const JobOrderForm = () => {
     generalRemarks,
     serviceAdvisor: signatures.serviceAdvisor,
     branchManager: signatures.branchManager,
+    jobOrderNumber,
   };
 
   useEffect(() => {

@@ -175,11 +175,28 @@ const TrimotorsJobOrderForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
+  const [jobOrderNumber, setJobOrderNumber] = useState("");
+
+  useEffect(() => {
+    const fetchJobOrderNumber = async () => {
+      try {
+        const response = await api.get("/get-job-order-number");
+
+        if (response.status === 200) {
+          setJobOrderNumber(response.data.job_order_number);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchJobOrderNumber();
+  }, []);
 
   // Handler functions for amount changes
   const handleJobAmountChange = (
     key: keyof TrimotorsJobAmountType,
-    value: number
+    value: number,
   ) => {
     setJobAmounts((prev) => ({
       ...prev,
@@ -191,7 +208,7 @@ const TrimotorsJobOrderForm = () => {
   const jobTotal = useMemo(() => {
     return Object.values(jobAmounts).reduce(
       (total, amount) => total + (amount || 0),
-      0
+      0,
     );
   }, [jobAmounts]);
 
@@ -304,6 +321,7 @@ const TrimotorsJobOrderForm = () => {
     serviceAdvisor: signatures.serviceAdvisor,
     branchManager: signatures.branchManager,
     mechanic,
+    jobOrderNumber,
   };
 
   useEffect(() => {
