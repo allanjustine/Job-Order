@@ -168,7 +168,10 @@ const JobOrderForm = () => {
   const [jobOrderNumber, setJobOrderNumber] = useState("");
 
   useEffect(() => {
-    const fetchJobOrderNumber = async () => {
+    fetchJobOrderNumber();
+  }, []);
+
+   const fetchJobOrderNumber = async () => {
       try {
         const response = await api.get("/get-job-order-number");
 
@@ -179,9 +182,6 @@ const JobOrderForm = () => {
         console.error(error);
       }
     };
-
-    fetchJobOrderNumber();
-  }, []);
 
   // Handler functions for amount changes
   const handleJobAmountChange = (key: keyof JobAmountsType, value: number) => {
@@ -448,6 +448,7 @@ const JobOrderForm = () => {
         });
         handlePreviewPrint();
         handleReset();
+        fetchJobOrderNumber();
       }
     } catch (error) {
       console.error(error);

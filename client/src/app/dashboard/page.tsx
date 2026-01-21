@@ -69,7 +69,7 @@ const Dashboard = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { handleLogout: handleLogoutUser } = useAuth();
+  const { user,handleLogout: handleLogoutUser } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -234,7 +234,7 @@ const Dashboard = () => {
               {/* Left side: Welcome text and buttons */}
               <div>
                 <h1 className="text-3xl font-bold mb-2">
-                  Welcome to Job Order System
+                  Welcome to Job Order System, {user?.name.toUpperCase()}
                 </h1>
                 <p className="text-blue-100 opacity-90 mb-6">
                   Manage and track all job orders efficiently. Create new job

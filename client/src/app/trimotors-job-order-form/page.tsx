@@ -178,7 +178,10 @@ const TrimotorsJobOrderForm = () => {
   const [jobOrderNumber, setJobOrderNumber] = useState("");
 
   useEffect(() => {
-    const fetchJobOrderNumber = async () => {
+    fetchJobOrderNumber();
+  }, []);
+
+   const fetchJobOrderNumber = async () => {
       try {
         const response = await api.get("/get-job-order-number");
 
@@ -189,9 +192,6 @@ const TrimotorsJobOrderForm = () => {
         console.error(error);
       }
     };
-
-    fetchJobOrderNumber();
-  }, []);
 
   // Handler functions for amount changes
   const handleJobAmountChange = (
@@ -349,6 +349,7 @@ const TrimotorsJobOrderForm = () => {
     window.onafterprint = () => {
       handlePrint();
       handleSavePrint();
+      fetchJobOrderNumber();
     };
 
     window.print();

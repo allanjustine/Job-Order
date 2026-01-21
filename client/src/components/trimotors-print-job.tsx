@@ -32,6 +32,7 @@ interface TrimotorsPrintJobOrderProps {
     serviceAdvisor: string;
     branchManager: string;
     mechanic:string;
+    jobOrderNumber: string;
   };
 }
 
@@ -89,7 +90,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
 
   return (
     <div
-      className="p-1 font-sans bg-white text-black leading-tight border-2 border-black-100"
+      className="p-0 font-sans bg-white text-black leading-tight border-2 border-black-100"
       style={{
         fontSize: "6pt",
         maxWidth: "210mm",
@@ -99,9 +100,15 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       }}
     >
       {/* Honda Header */}
-      <div className="flex flex-col justify-center items-center mb-1">
-        <img src="/smct-header.jpg" alt="Company Logo" className="h-8 w-auto mx-auto" />
-        <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "6pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
+       <div className="flex flex-col justify-center items-center mb-1">
+        <div className="flex justify-between items-center w-full">
+          <div className="flex-1"></div> {/* Left spacer */}
+          <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
+          <div className="flex-1 flex justify-end items-center">
+            <h3 className="text-right">{ data.branch.replace("(", "").replace(")", "").split(" ")[0] }-{ data.jobOrderNumber }</h3>
+          </div>
+        </div>
+        <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "8pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
       </div>
 
       {/* Vehicle Information - Compact Grid */}
