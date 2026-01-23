@@ -88,7 +88,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       }}
     >
       {/* Honda Header */}
-       <div className="flex flex-col justify-center items-center mb-1">
+       <div className="flex flex-col justify-center items-center mb-0.5">
         <div className="flex justify-between items-center w-full">
           <div className="flex-1"></div> {/* Left spacer */}
           <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
@@ -237,7 +237,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       </div>
 
       {/* Motorcycle Diagnosis Section */}
-      <div className="mb-2 text-xs">
+      <div className="mb-1 text-xs">
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           MOTORCYCLE'S DIAGNOSIS
         </h3>
