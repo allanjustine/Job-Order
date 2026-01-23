@@ -93,7 +93,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
           <div className="flex-1"></div> {/* Left spacer */}
           <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
           <div className="flex-1 flex justify-end items-center">
-            <h3 className="text-right">{ data.branch.replace("(", "").replace(")", "").split(" ")[0] }-{ data.jobOrderNumber }</h3>
+            <h3 className="text-right font-bold">{ data.branch.replace("(", "").replace(")", "").split(" ")[0] }-{ data.jobOrderNumber }</h3>
           </div>
         </div>
         <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "8pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
@@ -525,7 +525,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
 
       {/* JOB ORDER - Two Column Layout */}
       <div
-        className="mb-0.5 text-xs"
+        className="mb-0 text-xs"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
         <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
@@ -1083,7 +1083,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
 
       {/* Signatures */}
       <div
-        className="mt-0.5 grid grid-cols-3 gap-2 text-xs"
+        className="mt-0 grid grid-cols-3 gap-2 text-xs"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
         <div className="text-center  p-0.5">
@@ -1122,7 +1122,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       </div>
 
       {/* Footer Note */}
-      <p className="mt-2 text-center" style={{ fontSize: "6pt" }}>
+      <p className="mt-2 text-center" style={{ fontSize: "5pt" }}>
         Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
       </p>
     </div>

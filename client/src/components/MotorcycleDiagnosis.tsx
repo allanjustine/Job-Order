@@ -80,14 +80,14 @@ export default function MotorcycleDiagnosis({
       <td className="p-1">
         <input
           type="text"
-          value={diagnosis[unitKey].remarks}
+          value={diagnosis[unitKey].remarks || ""}
           onChange={(e) => handleRemarksChange(unitKey, e.target.value)}
           className={`w-full px-1.5 py-0.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
             !diagnosis[unitKey].status && "bg-gray-100 cursor-not-allowed"
           }`}
           placeholder="..."
           disabled={!diagnosis[unitKey].status}
-          required={!!diagnosis[unitKey].status}
+          // required={!!diagnosis[unitKey].status}
         />
       </td>
     </tr>
