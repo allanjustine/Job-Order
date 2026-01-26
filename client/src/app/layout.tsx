@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] scroll-smooth font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [bg-size:16px_16px] scroll-smooth font-sans`}
       >
         <AuthContextProvider>
           <Toaster />
