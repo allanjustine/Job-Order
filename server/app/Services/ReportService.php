@@ -25,7 +25,7 @@ class ReportService
             'customer.name'      => Customer::query()->select('name')->whereColumn('customers.id', 'job_orders.customer_id'),
             'mechanic.name'      => Mechanic::query()->select('name')->whereColumn('mechanics.id', 'job_orders.mechanic_id'),
             'customer.user.name' => User::query()->select('users.name')->where('users.id', Customer::query()->select('customers.user_id')->whereColumn('customers.id', 'job_orders.customer_id')),
-            default => $sort['column']
+            default              => $sort['column']
         };
 
         $search = request('search', '');
