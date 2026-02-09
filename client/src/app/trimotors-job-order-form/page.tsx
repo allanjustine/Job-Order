@@ -739,6 +739,7 @@ const TrimotorsJobOrderForm = () => {
                 />
 
                 <NextSchedule
+                  errors={errors}
                   nextScheduleDate={nextScheduleDate}
                   nextScheduleKms={nextScheduleKms}
                   generalRemarks={generalRemarks}
