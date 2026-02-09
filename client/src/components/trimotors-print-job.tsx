@@ -584,7 +584,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
         </div>
         <div className="text-center  p-0.5">
           <div className=" mb-1 pb-1 h-3"></div>
-          <p className="text-xxs text-left" style={{fontSize: '7pt'}}>Performed by:</p>
+          <p className="text-xxs text-left" style={{fontSize: '7pt'}}>Conformed by:</p>
           <p className="underline" style={{fontStyle:'underline',fontSize: '7pt'}}>{data.customerName}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">Customer</p>
