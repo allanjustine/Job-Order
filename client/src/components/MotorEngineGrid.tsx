@@ -30,7 +30,7 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label required>Label</Label>
+              <Label required>Remarks</Label>
               <Input 
                 error={errors.remarks}
                 placeholder=""
