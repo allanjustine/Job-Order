@@ -754,6 +754,7 @@ const JobOrderForm = () => {
 
                 {/* Repair Dates - Full width */}
                 <MotorEngineGrid
+                  errors={errors}
                   motorcycleUnit={motorcycleUnit}
                   remarks={remarks}
                   engineUnit={engineUnit}
@@ -794,6 +795,7 @@ const JobOrderForm = () => {
                 />
 
                 <NextSchedule
+                  errors={errors}
                   nextScheduleDate={nextScheduleDate}
                   nextScheduleKms={nextScheduleKms}
                   generalRemarks={generalRemarks}

@@ -3,6 +3,7 @@ import Input from "./ui/input";
 import Label from "./ui/label";
 
 export default function NextSchedule({
+  errors,
   nextScheduleDate,
   nextScheduleKms,
   generalRemarks,
@@ -36,11 +37,15 @@ export default function NextSchedule({
       <div className="mt-4">
         <Label>General Remarks:</Label>
         <Input 
+          error={errors.generalRemarks}
           placeholder=""
           className="w-full mt-1"
           value={generalRemarks}
           onChange={(e) => setGeneralRemarks(e.target.value)}
         />
+         {errors.date && (
+          <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+        )}
       </div>
     </div>
   );

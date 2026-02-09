@@ -3,6 +3,7 @@ import Label from "./ui/label";
 import Select from "./ui/select";
 
 export default function MotorEngineGrid({
+  errors,
   motorcycleUnit,
   remarks,
   engineUnit,
@@ -31,11 +32,15 @@ export default function MotorEngineGrid({
             <div className="mt-2">
               <Label>Remarks</Label>
               <Input 
+                error={errors.remarks}
                 placeholder=""
                 className="w-full"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
               />
+              {errors.remarks && (
+                <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
+             )}
             </div>
           </div>
         </div>
@@ -53,11 +58,15 @@ export default function MotorEngineGrid({
             <div className="mt-2">
               <Label>Engine Condition</Label>
               <Input 
+                error={errors.engineCondition}
                 placeholder=""
                 className="w-full"
                 value={engineCondition}
                 onChange={(e) => setEngineCondition(e.target.value)}
               />
+              {errors.engineCondition && (
+                <p className="text-red-500 text-xs mt-1">{errors.engineCondition}</p>
+              )}
             </div>
           </div>
         </div>
@@ -66,11 +75,15 @@ export default function MotorEngineGrid({
       <div className="mt-4">
         <Label>Contents inside U-Box</Label>
         <Input 
+          error={errors.contentUbox}
           placeholder=""
           className="w-full"
           value={contentUbox}
           onChange={(e) => setContentUbox(e.target.value)}
         />
+        {errors.contentUbox && (
+          <p className="text-red-500 text-xs mt-1">{errors.contentUbox}</p>
+        )}
       </div>
     </div>
   );
