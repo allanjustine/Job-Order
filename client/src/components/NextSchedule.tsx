@@ -35,7 +35,7 @@ export default function NextSchedule({
       </div>
 
       <div className="mt-4">
-        <Label>General Remarks:</Label>
+        <Label required>General Remarks:</Label>
         <Input 
           error={errors.generalRemarks}
           placeholder=""

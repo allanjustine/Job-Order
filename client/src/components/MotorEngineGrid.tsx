@@ -30,7 +30,7 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label>Remarks</Label>
+              <Label required>Label</Label>
               <Input 
                 error={errors.remarks}
                 placeholder=""
@@ -47,7 +47,7 @@ export default function MotorEngineGrid({
         
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
-            <Label>Engine Unit</Label>
+            <Label required>Engine Unit</Label>
             <Select value={engineUnit} onChange={(e) => setEngineUnit(e.target.value)}>
               <option value="" disabled>Select Engine Unit</option>
               <option value="business_sports">Business/Sports</option>
@@ -56,7 +56,7 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label>Engine Condition</Label>
+              <Label required>Engine Condition</Label>
               <Input 
                 error={errors.engineCondition}
                 placeholder=""
@@ -73,7 +73,7 @@ export default function MotorEngineGrid({
       </div>
       
       <div className="mt-4">
-        <Label>Contents inside U-Box</Label>
+        <Label required>Contents inside U-Box</Label>
         <Input 
           error={errors.contentUbox}
           placeholder=""
