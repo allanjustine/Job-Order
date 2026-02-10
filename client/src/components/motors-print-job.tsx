@@ -543,7 +543,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                 Amount
               </th>
               <th className="border border-black p-0.5 text-left">
-                Parts for Replacement
+                Parts Used
               </th>
               <th className="border border-black p-0.5 text-center w-16">
                 Amount

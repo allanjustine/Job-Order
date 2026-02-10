@@ -437,7 +437,7 @@ const formatCurrency = (amount: number | undefined): string => {
             <tr className="bg-gray-40">
               <th className="border border-black p-0.5 text-left">Specific Job(s) Request</th>
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
-              <th className="border border-black p-0.5 text-left">Parts for Replacement</th>
+              <th className="border border-black p-0.5 text-left">Parts Used</th>
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
             </tr>
           </thead>
