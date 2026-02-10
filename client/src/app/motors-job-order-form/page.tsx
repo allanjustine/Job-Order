@@ -54,6 +54,10 @@ const formSchema = z.object({
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
   mechanic: z.string().min(1, "Mechanic is required"),
+  remarks: z.string().min(1, "Remarks is required"),
+  engineCondition: z.string().min(1, "Engine condition is required"),
+  contentUbox: z.string().min(1, "Content inside Ubox is required"),
+  generalRemarks: z.string().min(1, "General remarks is required"),
 });
 
 const JobOrderForm = () => {
@@ -168,7 +172,10 @@ const JobOrderForm = () => {
   const [jobOrderNumber, setJobOrderNumber] = useState("");
 
   useEffect(() => {
-    const fetchJobOrderNumber = async () => {
+    fetchJobOrderNumber();
+  }, []);
+
+   const fetchJobOrderNumber = async () => {
       try {
         const response = await api.get("/get-job-order-number");
 
@@ -179,9 +186,6 @@ const JobOrderForm = () => {
         console.error(error);
       }
     };
-
-    fetchJobOrderNumber();
-  }, []);
 
   // Handler functions for amount changes
   const handleJobAmountChange = (key: keyof JobAmountsType, value: number) => {
@@ -270,6 +274,10 @@ const JobOrderForm = () => {
         repairStart,
         repairEnd,
         mechanic,
+        remarks,
+        engineCondition,
+        contentUbox,
+        generalRemarks,
       });
       setErrors({});
       return true;
@@ -448,6 +456,7 @@ const JobOrderForm = () => {
         });
         handlePreviewPrint();
         handleReset();
+        fetchJobOrderNumber();
       }
     } catch (error) {
       console.error(error);
@@ -745,6 +754,7 @@ const JobOrderForm = () => {
 
                 {/* Repair Dates - Full width */}
                 <MotorEngineGrid
+                  errors={errors}
                   motorcycleUnit={motorcycleUnit}
                   remarks={remarks}
                   engineUnit={engineUnit}
@@ -785,6 +795,7 @@ const JobOrderForm = () => {
                 />
 
                 <NextSchedule
+                  errors={errors}
                   nextScheduleDate={nextScheduleDate}
                   nextScheduleKms={nextScheduleKms}
                   generalRemarks={generalRemarks}

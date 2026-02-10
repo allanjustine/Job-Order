@@ -34,6 +34,7 @@ interface PreviewJobOrderProps {
     serviceAdvisor: string;
     branchManager: string;
     mechanic:string;
+    jobOrderNumber: string;
   };
 }
 
@@ -73,10 +74,16 @@ const formatCurrency = (amount: number | undefined): string => {
       }}
     >
       {/* Honda Header */}
-     <div className="flex flex-col justify-center items-center mb-1">
-        <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto mx-auto" />
+      <div className="flex flex-col justify-center items-center mb-1">
+        <div className="flex justify-between items-center w-full">
+          <div className="flex-1"></div> {/* Left spacer */}
+          <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
+          <div className="flex-1 flex justify-end items-center">
+            <h3 className="text-right font-bold">{ data.branch.replace("(", "").replace(")", "").split(" ")[0] }-{ data.jobOrderNumber }</h3>
+          </div>
+        </div>
         <h2 className="font-bold border-t border-b border-black py-1 my-1 text-center w-full" style={{ fontSize: "8pt", lineHeight: "0.8" }}>VEHICLE CHECKLIST</h2>
-    </div>
+      </div>
 
       {/* Vehicle Information - Compact Grid */}
       <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
@@ -430,7 +437,7 @@ const formatCurrency = (amount: number | undefined): string => {
             <tr className="bg-gray-40">
               <th className="border border-black p-0.5 text-left">Specific Job(s) Request</th>
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
-              <th className="border border-black p-0.5 text-left">Parts for Replacement</th>
+              <th className="border border-black p-0.5 text-left">Parts Used</th>
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
             </tr>
           </thead>
