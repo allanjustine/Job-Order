@@ -61,6 +61,20 @@ const formatCurrency = (amount: number | undefined): string => {
   if (!amount || amount === 0) return '';
   return phpCurrency(amount);
 };
+const getCouponName = (couponId: number | undefined): string => {
+  if (!couponId) return "";
+  
+  const coupons = [
+    { id: 1, name: "Coupon 1" },
+    { id: 2, name: "Coupon 2" },
+    { id: 3, name: "Coupon 3" },
+    { id: 4, name: "Coupon 4" },
+    { id: 5, name: "Coupon 5" },
+    { id: 6, name: "Coupon 6" },
+  ];
+  
+  return coupons.find(c => c.id === couponId)?.name || `Coupon ${couponId}`;
+};
 
   return (
     <div
@@ -447,17 +461,26 @@ const formatCurrency = (amount: number | undefined): string => {
               <td className="border border-black p-0.5">
                 <div className="flex items-center">
                   <span className="w-6">{renderCheckbox(data.jobRequest.coupon)}</span>
-                  <span>Coupon (1 / 2 / 3)</span>
+                  <span>
+                    {data.jobRequest.coupon && data.jobRequest.selectedCoupon 
+                      ? `Coupon - ${getCouponName(data.jobRequest.selectedCoupon)}`
+                      : "Coupon"
+                    }
+                  </span>
                 </div>
               </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("coupon"))}</td>
+              <td className="border border-black p-0.5 text-left">
+                {data.jobRequest.coupon ? formatCurrency(getJobAmount("coupon")) : ""}
+              </td>
               <td className="border border-black p-0.5">
                 <div className="flex items-center">
                   <span className="w-6">{renderCheckbox(data.partsReplacement.engineOil)}</span>
                   <span>Engine Oil</span>
                 </div>
               </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("engineOil"))}</td>
+              <td className="border border-black p-0.5 text-left">
+                {formatCurrency(getPartsAmount("engineOil"))}
+              </td>
             </tr>
             
             {/* Row 2 */}
