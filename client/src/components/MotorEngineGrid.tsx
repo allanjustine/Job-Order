@@ -3,7 +3,6 @@ import Label from "./ui/label";
 import Select from "./ui/select";
 
 export default function MotorEngineGrid({
-  errors,
   motorcycleUnit,
   remarks,
   engineUnit,
@@ -30,24 +29,20 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label required>Remarks</Label>
+              <Label>Remarks</Label>
               <Input 
-                error={errors.remarks}
                 placeholder=""
                 className="w-full"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
               />
-              {errors.remarks && (
-                <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
-             )}
             </div>
           </div>
         </div>
         
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
-            <Label required>Engine Unit</Label>
+            <Label>Engine Unit</Label>
             <Select value={engineUnit} onChange={(e) => setEngineUnit(e.target.value)}>
               <option value="" disabled>Select Engine Unit</option>
               <option value="business_sports">Business/Sports</option>
@@ -56,34 +51,26 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label required>Engine Condition</Label>
+              <Label>Engine Condition</Label>
               <Input 
-                error={errors.engineCondition}
                 placeholder=""
                 className="w-full"
                 value={engineCondition}
                 onChange={(e) => setEngineCondition(e.target.value)}
               />
-              {errors.engineCondition && (
-                <p className="text-red-500 text-xs mt-1">{errors.engineCondition}</p>
-              )}
             </div>
           </div>
         </div>
       </div>
       
       <div className="mt-4">
-        <Label required>Contents inside U-Box</Label>
+        <Label>Contents inside U-Box</Label>
         <Input 
-          error={errors.contentUbox}
           placeholder=""
           className="w-full"
           value={contentUbox}
           onChange={(e) => setContentUbox(e.target.value)}
         />
-        {errors.contentUbox && (
-          <p className="text-red-500 text-xs mt-1">{errors.contentUbox}</p>
-        )}
       </div>
     </div>
   );
