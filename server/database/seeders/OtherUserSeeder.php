@@ -76,7 +76,7 @@ class OtherUserSeeder extends Seeder
             ['DSM Santo Tomas', 'TOMAS', 3],
             ['Suzuki Ozamiz', 'DSMSO', 3],
             ['DSM Tacurong', 'TACU', 3],
-            ['DSM Tagbilaran 2', 'DSMT2', 3],
+            ['DSM Tagbilaran', 'DSMT', 3],
             ['DSM Tagum', 'DSMTG', 3],
             ['DSM Toril', 'TORI', 3],
             ['DSM Valencia', 'DSMV', 3],

@@ -1,6 +1,12 @@
 
+export type CouponType = {
+  id: number;
+  name: string;
+};
+
 export type JobRequest = {
   coupon: boolean;
+  selectedCoupon?: number;
   changeOil: boolean;
   overhaul: boolean;
   chainSprocket: boolean;
