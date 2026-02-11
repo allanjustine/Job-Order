@@ -22,7 +22,7 @@ export default function PartsReplacementSection({
   return (
     <div className="bg-gray-50 p-4 rounded-md">
       <h3 className="text-md font-semibold mb-3 text-blue-700 text-center">
-        PARTS FOR REPLACEMENT
+        PARTS USED
       </h3>
       <div className="space-y-2">
         {partsItems
