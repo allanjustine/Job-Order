@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(JobOrder::class)->constrained()->cascadeOnDelete();
             $table->string('category');
             $table->integer('amount');
+            $table->string('type');
             $table->timestamps();
         });
     }
