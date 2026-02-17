@@ -27,7 +27,7 @@ import PreviewData from "@/components/PreviewData";
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { FaMagnifyingGlass, FaRotateRight,FaFileExcel } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Link from "next/link";
@@ -336,6 +336,22 @@ const Dashboard = () => {
                           <FaRotateRight /> Refresh
                         </>
                       )}
+                    </Button>
+                    <Button
+                        type="button"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white ml-5"
+                        // onClick={handleExport}
+                        // disabled={isExporting}
+                      >
+                        {isRefresh? (
+                          <>
+                            <FaCircleNotch className="animate-spin" /> Exporting...
+                          </>
+                        ) : (
+                          <>
+                            <FaFileExcel /> Export
+                          </>
+                        )}
                     </Button>
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
