@@ -171,6 +171,8 @@ const Reports = () => {
     { value: "branch", label: "Branch" },
     { value: "area_manager", label: "Area Manager" },
     { value: "date", label: "Date" },
+    { value: "job_order_type", label: "Job Order Type" },
+    { value: "job_order_detail_type", label: "Job Order Detail Type" },
   ];
 
   const handleFilterItem = (e: any) => {
@@ -192,8 +194,7 @@ const Reports = () => {
         const worksheet = XLSX.utils.json_to_sheet(response.data.data);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
-        console.log(workbook);
-
+        
         const excelBuffer = XLSX.write(workbook, {
           bookType: "xlsx",
           type: "array",
@@ -203,25 +204,32 @@ const Reports = () => {
         });
 
         let item: any;
-
+        
         if (filterBy === "branch") {
           item = branches.find(
-            (branch: any) => branch.id === Number(filterItem)
+            (branch: any) => branch.id === Number(filterItem),
           );
         } else if (filterBy === "area_manager") {
           item = areaManagers.find(
-            (areaManager: any) => areaManager.id === Number(filterItem)
+            (areaManager: any) => areaManager.id === Number(filterItem),
           );
         }
 
         const saveFileName =
           filterBy === "all"
             ? "all-data-of-job-request-reports.xlsx"
-            : filterBy === "branch"
-            ? `${filterBy}-(${item?.code})-${item?.name}-data-of-job-request-reports.xlsx`
-            : filterBy === "area_manager"
-            ? `${filterBy}-${item?.name}-data-of-job-request-reports.xlsx`
-            : `reports.xlsx`;
+            : filterBy === "job_order_detail_type" ||
+                filterBy === "job_order_type"
+              ? `${filterBy}-(${filterItem})-data-of-job-request-reports.xlsx`
+              : filterBy === "branch"
+                ? `${filterBy}-(${item?.code})-${item?.name}-data-of-job-request-reports.xlsx`
+                : filterBy === "search"
+                ? `${filterBy}-(${searchTerm?.toLowerCase()})-data-of-job-request-reports.xlsx`
+                : filterBy === "date"
+                ? `${filterBy}-(${filterItem})-data-of-job-request-reports.xlsx`
+                : filterBy === "area_manager"
+                  ? `${filterBy}-${item?.name}-data-of-job-request-reports.xlsx`
+                  : `reports.xlsx`;
 
         saveAs(blob, saveFileName);
       }
@@ -323,6 +331,44 @@ const Reports = () => {
                 />
               </div>
             </Activity>
+            <Activity
+              mode={filterBy === "job_order_detail_type" ? "visible" : "hidden"}
+            >
+              <div className="w-full">
+                <Label htmlFor="branch">Filter by Job Order Detail Type</Label>
+                <Select
+                  value={filterItem}
+                  onChange={handleFilterItem}
+                  className="h-12"
+                >
+                  <option value="" disabled>
+                    {" "}
+                    Select job order detail type
+                  </option>
+                  <option value="job_request">Job Request</option>
+                  <option value="parts_replacement">Parts Replacement</option>
+                </Select>
+              </div>
+            </Activity>
+            <Activity
+              mode={filterBy === "job_order_type" ? "visible" : "hidden"}
+            >
+              <div className="w-full">
+                <Label htmlFor="branch">Filter by Job Order Type</Label>
+                <Select
+                  value={filterItem}
+                  onChange={handleFilterItem}
+                  className="h-12"
+                >
+                  <option value="" disabled>
+                    {" "}
+                    Select job order type
+                  </option>
+                  <option value="motors">Motors</option>
+                  <option value="trimotors">Trimotors</option>
+                </Select>
+              </div>
+            </Activity>
           </div>
         </div>
         <div className="bg-white rounded-md border border-gray-300 shadow">
@@ -349,9 +395,7 @@ const Reports = () => {
                 </Button>
                 <Activity
                   mode={
-                    ["branch", "area_manager", "all"].includes(filterBy) &&
-                    filterItem &&
-                    reports.length > 0
+                    filterBy && (filterItem || searchTerm) && !isRefresh && !isLoading && reports.length > 0
                       ? "visible"
                       : "hidden"
                   }

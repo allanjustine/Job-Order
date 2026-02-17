@@ -31,7 +31,6 @@ const RepairJobForm: FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted data:", formData);
   };
 
   const router = useRouter();

@@ -52,6 +52,12 @@ const Users = () => {
       sortField: "code",
     },
     {
+      name: "LAST EXPORT",
+      cell: (row: any) => (
+        <span className="font-bold text-gray-600">{row.user_export_log ?? "N/A"}</span>
+      ),
+    },
+    {
       name: "ASSIGNED BRANCH",
       cell: (row: any) => (
         <div>

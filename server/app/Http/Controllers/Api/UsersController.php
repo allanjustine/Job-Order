@@ -21,7 +21,7 @@ class UsersController extends Controller
 
         $search = request('search') ?: '';
 
-        $customers = User::with('branch:id,branch_name,branch_code', 'roles:id,name')
+        $customers = User::with(['branch:id,branch_name,branch_code', 'roles:id,name', 'userExportLog'])
             ->whereNotIn('id', [Auth::id()])
             ->when(
                 $search,
@@ -48,7 +48,17 @@ class UsersController extends Controller
             ->paginate($per_page);
 
         $data = async(fn() => [
-            "data"  => $customers
+            "data"                => $customers->through(fn($user) => [
+                "id"              => $user->id,
+                "name"            => $user->name,
+                "code"            => $user->code,
+                "branch_id"       => $user->branch_id,
+                "email"           => $user->email,
+                "branch"          => $user->branch,
+                "user_export_log" => $user->userExportLog?->created_at?->diffForHumans(),
+                "roles"           => $user->roles,
+                'created_at'      => $user->created_at,
+            ])
         ]);
 
         return response()->json(await($data), 200);

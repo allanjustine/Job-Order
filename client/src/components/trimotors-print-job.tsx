@@ -37,7 +37,6 @@ interface TrimotorsPrintJobOrderProps {
 }
 
 const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
-  console.log(data);
   
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
   
