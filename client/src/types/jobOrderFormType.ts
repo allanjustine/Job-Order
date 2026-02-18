@@ -6,7 +6,7 @@ export type CouponType = {
 
 export type JobRequest = {
   coupon: boolean;
-  selectedCoupon?: number;
+  selectedCoupon?: string;
   changeOil: boolean;
   overhaul: boolean;
   chainSprocket: boolean;
