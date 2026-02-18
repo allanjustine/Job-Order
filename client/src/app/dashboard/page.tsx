@@ -74,7 +74,6 @@ const Dashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, handleLogout: handleLogoutUser } = useAuth();
   const [isExporting, setIsExporting] = useState<boolean>(false);
-  const [filterMechanic, setFilterMechanic] = useState<string>("");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
