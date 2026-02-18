@@ -571,7 +571,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span className="w-6">{renderCheckbox(data.jobRequest.coupon)}</span>
                   <span>
                     {data.jobRequest.coupon && data.jobRequest.selectedCoupon 
-                      ? `Coupon - ${getCouponName(data.jobRequest.selectedCoupon)}`
+                      ? `Coupon - ${getCouponName(String(data.jobRequest.selectedCoupon))}`
                       : "Coupon"
                     }
                   </span>
