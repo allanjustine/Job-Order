@@ -181,17 +181,17 @@ const TrimotorsJobOrderForm = () => {
     fetchJobOrderNumber();
   }, []);
 
-   const fetchJobOrderNumber = async () => {
-      try {
-        const response = await api.get("/get-job-order-number");
+  const fetchJobOrderNumber = async () => {
+    try {
+      const response = await api.get("/get-job-order-number");
 
-        if (response.status === 200) {
-          setJobOrderNumber(response.data.job_order_number);
-        }
-      } catch (error) {
-        console.error(error);
+      if (response.status === 200) {
+        setJobOrderNumber(response.data.job_order_number);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // Handler functions for amount changes
   const handleJobAmountChange = (
@@ -377,6 +377,7 @@ const TrimotorsJobOrderForm = () => {
     .map((item) => ({
       category: item.key === "others" ? jobRequest.othersText : item.label,
       amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
+      type: "job_request",
     }));
 
   const itemToStore = {
@@ -400,8 +401,6 @@ const TrimotorsJobOrderForm = () => {
     },
     job_order_details: itemsData,
   };
-
-  console.log(itemsData);
 
   const handleSavePrint = async () => {
     try {

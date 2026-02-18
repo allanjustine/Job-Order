@@ -6,7 +6,7 @@ export type CouponType = {
 
 export type JobRequest = {
   coupon: boolean;
-  selectedCoupon?: number;
+  selectedCoupon?: string;
   changeOil: boolean;
   overhaul: boolean;
   chainSprocket: boolean;
@@ -103,6 +103,7 @@ export type JobAmountsType = {
   generalCheckup?: number;
   warrantyRepair?: number;
   others?: number;
+  selectedCoupon?: number;
 };
 
 export type PartsAmountsType = {

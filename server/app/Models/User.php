@@ -95,4 +95,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(AreaManager::class);
     }
+
+    public function userExportLog()
+    {
+        return $this->hasOne(UserExportLog::class);
+    }
 }

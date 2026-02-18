@@ -27,7 +27,7 @@ import PreviewData from "@/components/PreviewData";
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaMagnifyingGlass, FaRotateRight,FaFileExcel } from "react-icons/fa6";
+import { FaFileExcel, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Link from "next/link";
@@ -37,6 +37,9 @@ import { formatDateAndTime } from "@/utils/format-date-and-time";
 import { diffForHumans } from "@/utils/diff-for-humans";
 import StatCards from "@/components/stat-cards";
 import Mechanics from "@/components/mechanics/mechanics";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { api } from "@/lib/api";
 
 const Dashboard = () => {
   const {
@@ -69,7 +72,9 @@ const Dashboard = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user,handleLogout: handleLogoutUser } = useAuth();
+  const { user, handleLogout: handleLogoutUser } = useAuth();
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [filterMechanic, setFilterMechanic] = useState<string>("");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -224,6 +229,49 @@ const Dashboard = () => {
 
   const router = useRouter();
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await api.get("/export-branch-reports", {
+        params: {
+          search: searchTerm,
+        },
+      });
+
+      if (response.status === 200) {
+        const worksheet = XLSX.utils.json_to_sheet(response.data.data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
+
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], {
+          type: "application/octet-stream",
+        });
+
+        let item: any;
+
+        const now = new Date();
+
+        const monthName = now.toLocaleString("en-US", { month: "long" });
+
+        const monthOfAndYear = `Month of ${monthName} ${now.getFullYear()}`;
+
+        const saveFileName = searchTerm
+          ? `${searchTerm}-${monthOfAndYear}.xlsx`
+          : `${monthOfAndYear}-Reports.xlsx`;
+
+        saveAs(blob, saveFileName);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <>
       <div className="p-6">
@@ -317,7 +365,7 @@ const Dashboard = () => {
             <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-[70%_30%] gap-2">
                 <div className="">
-                  <div className="mb-2 flex justify-end">
+                  <div className="mb-2 flex justify-end gap-1">
                     <Button
                       type="button"
                       disabled={isRefresh}
@@ -337,22 +385,31 @@ const Dashboard = () => {
                         </>
                       )}
                     </Button>
-                    <Button
+                    <Activity
+                      mode={
+                        !isRefresh && !isLoading && jobOrders.length > 0
+                          ? "visible"
+                          : "hidden"
+                      }
+                    >
+                      <Button
                         type="button"
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white ml-5"
-                        // onClick={handleExport}
-                        // disabled={isExporting}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                        onClick={handleExport}
+                        disabled={isExporting}
                       >
-                        {isRefresh? (
+                        {isExporting ? (
                           <>
-                            <FaCircleNotch className="animate-spin" /> Exporting...
+                            <FaCircleNotch className="animate-spin" />{" "}
+                            Exporting...
                           </>
                         ) : (
                           <>
                             <FaFileExcel /> Export
                           </>
                         )}
-                    </Button>
+                      </Button>
+                    </Activity>
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                     <h2 className="text-xl font-semibold text-gray-600">
@@ -444,7 +501,7 @@ const Dashboard = () => {
                                 category: string;
                                 amount: number;
                               },
-                              index: number
+                              index: number,
                             ) => (
                               <div
                                 className="w-full p-5 rounded-lg bg-blue-200 h-15 flex justify-between items-center"
@@ -457,7 +514,7 @@ const Dashboard = () => {
                                   {phpCurrency(amount)}
                                 </span>
                               </div>
-                            )
+                            ),
                           )
                         ) : (
                           <p className="text-center text-md font-semibold text-gray-600">

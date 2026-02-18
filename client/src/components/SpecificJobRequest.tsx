@@ -1,7 +1,11 @@
 import Input from "./ui/input";
 import Label from "./ui/label";
 import phpCurrency from "@/utils/phpCurrency";
-import { JobAmountsType, JobRequest, CouponType } from "@/types/jobOrderFormType";
+import {
+  JobAmountsType,
+  JobRequest,
+  CouponType,
+} from "@/types/jobOrderFormType";
 import { jobItems } from "@/constants/job-items";
 
 interface SpecificJobRequestProps {
@@ -45,16 +49,20 @@ export default function SpecificJobRequest({
                   ...jobRequest,
                   coupon: e.target.checked,
                   // Reset selected coupon when unchecking
-                  ...(e.target.checked === false && { selectedCoupon: undefined }),
+                  ...(e.target.checked === false && {
+                    selectedCoupon: undefined,
+                  }),
                 })
               }
             />
             Coupon
           </Label>
-          
+
           {/* Show coupon dropdown and amount field side-by-side when coupon is checked */}
           {jobRequest.coupon && (
-            <div className="flex items-center gap-2 w-80"> {/* Increased width */}
+            <div className="flex items-center gap-2 w-80">
+              {" "}
+              {/* Increased width */}
               {/* Coupon dropdown */}
               <div className="w-1/2">
                 <select
@@ -62,21 +70,22 @@ export default function SpecificJobRequest({
                   onChange={(e) =>
                     setJobRequest({
                       ...jobRequest,
-                      selectedCoupon: e.target.value ? parseInt(e.target.value) : undefined,
+                      selectedCoupon: e.target.value ?? undefined,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   required
                 >
-                  <option value="" disabled>Select Coupon</option>
+                  <option value="" disabled>
+                    Select Coupon
+                  </option>
                   {coupons.map((coupon) => (
-                    <option key={coupon.id} value={coupon.id}>
+                    <option key={coupon.id} value={coupon.name}>
                       {coupon.name}
                     </option>
                   ))}
                 </select>
               </div>
-              
               {/* Amount input field - show only when coupon is selected */}
               {jobRequest.selectedCoupon && (
                 <div className="w-1/2">
@@ -87,9 +96,9 @@ export default function SpecificJobRequest({
                     <Input
                       type="number"
                       placeholder="0.00"
-                      value={jobAmounts.coupon || ""}
+                      value={jobAmounts.selectedCoupon || ""}
                       onChange={(e) =>
-                        handleJobAmountChange("coupon", Number(e.target.value))
+                        handleJobAmountChange("selectedCoupon", Number(e.target.value))
                       }
                       min="0"
                       step="0.01"
@@ -105,7 +114,9 @@ export default function SpecificJobRequest({
 
         {/* Regular job items */}
         {jobItems
-          .filter((item) => item.key !== "others")
+          .filter(
+            (item) => item.key !== "others" && item.key !== "selectedCoupon",
+          )
           .map((item) => (
             <div
               key={item.key}
@@ -137,7 +148,7 @@ export default function SpecificJobRequest({
                       onChange={(e) =>
                         handleJobAmountChange(
                           item.key as keyof JobAmountsType,
-                          Number(e.target.value)
+                          Number(e.target.value),
                         )
                       }
                       min="0"

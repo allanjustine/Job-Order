@@ -175,17 +175,17 @@ const JobOrderForm = () => {
     fetchJobOrderNumber();
   }, []);
 
-   const fetchJobOrderNumber = async () => {
-      try {
-        const response = await api.get("/get-job-order-number");
+  const fetchJobOrderNumber = async () => {
+    try {
+      const response = await api.get("/get-job-order-number");
 
-        if (response.status === 200) {
-          setJobOrderNumber(response.data.job_order_number);
-        }
-      } catch (error) {
-        console.error(error);
+      if (response.status === 200) {
+        setJobOrderNumber(response.data.job_order_number);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // Handler functions for amount changes
   const handleJobAmountChange = (key: keyof JobAmountsType, value: number) => {
@@ -274,7 +274,7 @@ const JobOrderForm = () => {
         repairStart,
         repairEnd,
         mechanic,
-        generalRemarks
+        generalRemarks,
       });
       setErrors({});
       return true;
@@ -332,8 +332,14 @@ const JobOrderForm = () => {
   const jobs = jobItems
     .filter((item) => jobRequest[item.key as keyof JobRequest])
     .map((item) => ({
-      category: item.key === "others" ? jobRequest.othersText : item.label,
+      category:
+        item.key === "others"
+          ? jobRequest.othersText
+          : item.key === "selectedCoupon"
+            ? jobRequest.selectedCoupon
+            : item.label,
       amount: jobAmounts[item.key as keyof JobAmountsType] || 0,
+      type: "job_request",
     }));
 
   const parts = partsItems
@@ -344,6 +350,7 @@ const JobOrderForm = () => {
           ? partsReplacement.partsOthersText
           : item.label,
       amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
+      type: "parts_replacement",
     }));
 
   const itemsData = [...jobs, ...parts];
@@ -469,7 +476,6 @@ const JobOrderForm = () => {
     if (validateForm()) {
       handlePreviewPrint();
     } else {
-      console.log(errors);
       toast.error("Please fill in all required fields.", {
         position: "bottom-center",
         duration: 5000,

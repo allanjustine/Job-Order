@@ -7,6 +7,7 @@ export const jobItems: JobItem[] = [
   { key: "changeOil", label: "Change Oil / Tune-up" },
   { key: "overhaul", label: "Top / major Overhaul" },
   { key: "chainSprocket", label: "Chain & Sprocket / Drive Belt" },
+  { key: "selectedCoupon", label: "Coupon" },
   { key: "carburetor", label: "Carburetor / Fuel Injection" },
   { key: "brakeSystem", label: "Brake System (FR / RR)" },
   { key: "steeringSystem", label: "Steering System" },

@@ -17,17 +17,17 @@ use App\Http\Controllers\Api\UserDashboardController;
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
+    Route::get('user', function (Request $request) {
         return $request->user()->load('roles:id,name', 'branch:id,branch_name,branch_code');
     });
 
     // ADMIN ROLE ROUTES
     Route::middleware('role:admin')->group(function () {
         Route::controller(CustomersController::class)->group(function () {
-            Route::get('/customers', 'index');
+            Route::get('customers', 'index');
         });
         Route::controller(UsersController::class)->group(function () {
-            Route::get('/users', 'index');
+            Route::get('users', 'index');
             Route::get('user-selection-options', 'userSelectionOptions');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
@@ -42,10 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // EMPLOYEE ROLE ROUTES
     Route::middleware('role:employee')->group(function () {
         Route::controller(JobOrderController::class)->group(function () {
-            Route::get('/job-orders', 'index');
+            Route::get('job-orders', 'index');
+            Route::get('export-branch-reports', [JobOrderController::class, 'exportBranchData']);
         });
         Route::controller(JobOrderController::class)->group(function () {
-            Route::post('/create-job-order', 'store');
+            Route::post('create-job-order', 'store');
         });
         Route::get('branch-mechanics', [MechanicController::class, 'branchMechanic']);
         Route::get('branch-stats', [UserDashboardController::class, 'index']);
@@ -62,22 +63,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // GLOBAL AUTHENTICATED ROUTES
     Route::controller(AuthController::class)->group(function () {
-        Route::post('/logout', 'destroy');
+        Route::post('logout', 'destroy');
     });
     Route::resource('mechanics', MechanicController::class);
 });
 
 // PUBLIC ROUTES
 Route::controller(BranchController::class)->group(function () {
-    Route::get('/branches', 'index');
+    Route::get('branches', 'index');
 });
 
 Route::controller(AuthController::class)->group(function () {
-    Route::post('/register', 'store');
-    Route::post('/login', 'login');
+    Route::post('register', 'store');
+    Route::post('login', 'login');
 });
 
-Route::get('/toks/{any}', function () {
+Route::get('toks/{any}', function () {
     $test2 = "0000242";
     $test = sprintf('%07d', $test2);
     return response()->json([
