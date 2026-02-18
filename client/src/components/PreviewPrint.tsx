@@ -61,7 +61,7 @@ const formatCurrency = (amount: number | undefined): string => {
   if (!amount || amount === 0) return '';
   return phpCurrency(amount);
 };
-const getCouponName = (couponId: number | undefined): string => {
+const getCouponName = (couponId: string | undefined): string => {
   if (!couponId) return "";
   
   const coupons = [
@@ -73,7 +73,7 @@ const getCouponName = (couponId: number | undefined): string => {
     { id: 6, name: "Coupon 6" },
   ];
   
-  return coupons.find(c => c.id === couponId)?.name || `Coupon ${couponId}`;
+  return coupons.find(c => c.name === couponId)?.name || `Coupon ${couponId}`;
 };
 
   return (
