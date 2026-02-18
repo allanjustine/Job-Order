@@ -40,6 +40,7 @@ import Mechanics from "@/components/mechanics/mechanics";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const {
@@ -236,6 +237,20 @@ const Dashboard = () => {
           search: searchTerm,
         },
       });
+
+      if (response.data.data.length === 0) {
+        return toast.error("Export failed! No data to export this month", {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "😒",
+          style: {
+            borderRadius: "15px",
+            background: "red",
+            color: "#fff",
+            padding: "15px",
+          },
+        });
+      }
 
       if (response.status === 200) {
         const worksheet = XLSX.utils.json_to_sheet(response.data.data);
