@@ -470,7 +470,7 @@ const getCouponName = (couponId: string | undefined): string => {
                 </div>
               </td>
               <td className="border border-black p-0.5 text-left">
-                {data.jobRequest.coupon ? formatCurrency(getJobAmount("coupon")) : ""}
+                {data.jobRequest.coupon ? formatCurrency(getJobAmount("selectedCoupon")) : ""}
               </td>
               <td className="border border-black p-0.5">
                 <div className="flex items-center">
