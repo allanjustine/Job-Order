@@ -106,6 +106,50 @@ export type JobAmountsType = {
   selectedCoupon?: number;
 };
 
+export type PartsBrand = {
+  engineOil?: string;
+  drainPlugWasher?: string;
+  tappetORing?: string;
+  sparkPlug?: string;
+  airCleanerElement?: string;
+  brakeShoePads?: string;
+  gaskets?: string;
+  battery?: string;
+  chainSprocketBelt?: string;
+  fuelHose?: string;
+  tiresTubesFlaps?: string;
+  bulbs?: string;
+  bearings?: string;
+  springs?: string;
+  rubberPartsOilSeal?: string;
+  plasticParts?: string;
+  brakeFluid?: string;
+  coolant?: string;
+  partsOthers?: string;
+};
+
+export type PartsNumber = {
+  engineOil?: number;
+  drainPlugWasher?: number;
+  tappetORing?: number;
+  sparkPlug?: number;
+  airCleanerElement?: number;
+  brakeShoePads?: number;
+  gaskets?: number;
+  battery?: number;
+  chainSprocketBelt?: number;
+  fuelHose?: number;
+  tiresTubesFlaps?: number;
+  bulbs?: number;
+  bearings?: number;
+  springs?: number;
+  rubberPartsOilSeal?: number;
+  plasticParts?: number;
+  brakeFluid?: number;
+  coolant?: number;
+  partsOthers?: number;
+};
+
 export type PartsAmountsType = {
   engineOil?: number;
   drainPlugWasher?: number;

@@ -3,7 +3,7 @@
 
 import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
-import { DiagnosisKeys, DiagnosisState, JobAmountsType, PartsAmountsType, JobRequest, PartsReplacement } from "@/types/jobOrderFormType";
+import { DiagnosisKeys, DiagnosisState, JobAmountsType, PartsAmountsType, JobRequest, PartsReplacement, PartsBrand, PartsNumber } from "@/types/jobOrderFormType";
 
 interface PreviewJobOrderProps {
   data: {
@@ -26,6 +26,8 @@ interface PreviewJobOrderProps {
     diagnosis: Record<DiagnosisKeys, DiagnosisState>;
     jobRequest: JobRequest;
     partsReplacement: PartsReplacement;
+    partsBrand: PartsBrand;
+    partsNumber: PartsNumber;
     jobAmounts: JobAmountsType;
     partsAmounts: PartsAmountsType;
     nextScheduleDate: string;
@@ -48,33 +50,48 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
   const grandTotal = jobTotal + partsTotal;
 
   // Helper function to safely get amount values
-// Simpler version with type assertions
-const getJobAmount = (key: string): number => {
-  return data.jobAmounts[key as keyof typeof data.jobAmounts] || 0;
-};
+  const getJobAmount = (key: string): number => {
+    return data.jobAmounts[key as keyof typeof data.jobAmounts] || 0;
+  };
 
-const getPartsAmount = (key: string): number => {
-  return data.partsAmounts[key as keyof typeof data.partsAmounts] || 0;
-};
+  const getPartsAmount = (key: string): number => {
+    return data.partsAmounts[key as keyof typeof data.partsAmounts] || 0;
+  };
 
-const formatCurrency = (amount: number | undefined): string => {
-  if (!amount || amount === 0) return '';
-  return phpCurrency(amount);
-};
-const getCouponName = (couponId: string | undefined): string => {
-  if (!couponId) return "";
-  
-  const coupons = [
-    { id: 1, name: "Coupon 1" },
-    { id: 2, name: "Coupon 2" },
-    { id: 3, name: "Coupon 3" },
-    { id: 4, name: "Coupon 4" },
-    { id: 5, name: "Coupon 5" },
-    { id: 6, name: "Coupon 6" },
-  ];
-  
-  return coupons.find(c => c.name === couponId)?.name || `Coupon ${couponId}`;
-};
+  const formatCurrency = (amount: number | undefined): string => {
+    if (!amount || amount === 0) return '';
+    return phpCurrency(amount);
+  };
+
+  const getCouponName = (couponId: string | undefined): string => {
+    if (!couponId) return "";
+    
+    const coupons = [
+      { id: 1, name: "Coupon 1" },
+      { id: 2, name: "Coupon 2" },
+      { id: 3, name: "Coupon 3" },
+      { id: 4, name: "Coupon 4" },
+      { id: 5, name: "Coupon 5" },
+      { id: 6, name: "Coupon 6" },
+    ];
+    
+    return coupons.find(c => c.name === couponId)?.name || `Coupon ${couponId}`;
+  };
+
+  // Helper function to format brand and part number display
+  const formatPartDetail = (partKey: string): string => {
+    const brand = data.partsBrand?.[partKey as keyof PartsBrand];
+    const partNo = data.partsNumber?.[partKey as keyof PartsNumber];
+    
+    if (brand && partNo) {
+      return `${brand} - ${partNo}`;
+    } else if (brand) {
+      return brand;
+    } else if (partNo) {
+      return `Part #: ${partNo}`;
+    }
+    return "";
+  };
 
   return (
     <div
@@ -228,6 +245,7 @@ const getCouponName = (couponId: string | undefined): string => {
       </tr>
     </thead>
     <tbody>
+      {/* Diagnosis rows - keep existing */}
       {/* Row 1 - Lights & Suspension */}
       <tr>
         <td className="border border-black p-0.5">Lights (HL/TL/SL/BL/MP)</td>
@@ -439,19 +457,20 @@ const getCouponName = (couponId: string | undefined): string => {
   </table>
 </div>
 
-      {/* JOB ORDER - Two Column Layout */}
+      {/* JOB ORDER - Updated with Brand and Part Number columns */}
       <div className="mb-1 text-xs" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
         <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
           JOB ORDER
         </h3>
   
-        {/* Job Order Table - 4 Column Layout */}
+        {/* Job Order Table - Updated with 5 columns */}
         <table className="w-full border-collapse border border-black">
           <thead>
             <tr className="bg-gray-40">
               <th className="border border-black p-0.5 text-left">Specific Job(s) Request</th>
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
               <th className="border border-black p-0.5 text-left">Parts Used</th>
+              <th className="border border-black p-0.5 text-left w-32">Brand / Part No.</th> {/* New column */}
               <th className="border border-black p-0.5 text-center w-16">Amount</th>
             </tr>
           </thead>
@@ -478,6 +497,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Engine Oil</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.engineOil && formatPartDetail("engineOil")}
+              </td>
               <td className="border border-black p-0.5 text-left">
                 {formatCurrency(getPartsAmount("engineOil"))}
               </td>
@@ -498,6 +520,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Drain Plug Washer</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.drainPlugWasher && formatPartDetail("drainPlugWasher")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("drainPlugWasher"))}</td>
             </tr>
             
@@ -515,6 +540,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.tappetORing)}</span>
                   <span>Tapped Cu Ring</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.tappetORing && formatPartDetail("tappetORing")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("tappetORing"))}</td>
             </tr>
@@ -534,6 +562,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Spark Plug</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.sparkPlug && formatPartDetail("sparkPlug")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("sparkPlug"))}</td>
             </tr>
             
@@ -551,6 +582,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.airCleanerElement)}</span>
                   <span>Air Cleaner Element</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.airCleanerElement && formatPartDetail("airCleanerElement")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("airCleanerElement"))}</td>
             </tr>
@@ -570,6 +604,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Brake Shoe / Pads (FR / RR)</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.brakeShoePads && formatPartDetail("brakeShoePads")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("brakeShoePads"))}</td>
             </tr>
             
@@ -585,8 +622,11 @@ const getCouponName = (couponId: string | undefined): string => {
               <td className="border border-black p-0.5">
                 <div className="flex items-center">
                   <span className="w-6">{renderCheckbox(data.partsReplacement.gaskets)}</span>
-                  <span>Gaskets (Head, Right, Left, Other: ______)</span>
+                  <span>Gaskets (Head, Right, Left)</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.gaskets && formatPartDetail("gaskets")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("gaskets"))}</td>
             </tr>
@@ -606,6 +646,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Battery</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.battery && formatPartDetail("battery")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("battery"))}</td>
             </tr>
             
@@ -623,6 +666,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.chainSprocketBelt)}</span>
                   <span>Chain & Sprocket / Drive Belt</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.chainSprocketBelt && formatPartDetail("chainSprocketBelt")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("chainSprocketBelt"))}</td>
             </tr>
@@ -642,6 +688,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Fuel Hose</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.fuelHose && formatPartDetail("fuelHose")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("fuelHose"))}</td>
             </tr>
             
@@ -659,6 +708,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.tiresTubesFlaps)}</span>
                   <span>Tires, Tubes, Flaps</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.tiresTubesFlaps && formatPartDetail("tiresTubesFlaps")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("tiresTubesFlaps"))}</td>
             </tr>
@@ -678,6 +730,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Bulbs</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.bulbs && formatPartDetail("bulbs")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("bulbs"))}</td>
             </tr>
             
@@ -695,6 +750,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.bearings)}</span>
                   <span>Bearings</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.bearings && formatPartDetail("bearings")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("bearings"))}</td>
             </tr>
@@ -714,6 +772,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Springs</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.springs && formatPartDetail("springs")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("springs"))}</td>
             </tr>
             
@@ -731,6 +792,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.rubberPartsOilSeal)}</span>
                   <span>Rubber Parts / Oil Seal</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.rubberPartsOilSeal && formatPartDetail("rubberPartsOilSeal")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("rubberPartsOilSeal"))}</td>
             </tr>
@@ -750,6 +814,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Plastic Parts</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.plasticParts && formatPartDetail("plasticParts")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("plasticParts"))}</td>
             </tr>
             
@@ -768,6 +835,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Brake Fluid</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.brakeFluid && formatPartDetail("brakeFluid")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("brakeFluid"))}</td>
             </tr>
             
@@ -780,6 +850,9 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span className="w-6">{renderCheckbox(data.partsReplacement.coolant)}</span>
                   <span>Coolant</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.coolant && formatPartDetail("coolant")}
               </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("coolant"))}</td>
             </tr>
@@ -799,14 +872,16 @@ const getCouponName = (couponId: string | undefined): string => {
                   <span>Others: {data.partsReplacement.partsOthersText}</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-left text-[7pt]">
+                {data.partsReplacement.partsOthers && formatPartDetail("partsOthers")}
+              </td>
               <td className="border border-black p-0.5 text-left">{formatCurrency(getPartsAmount("partsOthers"))}</td>
             </tr>
             
             {/* Row 20 - Totals */}
             <tr>
-              <td className="border border-black p-0.5 font-semibold">Total Labor Cost:</td>
-              <td className="border border-black p-0.5 text-left font-semibold">{phpCurrency(jobTotal)}</td>
-              <td className="border border-black p-0.5 font-semibold">Total Parts Cost:</td>
+              <td className="border border-black p-0.5 font-semibold" colSpan={2}>Total Labor Cost: {phpCurrency(jobTotal)}</td>
+              <td className="border border-black p-0.5 font-semibold" colSpan={2}>Total Parts Cost:</td>
               <td className="border border-black p-0.5 text-left font-semibold">{phpCurrency(partsTotal)}</td>
             </tr>
           </tbody>

@@ -21,6 +21,8 @@ import {
   PartsReplacement,
   JobAmountsType,
   PartsAmountsType,
+  PartsBrand,
+  PartsNumber
 } from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
 import acronymName from "@/utils/acronymName";
@@ -87,6 +89,9 @@ const JobOrderForm = () => {
   // Amounts state
   const [jobAmounts, setJobAmounts] = useState<JobAmountsType>({});
   const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
+  const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
+  const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
+
 
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
@@ -385,6 +390,8 @@ const JobOrderForm = () => {
     serviceAdvisor: signatures.serviceAdvisor,
     branchManager: signatures.branchManager,
     jobOrderNumber,
+    partsBrand,
+    partsNumber,
   };
 
   useEffect(() => {
@@ -792,6 +799,10 @@ const JobOrderForm = () => {
                   handleJobAmountChange={handleJobAmountChange}
                   partsAmounts={partsAmounts}
                   handlePartsAmountChange={handlePartsAmountChange}
+                  partsBrand={partsBrand}
+                  setPartsBrand={setPartsBrand}
+                  partsNumber={partsNumber}
+                  setPartsNumber={setPartsNumber}
                   jobTotal={jobTotal}
                   partsTotal={partsTotal}
                   overallTotal={overallTotal}
