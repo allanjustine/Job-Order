@@ -10,8 +10,9 @@ import {
   PartsAmountsType,
   JobRequest,
   PartsReplacement,
-  PartsBrand, 
-  PartsNumber, 
+  PartsBrand,
+  PartsNumber,
+  PartsQuantity 
 } from "@/types/jobOrderFormType";
 
 interface PrintJobOrderProps {
@@ -35,8 +36,9 @@ interface PrintJobOrderProps {
     diagnosis: Record<DiagnosisKeys, DiagnosisState>;
     jobRequest: JobRequest;
     partsReplacement: PartsReplacement;
-    partsBrand: PartsBrand;      
-    partsNumber: PartsNumber;      
+    partsBrand: PartsBrand;
+    partsNumber: PartsNumber;
+    partsQuantity: PartsQuantity;
     jobAmounts: JobAmountsType;
     partsAmounts: PartsAmountsType;
     nextScheduleDate: string;
@@ -73,6 +75,11 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
   const getPartsAmount = (key: string): number => {
     return data.partsAmounts[key as keyof typeof data.partsAmounts] || 0;
   };
+  
+  const getPartsQuantity = (key: string): number => {
+    if (!data.partsQuantity) return 0;
+    return data.partsQuantity[key as keyof PartsQuantity] || 0;
+  };
 
   const formatCurrency = (amount: number | undefined): string => {
     if (!amount || amount === 0) return "";
@@ -95,10 +102,6 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
 
   // Helper function to format brand and part number display
   const formatPartDetail = (partKey: string): string => {
-    const isPartChecked = data.partsReplacement?.[partKey as keyof PartsReplacement];
-    
-    if (!isPartChecked) return "";
-    
     const brand = data.partsBrand?.[partKey as keyof PartsBrand];
     const partNo = data.partsNumber?.[partKey as keyof PartsNumber];
     
@@ -110,6 +113,10 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       return `#${partNo}`;
     }
     return "";
+  };
+  // Check if part is selected and has quantity
+  const isPartSelected = (partKey: string): boolean => {
+    return !!(data.partsReplacement?.[partKey as keyof PartsReplacement] && getPartsQuantity(partKey) > 0);
   };
 
   return (
@@ -581,7 +588,10 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
               <th className="border border-black p-0.5 text-left">
                 Parts Used
               </th>
-              <th className="border border-black p-0.5 text-left w-32">
+              <th className="border border-black p-0.5 text-center w-10">
+                Qty
+                </th> 
+              <th className="border border-black p-0.5 text-left w-28">
                 Brand / Part No.
               </th>
               <th className="border border-black p-0.5 text-center w-16">
@@ -604,7 +614,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                 </div>
               </td>
               <td className="border border-black p-0.5 text-left">
-                {data.jobRequest.coupon ? formatCurrency(getJobAmount("coupon")) : ""}
+                {data.jobRequest.coupon ? formatCurrency(getJobAmount("selectedCoupon")) : ""}
               </td>
               <td className="border border-black p-0.5">
                 <div className="flex items-center">
@@ -614,11 +624,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Engine Oil</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("engineOil") ? getPartsQuantity("engineOil") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.engineOil && formatPartDetail("engineOil")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("engineOil"))}
+                {isPartSelected("engineOil") ? formatCurrency(getPartsAmount("engineOil")) : ""}
               </td>
             </tr>
 
@@ -643,11 +656,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Drain Plug Washer</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("drainPlugWasher") ? getPartsQuantity("drainPlugWasher") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.drainPlugWasher && formatPartDetail("drainPlugWasher")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("drainPlugWasher"))}
+                {isPartSelected("drainPlugWasher") ? formatCurrency(getPartsAmount("drainPlugWasher")) : ""}
               </td>
             </tr>
 
@@ -672,11 +688,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Tapped Cu Ring</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("tappetORing") ? getPartsQuantity("tappetORing") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.tappetORing && formatPartDetail("tappetORing")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("tappetORing"))}
+                {isPartSelected("tappetORing") ? formatCurrency(getPartsAmount("tappetORing")) : ""}
               </td>
             </tr>
 
@@ -701,11 +720,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Spark Plug</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("sparkPlug") ? getPartsQuantity("sparkPlug") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.sparkPlug && formatPartDetail("sparkPlug")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("sparkPlug"))}
+                {isPartSelected("sparkPlug") ? formatCurrency(getPartsAmount("sparkPlug")) : ""}
               </td>
             </tr>
 
@@ -730,11 +752,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Air Cleaner Element</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("airCleanerElement") ? getPartsQuantity("airCleanerElement") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.airCleanerElement && formatPartDetail("airCleanerElement")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("airCleanerElement"))}
+                {isPartSelected("airCleanerElement") ? formatCurrency(getPartsAmount("airCleanerElement")) : ""}
               </td>
             </tr>
 
@@ -759,11 +784,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Brake Shoe / Pads (FR / RR)</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("brakeShoePads") ? getPartsQuantity("brakeShoePads") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.brakeShoePads && formatPartDetail("brakeShoePads")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("brakeShoePads"))}
+                {isPartSelected("brakeShoePads") ? formatCurrency(getPartsAmount("brakeShoePads")) : ""}
               </td>
             </tr>
 
@@ -785,14 +813,17 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span className="w-6">
                     {renderCheckbox(data.partsReplacement.gaskets)}
                   </span>
-                  <span>Gaskets (Head, Right, Left, Other: ______)</span>
+                  <span>Gaskets (Head, Right, Left)</span>
                 </div>
+              </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("gaskets") ? getPartsQuantity("gaskets") : ""}
               </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.gaskets && formatPartDetail("gaskets")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("gaskets"))}
+                {isPartSelected("gaskets") ? formatCurrency(getPartsAmount("gaskets")) : ""}
               </td>
             </tr>
 
@@ -817,11 +848,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Battery</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("battery") ? getPartsQuantity("battery") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.battery && formatPartDetail("battery")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("battery"))}
+                {isPartSelected("battery") ? formatCurrency(getPartsAmount("battery")) : ""}
               </td>
             </tr>
 
@@ -846,11 +880,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Chain & Sprocket / Drive Belt</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("chainSprocketBelt") ? getPartsQuantity("chainSprocketBelt") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.chainSprocketBelt && formatPartDetail("chainSprocketBelt")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("chainSprocketBelt"))}
+                {isPartSelected("chainSprocketBelt") ? formatCurrency(getPartsAmount("chainSprocketBelt")) : ""}
               </td>
             </tr>
 
@@ -875,11 +912,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Fuel Hose</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("fuelHose") ? getPartsQuantity("fuelHose") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.fuelHose && formatPartDetail("fuelHose")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("fuelHose"))}
+                {isPartSelected("fuelHose") ? formatCurrency(getPartsAmount("fuelHose")) : ""}
               </td>
             </tr>
 
@@ -904,11 +944,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Tires, Tubes, Flaps</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("tiresTubesFlaps") ? getPartsQuantity("tiresTubesFlaps") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.tiresTubesFlaps && formatPartDetail("tiresTubesFlaps")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("tiresTubesFlaps"))}
+                {isPartSelected("tiresTubesFlaps") ? formatCurrency(getPartsAmount("tiresTubesFlaps")) : ""}
               </td>
             </tr>
 
@@ -933,11 +976,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Bulbs</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("bulbs") ? getPartsQuantity("bulbs") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.bulbs && formatPartDetail("bulbs")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("bulbs"))}
+                {isPartSelected("bulbs") ? formatCurrency(getPartsAmount("bulbs")) : ""}
               </td>
             </tr>
 
@@ -962,11 +1008,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Bearings</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("bearings") ? getPartsQuantity("bearings") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.bearings && formatPartDetail("bearings")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("bearings"))}
+                {isPartSelected("bearings") ? formatCurrency(getPartsAmount("bearings")) : ""}
               </td>
             </tr>
 
@@ -991,11 +1040,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Springs</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("springs") ? getPartsQuantity("springs") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.springs && formatPartDetail("springs")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("springs"))}
+                {isPartSelected("springs") ? formatCurrency(getPartsAmount("springs")) : ""}
               </td>
             </tr>
 
@@ -1020,11 +1072,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Rubber Parts / Oil Seal</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("rubberPartsOilSeal") ? getPartsQuantity("rubberPartsOilSeal") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.rubberPartsOilSeal && formatPartDetail("rubberPartsOilSeal")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("rubberPartsOilSeal"))}
+                {isPartSelected("rubberPartsOilSeal") ? formatCurrency(getPartsAmount("rubberPartsOilSeal")) : ""}
               </td>
             </tr>
 
@@ -1049,11 +1104,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Plastic Parts</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("plasticParts") ? getPartsQuantity("plasticParts") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.plasticParts && formatPartDetail("plasticParts")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("plasticParts"))}
+                {isPartSelected("plasticParts") ? formatCurrency(getPartsAmount("plasticParts")) : ""}
               </td>
             </tr>
 
@@ -1078,11 +1136,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Brake Fluid</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("brakeFluid") ? getPartsQuantity("brakeFluid") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.brakeFluid && formatPartDetail("brakeFluid")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("brakeFluid"))}
+                {isPartSelected("brakeFluid") ? formatCurrency(getPartsAmount("brakeFluid")) : ""}
               </td>
             </tr>
 
@@ -1098,11 +1159,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Coolant</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("coolant") ? getPartsQuantity("coolant") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.coolant && formatPartDetail("coolant")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("coolant"))}
+                {isPartSelected("coolant") ? formatCurrency(getPartsAmount("coolant")) : ""}
               </td>
             </tr>
 
@@ -1123,11 +1187,14 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
                   <span>Others: {data.partsReplacement.partsOthersText}</span>
                 </div>
               </td>
+              <td className="border border-black p-0.5 text-center">
+                {isPartSelected("partsOthers") ? getPartsQuantity("partsOthers") : ""}
+              </td>
               <td className="border border-black p-0.5 text-left text-[7pt]">
                 {data.partsReplacement.partsOthers && formatPartDetail("partsOthers")}
               </td>
               <td className="border border-black p-0.5 text-left">
-                {formatCurrency(getPartsAmount("partsOthers"))}
+                {isPartSelected("partsOthers") ? formatCurrency(getPartsAmount("partsOthers")) : ""}
               </td>
             </tr>
 
@@ -1135,13 +1202,10 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
             <tr>
               <td className="border border-black p-0.5 font-semibold" colSpan={2}>
                 Total Labor Cost: {phpCurrency(jobTotal)}
-              </td>
-              <td className="border border-black p-0.5 font-semibold" colSpan={2}>
-                Total Parts Cost:
-              </td>
-              <td className="border border-black p-0.5 text-left font-semibold">
-                {phpCurrency(partsTotal)}
-              </td>
+                </td>
+              <td className="border border-black p-0.5 font-semibold" colSpan={4}>
+                Total Parts Cost: {phpCurrency(partsTotal)}
+                </td>
             </tr>
           </tbody>
         </table>

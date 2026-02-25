@@ -39,7 +39,7 @@ export default function SpecificJobRequest({
       </h3>
       <div className="space-y-2">
         {/* Coupon Item - Similar to other job items */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 text-sm">
           <Label onCheck className="flex-1">
             <Input
               type="checkbox"
@@ -120,7 +120,7 @@ export default function SpecificJobRequest({
           .map((item) => (
             <div
               key={item.key}
-              className="flex items-center justify-between gap-4"
+              className="flex items-center justify-between gap-4 text-sm"
             >
               <Label onCheck className="flex-1">
                 <Input

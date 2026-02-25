@@ -8,7 +8,8 @@ import {
   JobRequest, 
   PartsReplacement,
   PartsBrand,
-  PartsNumber
+  PartsNumber,
+  PartsQuantity,
 } from "@/types/jobOrderFormType";
 
 interface JobDetailsGridProps {
@@ -24,6 +25,8 @@ interface JobDetailsGridProps {
   setPartsBrand: React.Dispatch<React.SetStateAction<PartsBrand>>;
   partsNumber: PartsNumber;
   setPartsNumber: React.Dispatch<React.SetStateAction<PartsNumber>>;
+  partsQuantity: PartsQuantity;
+  setPartsQuantity: React.Dispatch<React.SetStateAction<PartsQuantity>>;
   jobTotal: number;
   partsTotal: number;
   overallTotal: number;
@@ -42,6 +45,8 @@ export default function JobDetailsGrid({
   setPartsBrand,
   partsNumber,
   setPartsNumber,
+  partsQuantity,
+  setPartsQuantity,
   jobTotal,
   partsTotal,
   overallTotal,
@@ -69,6 +74,8 @@ export default function JobDetailsGrid({
         setPartsBrand={setPartsBrand}
         partsNumber={partsNumber}
         setPartsNumber={setPartsNumber}
+        partsQuantity={partsQuantity}
+        setPartsQuantity={setPartsQuantity}
       />
 
       {(jobTotal > 0 || partsTotal > 0) && (

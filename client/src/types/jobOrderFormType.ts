@@ -150,6 +150,28 @@ export type PartsNumber = {
   partsOthers?: number;
 };
 
+export type PartsQuantity = {
+  engineOil?: number;
+  drainPlugWasher?: number;
+  tappetORing?: number;
+  sparkPlug?: number;
+  airCleanerElement?: number;
+  brakeShoePads?: number;
+  gaskets?: number;
+  battery?: number;
+  chainSprocketBelt?: number;
+  fuelHose?: number;
+  tiresTubesFlaps?: number;
+  bulbs?: number;
+  bearings?: number;
+  springs?: number;
+  rubberPartsOilSeal?: number;
+  plasticParts?: number;
+  brakeFluid?: number;
+  coolant?: number;
+  partsOthers?: number;
+};
+
 export type PartsAmountsType = {
   engineOil?: number;
   drainPlugWasher?: number;

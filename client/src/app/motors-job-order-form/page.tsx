@@ -22,7 +22,8 @@ import {
   JobAmountsType,
   PartsAmountsType,
   PartsBrand,
-  PartsNumber
+  PartsNumber,
+  PartsQuantity,
 } from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
 import acronymName from "@/utils/acronymName";
@@ -143,6 +144,28 @@ const JobOrderForm = () => {
     coolant: false,
     partsOthers: false,
     partsOthersText: "",
+  });
+
+    const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
+    engineOil: 1,
+    drainPlugWasher: 1,
+    tappetORing: 1,
+    sparkPlug: 1,
+    airCleanerElement: 1,
+    brakeShoePads: 1,
+    gaskets: 1,
+    battery: 1,
+    chainSprocketBelt: 1,
+    fuelHose: 1,
+    tiresTubesFlaps: 1,
+    bulbs: 1,
+    bearings: 1,
+    springs: 1,
+    rubberPartsOilSeal: 1,
+    plasticParts: 1,
+    brakeFluid: 1,
+    coolant: 1,
+    partsOthers: 1,
   });
 
   const [diagnosis, setDiagnosis] = useState<
@@ -383,6 +406,7 @@ const JobOrderForm = () => {
     jobRequest,
     jobAmounts,
     partsAmounts,
+    partsQuantity,
     partsReplacement,
     nextScheduleDate,
     nextScheduleKms,
@@ -647,7 +671,7 @@ const JobOrderForm = () => {
               <div>
                 <Image
                   height={100}
-                  width={200}
+                  width={300}
                   src={branchImages[user?.branch?.branch_code] || ""}
                   alt="logo"
                 />
@@ -803,6 +827,8 @@ const JobOrderForm = () => {
                   setPartsBrand={setPartsBrand}
                   partsNumber={partsNumber}
                   setPartsNumber={setPartsNumber}
+                  partsQuantity={partsQuantity}
+                  setPartsQuantity={setPartsQuantity}
                   jobTotal={jobTotal}
                   partsTotal={partsTotal}
                   overallTotal={overallTotal}
