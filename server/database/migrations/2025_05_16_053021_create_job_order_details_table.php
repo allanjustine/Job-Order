@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('category');
             $table->integer('amount');
             $table->string('type');
+            $table->string('part_brand');
+            $table->string('part_number');
+            $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }
