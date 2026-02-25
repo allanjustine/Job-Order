@@ -93,7 +93,6 @@ const JobOrderForm = () => {
   const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
   const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
 
-
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
     branchManager: string;
@@ -146,7 +145,7 @@ const JobOrderForm = () => {
     partsOthersText: "",
   });
 
-    const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
+  const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
     engineOil: 1,
     drainPlugWasher: 1,
     tappetORing: 1,
@@ -368,6 +367,8 @@ const JobOrderForm = () => {
             : item.label,
       amount: jobAmounts[item.key as keyof JobAmountsType] || 0,
       type: "job_request",
+      part_brand: "n/a",
+      part_number: "n/a",
     }));
 
   const parts = partsItems
@@ -379,6 +380,9 @@ const JobOrderForm = () => {
           : item.label,
       amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
       type: "parts_replacement",
+      part_brand: partsBrand[item.key as keyof PartsBrand],
+      part_number: partsNumber[item.key as keyof PartsNumber],
+      quantity: partsQuantity[item.key as keyof PartsQuantity],
     }));
 
   const itemsData = [...jobs, ...parts];

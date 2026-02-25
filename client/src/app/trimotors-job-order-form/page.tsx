@@ -378,6 +378,8 @@ const TrimotorsJobOrderForm = () => {
       category: item.key === "others" ? jobRequest.othersText : item.label,
       amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
       type: "job_request",
+      part_brand: "n/a",
+      part_number: "n/a",
     }));
 
   const itemToStore = {
