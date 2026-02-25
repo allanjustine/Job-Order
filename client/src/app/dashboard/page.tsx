@@ -13,7 +13,7 @@ import {
   BikeIcon,
   LogOut,
 } from "lucide-react";
-import { FaCircleNotch, FaEye } from "react-icons/fa";
+import { FaCheckCircle, FaCircleNotch, FaEye } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import Button from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
   ModalHeader,
 } from "@/components/ui/modal";
 import PreviewData from "@/components/PreviewData";
-import { Activity, useEffect, useRef, useState } from "react";
+import { Activity, ChangeEvent, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { FaFileExcel, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
@@ -41,6 +41,11 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
+import MonthOptions from "@/components/month-options";
+import Label from "@/components/ui/label";
+import Select from "@/components/ui/select";
+import YearOptions from "@/components/year-options";
+import { MonthAndYearType } from "@/types/month-and-year";
 
 const Dashboard = () => {
   const {
@@ -65,7 +70,13 @@ const Dashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isMechanicOpen, setIsMechanicOpen] = useState<boolean>(false);
   const [topJobOrders, setTopJobOrders] = useState<
-    { category: string; amount: number }[]
+    {
+      category: string;
+      amount: number;
+      type: string;
+      quantity: number;
+      part_brand: number;
+    }[]
   >([]);
   const [mechanicAdded, setMechanicAdded] = useState<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -75,6 +86,11 @@ const Dashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, handleLogout: handleLogoutUser } = useAuth();
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [isExport, setIsExport] = useState<boolean>(false);
+  const [monthAndYear, setMonthAndYear] = useState<MonthAndYearType>({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -235,21 +251,25 @@ const Dashboard = () => {
       const response = await api.get("/export-branch-reports", {
         params: {
           search: searchTerm,
+          ...monthAndYear,
         },
       });
 
       if (response.data.data.length === 0) {
-        return toast.error("Export failed! No data to export this month", {
-          position: "bottom-center",
-          duration: 5000,
-          icon: "😒",
-          style: {
-            borderRadius: "15px",
-            background: "red",
-            color: "#fff",
-            padding: "15px",
+        return toast.error(
+          "Export failed! No data to export in selected month and year",
+          {
+            position: "bottom-center",
+            duration: 5000,
+            icon: "😒",
+            style: {
+              borderRadius: "15px",
+              background: "red",
+              color: "#fff",
+              padding: "15px",
+            },
           },
-        });
+        );
       }
 
       if (response.status === 200) {
@@ -265,19 +285,43 @@ const Dashboard = () => {
           type: "application/octet-stream",
         });
 
-        let item: any;
-
-        const now = new Date();
+        const now = new Date(
+          Number(monthAndYear.year),
+          Number(monthAndYear.month) - 1,
+          1,
+        );
 
         const monthName = now.toLocaleString("en-US", { month: "long" });
 
-        const monthOfAndYear = `Month of ${monthName} ${now.getFullYear()}`;
+        const monthOfAndYear = `Month of ${monthName} and Year of ${now.getFullYear()}`;
 
         const saveFileName = searchTerm
-          ? `${searchTerm}-${monthOfAndYear}.xlsx`
-          : `${monthOfAndYear}-Reports.xlsx`;
+          ? `(Searched: ${searchTerm}) ${monthOfAndYear}.xlsx`
+          : `${monthOfAndYear} Reports.xlsx`;
 
         saveAs(blob, saveFileName);
+
+        setIsExport(false);
+
+        setMonthAndYear({
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+        });
+
+        toast.error(
+          "Export Ready! After saving the file, Please check your downloads folder.",
+          {
+            position: "bottom-center",
+            duration: 5000,
+            icon: "✅",
+            style: {
+              borderRadius: "15px",
+              background: "green",
+              color: "#fff",
+              padding: "15px",
+            },
+          },
+        );
       }
     } catch (error) {
       console.error(error);
@@ -285,6 +329,19 @@ const Dashboard = () => {
       setIsExporting(false);
     }
   };
+
+  const handleViewExport = () => {
+    setIsExport(!isExport);
+  };
+
+  const handleMonthAndYearChange =
+    (monthAndYear: string) => (e: ChangeEvent<HTMLSelectElement>) => {
+      const { value } = e.target;
+      setMonthAndYear((prev) => ({
+        ...prev,
+        [monthAndYear]: value,
+      }));
+    };
 
   return (
     <>
@@ -409,19 +466,9 @@ const Dashboard = () => {
                       <Button
                         type="button"
                         className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                        onClick={handleExport}
-                        disabled={isExporting}
+                        onClick={handleViewExport}
                       >
-                        {isExporting ? (
-                          <>
-                            <FaCircleNotch className="animate-spin" />{" "}
-                            Exporting...
-                          </>
-                        ) : (
-                          <>
-                            <FaFileExcel /> Export
-                          </>
-                        )}
+                        <FaFileExcel /> Export
                       </Button>
                     </Activity>
                   </div>
@@ -511,19 +558,44 @@ const Dashboard = () => {
                               {
                                 category,
                                 amount,
+                                type,
+                                quantity,
+                                part_brand,
                               }: {
                                 category: string;
                                 amount: number;
+                                type: string;
+                                quantity: number;
+                                part_brand: number;
                               },
                               index: number,
                             ) => (
                               <div
-                                className="w-full p-5 rounded-lg bg-blue-200 h-15 flex justify-between items-center"
+                                className="w-full p-5 rounded-lg bg-blue-200 h-fit flex justify-between items-center hover:shadow-md hover:bg-blue-300"
                                 key={index}
                               >
-                                <span className="text-gray-500 font-semibold">
-                                  {category}
-                                </span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-gray-500 font-semibold">
+                                    {category}
+                                  </span>
+                                  <span className="text-gray-500 font-bold text-[10px]">
+                                    {type.toUpperCase().replace("_", " ")}
+                                  </span>
+                                  <Activity
+                                    mode={
+                                      type === "parts_replacement"
+                                        ? "visible"
+                                        : "hidden"
+                                    }
+                                  >
+                                    <span className="text-gray-600 font-thin text-sm">
+                                      Total quantity: x{quantity}
+                                    </span>
+                                    <span className="text-gray-600 font-thin text-sm">
+                                      Total brand used: {part_brand}
+                                    </span>
+                                  </Activity>
+                                </div>
                                 <span className="text-lg font-bold text-gray-800">
                                   {phpCurrency(amount)}
                                 </span>
@@ -621,6 +693,51 @@ const Dashboard = () => {
             onClick={handleView(null)}
           >
             Close
+          </Button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={isExport} className="w-md">
+        <ModalHeader onClose={handleViewExport}>
+          Filter Date and Export
+        </ModalHeader>
+        <ModalBody>
+          <div className="grid grid-cols-[60%_40%] gap-1">
+            <div className="space-y-2">
+              <Label htmlFor="date">Select Month</Label>
+              <Select
+                value={monthAndYear.month}
+                onChange={handleMonthAndYearChange("month")}
+              >
+                <MonthOptions />
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date">Select Year</Label>
+              <Select
+                value={monthAndYear.year}
+                onChange={handleMonthAndYearChange("year")}
+              >
+                <YearOptions startYear={1900} />
+              </Select>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            type="button"
+            className={`bg-green-500 hover:bg-green-600 text-white ${isExporting || !monthAndYear.month || !monthAndYear.year ? "cursor-not-allowed!" : ""}`}
+            onClick={handleExport}
+            disabled={isExporting || !monthAndYear.month || !monthAndYear.year}
+          >
+            {isExporting ? (
+              <>
+                <FaCircleNotch className="animate-spin" /> Exporting...
+              </>
+            ) : (
+              <>
+                <FaCheckCircle /> Proceed
+              </>
+            )}
           </Button>
         </ModalFooter>
       </Modal>
