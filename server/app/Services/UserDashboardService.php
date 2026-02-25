@@ -90,8 +90,11 @@ class UserDashboardService
             ->get()
             ->groupBy('category')
             ->map(fn($items, $category) => [
-                'category' => $category,
-                'amount'   => $items->sum('amount'),
+                'category'   => $category,
+                'type'       => $items->first()->type,
+                'amount'     => $items->sum('amount'),
+                'quantity'   => $items->where('type', "parts_replacement")->sum('quantity') ?: null,
+                'part_brand' => $items->where('type', "parts_replacement")->pluck('part_brand')->filter()->unique()->count() ?: null
             ])
             ->sortByDesc('amount')
             ->take(5)

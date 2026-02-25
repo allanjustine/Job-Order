@@ -27,7 +27,6 @@ class JobOrderService
 
         $jobOrders = JobOrder::query()
             ->select('id', 'job_order_number', 'mechanic_id', 'customer_id', 'created_at')
-            ->whereRelation('customer.user', 'id', Auth::id())
             ->with([
                 'customer:id,name',
                 'mechanic:id,name'
@@ -47,6 +46,7 @@ class JobOrderService
                     ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
                     ->orWhereRelation('mechanic', 'name', 'like', "%{$search}%")
             )
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->orderBy(
                 $column,
                 $sort['direction']
