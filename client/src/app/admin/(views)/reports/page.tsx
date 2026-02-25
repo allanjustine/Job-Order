@@ -187,6 +187,7 @@ const Reports = () => {
         params: {
           filter_item: filterItem,
           filter_by: filterBy,
+          search: searchTerm,
         },
       });
 

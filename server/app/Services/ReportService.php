@@ -129,23 +129,13 @@ class ReportService
 
         $search = request('search', '');
 
-        return JobOrder::query()
+        return JobOrderDetail::query()
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'customer:id,name,user_id',
-                'customer.user:id,name,code',
-                'mechanic:id,name',
-                'jobOrderDetails'
-                =>
-                fn($item)
-                =>
-                $item->when(
-                    $filter_by === 'job_order_detail_type',
-                    fn($item)
-                    =>
-                    $item->where('type', $filter_item)
-                )
+                'jobOrder:id,job_order_number,customer_id,mechanic_id,job_order_type',
+                'jobOrder.customer:id,name',
+                'jobOrder.mechanic:id,name',
             ])
-            ->select('id', 'job_order_number', 'job_order_type', 'created_at', 'customer_id', 'mechanic_id')
             ->when(
                 $search,
                 fn($jobOrder)
@@ -155,15 +145,18 @@ class ReportService
                     =>
                     $item->whereAny(
                         [
-                            'job_order_number',
-                            'job_order_type'
+                            'part_brand',
+                            'part_number',
+                            'quantity',
+                            'type',
+                            'category',
                         ],
                         'like',
                         "%{$search}%"
                     )
-                        ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
-                        ->orWhereRelation('mechanic', 'name', 'like', "%{$search}%")
-                        ->orWhereHas('customer.user', function ($q) use ($search) {
+                        ->orWhereRelation('jobOrder.customer', 'name', 'like', "%{$search}%")
+                        ->orWhereRelation('jobOrder.mechanic', 'name', 'like', "%{$search}%")
+                        ->orWhereHas('jobOrder.customer.user', function ($q) use ($search) {
                             $q->where('name', 'like', "%{$search}%")
                                 ->orWhere('code', 'like', "%{$search}%");
                         })
@@ -176,7 +169,7 @@ class ReportService
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('customer.user', 'id', $filter_item)
+                    $item->whereRelation('jobOrder.customer.user', 'id', $filter_item)
                 )
             )
             ->when(
@@ -186,7 +179,7 @@ class ReportService
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('customer.user.areaManagers', 'area_manager_id', $filter_item)
+                    $item->whereRelation('jobOrder.customer.user.areaManagers', 'area_manager_id', $filter_item)
                 )
             )
             ->when(
@@ -199,22 +192,27 @@ class ReportService
                 $filter_by === 'job_order_type',
                 fn($item)
                 =>
-                $item->where('job_order_type', $filter_item)
+                $item->whereRelation('jobOrder', 'job_order_type', $filter_item)
             )
-            ->orderBy('id', 'asc')
+            ->when(
+                $filter_by === 'job_order_detail_type',
+                fn($item)
+                =>
+                $item->where('type', $filter_item)
+            )
+            ->orderBy('type', 'asc')
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'                  => $item->created_at->format('Y-m-d H:i:s'),
-                    'Customer Name'         => $item->customer?->name,
-                    'Job Requests & Amount' => $item->jobOrderDetails->where('type', 'job_request')->map(function ($item) {
-                        return "{$item->category}: ₱{$item->amount}";
-                    })
-                        ->implode("\n"),
-                    'Part Used & Amount'    => $item->jobOrderDetails->where('type', 'parts_replacement')->map(function ($item) {
-                        return "{$item->category}: ₱{$item->amount}";
-                    })
-                        ->implode("\n")
+                    'Date'              => $item->created_at->format('Y-m-d H:i:s'),
+                    'Customer Name'     => $item->jobOrder?->customer?->name,
+                    'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
+                    'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
+                    'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',
+                    'Quantity'          => $item->type === 'parts_replacement' ? $item->quantity : '',
+                    'Part Brand'        => $item->type === 'parts_replacement' ? $item->part_brand : '',
+                    'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
+                    'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : ''
                 ];
             });
     }
@@ -225,13 +223,16 @@ class ReportService
 
         $search = request('search', '');
 
-        $jobOrders = JobOrder::query()
-            ->select('id', 'job_order_number', 'mechanic_id', 'customer_id', 'created_at')
-            ->whereRelation('customer.user', 'id', Auth::id())
+        $year = request('year', now()->year);
+
+        $month = request('month', now()->month);
+
+        $jobOrders = JobOrderDetail::query()
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'customer:id,name',
-                'mechanic:id,name',
-                'jobOrderDetails'
+                'jobOrder:id,job_order_number,customer_id,mechanic_id,job_order_type',
+                'jobOrder.customer:id,name',
+                'jobOrder.mechanic:id,name',
             ])
             ->when(
                 $search,
@@ -239,29 +240,39 @@ class ReportService
                 =>
                 $jobOrder->whereAny(
                     [
-                        'job_order_number'
+                        'part_brand',
+                        'part_number',
+                        'quantity',
+                        'type',
+                        'category',
                     ],
                     'like',
                     "%{$search}%"
                 )
-                    ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
-                    ->orWhereRelation('mechanic', 'name', 'like', "%{$search}%")
+                    ->orWhereRelation('jobOrder', 'job_order_number', 'like', "%{$search}%")
+                    ->orWhereRelation('jobOrder.customer', 'name', 'like', "%{$search}%")
+                    ->orWhereRelation('jobOrder.mechanic', 'name', 'like', "%{$search}%")
             )
-            ->orderBy('id', 'asc')
-            ->whereMonth('created_at', now()->month)
+            ->orderBy('type', 'asc')
+            ->where(
+                fn($item)
+                =>
+                $item->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+            )
+            ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'                  => $item->created_at->format('Y-m-d H:i:s'),
-                    'Customer Name'         => $item->customer?->name,
-                    'Job Requests & Amount' => $item->jobOrderDetails->where('type', 'job_request')->map(function ($item) {
-                        return "{$item->category}: ₱{$item->amount}";
-                    })
-                        ->implode("\n"),
-                    'Part Used & Amount'    => $item->jobOrderDetails->where('type', 'parts_replacement')->map(function ($item) {
-                        return "{$item->category}: ₱{$item->amount}";
-                    })
-                        ->implode("\n")
+                    'Date'              => $item->created_at->format('Y-m-d H:i:s'),
+                    'Customer Name'     => $item->jobOrder?->customer?->name,
+                    'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
+                    'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
+                    'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',
+                    'Quantity'          => $item->type === 'parts_replacement' ? $item->quantity : '',
+                    'Part Brand'        => $item->type === 'parts_replacement' ? $item->part_brand : '',
+                    'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
+                    'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : ''
                 ];
             });
 
