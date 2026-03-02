@@ -1,10 +1,14 @@
 "use client";
 
+import GlobalLoader from "@/components/GlobalLoaders";
 import { useAuth } from "@/context/authContext";
 import Link from "next/link";
 
 export default function NotFound() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <GlobalLoader />;
+
   return (
     <div className="bg-white bottom-0 top-0 left-0 right-0 z-50 flex justify-center items-center h-screen overflow-hidden">
       <div className="max-w-md w-full rounded-xl overflow-hidden">
