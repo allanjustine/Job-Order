@@ -1,4 +1,4 @@
-interface PartsItem {
+export interface PartsItem {
   key: string;
   label: string;
 }
@@ -9,10 +9,10 @@ export const partsItems: PartsItem[] = [
   { key: "tappetORing", label: "Tappet O-Ring" },
   { key: "sparkPlug", label: "Spark Plug" },
   { key: "airCleanerElement", label: "Air Cleaner Element" },
-  { key: "brakeShoePads", label: "Brake Shoe/Pads (FR/RR)" },
+  { key: "brakeShoePads", label: "Brake Shoe/Pads" },
   { key: "gaskets", label: "Gaskets" },
   { key: "battery", label: "Battery" },
-  { key: "chainSprocketBelt", label: "Chain & Sprocket/Drive Belt" },
+  { key: "chainSprocketBelt", label: "Chain&Sprocket/Drive Belt" },
   { key: "fuelHose", label: "Fuel Hose" },
   { key: "tiresTubesFlaps", label: "Tires, Tubes, Flaps" },
   { key: "bulbs", label: "Bulbs" },

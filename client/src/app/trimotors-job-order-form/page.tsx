@@ -17,6 +17,11 @@ import {
   DiagnosisState,
   TrimotorsJobRequestType,
   TrimotorsJobAmountType,
+  PartsQuantity,
+  PartsNumber,
+  PartsBrand,
+  PartsAmountsType,
+  PartsReplacement,
 } from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
 import acronymName from "@/utils/acronymName";
@@ -37,6 +42,7 @@ import TrimotorsPrintJobOrder from "@/components/trimotors-print-job";
 import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
 import FormHeader from "@/components/form-header";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
+import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -71,7 +77,11 @@ const TrimotorsJobOrderForm = () => {
   const [generalRemarks, setGeneralRemarks] = useState("");
 
   // Amounts state
-  const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
+   // Amounts state
+   const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
+   const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
+   const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
+   const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
 
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
@@ -167,6 +177,51 @@ const TrimotorsJobOrderForm = () => {
     warrantyBooklet: { status: null, remarks: "" },
   });
 
+    const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
+      engineOil: false,
+      drainPlugWasher: false,
+      tappetORing: false,
+      sparkPlug: false,
+      airCleanerElement: false,
+      brakeShoePads: false,
+      gaskets: false,
+      battery: false,
+      chainSprocketBelt: false,
+      fuelHose: false,
+      tiresTubesFlaps: false,
+      bulbs: false,
+      bearings: false,
+      springs: false,
+      rubberPartsOilSeal: false,
+      plasticParts: false,
+      brakeFluid: false,
+      coolant: false,
+      partsOthers: false,
+      partsOthersText: "",
+    });
+  
+    const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
+      engineOil: 1,
+      drainPlugWasher: 1,
+      tappetORing: 1,
+      sparkPlug: 1,
+      airCleanerElement: 1,
+      brakeShoePads: 1,
+      gaskets: 1,
+      battery: 1,
+      chainSprocketBelt: 1,
+      fuelHose: 1,
+      tiresTubesFlaps: 1,
+      bulbs: 1,
+      bearings: 1,
+      springs: 1,
+      rubberPartsOilSeal: 1,
+      plasticParts: 1,
+      brakeFluid: 1,
+      coolant: 1,
+      partsOthers: 1,
+    });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
   const [dropDownOpen, setDropdownOpen] = useState<boolean>(false);
@@ -204,6 +259,16 @@ const TrimotorsJobOrderForm = () => {
     }));
   };
 
+  const handlePartsAmountChange = (
+    key: keyof PartsAmountsType,
+    value: number,
+  ) => {
+    setPartsAmounts((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   // Calculate totals
   const jobTotal = useMemo(() => {
     return Object.values(jobAmounts).reduce(
@@ -211,6 +276,19 @@ const TrimotorsJobOrderForm = () => {
       0,
     );
   }, [jobAmounts]);
+
+  const partsTotal = useMemo(() => {
+    return Object.values(partsAmounts).reduce(
+      (total, amount) => total + (amount || 0),
+      0,
+    );
+  }, [partsAmounts]);
+
+  const overallTotal = useMemo(
+    () => jobTotal + partsTotal,
+    [jobTotal, partsTotal],
+  );
+
 
   // Clean up amounts when checkboxes are unchecked
   useEffect(() => {
@@ -220,16 +298,30 @@ const TrimotorsJobOrderForm = () => {
     Object.keys(updatedAmounts).forEach((key) => {
       const typedKey = key as keyof TrimotorsJobAmountType;
       // Check if the key exists in jobRequest and if it's false (exclude 'others' which is handled separately)
-      if (
-        typedKey !== "others" &&
-        !jobRequest[typedKey as keyof TrimotorsJobRequestType]
-      ) {
+      if (typedKey !== "others" && !jobRequest[typedKey as keyof TrimotorsJobRequestType]) {
         delete updatedAmounts[typedKey];
       }
     });
 
     setJobAmounts(updatedAmounts);
   }, [jobRequest]);
+
+  useEffect(() => {
+    const updatedAmounts = { ...partsAmounts };
+
+    // Remove amount entries for unchecked parts (exclude 'partsOthers' which is handled separately)
+    Object.keys(updatedAmounts).forEach((key) => {
+      const typedKey = key as keyof PartsAmountsType;
+      if (
+        typedKey !== "partsOthers" &&
+        !partsReplacement[typedKey as keyof PartsReplacement]
+      ) {
+        delete updatedAmounts[typedKey];
+      }
+    });
+
+    setPartsAmounts(updatedAmounts);
+  }, [partsReplacement]);
 
   // Form validation
   const validateForm = () => {
@@ -315,6 +407,11 @@ const TrimotorsJobOrderForm = () => {
     diagnosis,
     jobRequest,
     jobAmounts,
+    partsReplacement,
+    partsBrand,
+    partsNumber,
+    partsQuantity,
+    partsAmounts,
     nextScheduleDate,
     nextScheduleKms,
     generalRemarks,
@@ -731,13 +828,25 @@ const TrimotorsJobOrderForm = () => {
 
                 {/* Documents and Visual Check - Side by side
                  */}
-                <TrimotorsJobRequest
-                  jobRequest={jobRequest}
-                  setJobRequest={setJobRequest}
-                  jobAmounts={jobAmounts}
-                  handleJobAmountChange={handleJobAmountChange}
-                  jobTotal={jobTotal}
-                />
+                  <TrimotorsJobDetailsGrid
+                    jobRequest={jobRequest}
+                    setJobRequest={setJobRequest}
+                    partsReplacement={partsReplacement}
+                    setPartsReplacement={setPartsReplacement}
+                    jobAmounts={jobAmounts}
+                    handleJobAmountChange={handleJobAmountChange}
+                    partsAmounts={partsAmounts}
+                    handlePartsAmountChange={handlePartsAmountChange}
+                    partsBrand={partsBrand}
+                    setPartsBrand={setPartsBrand}
+                    partsNumber={partsNumber}
+                    setPartsNumber={setPartsNumber}
+                    partsQuantity={partsQuantity}
+                    setPartsQuantity={setPartsQuantity}
+                    jobTotal={jobTotal}
+                    partsTotal={partsTotal}
+                    overallTotal={overallTotal}
+                  />
 
                 <NextSchedule
                   errors={errors}

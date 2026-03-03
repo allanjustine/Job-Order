@@ -20,10 +20,10 @@
     "react": "^19.2.3",
     "react-data-table-component": "^7.7.0",
     "react-dom": "^19.2.3",
-    "react-hook-form": "^7.70.0",
+    "react-hook-form": "^7.71.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.11.0",
+    "react-router-dom": "^7.12.0",
     "react-select": "^5.10.2",
     "react-to-print": "^3.2.0",
     "sweetalert2": "^11.26.17",
@@ -34,8 +34,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/file-saver": "^2.0.7",
-    "@types/node": "^20.19.27",
-    "@types/react": "^19.2.7",
+    "@types/node": "^20.19.28",
+    "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"

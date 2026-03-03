@@ -1,6 +1,7 @@
 export interface TrimotorsJobItem {
   key: string;
   label: string;
+  hasText?: boolean; 
 }
 
 export const trimotorsJobItems: TrimotorsJobItem[] = [

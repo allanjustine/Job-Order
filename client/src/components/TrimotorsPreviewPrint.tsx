@@ -3,7 +3,11 @@
 
 import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
-import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType,TrimotorsJobRequestType} from "@/types/jobOrderFormType";
+import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsAmountsType } from "@/types/jobOrderFormType";
+import { partsItems } from "@/constants/part-items";
+import { TrimotorsPartsTable } from "@/components/TrimotorsPartsTable";
+import { TrimotorsJobTable } from "@/components/TrimotorsJobTable";
+import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 
 interface TrimotorsPreviewJobOrderProps {
   data: {
@@ -26,12 +30,17 @@ interface TrimotorsPreviewJobOrderProps {
     diagnosis: Record<TrimotorsDiagnosisKeys, DiagnosisState>;
     jobRequest: TrimotorsJobRequestType;
     jobAmounts: TrimotorsJobAmountType;
+    partsReplacement: PartsReplacement;
+    partsBrand: PartsBrand;
+    partsNumber: PartsNumber;
+    partsQuantity: PartsQuantity;
+    partsAmounts: PartsAmountsType;
     nextScheduleDate: string;
     nextScheduleKms: string;
     generalRemarks: string;
     serviceAdvisor: string;
     branchManager: string;
-    mechanic:string;
+    mechanic: string;
     jobOrderNumber: string;
   };
 }
@@ -42,16 +51,44 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   
   // Safely calculate totals with fallbacks
   const jobTotal = Object.values(data.jobAmounts || {}).reduce((s, v) => s + (Number(v) || 0), 0);
-
+  const partsTotal = Object.values(data.partsAmounts || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+  const grandTotal = jobTotal + partsTotal;
 
   // Helper function to safely get amount values
   const getJobAmount = (key: string): number => {
     return data.jobAmounts[key as keyof typeof data.jobAmounts] || 0;
   };
 
+  const getPartsAmount = (key: string): number => {
+    return data.partsAmounts[key as keyof typeof data.partsAmounts] || 0;
+  };
+  
+  const getPartsQuantity = (key: string): number => {
+    if (!data.partsQuantity) return 0;
+    return data.partsQuantity[key as keyof PartsQuantity] || 0;
+  };
+  
   const formatCurrency = (amount: number | undefined): string => {
     if (!amount || amount === 0) return '';
     return phpCurrency(amount);
+  };
+  const formatPartDetail = (partKey: string): string => {
+    const brand = data.partsBrand?.[partKey as keyof PartsBrand];
+    const partNo = data.partsNumber?.[partKey as keyof PartsNumber];
+    
+    if (brand && partNo) {
+      return `${brand} - ${partNo}`;
+    } else if (brand) {
+      return brand;
+    } else if (partNo) {
+      return `Part #: ${partNo}`;
+    }
+    return "";
+  };
+  
+  // Check if part is selected and has quantity
+  const isPartSelected = (partKey: string): boolean => {
+    return !!(data.partsReplacement?.[partKey as keyof PartsReplacement] && getPartsQuantity(partKey) > 0);
   };
 
   const diagnosisRows = [
@@ -99,7 +136,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
       }}
     >
       {/* Honda Header */}
-       <div className="flex flex-col justify-center items-center mb-1">
+      <div className="flex flex-col justify-center items-center mb-1">
         <div className="flex justify-between items-center w-full">
           <div className="flex-1"></div> {/* Left spacer */}
           <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
@@ -152,7 +189,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
           <span className="font-bold w-40">Repair End Time:</span>
           <span className="border-b border-black flex-1">{data.repairEnd}</span>
         </div>
-          <div className="flex">
+        <div className="flex">
           <span className="font-bold w-32">Fuel Level:</span>
           <span className="border-b border-black flex-1">{data.fuelLevel}</span>
         </div>
@@ -186,7 +223,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         </div>
       </div>
 
-      {/* Motorcycle Diagnosis Section - REFACTORED */}
+      {/* Motorcycle Diagnosis Section */}
       <div className="mb-2 text-xs">
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           TRIMOTORS' DIAGNOSIS
@@ -249,308 +286,37 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         </table>
       </div>
 
-      {/* JOB ORDER - Two Column Layout */}
+      {/* Dynamic Job Order Table */}
       <div className="mb-1 text-xs" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
-        <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
-          JOB ORDER
-        </h3>
-  
-        {/* Job Order Table - 4 Column Layout */}
-        <table className="w-full border-collapse border border-black">
-          <thead>
-            <tr className="bg-gray-40">
-              <th className="border border-black p-0.5 text-left">Specific Job(s) Request</th>
-              <th className="border border-black p-0.5 text-center w-16">Amount</th>
-              <th className="border border-black p-0.5 text-left"></th>
-              <th className="border border-black p-0.5 text-center w-16">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Row 1 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.vehicleWashing)}</span>
-                  <span>Vehicle Washing & Cleaning</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("vehicleWashing"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkShock)}</span>
-                  <span>Check front/near shock absorbers for any defect</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkShock"))}</td>
-            </tr>
-            
-            {/* Row 2 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.airFilter)}</span>
-                  <span>Clean/Replace breather tube filter</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("airFilter"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkBrake)}</span>
-                  <span>Check & top up brake fluid</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkBrake"))}</td>
-            </tr>
-            
-            {/* Row 3 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.breather)}</span>
-                  <span>Clean/Replace breather tube filter</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("breather"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.deCarbonising)}</span>
-                  <span>De-carbonising engine</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("deCarbonising"))}</td>
-            </tr>
-            
-            {/* Row 4 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkLights)}</span>
-                  <span>Check all lights for working</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkLights"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkBrakeLiner)}</span>
-                  <span>Check brake liner wear, replace if required</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkBrakeLiner"))}</td>
-            </tr>
-            
-            {/* Row 5 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.oilStrainer)}</span>
-                  <span>Replace oil strainer</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("oilStrainer"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.replaceEngine)}</span>
-                  <span>Replace engine oil</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("replaceEngine"))}</td>
-            </tr>
-            
-            {/* Row 6 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkSteering)}</span>
-                  <span>Check/adjust steering column tight race & lock nut</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkSteering"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.replaceDifferential)}</span>
-                  <span>Replace/top up differential oil</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("replaceDifferential"))}</td>
-            </tr>
-            
-            {/* Row 7 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.cleanSpark)}</span>
-                  <span>Clean/Adjust/Replace Spark plug gap</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("cleanSpark"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greaseSteering)}</span>
-                  <span>Grease steering races, balls</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseSteering"))}</td>
-            </tr>
-            
-            {/* Row 8 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkValve)}</span>
-                  <span>Check & adjust valve clearance</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkValve"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greaseFront)}</span>
-                  <span>Grease Front Suspension</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseFront"))}</td>
-            </tr>
-            
-            {/* Row 9 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkFuel)}</span>
-                  <span>Check/replace fule pipe</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkFuel"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greaseNipple)}</span>
-                  <span>Grease Front & Rear axles ( bGrease nipple)</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseNipple"))}</td>
-            </tr>
-            
-            {/* Row 10 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkBattery)}</span>
-                  <span>Check battery electrolyte level & top up</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkBattery"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greasePropeller)}</span>
-                  <span>Grease Propeller shaft flanges</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greasePropeller"))}</td>
-            </tr>
-            
-            {/* Row 11 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.tireRotation)}</span>
-                  <span>Do tire rotation (seq. 1 & 2)</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("tireRotation"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greaseGear)}</span>
-                  <span>Grease Gear shifter sector</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseGear"))}</td>
-            </tr>
-            
-            {/* Row 12 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.replaceProp)}</span>
-                  <span>Replace Prop. Shaft rubber buffers</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseNipple"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.greaseFare)}</span>
-                  <span>Grease Fare/Speedo meter drive</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("greaseFare"))}</td>
-            </tr>
-            
-            {/* Row 13 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.replaceOil)}</span>
-                  <span>Replace Oil Filter</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("replaceOil"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.speedometer)}</span>
-                  <span>Speedometer inner greasing</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("speedometer"))}</td>
-            </tr>
-            
-            {/* Row 14 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.checkCabies)}</span>
-                  <span>Check and adjust control cabies</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("checkCabies"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.petroleum)}</span>
-                  <span>Apply petroleum jelly on battery terminals</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("petroleum"))}</td>
-            </tr>
-             
-            {/* Row 15 */}
-            <tr>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6">{renderCheckbox(data.jobRequest.others)}</span>
-                  <span>Others: {data.jobRequest.othersText}</span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left">{formatCurrency(getJobAmount("others"))}</td>
-              <td className="border border-black p-0.5">
-                <div className="flex items-center">
-                  <span className="w-6"></span>
-                  <span></span>
-                </div>
-              </td>
-              <td className="border border-black p-0.5 text-left"></td>
-            </tr>           
-            
-            {/* Row 20 - Totals */}
-            <tr>
-              <td className="border border-black p-0.5 font-semibold">Total Labor Cost:</td>
-              <td className="border border-black p-0.5 text-left font-semibold">{phpCurrency(jobTotal)}</td>
-            </tr>
-          </tbody>
-        </table>
+        <TrimotorsJobTable
+          data={data}
+          jobItems={trimotorsJobItems}
+          renderCheckbox={renderCheckbox}
+          getJobAmount={getJobAmount}
+          formatCurrency={formatCurrency}
+          jobTotal={jobTotal}
+        />
+
+        {/* Dynamic Parts Used Table */}
+        <TrimotorsPartsTable
+          data={data}
+          partsItems={partsItems}
+          renderCheckbox={renderCheckbox}
+          formatPartDetail={formatPartDetail}
+          getPartsQuantity={getPartsQuantity}
+          getPartsAmount={getPartsAmount}
+          formatCurrency={formatCurrency}
+          isPartSelected={isPartSelected}
+          partsTotal={partsTotal}
+        />
 
         {/* Next Service Schedule - Below the table */}
-        <div className="flex justify-between items-center border border-black border-t-0 py-1 ">
-          <div className="font-bold ml-1 text-xxs">Grand Total: {phpCurrency(jobTotal)}</div>
+        <div className="flex justify-between items-center border border-black border-t-0 py-1">
+          <div className="font-bold ml-1 text-xxs">Grand Total: {phpCurrency(grandTotal)}</div>
         </div>
 
         <div className="py-2">
-          <span className="font-bold mr-2 ">Your Next Service Schedule is:</span>
+          <span className="font-bold mr-2">Your Next Service Schedule is:</span>
           <span className="border-b border-black w-18 inline-block">{data.nextScheduleDate}</span>
           <span> or </span>
           <span className="border-b border-black w-25 inline-block">{data.nextScheduleKms}</span>
@@ -567,24 +333,24 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
 
       {/* Signatures */}
       <div className="mt-0.5 grid grid-cols-3 gap-2 text-xs" style={{fontSize: '8pt', lineHeight: '0.8'}}>
-        <div className="text-center  p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
+        <div className="text-center p-0.5">
+          <div className="mb-1 pb-1 h-6"></div>
           <p className="text-xs text-left">Prepared by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.serviceAdvisor}</p>
-          <p className="text-xs text-gray-600" style={{fontSize: '7pt'}} >(Signature Over Printed Name)</p>
+          <p className="underline">{data.serviceAdvisor}</p>
+          <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">Salesrep/Service Advisor</p>
         </div>
         <div className="text-center p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
+          <div className="mb-1 pb-1 h-6"></div>
           <p className="text-xs text-left">Checked by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.branchManager}</p>
+          <p className="underline">{data.branchManager}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">BM/BS</p>
         </div>
-        <div className="text-center  p-0.5">
-          <div className=" mb-1 pb-1 h-6"></div>
+        <div className="text-center p-0.5">
+          <div className="mb-1 pb-1 h-6"></div>
           <p className="text-xs text-left">Conformed by:</p>
-          <p className="underline" style={{fontStyle:'underline'}}>{data.customerName}</p>
+          <p className="underline">{data.customerName}</p>
           <p className="text-xs text-gray-600" style={{fontSize: '7pt'}}>(Signature Over Printed Name)</p>
           <p className="text-xxs">Customer</p>
         </div>
