@@ -1,5 +1,5 @@
 import Input from "./ui/input";
-import Label from "./ui/label";
+import { Label } from "./ui/label";
 import phpCurrency from "@/utils/phpCurrency";
 import { PartsAmountsType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity } from "@/types/jobOrderFormType";
 import { partsItems } from "@/constants/part-items";

@@ -16,7 +16,7 @@ import {
 import { FaCheckCircle, FaCircleNotch, FaEye } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Modal,
   ModalBody,
@@ -41,11 +41,9 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
-import MonthOptions from "@/components/month-options";
-import Label from "@/components/ui/label";
-import Select from "@/components/ui/select";
-import YearOptions from "@/components/year-options";
-import { MonthAndYearType } from "@/types/month-and-year";
+import { DatePickerWithRange } from "@/components/date-picker.with-range";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 const Dashboard = () => {
   const {
@@ -87,9 +85,9 @@ const Dashboard = () => {
   const { user, handleLogout: handleLogoutUser } = useAuth();
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [isExport, setIsExport] = useState<boolean>(false);
-  const [monthAndYear, setMonthAndYear] = useState<MonthAndYearType>({
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(),
   });
 
   useEffect(() => {
@@ -251,13 +249,13 @@ const Dashboard = () => {
       const response = await api.get("/export-branch-reports", {
         params: {
           search: searchTerm,
-          ...monthAndYear,
+          ...date,
         },
       });
 
       if (response.data.data.length === 0) {
         return toast.error(
-          "Export failed! No data to export in selected month and year",
+          "Export failed! No data to export in selected date range.",
           {
             position: "bottom-center",
             duration: 5000,
@@ -285,27 +283,22 @@ const Dashboard = () => {
           type: "application/octet-stream",
         });
 
-        const now = new Date(
-          Number(monthAndYear.year),
-          Number(monthAndYear.month) - 1,
-          1,
-        );
-
-        const monthName = now.toLocaleString("en-US", { month: "long" });
-
-        const monthOfAndYear = `Month of ${monthName} and Year of ${now.getFullYear()}`;
+        const dateFromTo =
+          date?.from &&
+          date?.to &&
+          `${format(date?.from, "LLL dd, y")} to ${format(date?.to, "LLL dd, y")}`;
 
         const saveFileName = searchTerm
-          ? `(Searched: ${searchTerm}) ${monthOfAndYear}.xlsx`
-          : `${monthOfAndYear} Reports.xlsx`;
+          ? `(Searched: ${searchTerm}) ${dateFromTo}.xlsx`
+          : `${dateFromTo} Reports.xlsx`;
 
         saveAs(blob, saveFileName);
 
         setIsExport(false);
 
-        setMonthAndYear({
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear(),
+        setDate({
+          from: new Date(),
+          to: new Date(),
         });
 
         toast.error(
@@ -333,15 +326,6 @@ const Dashboard = () => {
   const handleViewExport = () => {
     setIsExport(!isExport);
   };
-
-  const handleMonthAndYearChange =
-    (monthAndYear: string) => (e: ChangeEvent<HTMLSelectElement>) => {
-      const { value } = e.target;
-      setMonthAndYear((prev) => ({
-        ...prev,
-        [monthAndYear]: value,
-      }));
-    };
 
   return (
     <>
@@ -701,33 +685,16 @@ const Dashboard = () => {
           Filter Date and Export
         </ModalHeader>
         <ModalBody>
-          <div className="grid grid-cols-[60%_40%] gap-1">
-            <div className="space-y-2">
-              <Label htmlFor="date">Select Month</Label>
-              <Select
-                value={monthAndYear.month}
-                onChange={handleMonthAndYearChange("month")}
-              >
-                <MonthOptions />
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="date">Select Year</Label>
-              <Select
-                value={monthAndYear.year}
-                onChange={handleMonthAndYearChange("year")}
-              >
-                <YearOptions startYear={1900} />
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <DatePickerWithRange date={date} setDate={setDate} />
           </div>
         </ModalBody>
         <ModalFooter>
           <Button
             type="button"
-            className={`bg-green-500 hover:bg-green-600 text-white ${isExporting || !monthAndYear.month || !monthAndYear.year ? "cursor-not-allowed!" : ""}`}
+            className={`bg-green-500 hover:bg-green-600 text-white ${isExporting || !date?.from || !date?.to ? "cursor-not-allowed!" : ""}`}
             onClick={handleExport}
-            disabled={isExporting || !monthAndYear.month || !monthAndYear.year}
+            disabled={isExporting || !date?.from || !date?.to}
           >
             {isExporting ? (
               <>

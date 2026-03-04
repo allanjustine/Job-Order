@@ -1,6 +1,6 @@
 import { set } from "date-fns";
 import Input from "./ui/input";
-import Label from "./ui/label";
+import { Label } from "./ui/label";
 
 export default function NextSchedule({
   errors,

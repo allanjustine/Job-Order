@@ -1,5 +1,5 @@
 import { FaPlus, FaTrash, FaTrashAlt } from "react-icons/fa";
-import Button from "./ui/button";
+import { Button } from "./ui/button";
 import Input from "./ui/input";
 
 export default function CustomersJobRequest({

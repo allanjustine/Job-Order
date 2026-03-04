@@ -1,8 +1,8 @@
 "use client";
 
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
-import Label from "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import Select from "@/components/ui/select";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
@@ -20,9 +20,11 @@ import {
 } from "react-icons/fa6";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { DatePickerWithRange } from "@/components/date-picker.with-range";
+import { DateRange } from "react-day-picker";
 
 const Reports = () => {
-  const [filterItem, setFilterItem] = useState<string>("");
+  const [filterItem, setFilterItem] = useState<string | undefined>("");
   const [filterBy, setFilterBy] = useState("all");
   const {
     data: reports,
@@ -49,6 +51,10 @@ const Reports = () => {
   const [areaManagers, setAreaManagers] = useState([]);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(),
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +79,14 @@ const Reports = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (filterBy !== "date" || !date?.from || !date?.to) return;
+
+    setFilterItem(
+      `${format(date?.from, "yyyy-MM-dd")}, ${format(date?.to, "yyyy-MM-dd")}`,
+    );
+  }, [date?.from, date?.to, filterBy]);
 
   useEffect(() => {
     if (filterBy === "all") {
@@ -195,7 +209,7 @@ const Reports = () => {
         const worksheet = XLSX.utils.json_to_sheet(response.data.data);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
-        
+
         const excelBuffer = XLSX.write(workbook, {
           bookType: "xlsx",
           type: "array",
@@ -205,7 +219,7 @@ const Reports = () => {
         });
 
         let item: any;
-        
+
         if (filterBy === "branch") {
           item = branches.find(
             (branch: any) => branch.id === Number(filterItem),
@@ -225,12 +239,14 @@ const Reports = () => {
               : filterBy === "branch"
                 ? `${filterBy}-(${item?.code})-${item?.name}-data-of-job-request-reports.xlsx`
                 : filterBy === "search"
-                ? `${filterBy}-(${searchTerm?.toLowerCase()})-data-of-job-request-reports.xlsx`
-                : filterBy === "date"
-                ? `${filterBy}-(${filterItem})-data-of-job-request-reports.xlsx`
-                : filterBy === "area_manager"
-                  ? `${filterBy}-${item?.name}-data-of-job-request-reports.xlsx`
-                  : `reports.xlsx`;
+                  ? `${filterBy}-(${searchTerm?.toLowerCase()})-data-of-job-request-reports.xlsx`
+                  : filterBy === "date"
+                    ? date?.from &&
+                      date?.to &&
+                      `${filterBy}-(${format(date?.from, "LLL dd, y")} - ${format(date?.to, "LLL dd, y")})-data-of-job-request-reports.xlsx`
+                    : filterBy === "area_manager"
+                      ? `${filterBy}-${item?.name}-data-of-job-request-reports.xlsx`
+                      : `reports.xlsx`;
 
         saveAs(blob, saveFileName);
       }
@@ -248,7 +264,7 @@ const Reports = () => {
           <h1 className="text-2xl font-semibold text-gray-600">Filter</h1>
           <div className="grid gap-2 grid-cols-2">
             <div className="w-full">
-              <Label htmlFor="filter_type">Filter by</Label>
+              <Label className="mb-1" htmlFor="filter_type">Filter by</Label>
               <Select
                 disabled={isDataLoading}
                 value={filterBy}
@@ -268,7 +284,7 @@ const Reports = () => {
             </div>
             <Activity mode={filterBy === "search" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label htmlFor="search">Search</Label>
+                <Label className="mb-1" htmlFor="search">Search</Label>
                 <div className="relative w-full">
                   <Input
                     value={defaultSearch}
@@ -283,7 +299,7 @@ const Reports = () => {
             </Activity>
             <Activity mode={filterBy === "branch" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label htmlFor="branch">Filter by Branch</Label>
+                <Label className="mb-1" htmlFor="branch">Filter by Branch</Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
@@ -303,7 +319,7 @@ const Reports = () => {
             </Activity>
             <Activity mode={filterBy === "area_manager" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label htmlFor="area_manager">Filter by Area Manager</Label>
+                <Label className="mb-1" htmlFor="area_manager">Filter by Area Manager</Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
@@ -323,20 +339,14 @@ const Reports = () => {
             </Activity>
             <Activity mode={filterBy === "date" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label htmlFor="date">Date</Label>
-                <Input
-                  type="date"
-                  value={filterItem}
-                  onChange={handleFilterItem}
-                  className="h-12"
-                />
+                <DatePickerWithRange date={date} setDate={setDate} />
               </div>
             </Activity>
             <Activity
               mode={filterBy === "job_order_detail_type" ? "visible" : "hidden"}
             >
               <div className="w-full">
-                <Label htmlFor="branch">Filter by Job Order Detail Type</Label>
+                <Label className="mb-1" htmlFor="branch">Filter by Job Order Detail Type</Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
@@ -355,7 +365,7 @@ const Reports = () => {
               mode={filterBy === "job_order_type" ? "visible" : "hidden"}
             >
               <div className="w-full">
-                <Label htmlFor="branch">Filter by Job Order Type</Label>
+                <Label className="mb-1" htmlFor="branch">Filter by Job Order Type</Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
@@ -396,7 +406,11 @@ const Reports = () => {
                 </Button>
                 <Activity
                   mode={
-                    filterBy && (filterItem || searchTerm) && !isRefresh && !isLoading && reports.length > 0
+                    filterBy &&
+                    (filterItem || searchTerm) &&
+                    !isRefresh &&
+                    !isLoading &&
+                    reports.length > 0
                       ? "visible"
                       : "hidden"
                   }

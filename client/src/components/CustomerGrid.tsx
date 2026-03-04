@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Input from "./ui/input";
-import Label from "./ui/label";
+import { Label } from "./ui/label";
 import Select from "./ui/select";
 import { api } from "@/lib/api";
 

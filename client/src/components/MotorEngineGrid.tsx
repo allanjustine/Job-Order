@@ -1,5 +1,5 @@
 import Input from "./ui/input";
-import Label from "./ui/label";
+import { Label } from "./ui/label";
 import Select from "./ui/select";
 
 export default function MotorEngineGrid({

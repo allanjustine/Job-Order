@@ -11,7 +11,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { Activity, useEffect, useState } from "react";
-import Button from "./ui/button";
+import { Button } from "./ui/button";
 
 export default function StatCards({
   spinner,
@@ -127,7 +127,7 @@ export default function StatCards({
                   <Activity mode={item.percentage ? "visible" : "hidden"}>
                     <span
                       className={`text-xs flex gap-1 items-center ${percentageColor(
-                        Number(!isLoading && item?.percentage?.split(".")[0])
+                        Number(!isLoading && item?.percentage?.split(".")[0]),
                       )}`}
                     >
                       <ArrowUp className="size-3" /> {item.percentage}
@@ -188,8 +188,9 @@ export default function StatCards({
               <Activity mode={isMechanicOpen ? "hidden" : "visible"}>
                 <Button
                   type="button"
+                  variant={"link"}
                   onClick={() => setIsMechanicOpen(!isMechanicOpen)}
-                  className="p-0 text-blue-500 hover:text-blue-600"
+                  className="p-0 text-blue-500 hover:text-blue-600 hover:no-underline"
                 >
                   <Plus size="20" /> Add more mechanic
                 </Button>

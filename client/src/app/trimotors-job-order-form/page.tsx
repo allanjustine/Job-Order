@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { FaPrint, FaSignOutAlt } from "react-icons/fa";
 import { z } from "zod";
 import { FaEye, FaRotate } from "react-icons/fa6";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
 import CustomerGrid from "@/components/CustomerGrid";
 import { api } from "@/lib/api";
@@ -43,6 +43,7 @@ import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
 import FormHeader from "@/components/form-header";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
+import { partsItems } from "@/constants/part-items";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -77,11 +78,11 @@ const TrimotorsJobOrderForm = () => {
   const [generalRemarks, setGeneralRemarks] = useState("");
 
   // Amounts state
-   // Amounts state
-   const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
-   const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
-   const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
-   const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
+  // Amounts state
+  const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
+  const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
+  const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
+  const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
 
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
@@ -177,50 +178,50 @@ const TrimotorsJobOrderForm = () => {
     warrantyBooklet: { status: null, remarks: "" },
   });
 
-    const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
-      engineOil: false,
-      drainPlugWasher: false,
-      tappetORing: false,
-      sparkPlug: false,
-      airCleanerElement: false,
-      brakeShoePads: false,
-      gaskets: false,
-      battery: false,
-      chainSprocketBelt: false,
-      fuelHose: false,
-      tiresTubesFlaps: false,
-      bulbs: false,
-      bearings: false,
-      springs: false,
-      rubberPartsOilSeal: false,
-      plasticParts: false,
-      brakeFluid: false,
-      coolant: false,
-      partsOthers: false,
-      partsOthersText: "",
-    });
-  
-    const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
-      engineOil: 1,
-      drainPlugWasher: 1,
-      tappetORing: 1,
-      sparkPlug: 1,
-      airCleanerElement: 1,
-      brakeShoePads: 1,
-      gaskets: 1,
-      battery: 1,
-      chainSprocketBelt: 1,
-      fuelHose: 1,
-      tiresTubesFlaps: 1,
-      bulbs: 1,
-      bearings: 1,
-      springs: 1,
-      rubberPartsOilSeal: 1,
-      plasticParts: 1,
-      brakeFluid: 1,
-      coolant: 1,
-      partsOthers: 1,
-    });
+  const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
+    engineOil: false,
+    drainPlugWasher: false,
+    tappetORing: false,
+    sparkPlug: false,
+    airCleanerElement: false,
+    brakeShoePads: false,
+    gaskets: false,
+    battery: false,
+    chainSprocketBelt: false,
+    fuelHose: false,
+    tiresTubesFlaps: false,
+    bulbs: false,
+    bearings: false,
+    springs: false,
+    rubberPartsOilSeal: false,
+    plasticParts: false,
+    brakeFluid: false,
+    coolant: false,
+    partsOthers: false,
+    partsOthersText: "",
+  });
+
+  const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
+    engineOil: 1,
+    drainPlugWasher: 1,
+    tappetORing: 1,
+    sparkPlug: 1,
+    airCleanerElement: 1,
+    brakeShoePads: 1,
+    gaskets: 1,
+    battery: 1,
+    chainSprocketBelt: 1,
+    fuelHose: 1,
+    tiresTubesFlaps: 1,
+    bulbs: 1,
+    bearings: 1,
+    springs: 1,
+    rubberPartsOilSeal: 1,
+    plasticParts: 1,
+    brakeFluid: 1,
+    coolant: 1,
+    partsOthers: 1,
+  });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
@@ -289,7 +290,6 @@ const TrimotorsJobOrderForm = () => {
     [jobTotal, partsTotal],
   );
 
-
   // Clean up amounts when checkboxes are unchecked
   useEffect(() => {
     const updatedAmounts = { ...jobAmounts };
@@ -298,7 +298,10 @@ const TrimotorsJobOrderForm = () => {
     Object.keys(updatedAmounts).forEach((key) => {
       const typedKey = key as keyof TrimotorsJobAmountType;
       // Check if the key exists in jobRequest and if it's false (exclude 'others' which is handled separately)
-      if (typedKey !== "others" && !jobRequest[typedKey as keyof TrimotorsJobRequestType]) {
+      if (
+        typedKey !== "others" &&
+        !jobRequest[typedKey as keyof TrimotorsJobRequestType]
+      ) {
         delete updatedAmounts[typedKey];
       }
     });
@@ -469,7 +472,7 @@ const TrimotorsJobOrderForm = () => {
     };
   }, []);
 
-  const itemsData = trimotorsJobItems
+  const jobRequests = trimotorsJobItems
     .filter((item) => jobRequest[item.key as keyof TrimotorsJobRequestType])
     .map((item) => ({
       category: item.key === "others" ? jobRequest.othersText : item.label,
@@ -478,6 +481,20 @@ const TrimotorsJobOrderForm = () => {
       part_brand: "n/a",
       part_number: "n/a",
     }));
+
+  const partsReplacements = partsItems
+    .filter((item) => partsReplacement[item.key as keyof PartsReplacement])
+    .map((item) => ({
+      category:
+        item.key === "others" ? partsReplacement.partsOthersText : item.label,
+      amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
+      type: "parts_replacement",
+      part_brand: partsBrand[item.key as keyof PartsBrand],
+      part_number: partsNumber[item.key as keyof PartsNumber],
+      quantity: partsQuantity[item.key as keyof PartsQuantity],
+    }));
+
+  const itemsData = [...jobRequests, ...partsReplacements];
 
   const itemToStore = {
     customer: {
@@ -654,8 +671,37 @@ const TrimotorsJobOrderForm = () => {
       branchManager: "",
     });
 
+    setPartsReplacement({
+      engineOil: false,
+      drainPlugWasher: false,
+      tappetORing: false,
+      sparkPlug: false,
+      airCleanerElement: false,
+      brakeShoePads: false,
+      gaskets: false,
+      battery: false,
+      chainSprocketBelt: false,
+      fuelHose: false,
+      tiresTubesFlaps: false,
+      bulbs: false,
+      bearings: false,
+      springs: false,
+      rubberPartsOilSeal: false,
+      plasticParts: false,
+      brakeFluid: false,
+      coolant: false,
+      partsOthers: false,
+      partsOthersText: "",
+    });
+
     // Reset errors
     setErrors({});
+
+    setJobAmounts({});
+    setPartsAmounts({});
+    setPartsBrand({});
+    setPartsNumber({});
+    setPartsQuantity({});
   };
 
   const handleLogoutUser = () => {
@@ -714,11 +760,10 @@ const TrimotorsJobOrderForm = () => {
                     type="button"
                     onClick={handleToggleDropdown}
                     ref={buttonRef}
-                    className="px-0 py-0"
+                    className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold hover:no-underline"
+                    variant={"link"}
                   >
-                    <div className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-                      {acronymName(user?.name)}
-                    </div>
+                    {acronymName(user?.name)}
                   </Button>
                 </div>
               </div>
@@ -749,6 +794,7 @@ const TrimotorsJobOrderForm = () => {
                       <Button
                         type="button"
                         onClick={handleLogoutUser}
+                        variant={"destructive"}
                         className="p-0 text-sm text-left font-semibold text-gray-600 w-full"
                       >
                         <span className="flex gap-2 items-center">
@@ -828,25 +874,25 @@ const TrimotorsJobOrderForm = () => {
 
                 {/* Documents and Visual Check - Side by side
                  */}
-                  <TrimotorsJobDetailsGrid
-                    jobRequest={jobRequest}
-                    setJobRequest={setJobRequest}
-                    partsReplacement={partsReplacement}
-                    setPartsReplacement={setPartsReplacement}
-                    jobAmounts={jobAmounts}
-                    handleJobAmountChange={handleJobAmountChange}
-                    partsAmounts={partsAmounts}
-                    handlePartsAmountChange={handlePartsAmountChange}
-                    partsBrand={partsBrand}
-                    setPartsBrand={setPartsBrand}
-                    partsNumber={partsNumber}
-                    setPartsNumber={setPartsNumber}
-                    partsQuantity={partsQuantity}
-                    setPartsQuantity={setPartsQuantity}
-                    jobTotal={jobTotal}
-                    partsTotal={partsTotal}
-                    overallTotal={overallTotal}
-                  />
+                <TrimotorsJobDetailsGrid
+                  jobRequest={jobRequest}
+                  setJobRequest={setJobRequest}
+                  partsReplacement={partsReplacement}
+                  setPartsReplacement={setPartsReplacement}
+                  jobAmounts={jobAmounts}
+                  handleJobAmountChange={handleJobAmountChange}
+                  partsAmounts={partsAmounts}
+                  handlePartsAmountChange={handlePartsAmountChange}
+                  partsBrand={partsBrand}
+                  setPartsBrand={setPartsBrand}
+                  partsNumber={partsNumber}
+                  setPartsNumber={setPartsNumber}
+                  partsQuantity={partsQuantity}
+                  setPartsQuantity={setPartsQuantity}
+                  jobTotal={jobTotal}
+                  partsTotal={partsTotal}
+                  overallTotal={overallTotal}
+                />
 
                 <NextSchedule
                   errors={errors}

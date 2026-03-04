@@ -15,7 +15,7 @@ import {
 import { FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Modal,
   ModalBody,

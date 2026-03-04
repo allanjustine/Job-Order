@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Input from "@/components/ui/input";
-import Label from "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import { LOGIN_INPUTS } from "@/constants/formInputs";
 import { LoginInputType } from "@/types/formInputType";
 import { useAuth } from "@/context/authContext";
