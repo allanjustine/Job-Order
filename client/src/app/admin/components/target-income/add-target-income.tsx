@@ -134,7 +134,7 @@ export default function AddTargetIncome({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="user_id" required>
+                <Label htmlFor="user_id">
                   Select branch
                 </Label>
                 {isLoading ? (
@@ -165,7 +165,7 @@ export default function AddTargetIncome({
                 )}
               </div>
               <div>
-                <Label htmlFor="target_income" required>
+                <Label htmlFor="target_income">
                   Target Income
                 </Label>
                 <Input

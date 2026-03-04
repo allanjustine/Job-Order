@@ -137,7 +137,7 @@ export default function EditMechanic({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name" required>
+                <Label htmlFor="name">
                   Mechanic Name
                 </Label>
                 <Input
@@ -152,7 +152,7 @@ export default function EditMechanic({
                 )}
               </div>
               <div>
-                <Label htmlFor="user_id" required>
+                <Label htmlFor="user_id">
                   Select branch
                 </Label>
                 {isLoading ? (
