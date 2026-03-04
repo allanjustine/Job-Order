@@ -21,7 +21,7 @@ interface TrimotorsPartsReplacementSectionProps {
 }
 
 // Brand options
-const brandChoices = ["Bajaj"];
+const brandChoices = ["Bajaj"," BG Powerstroke"];
 
 export default function TrimotorsPartsReplacementSection({
   partsReplacement,

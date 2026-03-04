@@ -21,7 +21,7 @@ interface PartsReplacementSectionProps {
 }
 
 // Brand options
-const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu"];
+const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu", "BG Powerstroke"];
 
 export default function PartsReplacementSection({
   partsReplacement,
