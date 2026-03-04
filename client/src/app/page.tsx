@@ -15,7 +15,7 @@ const Home = () => {
       style={{ backgroundImage: "url('/engine.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/80 z-0"></div>
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <section className="relative py-20">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-8 text-center">
             <img
@@ -29,9 +29,9 @@ const Home = () => {
             <div className="space-y-4 max-w-4xl">
               <h1 className="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-6xl lg:text-7xl">
                 SMCT Group of Companies{" "}
-                <span className="text-primary  ">Job Order Form</span>
+                <span className="text-white">Job Order Form</span>
               </h1>
-              <p className="mx-auto max-w-2xl text-white text-muted-foreground text-lg sm:text-xl">
+              <p className="mx-auto max-w-2xl text-gray-200 text-lg sm:text-xl">
                 Manage vehicle repairs, customer details, and parts requests
                 seamlessly with job order system for automotive service
                 providers.
