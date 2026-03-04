@@ -132,7 +132,7 @@ export default function PartsReplacementSection({
                 className="flex items-center gap-4 text-sm"
               >
                 <div className="flex items-center gap-4 flex-1">
-                  <Label onCheck className="whitespace-nowrap">
+                  <Label className="whitespace-nowrap">
                     <Input
                       type="checkbox"
                       checked={
@@ -237,7 +237,7 @@ export default function PartsReplacementSection({
         {/* Others field for parts */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-4 flex-1">
-            <Label onCheck className="whitespace-nowrap">
+            <Label className="whitespace-nowrap">
               <Input
                 type="checkbox"
                 checked={partsReplacement.partsOthers}

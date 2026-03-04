@@ -41,7 +41,7 @@ export default function TrimotorsJobRequest({
       key={item.key}
       className="flex items-center justify-between gap-4 mb-2"
     >
-      <Label onCheck className="flex-1">
+      <Label className="flex-1">
         <Input
           type="checkbox"
           checked={
@@ -100,7 +100,7 @@ export default function TrimotorsJobRequest({
           {/* Others field - placed in second column */}
           <div className="flex items-center justify-between gap-4 mb-2">
             <div className="flex items-center gap-2 flex-1">
-              <Label onCheck>
+              <Label>
                 <Input
                   type="checkbox"
                   checked={jobRequest.others}
