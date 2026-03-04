@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/input";
-import Label from "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import Select from "@/components/ui/select";
 import { FORM_INPUTS } from "@/constants/formInputs";
 import { FormInputType } from "@/types/formInputType";

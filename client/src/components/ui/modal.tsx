@@ -1,13 +1,14 @@
-import Button from "./button";
+import { Button } from "./button";
 import { FaX } from "react-icons/fa6";
-import cn from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 function ModalHeader({ onClose, className, centerText, children }: any) {
   return (
     <div className={`p-4 ${centerText && "text-center"}`}>
       <Button
         type="button"
-        className="absolute top-3 right-0"
+        className="hover:no-underline absolute top-3 right-3"
+        variant={"link"}
         onClick={onClose}
       >
         <FaX className="text-gray-600 text-sm" />

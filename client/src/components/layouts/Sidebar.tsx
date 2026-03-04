@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
-import Button from "../ui/button";
+import { Button } from "../ui/button";
 import { sidebarData } from "@/constants/sidebarData";
 import Swal from "sweetalert2";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -119,11 +119,10 @@ export default function Sidebar({
               type="button"
               onClick={handleToggleDropdown}
               ref={buttonRef}
-              className="p-0"
+              className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold hover:no-underline"
+              variant={"link"}
             >
-              <div className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-                {acronymName(user?.name)}
-              </div>
+              {acronymName(user?.name)}
             </Button>
             {dropDownOpen && (
               <div
@@ -150,6 +149,7 @@ export default function Sidebar({
                     <Button
                       type="button"
                       onClick={handleLogoutUser}
+                      variant={"destructive"}
                       className="p-0 text-sm font-semibold text-gray-600 w-full text-left"
                     >
                       <span className="flex items-center gap-2">

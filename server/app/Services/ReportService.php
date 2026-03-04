@@ -94,10 +94,10 @@ class ReportService
                 )
             )
             ->when(
-                $filter_by === 'date',
+                $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereDate('created_at', $filter_item)
+                $query->whereBetween('created_at', explode(", ", $filter_item))
             )
             ->when(
                 $sort['column'] !== 'user.name',
@@ -183,10 +183,10 @@ class ReportService
                 )
             )
             ->when(
-                $filter_by === 'date',
+                $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereDate('created_at', $filter_item)
+                $query->whereBetween('created_at', explode(", ", $filter_item))
             )
             ->when(
                 $filter_by === 'job_order_type',
@@ -223,9 +223,9 @@ class ReportService
 
         $search = request('search', '');
 
-        $year = request('year', now()->year);
+        $from = request('from', '');
 
-        $month = request('month', now()->month);
+        $to = request('to', '');
 
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
@@ -257,8 +257,7 @@ class ReportService
             ->where(
                 fn($item)
                 =>
-                $item->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
+                $item->whereBetween('created_at', [$from, $to])
             )
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get()

@@ -5,7 +5,7 @@ import { FaPrint, FaSignOutAlt } from "react-icons/fa";
 import MotorsPrintJobOrder from "@/components/motors-print-job";
 import { z } from "zod";
 import { FaEye, FaRotate } from "react-icons/fa6";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
 import CustomerGrid from "@/components/CustomerGrid";
 import JobDetailsGrid from "@/components/JobDetailsGrid";
@@ -626,6 +626,12 @@ const JobOrderForm = () => {
       branchManager: "",
     });
 
+    setJobAmounts({});
+    setPartsAmounts({});
+    setPartsBrand({});
+    setPartsNumber({});
+    setPartsQuantity({});
+
     // Reset errors
     setErrors({});
   };
@@ -686,11 +692,10 @@ const JobOrderForm = () => {
                     type="button"
                     onClick={handleToggleDropdown}
                     ref={buttonRef}
-                    className="px-0 py-0"
+                    className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold hover:no-underline"
+                    variant={"link"}
                   >
-                    <div className="ml-3 rounded-full w-10 h-10 flex items-center justify-center bg-gray-300 font-bold">
-                      {acronymName(user?.name)}
-                    </div>
+                    {acronymName(user?.name)}
                   </Button>
                 </div>
               </div>
@@ -721,6 +726,7 @@ const JobOrderForm = () => {
                       <Button
                         type="button"
                         onClick={handleLogoutUser}
+                        variant={"destructive"}
                         className="p-0 text-sm text-left font-semibold text-gray-600 w-full"
                       >
                         <span className="flex gap-2 items-center">

@@ -1,4 +1,4 @@
-import cn from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ChangeEvent, ReactNode } from "react";
 
 export default function Select({

@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Modal,
   ModalBody,
@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import Input from "@/components/ui/input";
-import Label from "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/authContext";
