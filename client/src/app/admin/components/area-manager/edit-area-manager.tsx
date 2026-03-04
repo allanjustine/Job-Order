@@ -166,7 +166,7 @@ export default function EditAreaManager({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name" required>
+                <Label htmlFor="name">
                   Area Manager
                 </Label>
                 <Input
@@ -182,7 +182,7 @@ export default function EditAreaManager({
                 )}
               </div>
               <div>
-                <Label htmlFor="user_ids" required>
+                <Label htmlFor="user_ids">
                   Select branch
                 </Label>
                 <Controller

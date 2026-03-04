@@ -116,7 +116,7 @@ export default function EditMechanic({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name" required>
+                <Label htmlFor="name">
                   Mechanic Name
                 </Label>
                 <Input

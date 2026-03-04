@@ -109,7 +109,7 @@ export default function EditTargetIncome({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name" required>
+                <Label htmlFor="name">
                   Target Income
                 </Label>
                 <Input
