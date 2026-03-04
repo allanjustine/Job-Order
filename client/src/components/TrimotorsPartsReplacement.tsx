@@ -133,7 +133,7 @@ export default function TrimotorsPartsReplacementSection({
         className="flex items-start gap-2 text-sm w-full"
       >
         <div className="flex items-start gap-2 flex-1 flex-wrap">
-          <Label onCheck className="whitespace-nowrap min-w-20">
+          <Label className="whitespace-nowrap min-w-20">
             <Input
               type="checkbox"
               checked={
@@ -258,7 +258,7 @@ export default function TrimotorsPartsReplacementSection({
       <div className="mt-2 pt-2">
         <div className="flex items-start gap-2">
           <div className="flex items-start gap-2 flex-1 flex-wrap">
-            <Label onCheck className="whitespace-nowrap min-w-20 text-sm">
+            <Label className="whitespace-nowrap min-w-20 text-sm">
               <Input
                 type="checkbox"
                 checked={partsReplacement.partsOthers}

@@ -40,7 +40,7 @@ export default function SpecificJobRequest({
       <div className="space-y-2">
         {/* Coupon Item - Similar to other job items */}
         <div className="flex items-center justify-between gap-4 text-sm">
-          <Label onCheck className="flex-1">
+          <Label className="flex-1">
             <Input
               type="checkbox"
               checked={jobRequest.coupon}
@@ -122,7 +122,7 @@ export default function SpecificJobRequest({
               key={item.key}
               className="flex items-center justify-between gap-4 text-sm"
             >
-              <Label onCheck className="flex-1">
+              <Label className="flex-1">
                 <Input
                   type="checkbox"
                   checked={jobRequest[item.key as keyof JobRequest] as boolean}
@@ -165,7 +165,7 @@ export default function SpecificJobRequest({
         {/* Others field */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 flex-1">
-            <Label onCheck>
+            <Label>
               <Input
                 type="checkbox"
                 checked={jobRequest.others}
