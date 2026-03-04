@@ -121,7 +121,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
 
   return (
     <div
-      className="p-1 font-sans bg-white text-black leading-tight border-2 border-black-100"
+      className="p-1 font-sans bg-white text-black leading-tight border-2 border-black"
       style={{
         fontSize: "8pt",
         maxWidth: "210mm",
