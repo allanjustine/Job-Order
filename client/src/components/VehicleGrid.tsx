@@ -29,7 +29,7 @@ export default function VehicleGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Chassis</Label>
+        <Label>Chassis</Label>
         <Input
           type="text"
           error={errors.chassis}

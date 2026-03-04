@@ -54,7 +54,7 @@ export default function CustomerGrid({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <div className="col-span-1">
-        <Label required>Date</Label>
+        <Label>Date</Label>
         <Input
           type="date"
           error={errors.date}
@@ -66,7 +66,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Branch Name</Label>
+        <Label>Branch Name</Label>
         <Input
           type="text"
           error={errors.branch}
@@ -79,7 +79,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Customer Name</Label>
+        <Label>Customer Name</Label>
         <Input
           type="text"
           error={errors.customerName}
@@ -91,7 +91,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Contact Number</Label>
+        <Label>Contact Number</Label>
         <Input
           type="text"
           error={errors.contact}
@@ -103,7 +103,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Model</Label>
+        <Label>Model</Label>
         <Input
           type="text"
           error={errors.model}
@@ -115,7 +115,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Engine/Frame No.</Label>
+        <Label>Engine/Frame No.</Label>
         <Input
           type="text"
           error={errors.engineFrameNo}
@@ -127,7 +127,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Mileage</Label>
+        <Label>Mileage</Label>
         <Input
           type="text"
           error={errors.mileage}
@@ -139,7 +139,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Purchased Date</Label>
+        <Label>Purchased Date</Label>
         <Input
           type="date"
           error={errors.purchaseDate}
@@ -151,7 +151,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Fuel Level</Label>
+        <Label>Fuel Level</Label>
         <Input
           type="text"
           error={errors.fuelLevel}
@@ -163,7 +163,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Repair Start Time</Label>
+        <Label>Repair Start Time</Label>
         <Input
           type="time"
           error={errors.repairStart}
@@ -177,7 +177,7 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label required>Repair End Time</Label>
+        <Label>Repair End Time</Label>
         <Input
           type="time"
           error={errors.repairEnd}
@@ -192,7 +192,7 @@ export default function CustomerGrid({
       </div>
 
       <div className="col-span-1">
-        <Label required>Mechanic Name</Label>
+        <Label>Mechanic Name</Label>
         {isLoading ? (
           "Loading mechanics..."
         ) : (
