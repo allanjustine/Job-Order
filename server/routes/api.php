@@ -21,6 +21,15 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()->load('roles:id,name', 'branch:id,branch_name,branch_code');
     });
 
+    Route::get('mechanic-checking', function (Request $request) {
+        $has_mechanic = $request->user()->mechanics();
+
+        return response()->json([
+            "message"      => "You have a mechanic: {$has_mechanic->count()}",
+            "has_mechanic" => $has_mechanic->exists()
+        ], 200);
+    });
+
     // ADMIN ROLE ROUTES
     Route::middleware('role:admin')->group(function () {
         Route::controller(CustomersController::class)->group(function () {
