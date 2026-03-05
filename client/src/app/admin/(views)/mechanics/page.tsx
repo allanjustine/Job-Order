@@ -72,7 +72,9 @@ const Mechanics = () => {
         <div className="flex items-center gap-2">
           <Button
             type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white p-2"
+            className="text-blue-500 hover:text-blue-600"
+            size={"icon"}
+            variant={"link"}
             onClick={() => {
               setIsOpenEdit(true);
               setSelectedMechanic(row);
@@ -83,7 +85,9 @@ const Mechanics = () => {
           <Button
             type="button"
             onClick={handleDeleteMechanics(row?.id)}
-            className="bg-red-500 hover:bg-red-600 text-white p-2"
+            className="text-red-500 hover:text-red-600"
+            size={"icon"}
+            variant={"link"}
           >
             <Trash className="size-5" />
           </Button>
@@ -153,7 +157,7 @@ const Mechanics = () => {
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
+                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                   isRefresh && "bg-blue-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
@@ -171,7 +175,7 @@ const Mechanics = () => {
               <Button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
               >
                 <UserPlus /> Add Mechanic
               </Button>

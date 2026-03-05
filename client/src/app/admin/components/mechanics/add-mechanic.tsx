@@ -13,8 +13,10 @@ import { api } from "@/lib/api";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 
 const schema = z.object({
   name: z
@@ -114,7 +116,7 @@ export default function AddMechanic({
               type: "server",
               message: msgs[0],
             });
-          }
+          },
         );
       }
     }
@@ -130,9 +132,7 @@ export default function AddMechanic({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">
-                  Mechanic Name
-                </Label>
+                <Label htmlFor="name">Mechanic Name</Label>
                 <Input
                   className="py-3"
                   placeholder="Enter mechanic name"
@@ -145,11 +145,9 @@ export default function AddMechanic({
                 )}
               </div>
               <div>
-                <Label htmlFor="user_id">
-                  Select branch
-                </Label>
+                <Label htmlFor="user_id">Select branch</Label>
                 {isLoading ? (
-                  <p className="text-gray-500 text-md">Loading branches...</p>
+                  <Skeleton className="h-12 w-full rounded-md" />
                 ) : (
                   <Select
                     className="py-2.5"
@@ -183,14 +181,22 @@ export default function AddMechanic({
             <Button
               type="submit"
               disabled={isSubmitting || isLoading}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
             >
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "Add"}
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Adding...
+                </>
+              ) : (
+                <>
+                  <Plus /> Add
+                </>
+              )}
             </Button>
             <Button
               onClick={() => setIsOpen(false)}
               type="button"
-              className="bg-gray-500 hover:bg-gray-600 text-white"
+              className="bg-gray-500 hover:bg-gray-600 text-white py-5"
             >
               Close
             </Button>
