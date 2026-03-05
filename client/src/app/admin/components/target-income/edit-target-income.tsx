@@ -12,8 +12,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import toast from "react-hot-toast";
+import { Spinner } from "@/components/ui/spinner";
 
 const schema = z.object({
   target_income: z
@@ -63,7 +64,7 @@ export default function EditTargetIncome({
         `/target-incomes/${selectedTargetIncome.id}`,
         {
           target_income: data.target_income,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -93,7 +94,7 @@ export default function EditTargetIncome({
               type: "server",
               message: msgs[0],
             });
-          }
+          },
         );
       }
     }
@@ -109,9 +110,7 @@ export default function EditTargetIncome({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">
-                  Target Income
-                </Label>
+                <Label htmlFor="name">Target Income</Label>
                 <Input
                   className="py-3"
                   placeholder="Enter target income"
@@ -129,14 +128,22 @@ export default function EditTargetIncome({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
             >
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "Update"}
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Updating...
+                </>
+              ) : (
+                <>
+                  <Edit /> Update
+                </>
+              )}
             </Button>
             <Button
               onClick={() => setIsOpen(false)}
               type="button"
-              className="bg-gray-500 hover:bg-gray-600 text-white"
+              className="bg-gray-500 hover:bg-gray-600 text-white py-5"
             >
               Close
             </Button>
