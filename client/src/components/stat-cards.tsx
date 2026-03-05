@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import phpCurrency from "@/utils/phpCurrency";
 import {
+  ArrowDown,
   ArrowUp,
   ChartSpline,
   PhilippinePeso,
@@ -19,6 +20,7 @@ export default function StatCards({
   isMechanicOpen,
   mechanicAdded,
   setTopJobOrders,
+  isScale,
 }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
@@ -77,9 +79,11 @@ export default function StatCards({
       case percentage < 100:
         return "text-emerald-600";
       default:
-        return "text-rose-800";
+        return "text-green-800";
     }
   }
+
+  console.log(isScale)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
@@ -112,6 +116,7 @@ export default function StatCards({
 
       {stats.map((item, index) => {
         const Icon = item.icon;
+
         return (
           <div
             key={index}
@@ -122,15 +127,25 @@ export default function StatCards({
                 <p className="text-sm font-medium text-gray-500 mb-2">
                   {item.label}
                 </p>
-                <p className="text-2xl font-semibold text-gray-800 items-center flex gap-2">
-                  {isLoading ? item.value : phpCurrency(item.value)}{" "}
+                <p
+                  className={`text-2xl font-semibold text-gray-800 items-center flex gap-2 ${item.value < 0 && "text-green-500"}`}
+                >
+                  {isLoading
+                    ? item.value
+                    : phpCurrency(item.value).replace("-", "+")}{" "}
                   <Activity mode={item.percentage ? "visible" : "hidden"}>
                     <span
                       className={`text-xs flex gap-1 items-center ${percentageColor(
                         Number(!isLoading && item?.percentage?.split(".")[0]),
                       )}`}
                     >
-                      <ArrowUp className="size-3" /> {item.percentage}
+                      {Number(!isLoading && item?.percentage?.split(".")[0]) >
+                      100 ? (
+                        <ArrowUp className="size-3" />
+                      ) : (
+                        <ArrowDown className="size-3" />
+                      )}{" "}
+                      {item.percentage}
                     </span>
                   </Activity>
                 </p>
@@ -190,7 +205,7 @@ export default function StatCards({
                   type="button"
                   variant={"link"}
                   onClick={() => setIsMechanicOpen(!isMechanicOpen)}
-                  className="p-0 text-blue-500 hover:text-blue-600 hover:no-underline"
+                  className={`p-0 hover:text-blue-600 hover:no-underline ${isScale ? "scale-130 text-red-500" : "text-blue-500"}`}
                 >
                   <Plus size="20" /> Add more mechanic
                 </Button>
