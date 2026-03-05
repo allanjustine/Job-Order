@@ -92,6 +92,7 @@ class UsersController extends Controller
                 =>
                 $query->doesntHave('areaManagers')
             )
+            ->orderBy('code')
             ->get(['id', 'name', 'code']);
 
         return response()->json([

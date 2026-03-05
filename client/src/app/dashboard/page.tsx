@@ -3,9 +3,6 @@
 import useFetch from "@/hooks/useFetch";
 import { useRouter } from "next/navigation";
 import {
-  PhilippinePeso,
-  PillBottleIcon,
-  Printer,
   Search,
   SearchSlash,
   Wrench,
@@ -13,7 +10,7 @@ import {
   BikeIcon,
   LogOut,
 } from "lucide-react";
-import { FaCheckCircle, FaCircleNotch, FaEye } from "react-icons/fa";
+import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import { Button } from "@/components/ui/button";
@@ -24,7 +21,7 @@ import {
   ModalHeader,
 } from "@/components/ui/modal";
 import PreviewData from "@/components/PreviewData";
-import { Activity, ChangeEvent, useEffect, useRef, useState } from "react";
+import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { FaFileExcel, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
@@ -44,6 +41,7 @@ import toast from "react-hot-toast";
 import { DatePickerWithRange } from "@/components/date-picker.with-range";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { Spinner } from "@/components/ui/spinner";
 
 const Dashboard = () => {
   const {
@@ -89,6 +87,10 @@ const Dashboard = () => {
     from: new Date(),
     to: new Date(),
   });
+  const [isLoadingMechanicChecking, setIsLoadingMechanicChecking] =
+    useState<boolean>(false);
+  const [hasMechanic, setHasMechanic] = useState<boolean>(false);
+  const [isScale, setIsScale] = useState<boolean>(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -117,6 +119,25 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchHasMechanicChecking = async () => {
+      setIsLoadingMechanicChecking(true);
+      try {
+        const response = await api.get("mechanic-checking");
+
+        if (response.status === 200) {
+          setHasMechanic(response.data.has_mechanic);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingMechanicChecking(false);
+      }
+    };
+
+    fetchHasMechanicChecking();
+  }, [mechanicAdded]);
 
   useEffect(() => {
     Swal.close();
@@ -200,6 +221,20 @@ const Dashboard = () => {
   };
 
   const handleOpenCreate = () => {
+    if (!hasMechanic) {
+      toast.error("No mechanic found, Please add mechanic first!", {
+        position: "bottom-center",
+        duration: 5000,
+        icon: "🤔",
+        style: {
+          borderRadius: "15px",
+          background: "red",
+          color: "#fff",
+          padding: "15px",
+        },
+      });
+      return;
+    }
     setIsOpenCreate(!isOpenCreate);
   };
 
@@ -362,7 +397,7 @@ const Dashboard = () => {
                   <Button
                     type="button"
                     onClick={handleLogout}
-                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-5 h-5" />
                     Logout
@@ -404,6 +439,7 @@ const Dashboard = () => {
           isMechanicOpen={isMechanicOpen}
           mechanicAdded={mechanicAdded}
           setTopJobOrders={setTopJobOrders}
+          isScale={isScale}
         />
 
         {/* Data Table Section */}
@@ -413,9 +449,33 @@ const Dashboard = () => {
               type="button"
               ref={createButtonRef}
               onClick={handleOpenCreate}
-              className="bg-blue-500 hover:bg-blue-600 text-white self-end font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+              onMouseDown={() => {
+                if (!hasMechanic) {
+                  setIsScale(true);
+                }
+              }}
+              onMouseUp={() => {
+                if (!hasMechanic) {
+                  setIsScale(false);
+                }
+              }}
+              onMouseLeave={() => {
+                if (!hasMechanic) {
+                  setIsScale(false);
+                }
+              }}
+              disabled={isLoadingMechanicChecking}
+              className="bg-blue-500 hover:bg-blue-600 py-6 text-white self-end font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
             >
-              <Wrench className="w-5 h-5" /> Create Job Order
+              {isLoadingMechanicChecking ? (
+                <>
+                  <Spinner /> Checking Mechanic...
+                </>
+              ) : (
+                <>
+                  <Wrench className="w-5 h-5" /> Create Job Order
+                </>
+              )}
             </Button>
             <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-[70%_30%] gap-2">
@@ -424,7 +484,7 @@ const Dashboard = () => {
                     <Button
                       type="button"
                       disabled={isRefresh}
-                      className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
+                      className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                         isRefresh && "bg-blue-400! cursor-not-allowed!"
                       }`}
                       onClick={handleRefresh}
@@ -604,7 +664,7 @@ const Dashboard = () => {
             <Button
               onClick={() => setIsMechanicOpen(false)}
               type="button"
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold"
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-5"
             >
               Close Mechanics
             </Button>
@@ -654,7 +714,7 @@ const Dashboard = () => {
         </ModalBody>
         <ModalFooter>
           <Button
-            className="bg-gray-400 hover:bg-gray-500 text-white"
+            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
             type="button"
             onClick={handleOpenCreate}
           >
@@ -672,7 +732,7 @@ const Dashboard = () => {
         </ModalBody>
         <ModalFooter>
           <Button
-            className="bg-gray-400 hover:bg-gray-500 text-white"
+            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
             type="button"
             onClick={handleView(null)}
           >

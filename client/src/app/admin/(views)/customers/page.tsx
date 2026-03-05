@@ -94,8 +94,8 @@ const Customers = () => {
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
-                  isRefresh && "!bg-blue-400 !cursor-not-allowed"
+                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                  isRefresh && "bg-blue-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
               >

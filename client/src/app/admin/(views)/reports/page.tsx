@@ -389,7 +389,7 @@ const Reports = () => {
                 <Button
                   type="button"
                   disabled={isRefresh}
-                  className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
+                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                     isRefresh && "bg-blue-400! cursor-not-allowed!"
                   }`}
                   onClick={handleRefresh}
@@ -417,7 +417,7 @@ const Reports = () => {
                 >
                   <Button
                     type="button"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white py-5"
                     onClick={handleExport}
                     disabled={isExporting}
                   >

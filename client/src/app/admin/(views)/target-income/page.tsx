@@ -5,7 +5,6 @@ import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { format, formatDistanceToNowStrict } from "date-fns";
 import {
   CircleFadingPlus,
   PenIcon,
@@ -104,7 +103,9 @@ const Reports = () => {
         <div className="flex items-center gap-2">
           <Button
             type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white p-2"
+            className="text-blue-500 hover:text-blue-600"
+            variant={"link"}
+            size={"icon"}
             onClick={() => {
               setIsOpenEdit(true);
               setSelectedTargetIncome(row);
@@ -115,7 +116,9 @@ const Reports = () => {
           <Button
             type="button"
             onClick={handleDeleteTargetIncomes(row?.id)}
-            className="bg-red-500 hover:bg-red-600 text-white p-2"
+            className="text-red-500 hover:text-red-600"
+            variant={"link"}
+            size={"icon"}
           >
             <Trash className="size-5" />
           </Button>
@@ -185,7 +188,7 @@ const Reports = () => {
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white p-2 ${
+                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                   isRefresh && "bg-blue-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
@@ -204,7 +207,7 @@ const Reports = () => {
               <Button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
               >
                 <CircleFadingPlus /> Add Target Income
               </Button>

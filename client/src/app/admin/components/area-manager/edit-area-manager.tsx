@@ -12,9 +12,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import toast from "react-hot-toast";
 import Select, { MultiValue } from "react-select";
+import { Spinner } from "@/components/ui/spinner";
 
 const schema = z.object({
   name: z
@@ -73,7 +74,7 @@ export default function EditAreaManager({
         : {
             name: "",
             user_ids: [],
-          }
+          },
     );
     async function fetchUsers() {
       setIsLoading(true);
@@ -103,7 +104,7 @@ export default function EditAreaManager({
         {
           name: data.name,
           user_ids: data.user_ids,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -133,7 +134,7 @@ export default function EditAreaManager({
               type: "server",
               message: msgs[0],
             });
-          }
+          },
         );
       }
     }
@@ -152,7 +153,7 @@ export default function EditAreaManager({
     ];
 
     return Array.from(
-      new Map(combined.map((item) => [item.value, item])).values()
+      new Map(combined.map((item) => [item.value, item])).values(),
     );
   }, [users, selectedAreaManager]);
 
@@ -166,9 +167,7 @@ export default function EditAreaManager({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">
-                  Area Manager
-                </Label>
+                <Label htmlFor="name">Area Manager</Label>
                 <Input
                   type="text"
                   className="py-3"
@@ -182,15 +181,13 @@ export default function EditAreaManager({
                 )}
               </div>
               <div>
-                <Label htmlFor="user_ids">
-                  Select branch
-                </Label>
+                <Label htmlFor="user_ids">Select branch</Label>
                 <Controller
                   name="user_ids"
                   control={control}
                   render={({ field }) => {
                     const selectedOptions = options.filter((option) =>
-                      field?.value?.includes(option?.value)
+                      field?.value?.includes(option?.value),
                     );
 
                     return (
@@ -200,11 +197,15 @@ export default function EditAreaManager({
                         options={options}
                         value={selectedOptions}
                         onChange={(
-                          val: MultiValue<{ value: number; label: string }>
+                          val: MultiValue<{ value: number; label: string }>,
                         ) => field.onChange(val.map((v) => v.value))}
                         menuPortalTarget={document.body}
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          control: (provided) => ({
+                            ...provided,
+                            minHeight: "3rem",
+                          }),
                         }}
                       />
                     );
@@ -223,14 +224,22 @@ export default function EditAreaManager({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
             >
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "Update"}
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Updating...
+                </>
+              ) : (
+                <>
+                  <Edit /> Update
+                </>
+              )}
             </Button>
             <Button
               onClick={() => setIsOpen(false)}
               type="button"
-              className="bg-gray-500 hover:bg-gray-600 text-white"
+              className="bg-gray-500 hover:bg-gray-600 text-white py-5"
             >
               Close
             </Button>
