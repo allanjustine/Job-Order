@@ -180,7 +180,6 @@ export default function AddAreaManager({
                         control: (provided) => ({
                           ...provided,
                           minHeight: "3rem",
-                          height: "3rem",
                         }),
                       }}
                     />

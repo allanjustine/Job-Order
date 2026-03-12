@@ -16,7 +16,7 @@ class AreaManagerService
 
         $search = request('search', '');
 
-        return AreaManager::query()
+        $area_managers = AreaManager::query()
             ->with('users:id,code,name')
             ->when(
                 $search,
@@ -25,7 +25,21 @@ class AreaManagerService
                 $query->whereRelation('users', 'name', 'like', "%{$search}%")
             )
             ->orderBy($sort['column'], $sort['direction'])
-            ->paginate($per_page, ['id', 'created_at', 'name']);
+            ->paginate($per_page);
+
+        return $area_managers->through(function ($area_manager) {
+            return [
+                'id' => $area_manager->id,
+                'name' => $area_manager->name,
+                'created_at' => $area_manager->created_at,
+                'users' => $area_manager->users->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'code' => $user->code
+                    ];
+                })
+            ];
+        });
     }
 
     public function store($request)
