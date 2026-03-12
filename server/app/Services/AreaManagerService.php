@@ -27,19 +27,15 @@ class AreaManagerService
             ->orderBy($sort['column'], $sort['direction'])
             ->paginate($per_page);
 
-        return $area_managers->through(function ($area_manager) {
-            return [
-                'id' => $area_manager->id,
-                'name' => $area_manager->name,
-                'created_at' => $area_manager->created_at,
-                'users' => $area_manager->users->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'code' => $user->code
-                    ];
-                })
-            ];
-        });
+        return $area_managers->through(fn($area_manager) => [
+            'id'         => $area_manager->id,
+            'name'       => $area_manager->name,
+            'created_at' => $area_manager->created_at,
+            'users'      => $area_manager->users->map(fn($user) => [
+                'id'     => $user->id,
+                'code'   => $user->code
+            ])
+        ]);
     }
 
     public function store($request)
