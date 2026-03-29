@@ -9,12 +9,13 @@ export default function withoutAuthPage(WrappedComponent: any) {
     const { isLoading, isAuthenticated, user } = useAuth();
     const pathname = usePathname();
     const isAuthPath = authPaths.includes(pathname);
+    const isAlreadyAuthenticated = isAuthenticated || user;
 
     if (isLoading) {
       return <GlobalLoader />;
     }
 
-    if ((isAuthPath && isAuthenticated && user?.redirect_url) || user) {
+    if (isAuthPath && isAlreadyAuthenticated && user?.redirect_url) {
       Swal.fire({
         title: "Authenticating...",
         text: "Redirecting to dashboard. Please wait...",
