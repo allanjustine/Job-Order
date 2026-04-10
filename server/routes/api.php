@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
         Route::get('reports', [ReportController::class, 'index']);
         Route::get('export-reports', [ReportController::class, 'exportData']);
+        Route::delete('delete-job-order/{id}', [JobOrderController::class, 'destroy']);
     });
 
     // EMPLOYEE ROLE ROUTES

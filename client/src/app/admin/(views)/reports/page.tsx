@@ -9,7 +9,7 @@ import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash } from "lucide-react";
+import { Search, SearchSlash, Trash } from "lucide-react";
 import { Activity, ChangeEvent, useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
@@ -22,6 +22,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { DatePickerWithRange } from "@/components/date-picker.with-range";
 import { DateRange } from "react-day-picker";
+import Swal from "sweetalert2";
+import { toast } from "react-hot-toast";
 
 const Reports = () => {
   const [filterItem, setFilterItem] = useState<string | undefined>("");
@@ -43,6 +45,7 @@ const Reports = () => {
     defaultSearch,
     setDefaultSearch,
     setSearchTerm,
+    fetchData,
   } = useFetch(`/reports`, {
     filterItem,
     filterBy,
@@ -55,6 +58,58 @@ const Reports = () => {
     from: new Date(),
     to: new Date(),
   });
+
+    function handleDeleteJobOrder(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to recover this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.delete(`/delete-job-order/${id}`);
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -166,6 +221,22 @@ const Reports = () => {
       ),
       sortable: true,
       sortField: "created_at",
+    },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            onClick={handleDeleteJobOrder(row?.id)}
+            className="text-red-500 hover:text-red-600"
+            variant={"link"}
+            size={"icon"}
+          >
+            <Trash className="size-5" />
+          </Button>
+        </div>
+      ),
     },
   ];
 

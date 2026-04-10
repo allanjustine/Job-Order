@@ -7,6 +7,7 @@ use App\Services\JobOrderService;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\JobOrder;
 
 class JobOrderController extends Controller
 {
@@ -37,6 +38,23 @@ class JobOrderController extends Controller
         return response()->json([
             'message' => 'Report exported successfully.',
             'data'    => $data
+        ], 200);
+    }
+
+    public function destroy($id)
+    {
+        $jobOrder = JobOrder::find($id);
+
+        if (!$jobOrder) {
+            return response()->json([
+                'message' => 'Job Order not found.'
+            ], 404);
+        }
+
+        $jobOrder->delete();
+
+        return response()->json([
+            'message' => 'Job Order deleted successfully.'
         ], 200);
     }
 }
