@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LOGIN_INPUTS } from "@/constants/formInputs";
@@ -17,6 +17,10 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formInputs, setFormInputs] = useState<LoginInputType>(LOGIN_INPUTS);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    Swal.close();
+  }, []);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();

@@ -284,7 +284,8 @@ const Dashboard = () => {
       const response = await api.get("/export-branch-reports", {
         params: {
           search: searchTerm,
-          ...date,
+          from: date?.from?.toISOString().split("T")[0],
+          to: date?.to?.toISOString().split("T")[0],
         },
       });
 
@@ -509,7 +510,7 @@ const Dashboard = () => {
                     >
                       <Button
                         type="button"
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white py-5"
                         onClick={handleViewExport}
                       >
                         <FaFileExcel /> Export

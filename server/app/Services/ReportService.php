@@ -8,6 +8,7 @@ use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
 use App\Models\Mechanic;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class ReportService
@@ -28,6 +29,8 @@ class ReportService
             'customer.user.name' => User::query()->select('users.name')->where('users.id', Customer::query()->select('customers.user_id')->whereColumn('customers.id', 'job_orders.customer_id')),
             default              => $sort['column']
         };
+
+        $date = explode(", ", $filter_item);
 
         $search = request('search', '');
 
@@ -97,7 +100,7 @@ class ReportService
                 $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereBetween('created_at', explode(", ", $filter_item))
+                $query->whereBetween('created_at', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
             )
             ->when(
                 $sort['column'] !== 'user.name',
@@ -128,6 +131,8 @@ class ReportService
         $filter_by = request('filter_by', 'all');
 
         $search = request('search', '');
+
+        $date = explode(", ", $filter_item);
 
         return JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
@@ -186,7 +191,7 @@ class ReportService
                 $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereBetween('created_at', explode(", ", $filter_item))
+                $query->whereBetween('created_at', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
             )
             ->when(
                 $filter_by === 'job_order_type',
@@ -257,7 +262,7 @@ class ReportService
             ->where(
                 fn($item)
                 =>
-                $item->whereBetween('created_at', [$from, $to])
+                $item->whereBetween('created_at', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
             )
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get()
