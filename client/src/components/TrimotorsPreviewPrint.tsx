@@ -1,12 +1,9 @@
-// components/PreviewPrint.tsx
 "use client";
 
 import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
 import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsAmountsType } from "@/types/jobOrderFormType";
 import { partsItems } from "@/constants/part-items";
-import { TrimotorsPartsTable } from "@/components/TrimotorsPartsTable";
-import { TrimotorsJobTable } from "@/components/TrimotorsJobTable";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 
 interface TrimotorsPreviewJobOrderProps {
@@ -72,16 +69,17 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
     if (!amount || amount === 0) return '';
     return phpCurrency(amount);
   };
+  
   const formatPartDetail = (partKey: string): string => {
     const brand = data.partsBrand?.[partKey as keyof PartsBrand];
     const partNo = data.partsNumber?.[partKey as keyof PartsNumber];
     
     if (brand && partNo) {
-      return `${brand} - ${partNo}`;
+      return `${brand}-${partNo}`;
     } else if (brand) {
       return brand;
     } else if (partNo) {
-      return `Part #: ${partNo}`;
+      return `#${partNo}`;
     }
     return "";
   };
@@ -89,6 +87,40 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   // Check if part is selected and has quantity
   const isPartSelected = (partKey: string): boolean => {
     return !!(data.partsReplacement?.[partKey as keyof PartsReplacement] && getPartsQuantity(partKey) > 0);
+  };
+
+  // Get job item label from trimotorsJobItems
+  const getJobItemLabel = (key: string): string => {
+    const jobItem = trimotorsJobItems.find(item => item.key === key);
+    return jobItem ? jobItem.label : key;
+  };
+
+  // Get part label
+  const getPartLabel = (key: string): string => {
+    const partItem = partsItems.find(item => item.key === key);
+    return partItem ? partItem.label : key.replace(/([A-Z])/g, ' $1').trim();
+  };
+
+  // Check if a job is selected
+  const isJobSelected = (jobKey: string): boolean => {
+    if (jobKey === 'others') {
+      return !!(data.jobRequest.others && data.jobRequest.othersText);
+    }
+    return !!(data.jobRequest[jobKey as keyof TrimotorsJobRequestType]);
+  };
+
+  // Get all selected jobs in order (using trimotorsJobItems order)
+  const getSelectedJobs = () => {
+    return trimotorsJobItems
+      .filter(item => isJobSelected(item.key))
+      .map(item => item.key);
+  };
+
+  // Get all selected parts in order (using partsItems order)
+  const getSelectedParts = () => {
+    return partsItems
+      .filter(item => isPartSelected(item.key))
+      .map(item => item.key);
   };
 
   const diagnosisRows = [
@@ -138,7 +170,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
       {/* Honda Header */}
       <div className="flex flex-col justify-center items-center mb-1">
         <div className="flex justify-between items-center w-full">
-          <div className="flex-1"></div> {/* Left spacer */}
+          <div className="flex-1"></div>
           <img src="/smct-header.jpg" alt="Company Logo" className="h-10 w-auto" />
           <div className="flex-1 flex justify-end items-center">
             <h3 className="text-right font-bold">{ data.branch.replace("(", "").replace(")", "").split(" ")[0] }-{ data.jobOrderNumber }</h3>
@@ -199,7 +231,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         </div>
       </div>
 
-      {/* Motorcycle Unit & Engine Unit - Two Column Side by Side */}
+      {/* Motorcycle Unit & Engine Unit */}
       <div className="mb-2 grid grid-cols-1 gap-2" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
         <div className="border border-black p-0.5">
           <div className="font-bold mb-1">MOTORCYCLE UNIT:</div>
@@ -250,7 +282,6 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
               
               return (
                 <tr key={index}>
-                  {/* Left side */}
                   <td className="border border-black p-0.5">{row.leftLabel}</td>
                   <td className="border border-black p-0.5 text-center">
                     {renderStatusCell(row.leftKey, 'ok')}
@@ -264,8 +295,6 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                   <td className="border border-black p-0.5" colSpan={2}>
                     {leftItem?.remarks || ''}
                   </td>
-                  
-                  {/* Right side */}
                   <td className="border border-black p-0.5">{row.rightLabel}</td>
                   <td className="border border-black p-0.5 text-center">
                     {renderStatusCell(row.rightKey, 'ok')}
@@ -286,35 +315,145 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         </table>
       </div>
 
-      {/* Dynamic Job Order Table */}
+      {/* JOB ORDER - Dynamic rows based on selected items (no fixed rows) */}
       <div className="mb-1 text-xs" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
-        <TrimotorsJobTable
-          data={data}
-          jobItems={trimotorsJobItems}
-          renderCheckbox={renderCheckbox}
-          getJobAmount={getJobAmount}
-          formatCurrency={formatCurrency}
-          jobTotal={jobTotal}
-        />
+        <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
+          JOB ORDER
+        </h3>
+  
+        <table className="w-full border-collapse border border-black">
+          <thead>
+            <tr className="bg-gray-40">
+              <th className="border border-black p-0.5 text-left">Specific Job(s) Request</th>
+              <th className="border border-black p-0.5 text-center w-16">Amount</th>
+              <th className="border border-black p-0.5 text-left">Parts Used</th>
+              <th className="border border-black p-0.5 text-center w-10">Qty</th>
+              <th className="border border-black p-0.5 text-left w-28">Brand / Part No.</th>
+              <th className="border border-black p-0.5 text-center w-16">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(() => {
+              const selectedJobs = getSelectedJobs();
+              const selectedParts = getSelectedParts();
+              
+              console.log('Selected Jobs:', selectedJobs);
+              console.log('Selected Parts:', selectedParts);
+              
+              // Get the maximum number of rows needed
+              const totalRows = Math.max(selectedJobs.length, selectedParts.length);
+              
+              const rows = [];
+              
+              // If nothing is selected, show empty state
+              if (totalRows === 0) {
+                rows.push(
+                  <tr key="empty">
+                    <td className="border border-black p-0.5 text-center text-gray-500" style={{ padding: "2px 4px" }} colSpan={6}>
+                      No job requests or parts selected
+                    </td>
+                  </tr>
+                );
+              } else {
+                // Loop through based on the maximum length
+                for (let i = 0; i < totalRows; i++) {
+                  const job = selectedJobs[i];
+                  const part = selectedParts[i];
+                  
+                  // Job data
+                  let jobLabel = '';
+                  let jobAmount = '';
+                  let jobCheckbox = '';
+                  
+                  if (job) {
+                    const jobKey = job;
+                    const jobLabelText = getJobItemLabel(jobKey);
+                    const jobAmountValue = getJobAmount(jobKey);
+                    
+                    if (jobKey === 'others') {
+                      jobLabel = `Others: ${data.jobRequest.othersText}`;
+                    } else {
+                      jobLabel = jobLabelText;
+                    }
+                    jobAmount = jobAmountValue > 0 ? phpCurrency(jobAmountValue) : '';
+                    jobCheckbox = '[✓] ';
+                  }
+                  
+                  // Part data
+                  let partLabel = '';
+                  let partQty: string = '';
+                  let partDetail = '';
+                  let partAmount = '';
+                  let partCheckbox = '';
+                  
+                  if (part) {
+                    const partKey = part;
+                    const partLabelText = getPartLabel(partKey);
+                    const partQtyValue = getPartsQuantity(partKey);
+                    const partAmountValue = getPartsAmount(partKey);
+                    const partDetailText = formatPartDetail(partKey);
+                    
+                    if (partKey === 'partsOthers') {
+                      partLabel = `Others: ${data.partsReplacement.partsOthersText}`;
+                    } else {
+                      partLabel = partLabelText;
+                    }
+                    partQty = partQtyValue > 0 ? partQtyValue.toString() : '';
+                    partDetail = partDetailText;
+                    partAmount = partAmountValue > 0 ? formatCurrency(partAmountValue) : '';
+                    partCheckbox = '[✓] ';
+                  }
+                  
+                  rows.push(
+                    <tr key={i}>
+                      <td className="border border-black p-0.5 h-3" style={{ padding: "2px 4px" }}>
+                        {job && <span>{jobCheckbox}{jobLabel}</span>}
+                      </td>
+                      <td className="border border-black p-0.5 text-left h-3" style={{ padding: "2px 4px" }}>
+                        {jobAmount}
+                      </td>
+                      <td className="border border-black p-0.5 h-3" style={{ padding: "2px 4px" }}>
+                        {part && <span>{partCheckbox}{partLabel}</span>}
+                      </td>
+                      <td className="border border-black p-0.5 text-center h-3" style={{ padding: "2px 4px" }}>
+                        {partQty}
+                      </td>
+                      <td className="border border-black p-0.5 text-left text-[7pt] h-3" style={{ padding: "2px 4px" }}>
+                        {partDetail}
+                      </td>
+                      <td className="border border-black p-0.5 text-left h-3" style={{ padding: "2px 4px" }}>
+                        {partAmount}
+                      </td>
+                    </tr>
+                  );
+                }
+              }
+              
+              // Add totals row (only if there are selections)
+              if (totalRows > 0) {
+                rows.push(
+                  <tr key="totals">
+                    <td className="border border-black p-0.5 font-semibold" style={{ padding: "2px 4px" }} colSpan={2}>
+                      Total Labor Cost: {phpCurrency(jobTotal)}
+                    </td>
+                    <td className="border border-black p-0.5 font-semibold" style={{ padding: "2px 4px" }} colSpan={4}>
+                      Total Parts Cost: {phpCurrency(partsTotal)}
+                    </td>
+                  </tr>
+                );
+              }
+              
+              return rows;
+            })()}
+          </tbody>
+        </table>
 
-        {/* Dynamic Parts Used Table */}
-        <TrimotorsPartsTable
-          data={data}
-          partsItems={partsItems}
-          renderCheckbox={renderCheckbox}
-          formatPartDetail={formatPartDetail}
-          getPartsQuantity={getPartsQuantity}
-          getPartsAmount={getPartsAmount}
-          formatCurrency={formatCurrency}
-          isPartSelected={isPartSelected}
-          partsTotal={partsTotal}
-        />
-
-        {/* Next Service Schedule - Below the table */}
+        {/* Grand Total */}
         <div className="flex justify-between items-center border border-black border-t-0 py-1">
           <div className="font-bold ml-1 text-xxs">Grand Total: {phpCurrency(grandTotal)}</div>
         </div>
 
+        {/* Next Service Schedule */}
         <div className="py-2">
           <span className="font-bold mr-2">Your Next Service Schedule is:</span>
           <span className="border-b border-black w-18 inline-block">{data.nextScheduleDate}</span>
