@@ -293,7 +293,7 @@ export default function TrimotorsJobRequest({
             <span className="font-semibold text-gray-700">
               TOTAL LABOR COST:
             </span>
-            <span className="font-bold text-blue-700 text-lg">
+            <span className="font-bold text-green-700 text-lg">
               {phpCurrency(computedTotal)}
             </span>
           </div>

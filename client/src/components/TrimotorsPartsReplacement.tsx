@@ -601,7 +601,7 @@ const calculateAndUpdateTotal = useCallback(() => {
           <div className="pt-4 mt-4 border-t border-gray-300">
             <div className="flex justify-between items-center">
               <span className="font-semibold text-gray-700">PARTS TOTAL:</span>
-              <span className="font-bold text-blue-700">
+              <span className="font-bold text-green-700">
                 {phpCurrency(partsTotal)}
               </span>
             </div>
