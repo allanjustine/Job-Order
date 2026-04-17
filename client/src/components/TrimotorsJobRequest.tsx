@@ -9,6 +9,16 @@ import {
   TrimotorsJobItem,
   trimotorsJobItems,
 } from "@/constants/trimotors-job-items";
+import { Button } from "./ui/button";
+import { Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
+// Extended type for multiple others items
+interface OthersJobItem {
+  id: string;
+  description: string;
+  amount: number;
+}
 
 interface TrimotorsJobRequestProps {
   jobRequest: TrimotorsJobRequestType;
@@ -19,6 +29,7 @@ interface TrimotorsJobRequestProps {
     value: number
   ) => void;
   jobTotal: number;
+  setJobTotal?: (total: number) => void;
 }
 
 export default function TrimotorsJobRequest({
@@ -27,6 +38,7 @@ export default function TrimotorsJobRequest({
   jobAmounts,
   handleJobAmountChange,
   jobTotal,
+  setJobTotal,
 }: TrimotorsJobRequestProps) {
   const firstColumnItems = trimotorsJobItems.slice(
     0,
@@ -35,6 +47,83 @@ export default function TrimotorsJobRequest({
   const secondColumnItems = trimotorsJobItems
     .filter((item) => item.key !== "others")
     .slice(Math.ceil(trimotorsJobItems.length / 2));
+
+  // Get others items from jobRequest
+  const [othersItems, setOthersItems] = useState<OthersJobItem[]>(() => {
+    return (jobRequest as any).othersItems || [];
+  });
+
+  // Sync othersItems with jobRequest when it changes from parent
+  useEffect(() => {
+    setOthersItems((jobRequest as any).othersItems || []);
+  }, [jobRequest]);
+
+  // Update jobRequest whenever othersItems changes
+  useEffect(() => {
+    const totalOthers = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    handleJobAmountChange("others", totalOthers);
+    
+    setJobRequest({
+      ...jobRequest,
+      others: othersItems.length > 0,
+      othersItems: othersItems as any,
+    });
+  }, [othersItems]);
+
+  // COMPUTE TOTAL DIRECTLY - including others
+  const computedTotal = useMemo(() => {
+    let total = 0;
+    
+    // Add all standard job amounts
+    Object.entries(jobAmounts).forEach(([key, value]) => {
+      if (key !== 'others') {
+        total += (value || 0);
+      }
+    });
+    
+    // Add others amount from the actual othersItems (not jobAmounts.others)
+    const othersTotal = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    total += othersTotal;
+    
+    return total;
+  }, [jobAmounts, othersItems]);
+
+  // Update parent total para consistent
+  useEffect(() => {
+    if (setJobTotal) {
+      setJobTotal(computedTotal);
+    }
+  }, [computedTotal, setJobTotal]);
+
+  // Add new others item
+  const addOthersItem = () => {
+    const newItem: OthersJobItem = {
+      id: Date.now().toString(),
+      description: "",
+      amount: 0,
+    };
+    
+    setOthersItems([...othersItems, newItem]);
+  };
+
+  // Remove others item
+  const removeOthersItem = (id: string) => {
+    setOthersItems(othersItems.filter(item => item.id !== id));
+  };
+
+  // Update others item description
+  const updateOthersDescription = (id: string, description: string) => {
+    setOthersItems(othersItems.map(item =>
+      item.id === id ? { ...item, description } : item
+    ));
+  };
+
+  // Update others item amount - THIS WILL NOW TRIGGER RE-RENDER IMMEDIATELY
+  const updateOthersAmount = (id: string, amount: number) => {
+    setOthersItems(othersItems.map(item =>
+      item.id === id ? { ...item, amount } : item
+    ));
+  };
 
   const renderJobItem = (item: TrimotorsJobItem) => (
     <div
@@ -47,12 +136,18 @@ export default function TrimotorsJobRequest({
           checked={
             jobRequest[item.key as keyof TrimotorsJobRequestType] as boolean
           }
-          onChange={(e) =>
+          onChange={(e) => {
             setJobRequest({
               ...jobRequest,
               [item.key]: e.target.checked,
-            })
-          }
+            });
+            if (!e.target.checked) {
+              handleJobAmountChange(
+                item.key as keyof TrimotorsJobAmountType,
+                0
+              );
+            }
+          }}
         />
         {item.label}
       </Label>
@@ -66,12 +161,12 @@ export default function TrimotorsJobRequest({
               type="number"
               placeholder="0.00"
               value={jobAmounts[item.key as keyof TrimotorsJobAmountType] || ""}
-              onChange={(e) =>
+              onChange={(e) => {
                 handleJobAmountChange(
                   item.key as keyof TrimotorsJobAmountType,
                   Number(e.target.value)
-                )
-              }
+                );
+              }}
               min="0"
               step="0.01"
               className="pl-8 pr-3 text-right text-sm"
@@ -97,72 +192,109 @@ export default function TrimotorsJobRequest({
         <div className="space-y-2">
           {secondColumnItems.map(renderJobItem)}
 
-          {/* Others field - placed in second column */}
-          <div className="flex items-center justify-between gap-4 mb-2">
-            <div className="flex items-center gap-2 flex-1">
-              <Label>
+          {/* Multiple Others Fields Section */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-2 font-semibold text-gray-700">
                 <Input
                   type="checkbox"
-                  checked={jobRequest.others}
-                  onChange={(e) =>
-                    setJobRequest({
-                      ...jobRequest,
-                      others: e.target.checked,
-                    })
-                  }
+                  checked={othersItems.length > 0}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      if (othersItems.length === 0) {
+                        addOthersItem();
+                      }
+                    } else {
+                      setOthersItems([]);
+                      handleJobAmountChange("others", 0);
+                      setJobRequest({
+                        ...jobRequest,
+                        others: false,
+                        othersItems: [],
+                      });
+                    }
+                  }}
                 />
-                Others
+                Others (Custom Jobs)
               </Label>
-              {jobRequest.others && (
-                <Input
-                  type="text"
-                  value={jobRequest.othersText || ""}
-                  onChange={(e) =>
-                    setJobRequest({
-                      ...jobRequest,
-                      othersText: e.target.value,
-                    })
-                  }
-                  placeholder="Specify"
-                  className="flex-1 text-sm"
-                  required
-                />
+              {othersItems.length > 0 && (
+                <Button
+                  type="button"
+                  onClick={addOthersItem}
+                  variant="outline"
+                  size="sm"
+                  className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Job
+                </Button>
               )}
             </div>
-            {jobRequest.others && (
-              <div className="w-32 min-w-[8rem]">
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                    ₱
-                  </span>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={jobAmounts.others || ""}
-                    onChange={(e) =>
-                      handleJobAmountChange("others", Number(e.target.value))
-                    }
-                    min="0"
-                    step="0.01"
-                    className="pl-8 pr-3 text-right text-sm"
-                    required
-                  />
-                </div>
+
+            {othersItems.length === 0 ? (
+              <div className="text-center text-gray-400 text-sm py-4">
+                {/* No custom jobs added. Click "Add Job" to add. */}
               </div>
+            ) : (
+              othersItems.map((item, index) => (
+                <div key={item.id} className="flex items-center gap-3 p-3 rounded-md">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
+                      <Input
+                        type="text"
+                        value={item.description}
+                        onChange={(e) => updateOthersDescription(item.id, e.target.value)}
+                        placeholder="Enter job description"
+                        className="flex-1 text-sm"
+                      />
+                      
+                      {/* Amount Field */}
+                      <div className="w-32">
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                            ₱
+                          </span>
+                          <Input
+                            type="number"
+                            placeholder="0.00"
+                            value={item.amount || ""}
+                            onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
+                            min="0"
+                            step="0.01"
+                            className="pl-8 pr-3 text-right text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={() => removeOthersItem(item.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))
             )}
           </div>
         </div>
       </div>
 
+      {/* Use computedTotal - this will update immediately when typing */}
       {(Object.values(jobRequest).some((val) => val === true) ||
-        jobTotal > 0) && (
+        computedTotal > 0 ||
+        othersItems.length > 0) && (
         <div className="pt-4 mt-6 border-t border-gray-300 col-span-full">
           <div className="flex justify-between items-center">
             <span className="font-semibold text-gray-700">
-              Total Labor Cost:
+              TOTAL LABOR COST:
             </span>
-            <span className="font-bold text-blue-700">
-              {phpCurrency(jobTotal)}
+            <span className="font-bold text-blue-700 text-lg">
+              {phpCurrency(computedTotal)}
             </span>
           </div>
         </div>

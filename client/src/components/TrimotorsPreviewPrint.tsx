@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
-import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsAmountsType } from "@/types/jobOrderFormType";
+import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsAmountsType, PartsOthersItem } from "@/types/jobOrderFormType";
 import { partsItems } from "@/constants/part-items";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 
@@ -47,8 +47,8 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
   
   // Safely calculate totals with fallbacks
-  const jobTotal = Object.values(data.jobAmounts || {}).reduce((s, v) => s + (Number(v) || 0), 0);
-  const partsTotal = Object.values(data.partsAmounts || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+  const jobTotal = Object.values(data.jobAmounts || {}).reduce((s: number = 0, v) => s + (Number(v) || 0), 0)!;
+  const partsTotal = Object.values(data.partsAmounts || {}).reduce((s: number = 0, v) => s + (Number(v) || 0), 0)!;
   const grandTotal = jobTotal + partsTotal;
 
   // Helper function to safely get amount values
@@ -101,26 +101,89 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
     return partItem ? partItem.label : key.replace(/([A-Z])/g, ' $1').trim();
   };
 
-  // Check if a job is selected
+  // Check if a job is selected (including others items)
   const isJobSelected = (jobKey: string): boolean => {
     if (jobKey === 'others') {
-      return !!(data.jobRequest.others && data.jobRequest.othersText);
+      const othersItems = (data.jobRequest as any).othersItems;
+      return !!(othersItems && othersItems.length > 0);
     }
     return !!(data.jobRequest[jobKey as keyof TrimotorsJobRequestType]);
   };
 
-  // Get all selected jobs in order (using trimotorsJobItems order)
+  // Get all selected jobs including multiple others items
   const getSelectedJobs = () => {
-    return trimotorsJobItems
-      .filter(item => isJobSelected(item.key))
-      .map(item => item.key);
+    const selectedJobs: Array<{ key: string; label: string; amount: number; isOthers?: boolean; description?: string }> = [];
+    
+    // Add regular selected jobs
+    trimotorsJobItems.forEach(item => {
+      if (item.key !== 'others' && isJobSelected(item.key)) {
+        selectedJobs.push({
+          key: item.key,
+          label: item.label,
+          amount: getJobAmount(item.key),
+          isOthers: false
+        });
+      }
+    });
+    
+    // Add others items if they exist
+    const othersItems = (data.jobRequest as any).othersItems;
+    if (othersItems && othersItems.length > 0) {
+      othersItems.forEach((item: any, index: number) => {
+        selectedJobs.push({
+          key: `others_${item.id || index}`,
+          label: item.description || `Custom Job ${index + 1}`,
+          amount: item.amount || 0,
+          isOthers: true,
+          description: item.description
+        });
+      });
+    }
+    
+    return selectedJobs;
   };
 
-  // Get all selected parts in order (using partsItems order)
+  // Get all selected parts including multiple others items
   const getSelectedParts = () => {
-    return partsItems
-      .filter(item => isPartSelected(item.key))
-      .map(item => item.key);
+    const selectedParts: Array<{ key: string; label: string; quantity: number; detail: string; amount: number; isOthers?: boolean; description?: string; brand?: string; partNumber?: number }> = [];
+    
+    // Add regular selected parts
+    partsItems.forEach(item => {
+      if (item.key !== 'partsOthers' && isPartSelected(item.key)) {
+        selectedParts.push({
+          key: item.key,
+          label: item.label,
+          quantity: getPartsQuantity(item.key),
+          detail: formatPartDetail(item.key),
+          amount: getPartsAmount(item.key),
+          isOthers: false
+        });
+      }
+    });
+    
+    // Add parts others items if they exist
+    const partsOthersItems = (data.partsReplacement as any).partsOthersItems;
+    if (partsOthersItems && partsOthersItems.length > 0) {
+      partsOthersItems.forEach((item: PartsOthersItem, index: number) => {
+        const brandInfo = item.brand ? item.brand : '';
+        const partNoInfo = item.partNumber ? `-${item.partNumber}` : '';
+        const detailText = brandInfo || partNoInfo ? `${brandInfo}${partNoInfo}` : '';
+        
+        selectedParts.push({
+          key: `partsOthers_${item.id || index}`,
+          label: item.description || `Custom Part ${index + 1}`,
+          quantity: item.quantity || 1,
+          detail: detailText,
+          amount: item.amount || 0,
+          isOthers: true,
+          description: item.description,
+          brand: item.brand,
+          partNumber: item.partNumber
+        });
+      });
+    }
+    
+    return selectedParts;
   };
 
   const diagnosisRows = [
@@ -315,7 +378,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         </table>
       </div>
 
-      {/* JOB ORDER - Dynamic rows based on selected items (no fixed rows) */}
+      {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
       <div className="mb-1 text-xs" style={{ fontSize: "8pt", lineHeight: "0.8" }}>
         <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
           JOB ORDER
@@ -336,9 +399,6 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
             {(() => {
               const selectedJobs = getSelectedJobs();
               const selectedParts = getSelectedParts();
-              
-              console.log('Selected Jobs:', selectedJobs);
-              console.log('Selected Parts:', selectedParts);
               
               // Get the maximum number of rows needed
               const totalRows = Math.max(selectedJobs.length, selectedParts.length);
@@ -366,16 +426,12 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                   let jobCheckbox = '';
                   
                   if (job) {
-                    const jobKey = job;
-                    const jobLabelText = getJobItemLabel(jobKey);
-                    const jobAmountValue = getJobAmount(jobKey);
-                    
-                    if (jobKey === 'others') {
-                      jobLabel = `Others: ${data.jobRequest.othersText}`;
+                    if (job.isOthers) {
+                      jobLabel = `Others: ${job.label}`;
                     } else {
-                      jobLabel = jobLabelText;
+                      jobLabel = job.label;
                     }
-                    jobAmount = jobAmountValue > 0 ? phpCurrency(jobAmountValue) : '';
+                    jobAmount = job.amount > 0 ? phpCurrency(job.amount) : '';
                     jobCheckbox = '[✓] ';
                   }
                   
@@ -387,20 +443,14 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                   let partCheckbox = '';
                   
                   if (part) {
-                    const partKey = part;
-                    const partLabelText = getPartLabel(partKey);
-                    const partQtyValue = getPartsQuantity(partKey);
-                    const partAmountValue = getPartsAmount(partKey);
-                    const partDetailText = formatPartDetail(partKey);
-                    
-                    if (partKey === 'partsOthers') {
-                      partLabel = `Others: ${data.partsReplacement.partsOthersText}`;
+                    if (part.isOthers) {
+                      partLabel = `Others: ${part.label}`;
                     } else {
-                      partLabel = partLabelText;
+                      partLabel = part.label;
                     }
-                    partQty = partQtyValue > 0 ? partQtyValue.toString() : '';
-                    partDetail = partDetailText;
-                    partAmount = partAmountValue > 0 ? formatCurrency(partAmountValue) : '';
+                    partQty = part.quantity > 0 ? part.quantity.toString() : '';
+                    partDetail = part.detail;
+                    partAmount = part.amount > 0 ? formatCurrency(part.amount) : '';
                     partCheckbox = '[✓] ';
                   }
                   

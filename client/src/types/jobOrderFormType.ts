@@ -4,6 +4,21 @@ export type CouponType = {
   name: string;
 };
 
+export interface JobOthersItem {
+  id: string;
+  description: string;
+  amount: number;
+}
+
+export interface PartsOthersItem {
+  id: string;
+  description: string;
+  brand: string;
+  partNumber: number;
+  quantity: number;
+  amount: number;
+}
+
 export type JobRequest = {
   coupon: boolean;
   selectedCoupon?: string;
@@ -22,8 +37,8 @@ export type JobRequest = {
   installAccessories: boolean;
   generalCheckup: boolean;
   warrantyRepair: boolean;
-  others: boolean;
-  othersText: string;
+  others: boolean; // To check if Others section is enabled
+  othersItems: JobOthersItem[]; // Array of custom job items
 };
 
 export type PartsReplacement = {
@@ -47,6 +62,8 @@ export type PartsReplacement = {
   coolant: boolean;
   partsOthers: boolean;
   partsOthersText: string;
+   partsOthersItems?: PartsOthersItem[]; // New array for multiple others
+  [key: string]: boolean | string | PartsOthersItem[] | undefined;
 };
 
 
@@ -79,8 +96,8 @@ export type TrimotorsJobRequestType = {
   greaseFare: boolean;
   speedometer: boolean;
   petroleum: boolean;
-  others: boolean;
-  othersText: string;
+  others: boolean; // To check if Others section is enabled
+  othersItems: JobOthersItem[]; 
 };
 
 
@@ -104,6 +121,7 @@ export type JobAmountsType = {
   warrantyRepair?: number;
   others?: number;
   selectedCoupon?: number;
+  [key: string]: number | undefined;
 };
 
 export type PartsBrand = {
@@ -126,6 +144,7 @@ export type PartsBrand = {
   brakeFluid?: string;
   coolant?: string;
   partsOthers?: string;
+  [key: string]: string | undefined;
 };
 
 export type PartsNumber = {
@@ -148,6 +167,7 @@ export type PartsNumber = {
   brakeFluid?: number;
   coolant?: number;
   partsOthers?: number;
+  [key: string]: number | undefined;
 };
 
 export type PartsQuantity = {
@@ -170,6 +190,7 @@ export type PartsQuantity = {
   brakeFluid?: number;
   coolant?: number;
   partsOthers?: number;
+  [key: string]: number | undefined;
 };
 
 export type PartsAmountsType = {
@@ -192,6 +213,7 @@ export type PartsAmountsType = {
   brakeFluid?: number;
   coolant?: number;
   partsOthers?: number;
+  [key: string]: number | undefined;
 };
 
 export type TrimotorsJobAmountType = {
