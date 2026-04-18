@@ -15,6 +15,8 @@ import {
    PartsQuantity, 
    JobOthersItem, 
    PartsOthersItem } from "@/types/jobOrderFormType";
+import { jobItems } from "@/constants/job-items";
+import { partsItems } from "@/constants/part-items";
 
 interface PrintJobOrderProps {
   data: {
@@ -114,53 +116,21 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
   };
 
   // Get job item label
-  const getJobItemLabel = (key: string): string => {
-    const jobLabels: Record<string, string> = {
-      coupon: "Coupon",
-      changeOil: "Charge Oil / Tune-up",
-      overhaul: "Top / Major Overhaul",
-      chainSprocket: "Chain & Sprocket / Drive Belt",
-      carburetor: "Carburetor / Fuel Injection",
-      brakeSystem: "Brake System (FR / RR)",
-      steeringSystem: "Steering System",
-      suspensionSystem: "Suspension System (FR / RR) / Swing Arm",
-      wheelsSpokes: "Wheel & Spokes (FR / RR)",
-      wheelAdjustment: "Wheel Adjustment",
-      batteryCharging: "Battery Charging",
-      minorElectrical: "Minor Electrical (Horn / Winker / Others)",
-      majorElectrical: "Major Electrical (Charging / Ignition / Starting)",
-      installAccessories: "Install Accessories",
-      generalCheckup: "General Check Up",
-      warrantyRepair: "Warranty Repair",
-      others: "Others"
-    };
-    return jobLabels[key] || key;
-  };
+ const jobMap = Object.fromEntries(
+  jobItems.map(item => [item.key, item.label])
+);
+
+const getJobItemLabel = (key: string): string => {
+  return jobMap[key] || key;
+};
 
   // Get part label
+const partsMap = Object.fromEntries(
+    partsItems.map(item => [item.key, item.label])
+  );
+
   const getPartLabel = (key: string): string => {
-    const partLabels: Record<string, string> = {
-      engineOil: "Engine Oil",
-      drainPlugWasher: "Drain Plug Washer",
-      tappetORing: "Tapped Cu Ring",
-      sparkPlug: "Spark Plug",
-      airCleanerElement: "Air Cleaner Element",
-      brakeShoePads: "Brake Shoe / Pads (FR / RR)",
-      gaskets: "Gaskets (Head, Right, Left)",
-      battery: "Battery",
-      chainSprocketBelt: "Chain & Sprocket / Drive Belt",
-      fuelHose: "Fuel Hose",
-      tiresTubesFlaps: "Tires, Tubes, Flaps",
-      bulbs: "Bulbs",
-      bearings: "Bearings",
-      springs: "Springs",
-      rubberPartsOilSeal: "Rubber Parts / Oil Seal",
-      plasticParts: "Plastic Parts",
-      brakeFluid: "Brake Fluid",
-      coolant: "Coolant",
-      partsOthers: "Others"
-    };
-    return partLabels[key] || key.replace(/([A-Z])/g, ' $1').trim();
+    return partsMap[key] || key.replace(/([A-Z])/g, " $1").trim();
   };
 
   // Check if a regular job is selected
