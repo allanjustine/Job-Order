@@ -11,7 +11,7 @@ import {
 } from "@/constants/trimotors-job-items";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 // Extended type for multiple others items
 interface OthersJobItem {
@@ -53,22 +53,43 @@ export default function TrimotorsJobRequest({
     return (jobRequest as any).othersItems || [];
   });
 
+  // Use ref to track if we're syncing to prevent loops
+  const isSyncingFromParent = useRef(false);
+  const isSyncingToParent = useRef(false);
+
   // Sync othersItems with jobRequest when it changes from parent
   useEffect(() => {
-    setOthersItems((jobRequest as any).othersItems || []);
-  }, [jobRequest]);
+    // Only sync if not currently syncing to parent
+    if (!isSyncingToParent.current) {
+      isSyncingFromParent.current = true;
+      const parentItems = (jobRequest as any).othersItems || [];
+      
+      // Only update if they're actually different
+      if (JSON.stringify(parentItems) !== JSON.stringify(othersItems)) {
+        setOthersItems(parentItems);
+      }
+      isSyncingFromParent.current = false;
+    }
+  }, [jobRequest]); // Only run when jobRequest changes
 
   // Update jobRequest whenever othersItems changes
   useEffect(() => {
-    const totalOthers = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-    handleJobAmountChange("others", totalOthers);
-    
-    setJobRequest({
-      ...jobRequest,
-      others: othersItems.length > 0,
-      othersItems: othersItems as any,
-    });
-  }, [othersItems]);
+    // Only sync if not currently syncing from parent
+    if (!isSyncingFromParent.current) {
+      isSyncingToParent.current = true;
+      
+      const totalOthers = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+      handleJobAmountChange("others", totalOthers);
+      
+      setJobRequest({
+        ...jobRequest,
+        others: othersItems.length > 0,
+        othersItems: othersItems as any,
+      });
+      
+      isSyncingToParent.current = false;
+    }
+ }, [othersItems]); 
 
   // COMPUTE TOTAL DIRECTLY - including others
   const computedTotal = useMemo(() => {
