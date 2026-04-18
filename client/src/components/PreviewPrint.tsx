@@ -486,7 +486,14 @@ const partsMap = Object.fromEntries(
                     const jobAmountValue = getJobAmount(amountKey);
                     
                     if (jobKey === 'coupon') {
-                      jobLabel = `Coupon - ${getCouponName(data.jobRequest.selectedCoupon)}`;
+                      // Display coupon with brand if available
+                      const couponName = getCouponName(data.jobRequest.selectedCoupon);
+                      const couponBrand = data.jobRequest.couponBrand;
+                      if (couponBrand) {
+                        jobLabel = `Coupon - ${couponName} - ${couponBrand}`;
+                      } else {
+                        jobLabel = `Coupon - ${couponName}`;
+                      }
                     } else {
                       jobLabel = jobLabelText;
                     }

@@ -20,6 +20,9 @@ interface SpecificJobRequestProps {
   jobTotal: number;
 }
 
+// Brand options (same as parts section)
+const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu", "BG Powerstroke"];
+
 export const coupons: CouponType[] = [
   { id: 1, name: "Coupon 1" },
   { id: 2, name: "Coupon 2" },
@@ -62,10 +65,6 @@ export default function SpecificJobRequest({
       othersItems: updatedItems,
     });
     
-    // Update total others amount
-    // const totalOthersAmount = updatedItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-    // handleJobAmountChange("others", totalOthersAmount);
-    
     // If no items left, uncheck the others checkbox
     if (updatedItems.length === 0) {
       setJobRequest(prev => ({
@@ -79,6 +78,17 @@ export default function SpecificJobRequest({
   const updateOthersDescription = (id: string, description: string) => {
     const updatedItems = othersItems.map(item =>
       item.id === id ? { ...item, description } : item
+    );
+    setJobRequest({
+      ...jobRequest,
+      othersItems: updatedItems,
+    });
+  };
+  
+  // Update others item brand
+  const updateOthersBrand = (id: string, brand: string) => {
+    const updatedItems = othersItems.map(item =>
+      item.id === id ? { ...item, brand } : item
     );
     setJobRequest({
       ...jobRequest,
@@ -132,9 +142,6 @@ export default function SpecificJobRequest({
       handleJobAmountChange("others", 0);
     }
   };
-  
-  // Calculate total others amount for display
-  // const totalOthersAmount = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
 
   return (
     <div className="bg-gray-50 p-4 rounded-md">
@@ -142,9 +149,9 @@ export default function SpecificJobRequest({
         SPECIFIC JOB(S) REQUEST
       </h3>
       <div className="space-y-2">
-        {/* Coupon Item - Similar to other job items */}
-        <div className="flex items-center justify-between gap-4 text-sm">
-          <Label className="flex-1">
+        {/* Coupon Item - Similar to other job items with brand */}
+        <div className="flex items-center gap-4 text-sm">
+          <Label className="flex items-center gap-2 whitespace-nowrap w-32">
             <Input
               type="checkbox"
               checked={jobRequest.coupon}
@@ -152,9 +159,10 @@ export default function SpecificJobRequest({
                 setJobRequest({
                   ...jobRequest,
                   coupon: e.target.checked,
-                   // Reset selected coupon when unchecking
+                  // Reset selected coupon and brand when unchecking
                   ...(e.target.checked === false && {
                     selectedCoupon: undefined,
+                    couponBrand: undefined,
                   }),
                 })
               }
@@ -162,19 +170,20 @@ export default function SpecificJobRequest({
             Coupon
           </Label>
 
-          {/* Show coupon dropdown and amount field side-by-side when coupon is checked */}
+          {/* Show coupon fields when coupon is checked - nasa tabi mismo */}
           {jobRequest.coupon && (
-            <div className="flex items-center gap-2 w-80">
-              <div className="w-1/2">
+            <div className="flex items-center gap-2 flex-1">
+              {/* Coupon dropdown */}
+              <div className="w-40">
                 <select
                   value={jobRequest.selectedCoupon || ""}
                   onChange={(e) =>
                     setJobRequest({
                       ...jobRequest,
-                      selectedCoupon: e.target.value ?? undefined,
+                      selectedCoupon: e.target.value || undefined,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   required
                 >
                   <option value="" disabled>
@@ -187,27 +196,54 @@ export default function SpecificJobRequest({
                   ))}
                 </select>
               </div>
-              {/* Amount input field - show only when coupon is selected */}
+
+              {/* Brand dropdown - lalabas after pumili ng coupon */}
               {jobRequest.selectedCoupon && (
-                <div className="w-1/2">
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                      ₱
-                    </span>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={jobAmounts.selectedCoupon || ""}
-                      onChange={(e) =>
-                        handleJobAmountChange("selectedCoupon", Number(e.target.value))
-                      }
-                      min="0"
-                      step="0.01"
-                      className="pl-8 pr-3 text-right w-full"
-                      required
-                    />
+                <>
+                  <div className="flex-1">
+                    <select
+                        value={jobRequest.couponBrand || ""}
+                        onChange={(e) =>
+                          setJobRequest({
+                            ...jobRequest,
+                            couponBrand: e.target.value || undefined,
+                          })
+                        }
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        required
+                      >
+                        <option value="" disabled>
+                          Select Brand
+                        </option>
+                        {brandChoices.map((brand) => (
+                          <option key={brand} value={brand}>
+                            {brand}
+                          </option>
+                        ))}
+                    </select>
                   </div>
-                </div>
+
+                  {/* Amount input field */}
+                  <div className="w-40">
+                 
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                        ₱
+                      </span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={jobAmounts.selectedCoupon || ""}
+                        onChange={(e) =>
+                          handleJobAmountChange("selectedCoupon", Number(e.target.value))
+                        }
+                        min="0"
+                        step="0.01"
+                        className="pl-8 pr-3 text-right w-full"
+                        required
+                      />
+           
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -294,10 +330,7 @@ export default function SpecificJobRequest({
             </div>
           ) : (
             jobRequest.others && othersItems.map((item, index) => (
-              <div key={item.id} className="flex items-center gap-2 p-2
-              
-              
-              rounded-md">
+              <div key={item.id} className="flex items-center gap-2 p-2 rounded-md">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
@@ -340,15 +373,6 @@ export default function SpecificJobRequest({
               </div>
             ))
           )}
-          
-          {/* {jobRequest.others && othersItems.length > 0 && (
-            <div className="flex justify-end items-center gap-4 pt-2 border-t border-gray-200">
-              <span className="font-semibold text-gray-700">Total Others:</span>
-              <span className="font-bold text-blue-700">
-                {phpCurrency(totalOthersAmount)}
-              </span>
-            </div>
-          )} */}
         </div>
 
         {/* Total section */}

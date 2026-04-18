@@ -22,6 +22,7 @@ export interface PartsOthersItem {
 export type JobRequest = {
   coupon: boolean;
   selectedCoupon?: string;
+  couponBrand?: string;
   changeOil: boolean;
   overhaul: boolean;
   chainSprocket: boolean;
