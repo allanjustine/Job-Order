@@ -475,23 +475,26 @@ const TrimotorsJobOrderForm = () => {
   const jobRequests = trimotorsJobItems
     .filter((item) => jobRequest[item.key as keyof TrimotorsJobRequestType])
     .map((item) => ({
-      category: item.key === "others" ? jobRequest.othersText : item.label,
+      category: item.key === "others" ? "other_items" : item.label,
       amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
       type: "job_request",
       part_brand: "n/a",
       part_number: "n/a",
+      is_others_items:
+        item.key === "others" && jobRequest.othersItems,
     }));
 
   const partsReplacements = partsItems
     .filter((item) => partsReplacement[item.key as keyof PartsReplacement])
     .map((item) => ({
-      category:
-        item.key === "others" ? partsReplacement.partsOthersText : item.label,
+      category: item.key === "partsOthers" ? "other_items" : item.label,
       amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
       type: "parts_replacement",
       part_brand: partsBrand[item.key as keyof PartsBrand],
       part_number: partsNumber[item.key as keyof PartsNumber],
       quantity: partsQuantity[item.key as keyof PartsQuantity],
+      is_others_items:
+        item.key === "partsOthers" && partsReplacement.partsOthersItems,
     }));
 
   const itemsData = [...jobRequests, ...partsReplacements];

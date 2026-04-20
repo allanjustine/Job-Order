@@ -11,7 +11,7 @@ import {
 } from "@/constants/trimotors-job-items";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useMemo, useState } from "react";
 
 // Extended type for multiple others items
 interface OthersJobItem {
@@ -53,97 +53,50 @@ export default function TrimotorsJobRequest({
     return (jobRequest as any).othersItems || [];
   });
 
-  // Use ref to track if we're syncing to prevent loops
-  const isSyncingFromParent = useRef(false);
-  const isSyncingToParent = useRef(false);
-
-  // Sync othersItems with jobRequest when it changes from parent
-  useEffect(() => {
-    // Only sync if not currently syncing to parent
-    if (!isSyncingToParent.current) {
-      isSyncingFromParent.current = true;
-      const parentItems = (jobRequest as any).othersItems || [];
-      
-      // Only update if they're actually different
-      if (JSON.stringify(parentItems) !== JSON.stringify(othersItems)) {
-        setOthersItems(parentItems);
-      }
-      isSyncingFromParent.current = false;
-    }
-  }, [jobRequest]); // Only run when jobRequest changes
-
-  // Update jobRequest whenever othersItems changes
-  useEffect(() => {
-    // Only sync if not currently syncing from parent
-    if (!isSyncingFromParent.current) {
-      isSyncingToParent.current = true;
-      
-      const totalOthers = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-      handleJobAmountChange("others", totalOthers);
-      
-      setJobRequest({
-        ...jobRequest,
-        others: othersItems.length > 0,
-        othersItems: othersItems as any,
-      });
-      
-      isSyncingToParent.current = false;
-    }
- }, [othersItems]); 
-
-  // COMPUTE TOTAL DIRECTLY - including others
   const computedTotal = useMemo(() => {
-    let total = 0;
-    
-    // Add all standard job amounts
-    Object.entries(jobAmounts).forEach(([key, value]) => {
-      if (key !== 'others') {
-        total += (value || 0);
-      }
-    });
-    
-    // Add others amount from the actual othersItems (not jobAmounts.others)
+    const standardTotal = Object.entries(jobAmounts)
+      .filter(([key]) => key !== 'others')
+      .reduce((sum, [, value]) => sum + (value || 0), 0);
     const othersTotal = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-    total += othersTotal;
-    
-    return total;
+    return standardTotal + othersTotal;
   }, [jobAmounts, othersItems]);
 
-  // Update parent total para consistent
-  useEffect(() => {
+  const syncToParent = (items: OthersJobItem[]) => {
+    const othersTotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+    handleJobAmountChange("others", othersTotal);
+    setJobRequest((prev) => ({ ...prev, others: items.length > 0, othersItems: items as any }));
     if (setJobTotal) {
-      setJobTotal(computedTotal);
+      const standardTotal = Object.entries(jobAmounts)
+        .filter(([key]) => key !== 'others')
+        .reduce((sum, [, value]) => sum + (value || 0), 0);
+      setJobTotal(standardTotal + othersTotal);
     }
-  }, [computedTotal, setJobTotal]);
+  };
 
   // Add new others item
   const addOthersItem = () => {
-    const newItem: OthersJobItem = {
-      id: Date.now().toString(),
-      description: "",
-      amount: 0,
-    };
-    
-    setOthersItems([...othersItems, newItem]);
+    const newItem: OthersJobItem = { id: Date.now().toString(), description: "", amount: 0 };
+    const updated = [...othersItems, newItem];
+    setOthersItems(updated);
+    syncToParent(updated);
   };
 
-  // Remove others item
   const removeOthersItem = (id: string) => {
-    setOthersItems(othersItems.filter(item => item.id !== id));
+    const updated = othersItems.filter(item => item.id !== id);
+    setOthersItems(updated);
+    syncToParent(updated);
   };
 
-  // Update others item description
   const updateOthersDescription = (id: string, description: string) => {
-    setOthersItems(othersItems.map(item =>
-      item.id === id ? { ...item, description } : item
-    ));
+    const updated = othersItems.map(item => item.id === id ? { ...item, description } : item);
+    setOthersItems(updated);
+    syncToParent(updated);
   };
 
-  // Update others item amount - THIS WILL NOW TRIGGER RE-RENDER IMMEDIATELY
   const updateOthersAmount = (id: string, amount: number) => {
-    setOthersItems(othersItems.map(item =>
-      item.id === id ? { ...item, amount } : item
-    ));
+    const updated = othersItems.map(item => item.id === id ? { ...item, amount } : item);
+    setOthersItems(updated);
+    syncToParent(updated);
   };
 
   const renderJobItem = (item: TrimotorsJobItem) => (
@@ -227,12 +180,7 @@ export default function TrimotorsJobRequest({
                       }
                     } else {
                       setOthersItems([]);
-                      handleJobAmountChange("others", 0);
-                      setJobRequest({
-                        ...jobRequest,
-                        others: false,
-                        othersItems: [],
-                      });
+                      syncToParent([]);
                     }
                   }}
                 />

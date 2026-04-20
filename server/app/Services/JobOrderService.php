@@ -76,9 +76,35 @@ class JobOrderService
                     'job_order_number' => $job_order_number
                 ]);
 
+            $data = [];
+
+            foreach ($request->job_order_details as $job_order_detail) {
+                if ($job_order_detail['category'] === 'other_items') {
+                    foreach ($job_order_detail['is_others_items'] as $other_item) {
+                        $data[] = [
+                            'category'    => $other_item['description'],
+                            'type'        => $job_order_detail['type'],
+                            'part_brand'  => $other_item['brand'] ?? 'n/a',
+                            'part_number' => $other_item['partNumber'] ?? 'n/a',
+                            'quantity'    => $other_item['quantity'] ?? 1,
+                            'amount'      => $other_item['amount'],
+                        ];
+                    }
+                } else {
+                    $data[] = [
+                        'category'    => $job_order_detail['category'],
+                        'type'        => $job_order_detail['type'],
+                        'part_brand'  => $job_order_detail['part_brand'] ?? 'n/a',
+                        'part_number' => $job_order_detail['part_number'] ?? 'n/a',
+                        'quantity'    => $job_order_detail['quantity'] ?? 1,
+                        'amount'      => $job_order_detail['amount'],
+                    ];
+                }
+            }
+
             $job_order
                 ->jobOrderDetails()
-                ->createMany($request->job_order_details);
+                ->createMany($data);
 
             return $customer;
         });
