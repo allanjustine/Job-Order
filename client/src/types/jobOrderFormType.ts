@@ -1,4 +1,3 @@
-
 export type CouponType = {
   id: number;
   name: string;
@@ -40,12 +39,13 @@ export type JobRequest = {
   warrantyRepair: boolean;
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[]; // Array of custom job items
+  othersText: string;
 };
 
 export type PartsReplacement = {
   engineOil: boolean;
   drainPlugWasher: boolean;
-  tappetORing: boolean; 
+  tappetORing: boolean;
   sparkPlug: boolean;
   airCleanerElement: boolean;
   brakeShoePads: boolean;
@@ -63,10 +63,9 @@ export type PartsReplacement = {
   coolant: boolean;
   partsOthers: boolean;
   partsOthersText: string;
-   partsOthersItems?: PartsOthersItem[]; // New array for multiple others
+  partsOthersItems?: PartsOthersItem[]; // New array for multiple others
   [key: string]: boolean | string | PartsOthersItem[] | undefined;
 };
-
 
 export type TrimotorsJobRequestType = {
   vehicleWashing: boolean;
@@ -98,9 +97,8 @@ export type TrimotorsJobRequestType = {
   speedometer: boolean;
   petroleum: boolean;
   others: boolean; // To check if Others section is enabled
-  othersItems: JobOthersItem[]; 
+  othersItems: JobOthersItem[];
 };
-
 
 // Define proper types for job and parts amounts
 export type JobAmountsType = {
@@ -122,6 +120,7 @@ export type JobAmountsType = {
   warrantyRepair?: number;
   others?: number;
   selectedCoupon?: number;
+  total?: any;
   [key: string]: number | undefined;
 };
 
@@ -213,6 +212,7 @@ export type PartsAmountsType = {
   plasticParts?: number;
   brakeFluid?: number;
   coolant?: number;
+  total?: any;
   partsOthers?: number;
   [key: string]: number | undefined;
 };
@@ -250,14 +250,14 @@ export type TrimotorsJobAmountType = {
   othersText?: number;
 };
 
-export type DiagnosisStatus = 'ok' | 'ng' | 'na' | null;
+export type DiagnosisStatus = "ok" | "ng" | "na" | null;
 
 export interface DiagnosisState {
   status: DiagnosisStatus;
   remarks: string;
 }
 
-export type DiagnosisKeys = 
+export type DiagnosisKeys =
   | "lights"
   | "horn"
   | "switches"
@@ -275,18 +275,52 @@ export type DiagnosisKeys =
   | "battery"
   | "cableOperation";
 
-export type TrimotorsDiagnosisKeys = 
-  | "windshield" | "wipeArm"  | "frontIndicator" | "frontHeadLamp"  | "housingScudo"  | "housingHeadlamp" | "frontFender" | "mudFlapFront" | "scudoFront" | "frontEmblem"
-  | "tailLamp" | "bumper" | "mudFlapRear" | "rearDoor" | "rearEmblem" | "tailEnd"
-  | "leftBeading" | "leftBodyPaint"
-  | "mudGuard" | "rightBeading" | "rightBodyPaint"
-  | "checkHoles" | "damageStitching" | "coverHood" | "tapeHood" | "alumninum" | "nailScrew"
-  | "dashboard" | "seatsDriver" | "seatsPassenger" | "seatBelts" | "handleLeather" | "rubberMatting" | "underseatCover"
-  | "headlamp" | "beam" | "signalLamp" | "hazardlamp" | "wiper" | "interiorLamp" | "gaugeLamp" | "carCharger"
-  | "tools" | "battery" | "jack" | "spareTire" | "sideMirror" | "warrantyBooklet"
-  
-
-
-
-
-
+export type TrimotorsDiagnosisKeys =
+  | "windshield"
+  | "wipeArm"
+  | "frontIndicator"
+  | "frontHeadLamp"
+  | "housingScudo"
+  | "housingHeadlamp"
+  | "frontFender"
+  | "mudFlapFront"
+  | "scudoFront"
+  | "frontEmblem"
+  | "tailLamp"
+  | "bumper"
+  | "mudFlapRear"
+  | "rearDoor"
+  | "rearEmblem"
+  | "tailEnd"
+  | "leftBeading"
+  | "leftBodyPaint"
+  | "mudGuard"
+  | "rightBeading"
+  | "rightBodyPaint"
+  | "checkHoles"
+  | "damageStitching"
+  | "coverHood"
+  | "tapeHood"
+  | "alumninum"
+  | "nailScrew"
+  | "dashboard"
+  | "seatsDriver"
+  | "seatsPassenger"
+  | "seatBelts"
+  | "handleLeather"
+  | "rubberMatting"
+  | "underseatCover"
+  | "headlamp"
+  | "beam"
+  | "signalLamp"
+  | "hazardlamp"
+  | "wiper"
+  | "interiorLamp"
+  | "gaugeLamp"
+  | "carCharger"
+  | "tools"
+  | "battery"
+  | "jack"
+  | "spareTire"
+  | "sideMirror"
+  | "warrantyBooklet";

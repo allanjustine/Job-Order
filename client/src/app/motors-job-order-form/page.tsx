@@ -120,6 +120,7 @@ const JobOrderForm = () => {
     warrantyRepair: false,
     others: false,
     othersText: "",
+    othersItems: [],
   });
 
   const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
@@ -361,7 +362,7 @@ const JobOrderForm = () => {
     .map((item) => ({
       category:
         item.key === "others"
-          ? jobRequest.othersText
+          ? "other_items"
           : item.key === "selectedCoupon"
             ? jobRequest.selectedCoupon
             : item.label,
@@ -369,20 +370,20 @@ const JobOrderForm = () => {
       type: "job_request",
       part_brand: "n/a",
       part_number: "n/a",
+      is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
 
   const parts = partsItems
     .filter((item) => partsReplacement[item.key as keyof PartsReplacement])
     .map((item) => ({
-      category:
-        item.key === "partsOthers"
-          ? partsReplacement.partsOthersText
-          : item.label,
+      category: item.key === "partsOthers" ? "other_items" : item.label,
       amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
       type: "parts_replacement",
       part_brand: partsBrand[item.key as keyof PartsBrand],
       part_number: partsNumber[item.key as keyof PartsNumber],
       quantity: partsQuantity[item.key as keyof PartsQuantity],
+      is_others_items:
+        item.key === "partsOthers" && partsReplacement.partsOthersItems,
     }));
 
   const itemsData = [...jobs, ...parts];
@@ -574,6 +575,7 @@ const JobOrderForm = () => {
       warrantyRepair: false,
       others: false,
       othersText: "",
+      othersItems: [],
     });
 
     // Reset parts replacement
