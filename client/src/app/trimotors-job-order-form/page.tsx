@@ -123,6 +123,7 @@ const TrimotorsJobOrderForm = () => {
     petroleum: false,
     others: false,
     othersText: "",
+    othersItems: [],
   });
 
   const [diagnosis, setDiagnosis] = useState<
@@ -480,8 +481,7 @@ const TrimotorsJobOrderForm = () => {
       type: "job_request",
       part_brand: "n/a",
       part_number: "n/a",
-      is_others_items:
-        item.key === "others" && jobRequest.othersItems,
+      is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
 
   const partsReplacements = partsItems
@@ -614,6 +614,7 @@ const TrimotorsJobOrderForm = () => {
       petroleum: false,
       others: false,
       othersText: "",
+      othersItems: [],
     });
 
     // Reset diagnosis

@@ -98,6 +98,7 @@ export type TrimotorsJobRequestType = {
   petroleum: boolean;
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[];
+  othersText: string;
 };
 
 // Define proper types for job and parts amounts
