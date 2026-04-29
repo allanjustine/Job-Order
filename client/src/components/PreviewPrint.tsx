@@ -475,7 +475,7 @@ const partsMap = Object.fromEntries(
                     const othersIndex = parseInt(job.split('_')[2]);
                     const othersItem = getJobOthersItemByIndex(othersIndex);
                     if (othersItem) {
-                      jobLabel = `Others: ${othersItem.description}`;
+                      jobLabel = `${othersItem.description}`;
                       jobAmount = othersItem.amount > 0 ? phpCurrency(othersItem.amount) : '';
                       jobCheckbox = '[✓] ';
                     }
@@ -515,7 +515,7 @@ const partsMap = Object.fromEntries(
                     const othersIndex = parseInt(part.split('_')[2]);
                     const partsOthersItem = getPartsOthersItemByIndex(othersIndex);
                     if (partsOthersItem) {
-                      partLabel = `Others: ${partsOthersItem.description}`;
+                      partLabel = `${partsOthersItem.description}`;
                       partQty = partsOthersItem.quantity > 0 ? partsOthersItem.quantity.toString() : '';
                       partDetail = partsOthersItem.brand && partsOthersItem.partNumber 
                         ? `${partsOthersItem.brand}-${partsOthersItem.partNumber}`

@@ -427,7 +427,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
                   
                   if (job) {
                     if (job.isOthers) {
-                      jobLabel = `Others: ${job.label}`;
+                      jobLabel = `${job.label}`;
                     } else {
                       jobLabel = job.label;
                     }
@@ -444,7 +444,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
                   
                   if (part) {
                     if (part.isOthers) {
-                      partLabel = `Others: ${part.label}`;
+                      partLabel = `${part.label}`;
                     } else {
                       partLabel = part.label;
                     }
