@@ -493,6 +493,6 @@ export type TrimotorsPartsAmountsType = {
   sparkplug?: number;
   sparkplugCapRh?: number;
   headlightRelay?: number;
-    partsOthers?: number;
+  partsOthers?: number;
   [key: string]: number | undefined;
 };

@@ -2,8 +2,8 @@
 
 import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
-import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsAmountsType, PartsOthersItem } from "@/types/jobOrderFormType";
-import { partsItems } from "@/constants/part-items";
+import { TrimotorsDiagnosisKeys, DiagnosisState, TrimotorsJobAmountType, TrimotorsJobRequestType, TrimotorsPartsReplacement, TrimotorsPartsBrand, TrimotorsPartsNumber, TrimotorsPartsQuantity, TrimotorsPartsAmountsType, TrimotorsPartsOthersItem } from "@/types/jobOrderFormType";
+import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 
 interface TrimotorsPrintJobOrderProps {
@@ -27,11 +27,11 @@ interface TrimotorsPrintJobOrderProps {
     diagnosis: Record<TrimotorsDiagnosisKeys, DiagnosisState>;
     jobRequest: TrimotorsJobRequestType;
     jobAmounts: TrimotorsJobAmountType;
-    partsReplacement: PartsReplacement;
-    partsBrand: PartsBrand;
-    partsNumber: PartsNumber;
-    partsQuantity: PartsQuantity;
-    partsAmounts: PartsAmountsType;
+    partsReplacement: TrimotorsPartsReplacement;
+    partsBrand: TrimotorsPartsBrand;
+    partsNumber: TrimotorsPartsNumber;
+    partsQuantity: TrimotorsPartsQuantity;
+    partsAmounts: TrimotorsPartsAmountsType;
     nextScheduleDate: string;
     nextScheduleKms: string;
     generalRemarks: string;
@@ -62,7 +62,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   
   const getPartsQuantity = (key: string): number => {
     if (!data.partsQuantity) return 0;
-    return data.partsQuantity[key as keyof PartsQuantity] || 0;
+    return data.partsQuantity[key as keyof TrimotorsPartsQuantity] || 0;
   };
   
   const formatCurrency = (amount: number | undefined): string => {
@@ -71,8 +71,8 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   };
   
   const formatPartDetail = (partKey: string): string => {
-    const brand = data.partsBrand?.[partKey as keyof PartsBrand];
-    const partNo = data.partsNumber?.[partKey as keyof PartsNumber];
+    const brand = data.partsBrand?.[partKey as keyof TrimotorsPartsBrand];
+    const partNo = data.partsNumber?.[partKey as keyof TrimotorsPartsNumber];
     
     if (brand && partNo) {
       return `${brand}-${partNo}`;
@@ -86,7 +86,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   
   // Check if part is selected and has quantity
   const isPartSelected = (partKey: string): boolean => {
-    return !!(data.partsReplacement?.[partKey as keyof PartsReplacement] && getPartsQuantity(partKey) > 0);
+    return !!(data.partsReplacement?.[partKey as keyof TrimotorsPartsReplacement] && getPartsQuantity(partKey) > 0);
   };
 
   // Get job item label from trimotorsJobItems
@@ -97,7 +97,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
 
   // Get part label
   const getPartLabel = (key: string): string => {
-    const partItem = partsItems.find(item => item.key === key);
+    const partItem = trimotorsPartsItems.find(item => item.key === key);
     return partItem ? partItem.label : key.replace(/([A-Z])/g, ' $1').trim();
   };
 
@@ -148,7 +148,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
     const selectedParts: Array<{ key: string; label: string; quantity: number; detail: string; amount: number; isOthers?: boolean; description?: string; brand?: string; partNumber?: number }> = [];
     
     // Add regular selected parts
-    partsItems.forEach(item => {
+    trimotorsPartsItems.forEach(item => {
       if (item.key !== 'partsOthers' && isPartSelected(item.key)) {
         selectedParts.push({
           key: item.key,
@@ -164,7 +164,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
     // Add parts others items if they exist
     const partsOthersItems = (data.partsReplacement as any).partsOthersItems;
     if (partsOthersItems && partsOthersItems.length > 0) {
-      partsOthersItems.forEach((item: PartsOthersItem, index: number) => {
+      partsOthersItems.forEach((item: TrimotorsPartsOthersItem, index: number) => {
         const brandInfo = item.brand ? item.brand : '';
         const partNoInfo = item.partNumber ? `-${item.partNumber}` : '';
         const detailText = brandInfo || partNoInfo ? `${brandInfo}${partNoInfo}` : '';

@@ -17,11 +17,11 @@ import {
   DiagnosisState,
   TrimotorsJobRequestType,
   TrimotorsJobAmountType,
-  PartsQuantity,
-  PartsNumber,
-  PartsBrand,
-  PartsAmountsType,
-  PartsReplacement,
+  TrimotorsPartsQuantity,
+  TrimotorsPartsNumber,
+  TrimotorsPartsBrand,
+  TrimotorsPartsAmountsType,
+  TrimotorsPartsReplacement,
 } from "@/types/jobOrderFormType";
 import { useAuth } from "@/context/authContext";
 import acronymName from "@/utils/acronymName";
@@ -43,7 +43,7 @@ import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
 import FormHeader from "@/components/form-header";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
-import { partsItems } from "@/constants/part-items";
+import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -80,9 +80,9 @@ const TrimotorsJobOrderForm = () => {
   // Amounts state
   // Amounts state
   const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
-  const [partsAmounts, setPartsAmounts] = useState<PartsAmountsType>({});
-  const [partsBrand, setPartsBrand] = useState<PartsBrand>({});
-  const [partsNumber, setPartsNumber] = useState<PartsNumber>({});
+  const [partsAmounts, setPartsAmounts] = useState<TrimotorsPartsAmountsType>({});
+  const [partsBrand, setPartsBrand] = useState<TrimotorsPartsBrand>({});
+  const [partsNumber, setPartsNumber] = useState<TrimotorsPartsNumber>({});
 
   const [signatures, setSignatures] = useState<{
     serviceAdvisor: string;
@@ -93,34 +93,39 @@ const TrimotorsJobOrderForm = () => {
   });
 
   const [jobRequest, setJobRequest] = useState<TrimotorsJobRequestType>({
-    vehicleWashing: false,
-    airFilter: false,
-    breather: false,
-    checkLights: false,
-    oilStrainer: false,
-    checkSteering: false,
-    cleanSpark: false,
-    checkValve: false,
-    checkFuel: false,
-    checkBattery: false,
-    tireRotation: false,
-    replaceProp: false,
-    replaceOil: false,
-    checkCabies: false,
-    checkShock: false,
-    checkBrake: false,
-    deCarbonising: false,
-    checkBrakeLiner: false,
-    replaceEngine: false,
-    replaceDifferential: false,
-    greaseSteering: false,
-    greaseFront: false,
-    greaseNipple: false,
-    greasePropeller: false,
-    greaseGear: false,
-    greaseFare: false,
-    speedometer: false,
-    petroleum: false,
+    pivotPin: false,
+    detachSteeringColumn: false,
+    differentialGearOverhaul: false,
+    topOverhaul: false,
+    replaceRubberBoots: false,
+    changeOil: false,
+    replaceTensioner: false,
+    replaceBrakeShoe: false,
+    replaceBrakeLightSwitch: false,
+    engineOverhauling: false,
+    tuneUp: false,
+    replaceHeadlightBulb: false,
+    rubberBootsGreasing: false,
+    replaceBrakeReservoir: false,
+    replaceClutchCable: false,
+    replaceAcceleratorCable: false,
+    brakeShoeCleaning: false,
+    replaceCarbonBrush: false,
+    replaceGearCable: false,
+    replaceOilPipeHose: false,
+    replaceEngineCover: false,
+    batteryCharging: false,
+    electricalMinorRepair: false,
+    electricalMajorRepair: false,
+    replaceFrontShockAbsorber: false,
+    replaceFuelStrainer: false,
+    replaceHandbrakeCable: false,
+    minorTroubleRepair: false,
+    majorTroubleRepair: false,
+    replaceStarterRelay: false,
+    replaceHeadlightRelay: false,
+    replaceIsolatorRubber: false,
+    replaceStatorMagnetoRotorAssy: false,
     others: false,
     othersText: "",
     othersItems: [],
@@ -179,48 +184,62 @@ const TrimotorsJobOrderForm = () => {
     warrantyBooklet: { status: null, remarks: "" },
   });
 
-  const [partsReplacement, setPartsReplacement] = useState<PartsReplacement>({
-    engineOil: false,
-    drainPlugWasher: false,
-    tappetORing: false,
-    sparkPlug: false,
-    airCleanerElement: false,
-    brakeShoePads: false,
-    gaskets: false,
-    battery: false,
-    chainSprocketBelt: false,
-    fuelHose: false,
-    tiresTubesFlaps: false,
-    bulbs: false,
-    bearings: false,
-    springs: false,
-    rubberPartsOilSeal: false,
-    plasticParts: false,
-    brakeFluid: false,
-    coolant: false,
+  const [partsReplacement, setPartsReplacement] = useState<TrimotorsPartsReplacement>({
+    bajajOil: false,
+    oilFilter: false,
+    fuelStrainer: false,
+    speedometerCable: false,
+    handBrakeCable: false,
+    clutchCable: false,
+    gearCableBlack: false,
+    gearCableWhite: false,
+    reverseCable: false,
+    acceleratorCable: false,
+    headlightBulb: false,
+    brakeLightBulb: false,
+    peanutBulb: false,
+    sealHeadCover: false,
+    clipSpring: false,
+    pivotPin: false,
+    fuse10Amp: false,
+    brakePipeAssly: false,
+    kitMajorTmc: false,
+    wheelCylinderAsslyFront: false,
+    brakeShoe: false,
+    wheelCylinderAsslyRear: false,
+    sparkplug: false,
+    sparkplugCapRh: false,
+    headlightRelay: false,
     partsOthers: false,
     partsOthersText: "",
   });
 
-  const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
-    engineOil: 1,
-    drainPlugWasher: 1,
-    tappetORing: 1,
-    sparkPlug: 1,
-    airCleanerElement: 1,
-    brakeShoePads: 1,
-    gaskets: 1,
-    battery: 1,
-    chainSprocketBelt: 1,
-    fuelHose: 1,
-    tiresTubesFlaps: 1,
-    bulbs: 1,
-    bearings: 1,
-    springs: 1,
-    rubberPartsOilSeal: 1,
-    plasticParts: 1,
-    brakeFluid: 1,
-    coolant: 1,
+  const [partsQuantity, setPartsQuantity] = useState<TrimotorsPartsQuantity>({
+    bajajOil: 1,
+    oilFilter: 1,
+    fuelStrainer: 1,
+    speedometerCable: 1,
+    handBrakeCable: 1,
+    clutchCable: 1,
+    gearCableBlack: 1,
+    gearCableWhite: 1,
+    reverseCable: 1,
+    acceleratorCable: 1,
+    headlightBulb: 1,
+    brakeLightBulb: 1,
+    peanutBulb: 1,
+    sealHeadCover: 1,
+    clipSpring: 1,
+    pivotPin: 1,
+    fuse10Amp: 1,
+    brakePipeAssly: 1,
+    kitMajorTmc: 1,
+    wheelCylinderAsslyFront: 1,
+    brakeShoe: 1,
+    wheelCylinderAsslyRear: 1,
+    sparkplug: 1,
+    sparkplugCapRh: 1,
+    headlightRelay: 1,
     partsOthers: 1,
   });
 
@@ -262,7 +281,7 @@ const TrimotorsJobOrderForm = () => {
   };
 
   const handlePartsAmountChange = (
-    key: keyof PartsAmountsType,
+    key: keyof TrimotorsPartsAmountsType,
     value: number,
   ) => {
     setPartsAmounts((prev) => ({
@@ -315,10 +334,10 @@ const TrimotorsJobOrderForm = () => {
 
     // Remove amount entries for unchecked parts (exclude 'partsOthers' which is handled separately)
     Object.keys(updatedAmounts).forEach((key) => {
-      const typedKey = key as keyof PartsAmountsType;
+      const typedKey = key as keyof TrimotorsPartsAmountsType;
       if (
         typedKey !== "partsOthers" &&
-        !partsReplacement[typedKey as keyof PartsReplacement]
+        !partsReplacement[typedKey as keyof TrimotorsPartsReplacement]
       ) {
         delete updatedAmounts[typedKey];
       }
@@ -484,15 +503,15 @@ const TrimotorsJobOrderForm = () => {
       is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
 
-  const partsReplacements = partsItems
-    .filter((item) => partsReplacement[item.key as keyof PartsReplacement])
+  const partsReplacements = trimotorsPartsItems
+    .filter((item) => partsReplacement[item.key as keyof TrimotorsPartsReplacement])
     .map((item) => ({
       category: item.key === "partsOthers" ? "other_items" : item.label,
-      amount: partsAmounts[item.key as keyof PartsAmountsType] || 0,
+      amount: partsAmounts[item.key as keyof TrimotorsPartsAmountsType] || 0,
       type: "parts_replacement",
-      part_brand: partsBrand[item.key as keyof PartsBrand],
-      part_number: partsNumber[item.key as keyof PartsNumber],
-      quantity: partsQuantity[item.key as keyof PartsQuantity],
+      part_brand: partsBrand[item.key as keyof TrimotorsPartsBrand],
+      part_number: partsNumber[item.key as keyof TrimotorsPartsNumber],
+      quantity: partsQuantity[item.key as keyof TrimotorsPartsQuantity],
       is_others_items:
         item.key === "partsOthers" && partsReplacement.partsOthersItems,
     }));
@@ -584,34 +603,39 @@ const TrimotorsJobOrderForm = () => {
 
     // Reset job request
     setJobRequest({
-      vehicleWashing: false,
-      airFilter: false,
-      breather: false,
-      checkLights: false,
-      oilStrainer: false,
-      checkSteering: false,
-      cleanSpark: false,
-      checkValve: false,
-      checkFuel: false,
-      checkBattery: false,
-      tireRotation: false,
-      replaceProp: false,
-      replaceOil: false,
-      checkCabies: false,
-      checkShock: false,
-      checkBrake: false,
-      deCarbonising: false,
-      checkBrakeLiner: false,
-      replaceEngine: false,
-      replaceDifferential: false,
-      greaseSteering: false,
-      greaseFront: false,
-      greaseNipple: false,
-      greasePropeller: false,
-      greaseGear: false,
-      greaseFare: false,
-      speedometer: false,
-      petroleum: false,
+       pivotPin: false,
+        detachSteeringColumn: false,
+        differentialGearOverhaul: false,
+        topOverhaul: false,
+        replaceRubberBoots: false,
+        changeOil: false,
+        replaceTensioner: false,
+        replaceBrakeShoe: false,
+        replaceBrakeLightSwitch: false,
+        engineOverhauling: false,
+        tuneUp: false,
+        replaceHeadlightBulb: false,
+        rubberBootsGreasing: false,
+        replaceBrakeReservoir: false,
+        replaceClutchCable: false,
+        replaceAcceleratorCable: false,
+        brakeShoeCleaning: false,
+        replaceCarbonBrush: false,
+        replaceGearCable: false,
+        replaceOilPipeHose: false,
+        replaceEngineCover: false,
+        batteryCharging: false,
+        electricalMinorRepair: false,
+        electricalMajorRepair: false,
+        replaceFrontShockAbsorber: false,
+        replaceFuelStrainer: false,
+        replaceHandbrakeCable: false,
+        minorTroubleRepair: false,
+        majorTroubleRepair: false,
+        replaceStarterRelay: false,
+        replaceHeadlightRelay: false,
+        replaceIsolatorRubber: false,
+        replaceStatorMagnetoRotorAssy: false,
       others: false,
       othersText: "",
       othersItems: [],
@@ -676,24 +700,31 @@ const TrimotorsJobOrderForm = () => {
     });
 
     setPartsReplacement({
-      engineOil: false,
-      drainPlugWasher: false,
-      tappetORing: false,
-      sparkPlug: false,
-      airCleanerElement: false,
-      brakeShoePads: false,
-      gaskets: false,
-      battery: false,
-      chainSprocketBelt: false,
-      fuelHose: false,
-      tiresTubesFlaps: false,
-      bulbs: false,
-      bearings: false,
-      springs: false,
-      rubberPartsOilSeal: false,
-      plasticParts: false,
-      brakeFluid: false,
-      coolant: false,
+      bajajOil: false,
+      oilFilter: false,
+      fuelStrainer: false,
+      speedometerCable: false,
+      handBrakeCable: false,
+      clutchCable: false,
+      gearCableBlack: false,
+      gearCableWhite: false,
+      reverseCable: false,
+      acceleratorCable: false,
+      headlightBulb: false,
+      brakeLightBulb: false,
+      peanutBulb: false,
+      sealHeadCover: false,
+      clipSpring: false,
+      pivotPin: false,
+      fuse10Amp: false,
+      brakePipeAssly: false,
+      kitMajorTmc: false,
+      wheelCylinderAsslyFront: false,
+      brakeShoe: false,
+      wheelCylinderAsslyRear: false,
+      sparkplug: false,
+      sparkplugCapRh: false,
+      headlightRelay: false,
       partsOthers: false,
       partsOthersText: "",
     });
