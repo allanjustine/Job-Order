@@ -67,7 +67,7 @@ const TrimotorsJobOrderForm = () => {
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
   const [fuelLevel, setFuelLevel] = useState("");
-  const [mechanic, setMechanic] = useState("");
+  const [mechanic, setMechanic] = useState<any>([]);
   const [motorcycleUnit, setMotorcycleUnit] = useState("");
   const [remarks, setRemarks] = useState("");
   const [engineUnit, setEngineUnit] = useState("");
@@ -620,7 +620,7 @@ const TrimotorsJobOrderForm = () => {
     setNextScheduleDate("");
     setNextScheduleKms("");
     setGeneralRemarks("");
-    setMechanic("");
+    setMechanic([]);
 
     // Reset amounts
     setJobAmounts({});
