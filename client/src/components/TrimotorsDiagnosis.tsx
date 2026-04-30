@@ -41,6 +41,34 @@ export default function TrimotorsDiagnosis({
     }));
   };
 
+  // Mark all units as OK
+  const handleMarkAllAsOK = () => {
+    setDiagnosis((prev) => {
+      const updated = { ...prev };
+      (Object.keys(updated) as TrimotorsDiagnosisKeys[]).forEach((key) => {
+        updated[key] = {
+          ...updated[key],
+          status: "ok",
+        };
+      });
+      return updated;
+    });
+  };
+
+  // Unmark all units (set status to null)
+  const handleUnmarkAll = () => {
+    setDiagnosis((prev) => {
+      const updated = { ...prev };
+      (Object.keys(updated) as TrimotorsDiagnosisKeys[]).forEach((key) => {
+        updated[key] = {
+          ...updated[key],
+          status: null,
+        };
+      });
+      return updated;
+    });
+  };
+
   const renderRow = (
     label: string,
     unitKey: TrimotorsDiagnosisKeys,
@@ -108,6 +136,24 @@ export default function TrimotorsDiagnosis({
 
   return (
     <div className="mb-4 bg-white rounded border border-gray-300 p-3">
+      {/* Action Buttons */}
+      <div className="mb-4 flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={handleMarkAllAsOK}
+          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+        >
+          ✓ Mark All as OK
+        </button>
+        <button
+          type="button"
+          onClick={handleUnmarkAll}
+          className="px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
+        >
+          ✗ Unmark All
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left Table */}
         <div className="overflow-x-auto">

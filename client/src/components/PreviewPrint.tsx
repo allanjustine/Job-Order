@@ -953,7 +953,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
       >
         <div className="text-center p-0.5">
           <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs mb-2">Prepared by:</p>
+          <p className="text-xs mb-2 text-left">Prepared by:</p>
           <p className="underline">{data.serviceAdvisor}</p>
           <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
             (Signature Over Printed Name)
@@ -962,7 +962,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
         </div>
         <div className="text-center p-0.5">
           <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs mb-2">Checked by:</p>
+          <p className="text-xs mb-2 text-left">Checked by:</p>
           <p className="underline">{data.branchManager}</p>
           <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
             (Signature Over Printed Name)
@@ -971,7 +971,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
         </div>
         <div className="text-center p-0.5">
           <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs mb-2">Conformed by:</p>
+          <p className="text-xs mb-2 text-left">Conformed by:</p>
           <p className="underline">{data.customerName}</p>
           <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
             (Signature Over Printed Name)
