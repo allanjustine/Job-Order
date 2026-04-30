@@ -135,7 +135,7 @@ class ReportService
         return JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name,user_id',
                 'jobOrder.mechanics.user',
@@ -238,7 +238,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name',
             ])
