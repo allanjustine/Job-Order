@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@base-ui/react": "^1.4.1",
     "@fontsource/quicksand": "^5.2.10",
     "@hookform/resolvers": "^5.2.2",
     "axios": "^1.13.2",

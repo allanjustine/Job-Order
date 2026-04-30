@@ -3,6 +3,7 @@ import Input from "./ui/input";
 import { Label } from "./ui/label";
 import Select from "./ui/select";
 import { api } from "@/lib/api";
+import { MultiMechanic } from "./MultiMechanic";
 
 export default function CustomerGrid({
   errors,
@@ -104,7 +105,7 @@ export default function CustomerGrid({
       </div>
       <div className="col-span-1">
         <Label>Model</Label>
-        <Input
+        <Input 
           type="text"
           error={errors.model}
           value={model}
@@ -192,32 +193,7 @@ export default function CustomerGrid({
       </div>
 
       <div className="col-span-1">
-        <Label>Mechanic Name</Label>
-        {isLoading ? (
-          "Loading mechanics..."
-        ) : (
-          <Select
-            value={mechanic}
-            required
-            onChange={(e) => setMechanic(e.target.value)}
-          >
-            <option value="" disabled>
-              Select Mechanic
-            </option>
-            {mechanics.length > 0 ? (
-              mechanics.map((mechanic: any, index: number) => (
-                <option value={`${mechanic.id}_${mechanic.name}`} key={index}>
-                  {mechanic.name}
-                </option>
-              ))
-            ) : (
-              <option value="" disabled>No mechanics found</option>
-            )}
-          </Select>
-        )}
-        {errors.mechanic && (
-          <p className="text-red-500 text-xs mt-1">{errors.mechanic}</p>
-        )}
+       <MultiMechanic />
       </div>
     </div>
   );
