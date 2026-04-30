@@ -220,6 +220,7 @@ class ReportService
                     'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
                     'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
                     'General Remarks '  => $item->jobOrder?->general_remarks,
+                    'JO Category'       => $item->jobOrder?->category,
                 ];
             });
     }
@@ -282,6 +283,7 @@ class ReportService
                     'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
                     'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
                     'General Remarks '  => $item->jobOrder?->general_remarks,
+                    'JO Category'       => $item->jobOrder?->category,
                 ];
             });
 
