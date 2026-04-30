@@ -237,7 +237,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name',
             ])
@@ -271,6 +271,8 @@ class ReportService
             ->map(function ($item) {
                 return [
                     'Date'              => $item->created_at->format('Y-m-d H:i:s'),
+                    'JO Number'         => $item->jobOrder?->job_order_number,
+                    'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
                     'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                     'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
@@ -278,7 +280,8 @@ class ReportService
                     'Quantity'          => $item->type === 'parts_replacement' ? $item->quantity : '',
                     'Part Brand'        => $item->type === 'parts_replacement' ? $item->part_brand : '',
                     'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
-                    'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : ''
+                    'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
+                    'General Remarks '  => $item->jobOrder?->general_remarks,
                 ];
             });
 
