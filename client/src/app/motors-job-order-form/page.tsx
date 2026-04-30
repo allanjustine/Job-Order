@@ -494,7 +494,7 @@ const JobOrderForm = () => {
       model: model,
       mileage: mileage,
       engine_number: engineFrameNo,
-      category: remarks
+      category: remarks === "others" ? otherRemarks : remarks,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
