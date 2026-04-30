@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ChangeEvent } from "react";
+import { ComponentProps } from "react";
 
 export default function Input({
   error,
@@ -7,24 +7,8 @@ export default function Input({
   ...props
 }: {
   error?: boolean | null | string;
-  value?: string | number;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
-  type?: string;
-  placeholder?: string;
-  required?: boolean;
-  hidden?: boolean;
-  checked?: boolean;
-  disabled?: boolean;
-  min?: string | number;
-  step?: string;
   className?: string;
-  name?: string;
-  id?: string;
-  readOnly?: boolean;
-  max?: string | number;
-  ref?: any;
-}) {
+} & ComponentProps<"input">) {
   return (
     <input
       {...props}
@@ -34,7 +18,7 @@ export default function Input({
             ? "h-4 w-4 rounded border-gray-300 text-blue-600"
             : "w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
         } ${error && "border-red-500"}`,
-        className
+        className,
       )}
     />
   );

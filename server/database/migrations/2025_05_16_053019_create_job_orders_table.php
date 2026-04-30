@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('job_orders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Customer::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Mechanic::class)->constrained()->cascadeOnDelete();
             $table->string('job_order_type');
             $table->string('job_order_number');
             $table->dateTime('date');

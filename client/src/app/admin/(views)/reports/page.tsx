@@ -9,7 +9,7 @@ import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash, Trash } from "lucide-react";
+import { Search, SearchSlash, Trash, User } from "lucide-react";
 import { Activity, ChangeEvent, useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
@@ -59,7 +59,7 @@ const Reports = () => {
     to: new Date(),
   });
 
-    function handleDeleteJobOrder(id: number) {
+  function handleDeleteJobOrder(id: number) {
     return function () {
       Swal.fire({
         title: "Are you sure?",
@@ -180,20 +180,26 @@ const Reports = () => {
       sortField: "customer.name",
     },
     {
-      name: "MECHANIC NAME",
-      selector: (row: any) => row.mechanic.name,
-      sortable: true,
-      sortField: "mechanic.name",
+      name: "MECHANIC(s)",
+      cell: (row: any) => (
+        <div className="flex flex-col gap-1">
+          {row.mechanics.map((mechanic: any) => (
+            <span className="flex gap-1 items-center" key={mechanic.id}>
+              <User size={15} /> {mechanic.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
-      name: "JOB FORM",
-      selector: (row: any) => (
-        <span className="uppercase font-bold text-gray-500">
-          {row.job_order_type}
+      name: "JOB TYPE",
+      cell: (row: any) => (
+        <span
+          className={`${row.job_order_type === "motors" ? "text-red-600" : "text-blue-600"} font-bold text-xs`}
+        >
+          {row.job_order_type?.toUpperCase()}
         </span>
       ),
-      sortable: true,
-      sortField: "job_order_type",
     },
     {
       name: "TOTAL JOB REQUEST",
@@ -328,22 +334,48 @@ const Reports = () => {
     }
   };
 
+  const activeFilterLabel = options.find((o) => o.value === filterBy)?.label;
+
   return (
     <>
-      <div className="p-6 space-y-2">
-        <div className="p-5 border border-gray-300 shadow-lg bg-white rounded-lg space-y-5">
-          <h1 className="text-2xl font-semibold text-gray-600">Filter</h1>
-          <div className="grid gap-2 grid-cols-2">
+      <div className="p-6 space-y-5">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Reports</h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            Filter, view, and export job order reports
+          </p>
+        </div>
+
+        {/* Filter Panel */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+              <h2 className="text-sm font-semibold text-gray-700">Filters</h2>
+            </div>
+            {filterBy !== "all" && (
+              <span className="text-xs bg-blue-50 text-blue-600 font-medium px-3 py-1 rounded-full border border-blue-100">
+                Active: {activeFilterLabel}
+              </span>
+            )}
+          </div>
+
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="w-full">
-              <Label className="mb-1" htmlFor="filter_type">Filter by</Label>
+              <Label
+                className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                htmlFor="filter_type"
+              >
+                Filter by
+              </Label>
               <Select
                 disabled={isDataLoading}
                 value={filterBy}
                 onChange={handleSelectFilter}
-                className="h-12"
+                className="h-10 rounded-lg border-gray-200 text-sm"
               >
                 <option value="" disabled>
-                  {" "}
                   Select filter type
                 </option>
                 {options.map((option) => (
@@ -353,51 +385,68 @@ const Reports = () => {
                 ))}
               </Select>
             </div>
+
             <Activity mode={filterBy === "search" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label className="mb-1" htmlFor="search">Search</Label>
-                <div className="relative w-full">
+                <Label
+                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  htmlFor="search"
+                >
+                  Search
+                </Label>
+                <div className="relative">
                   <Input
                     value={defaultSearch}
                     type="search"
                     placeholder="Search..."
                     onChange={handleSearch}
-                    className="w-full border border-gray-300 h-12 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="h-10 rounded-lg border-gray-200 pl-9 text-sm"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 </div>
               </div>
             </Activity>
+
             <Activity mode={filterBy === "branch" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label className="mb-1" htmlFor="branch">Filter by Branch</Label>
+                <Label
+                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  htmlFor="branch"
+                >
+                  Branch
+                </Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
-                  className="h-12"
+                  className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
-                    {" "}
                     Select branch
                   </option>
                   {branches.map((branch: any) => (
-                    <option key={branch.id} value={branch.id}>
-                      {`(${branch.code}) - ${branch.name}`}
-                    </option>
+                    <option
+                      key={branch.id}
+                      value={branch.id}
+                    >{`(${branch.code}) - ${branch.name}`}</option>
                   ))}
                 </Select>
               </div>
             </Activity>
+
             <Activity mode={filterBy === "area_manager" ? "visible" : "hidden"}>
               <div className="w-full">
-                <Label className="mb-1" htmlFor="area_manager">Filter by Area Manager</Label>
+                <Label
+                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  htmlFor="area_manager"
+                >
+                  Area Manager
+                </Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
-                  className="h-12"
+                  className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
-                    {" "}
                     Select area manager
                   </option>
                   {areaManagers.map((areaManager: any) => (
@@ -408,43 +457,57 @@ const Reports = () => {
                 </Select>
               </div>
             </Activity>
+
             <Activity mode={filterBy === "date" ? "visible" : "hidden"}>
               <div className="w-full">
+                <Label className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Date Range
+                </Label>
                 <DatePickerWithRange date={date} setDate={setDate} />
               </div>
             </Activity>
+
             <Activity
               mode={filterBy === "job_order_detail_type" ? "visible" : "hidden"}
             >
               <div className="w-full">
-                <Label className="mb-1" htmlFor="branch">Filter by Job Order Detail Type</Label>
+                <Label
+                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  htmlFor="detail_type"
+                >
+                  Job Order Detail Type
+                </Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
-                  className="h-12"
+                  className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
-                    {" "}
-                    Select job order detail type
+                    Select detail type
                   </option>
                   <option value="job_request">Job Request</option>
                   <option value="parts_replacement">Parts Replacement</option>
                 </Select>
               </div>
             </Activity>
+
             <Activity
               mode={filterBy === "job_order_type" ? "visible" : "hidden"}
             >
               <div className="w-full">
-                <Label className="mb-1" htmlFor="branch">Filter by Job Order Type</Label>
+                <Label
+                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  htmlFor="order_type"
+                >
+                  Job Order Type
+                </Label>
                 <Select
                   value={filterItem}
                   onChange={handleFilterItem}
-                  className="h-12"
+                  className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
-                    {" "}
-                    Select job order type
+                    Select order type
                   </option>
                   <option value="motors">Motors</option>
                   <option value="trimotors">Trimotors</option>
@@ -453,108 +516,120 @@ const Reports = () => {
             </Activity>
           </div>
         </div>
-        <div className="bg-white rounded-md border border-gray-300 shadow">
-          <div className="p-6">
-            <div className="mb-2 flex justify-end">
-              <div className="flex gap-2">
+
+        {/* Table Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 className="text-base font-semibold text-gray-800">
+                Job Order Reports
+              </h2>
+              <p className="text-xs text-gray-400">
+                {pagination.total > 0
+                  ? `${pagination.total} record${pagination.total !== 1 ? "s" : ""} found`
+                  : "No records found"}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                disabled={isRefresh}
+                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                  isRefresh && "opacity-60 cursor-not-allowed!"
+                }`}
+                onClick={handleRefresh}
+              >
+                {isRefresh ? (
+                  <>
+                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <FaRotateRight /> Refresh
+                  </>
+                )}
+              </Button>
+              <Activity
+                mode={
+                  filterBy &&
+                  (filterItem || searchTerm) &&
+                  !isRefresh &&
+                  !isLoading &&
+                  reports.length > 0
+                    ? "visible"
+                    : "hidden"
+                }
+              >
                 <Button
                   type="button"
-                  disabled={isRefresh}
-                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                    isRefresh && "bg-blue-400! cursor-not-allowed!"
-                  }`}
-                  onClick={handleRefresh}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white py-5"
+                  onClick={handleExport}
+                  disabled={isExporting}
                 >
-                  {isRefresh ? (
+                  {isExporting ? (
                     <>
-                      <FaCircleNotch className="animate-spin" /> Refreshing...
+                      <FaCircleNotch className="animate-spin" /> Exporting...
                     </>
                   ) : (
                     <>
-                      <FaRotateRight /> Refresh
+                      <FaFileExcel /> Export to Excel
                     </>
                   )}
                 </Button>
-                <Activity
-                  mode={
-                    filterBy &&
-                    (filterItem || searchTerm) &&
-                    !isRefresh &&
-                    !isLoading &&
-                    reports.length > 0
-                      ? "visible"
-                      : "hidden"
-                  }
-                >
-                  <Button
-                    type="button"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white py-5"
-                    onClick={handleExport}
-                    disabled={isExporting}
-                  >
-                    {isExporting ? (
-                      <>
-                        <FaCircleNotch className="animate-spin" /> Exporting...
-                      </>
-                    ) : (
-                      <>
-                        <FaFileExcel /> Export
-                      </>
-                    )}
-                  </Button>
-                </Activity>
-              </div>
+              </Activity>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Reports</h2>
-            </div>
-            <div className="overflow-x-auot">
-              <DataTable
-                columns={columns}
-                data={reports}
-                pagination
-                paginationServer
-                sortServer
-                onSort={handleSort}
-                paginationTotalRows={pagination.total}
-                onChangeRowsPerPage={handleRowsPerPageChange}
-                onChangePage={handlePageChange}
-                paginationPerPage={pagination.perPage}
-                striped
-                highlightOnHover
-                progressPending={isLoading || isRefresh || isSearching}
-                progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
-                    ) : (
-                      "Loading..."
-                    )}
-                  </div>
-                }
-                persistTableHead
-                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                defaultSortAsc={sort.sortBy}
-                defaultSortFieldId={sort.column}
-                noDataComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {searchTerm ? (
-                      <>
-                        <span className="flex gap-1 items-center">
-                          <SearchSlash /> No results for "{searchTerm}"
-                        </span>
-                      </>
-                    ) : (
-                      "No reports yet."
-                    )}
-                  </div>
-                }
-              />
-            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <DataTable
+              columns={columns}
+              data={reports}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <div className="py-8 text-sm text-gray-500 flex items-center justify-center gap-2">
+                  {isSearching ? (
+                    <>
+                      <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
+                      {searchTerm && `"${searchTerm}"`}...
+                    </>
+                  ) : (
+                    <>
+                      <FaCircleNotch className="animate-spin text-blue-500 text-lg" />{" "}
+                      Loading...
+                    </>
+                  )}
+                </div>
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-10 text-gray-400 text-sm flex flex-col items-center gap-2">
+                  {searchTerm ? (
+                    <>
+                      <SearchSlash className="w-8 h-8" />
+                      <span>No results for "{searchTerm}"</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-8 h-8" />
+                      <span>No reports found. Try adjusting your filters.</span>
+                    </>
+                  )}
+                </div>
+              }
+            />
           </div>
         </div>
       </div>

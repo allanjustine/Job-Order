@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import React, { SetStateAction } from "react";
 
 import {
   Combobox,
@@ -13,33 +13,38 @@ import {
   ComboboxList,
   ComboboxValue,
   useComboboxAnchor,
-} from "./ui/combobox"
+} from "./ui/combobox";
 
-const frameworks = [
-  "Next.js",
-  "SvelteKit",
-  "Nuxt.js",
-  "Remix",
-  "Astro",
-] as const
-
-export function MultiMechanic() {
-  const anchor = useComboboxAnchor()
+export function MultiMechanic({
+  mechanics,
+  setMechanic,
+  mechanic,
+}: {
+  mechanics: any;
+  setMechanic: React.Dispatch<SetStateAction<any>>;
+  mechanic: any;
+}) {
+  const anchor = useComboboxAnchor();
 
   return (
     <Combobox
       multiple
       autoHighlight
-      items={frameworks}
-      defaultValue={[frameworks[0]]}
+      items={mechanics}
+      onValueChange={setMechanic}
+      value={mechanic}
     >
-      <ComboboxChips ref={anchor} className="w-full max-w-xs">
+      <ComboboxChips ref={anchor} className="w-full">
         <ComboboxValue>
-          {(mechanics) => (
+          {(items) => (
             <React.Fragment>
-              {mechanics.map((mechanic:any,) => (
-                <ComboboxChip key={mechanic}>{mechanic}</ComboboxChip>
-              ))}
+              {mechanics
+                .filter((mechanic: any) => items.includes(mechanic.id))
+                .map((mechanic: any) => (
+                  <ComboboxChip key={mechanic.id}>
+                    {mechanic?.name}
+                  </ComboboxChip>
+                ))}
               <ComboboxChipsInput />
             </React.Fragment>
           )}
@@ -49,12 +54,12 @@ export function MultiMechanic() {
         <ComboboxEmpty>No mechanics found.</ComboboxEmpty>
         <ComboboxList>
           {(item) => (
-            <ComboboxItem key={item} value={item}>
-              {item}
+            <ComboboxItem key={item.id} value={item.id}>
+              {item.name}
             </ComboboxItem>
           )}
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-  )
+  );
 }

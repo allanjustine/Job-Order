@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
     {
         app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $password = Hash::make('password');
+        $password = Hash::make('dapho04051983');
 
         $users = [
             [
@@ -32,9 +32,9 @@ class UserSeeder extends Seeder
                 'updated_at'    => now(),
             ],
             [
-                "name"          => "Testing User",
-                "code"          => "TEST",
-                "email"         => "test@gmail.com",
+                "name"          => "Sample Branch",
+                "code"          => "samplebranch",
+                "email"         => "samplebranch@gmail.com",
                 "password"      => $password,
                 "branch_id"     => 2,
                 'created_at'    => now(),

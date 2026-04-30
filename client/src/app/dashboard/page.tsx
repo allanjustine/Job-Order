@@ -6,9 +6,11 @@ import {
   Search,
   SearchSlash,
   Wrench,
-  CarFrontIcon,
-  BikeIcon,
   LogOut,
+  X,
+  BikeIcon,
+  CarFrontIcon,
+  User,
 } from "lucide-react";
 import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -42,6 +44,7 @@ import { DatePickerWithRange } from "@/components/date-picker.with-range";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
+import formatDate from "@/utils/format-date";
 
 const Dashboard = () => {
   const {
@@ -170,16 +173,32 @@ const Dashboard = () => {
       sortField: "job_order_number",
     },
     {
+      name: "JOB TYPE",
+      cell: (row: any) => (
+        <span
+          className={`${row.job_order_type === "motors" ? "text-red-600" : "text-blue-600"} font-bold text-xs`}
+        >
+          {row.job_order_type?.toUpperCase()}
+        </span>
+      ),
+    },
+    {
       name: "CUSTOMER NAME",
       selector: (row: any) => row.customer.name,
       sortable: true,
       sortField: "customer.name",
     },
     {
-      name: "MECHANIC",
-      selector: (row: any) => row.mechanic.name,
-      sortable: true,
-      sortField: "mechanic.name",
+      name: "MECHANIC(s)",
+      cell: (row: any) => (
+        <div className="flex flex-col gap-1">
+          {row.mechanics.map((mechanic: any) => (
+            <span className="flex gap-1 items-center" key={mechanic.id}>
+              <User size={15} /> {mechanic.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
       name: "TOTAL AMOUNT",
@@ -284,8 +303,8 @@ const Dashboard = () => {
       const response = await api.get("/export-branch-reports", {
         params: {
           search: searchTerm,
-          from: date?.from?.toISOString().split("T")[0],
-          to: date?.to?.toISOString().split("T")[0],
+          from: formatDate(date?.from),
+          to: formatDate(date?.to),
         },
       });
 
@@ -363,77 +382,43 @@ const Dashboard = () => {
     setIsExport(!isExport);
   };
 
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
   return (
     <>
-      <div className="p-6">
-        {/* Welcome Card with Buttons and Picture Space */}
-        <div className="mb-8">
-          <div className="bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              {/* Left side: Welcome text and buttons */}
-              <div>
-                <h1 className="text-3xl font-bold mb-2">
-                  Welcome to Job Order System, {user?.name.toUpperCase()}
-                </h1>
-                <p className="text-blue-100 opacity-90 mb-6">
-                  Manage and track all job orders efficiently. Create new job
-                  orders or view existing ones.
-                </p>
-
-                {/* Single Button with Dropdown */}
-                <div ref={dropdownRef} className="relative inline-block">
-                  {/* <Button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <Wrench className="w-5 h-5" />
-                    Create Job Order
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${
-                        isDropdownOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </Button> */}
-                  <Button
-                    type="button"
-                    onClick={handleLogout}
-                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Logout
-                  </Button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-full min-w-55 bg-white rounded-lg shadow-lg z-10 overflow-hidden border border-gray-200">
-                      <button
-                        onClick={() => handleDropdownSelect("motorcycle")}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
-                      >
-                        <BikeIcon className="w-4 h-4 text-blue-600" />
-                        Motorcycle Job Order Form
-                      </button>
-
-                      <div className="border-t border-gray-200"></div>
-
-                      <button
-                        onClick={() => handleDropdownSelect("trimotors")}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 text-gray-800 font-medium flex items-center gap-3 transition-colors"
-                      >
-                        <CarFrontIcon className="w-4 h-4 text-blue-600" />
-                        Trimotors Job Order Form
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+      <div className="min-h-screen bg-gray-50 p-6">
+        {/* Welcome Banner */}
+        <div className="mb-6 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl shadow-lg p-6 text-white flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold shrink-0">
+              {user?.name?.[0]?.toUpperCase()}
+            </div>
+            <div>
+              <p className="text-blue-200 text-sm">{greeting()},</p>
+              <h1 className="text-2xl font-bold leading-tight">
+                {user?.name?.toUpperCase()}
+              </h1>
+              <p className="text-blue-100 text-xs mt-0.5 opacity-80">
+                Job Order Management System
+              </p>
             </div>
           </div>
+          <Button
+            type="button"
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 border border-white/30 text-white font-medium py-5 px-4 rounded-lg flex items-center gap-2 shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
 
         {/* Stats Cards */}
-
         <StatCards
           spinner={spinner}
           setIsMechanicOpen={setIsMechanicOpen}
@@ -445,229 +430,251 @@ const Dashboard = () => {
 
         {/* Data Table Section */}
         <Activity mode={!isMechanicOpen ? "visible" : "hidden"}>
-          <div className="mt-10 space-y-3 flex flex-col">
-            <Button
-              type="button"
-              ref={createButtonRef}
-              onClick={handleOpenCreate}
-              onMouseDown={() => {
-                if (!hasMechanic) {
-                  setIsScale(true);
-                }
-              }}
-              onMouseUp={() => {
-                if (!hasMechanic) {
-                  setIsScale(false);
-                }
-              }}
-              onMouseLeave={() => {
-                if (!hasMechanic) {
-                  setIsScale(false);
-                }
-              }}
-              disabled={isLoadingMechanicChecking}
-              className="bg-blue-500 hover:bg-blue-600 py-6 text-white self-end font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              {isLoadingMechanicChecking ? (
-                <>
-                  <Spinner /> Checking Mechanic...
-                </>
-              ) : (
-                <>
-                  <Wrench className="w-5 h-5" /> Create Job Order
-                </>
-              )}
-            </Button>
-            <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-[70%_30%] gap-2">
-                <div className="">
-                  <div className="mb-2 flex justify-end gap-1">
-                    <Button
-                      type="button"
-                      disabled={isRefresh}
-                      className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                        isRefresh && "bg-blue-400! cursor-not-allowed!"
-                      }`}
-                      onClick={handleRefresh}
-                    >
-                      {isRefresh ? (
-                        <>
-                          <FaCircleNotch className="animate-spin" />{" "}
-                          Refreshing...
-                        </>
-                      ) : (
-                        <>
-                          <FaRotateRight /> Refresh
-                        </>
-                      )}
-                    </Button>
-                    <Activity
-                      mode={
-                        !isRefresh && !isLoading && jobOrders.length > 0
-                          ? "visible"
-                          : "hidden"
-                      }
-                    >
-                      <Button
-                        type="button"
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white py-5"
-                        onClick={handleViewExport}
-                      >
-                        <FaFileExcel /> Export
-                      </Button>
-                    </Activity>
-                  </div>
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-                    <h2 className="text-xl font-semibold text-gray-600">
+          <div className="space-y-4">
+            {/* Action Bar */}
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Job Orders
+              </h2>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  disabled={isRefresh}
+                  className={`bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 py-5 px-3 text-sm shadow-sm ${
+                    isRefresh && "cursor-not-allowed! opacity-60"
+                  }`}
+                  onClick={handleRefresh}
+                >
+                  {isRefresh ? (
+                    <>
+                      <FaCircleNotch className="animate-spin" /> Refreshing...
+                    </>
+                  ) : (
+                    <>
+                      <FaRotateRight /> Refresh
+                    </>
+                  )}
+                </Button>
+                <Activity
+                  mode={
+                    !isRefresh && !isLoading && jobOrders.length > 0
+                      ? "visible"
+                      : "hidden"
+                  }
+                >
+                  <Button
+                    type="button"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white py-5 px-3 text-sm shadow-sm"
+                    onClick={handleViewExport}
+                  >
+                    <FaFileExcel /> Export
+                  </Button>
+                </Activity>
+                <Button
+                  type="button"
+                  ref={createButtonRef}
+                  onClick={handleOpenCreate}
+                  onMouseDown={() => {
+                    if (!hasMechanic) setIsScale(true);
+                  }}
+                  onMouseUp={() => {
+                    if (!hasMechanic) setIsScale(false);
+                  }}
+                  onMouseLeave={() => {
+                    if (!hasMechanic) setIsScale(false);
+                  }}
+                  disabled={isLoadingMechanicChecking}
+                  className="bg-blue-600 hover:bg-blue-700 text-white py-5 px-4 text-sm font-semibold shadow-sm flex items-center gap-2"
+                >
+                  {isLoadingMechanicChecking ? (
+                    <>
+                      <Spinner /> Checking...
+                    </>
+                  ) : (
+                    <>
+                      <Wrench className="w-4 h-4" /> Create Job Order
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
+              {/* Table Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
                       Recent Print Job Orders
-                    </h2>
-                    <div className="relative w-full md:w-1/3">
-                      <Input
-                        type="search"
-                        placeholder="Search..."
-                        onChange={handleSearch}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    </div>
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      All printed job orders from this branch
+                    </p>
                   </div>
-                  <div className="overflow-x-auto">
-                    <DataTable
-                      columns={columns}
-                      data={jobOrders}
-                      pagination
-                      paginationServer
-                      sortServer
-                      onSort={handleSort}
-                      paginationTotalRows={pagination.total}
-                      onChangeRowsPerPage={handleRowsPerPageChange}
-                      onChangePage={handlePageChange}
-                      paginationPerPage={pagination.perPage}
-                      striped
-                      highlightOnHover
-                      progressPending={isLoading || isRefresh || isSearching}
-                      progressComponent={
-                        <div className="py-5 font-bold text-gray-600 text-xl">
-                          {isSearching ? (
-                            <div className="flex items-center gap-1">
-                              <FaMagnifyingGlass className="animate-ping" />{" "}
-                              Searching{" "}
-                              {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                              ...
-                            </div>
-                          ) : (
-                            "Loading..."
-                          )}
-                        </div>
-                      }
-                      persistTableHead
-                      paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                      defaultSortAsc={sort.sortBy}
-                      defaultSortFieldId={sort.column}
-                      noDataComponent={
-                        <div className="py-5 font-bold text-gray-600 text-xl">
-                          {searchTerm ? (
-                            <>
-                              <span className="flex gap-1 items-center">
-                                <SearchSlash /> No results for "{searchTerm}"
-                              </span>
-                            </>
-                          ) : (
-                            "No job orders yet."
-                          )}
-                        </div>
-                      }
+                  <div className="relative w-full sm:w-56">
+                    <Input
+                      type="search"
+                      placeholder="Search orders..."
+                      onChange={handleSearch}
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
                     />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   </div>
                 </div>
-                <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
-                  <div className="text-center text-lg font-bold text-gray-500 mb-3">
-                    Most Job Request & Parts Replacement
-                  </div>
-                  <div className="flex flex-col space-y-2">
-                    {isLoading ? (
-                      <>
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <div
-                            className="w-full p-5 rounded-lg bg-slate-200 h-15 flex justify-between items-center animate-pulse"
-                            key={index}
-                            style={{ animationDelay: `${index * 0.2}s` }}
-                          ></div>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        {topJobOrders.length > 0 ? (
-                          topJobOrders.map(
-                            (
-                              {
-                                category,
-                                amount,
-                                type,
-                                quantity,
-                                part_brand,
-                              }: {
-                                category: string;
-                                amount: number;
-                                type: string;
-                                quantity: number;
-                                part_brand: number;
-                              },
-                              index: number,
-                            ) => (
-                              <div
-                                className="w-full p-5 rounded-lg bg-blue-200 h-fit flex justify-between items-center hover:shadow-md hover:bg-blue-300"
-                                key={index}
-                              >
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-gray-500 font-semibold">
-                                    {category}
-                                  </span>
-                                  <span className="text-gray-500 font-bold text-[10px]">
-                                    {type.toUpperCase().replace("_", " ")}
-                                  </span>
-                                  <Activity
-                                    mode={
-                                      type === "parts_replacement"
-                                        ? "visible"
-                                        : "hidden"
-                                    }
-                                  >
-                                    <span className="text-gray-600 font-thin text-sm">
-                                      Total quantity: x{quantity}
-                                    </span>
-                                    <span className="text-gray-600 font-thin text-sm">
-                                      Total brand used: {part_brand}
-                                    </span>
-                                  </Activity>
-                                </div>
-                                <span className="text-lg font-bold text-gray-800">
-                                  {phpCurrency(amount)}
-                                </span>
-                              </div>
-                            ),
-                          )
+                <div className="overflow-x-auto">
+                  <DataTable
+                    columns={columns}
+                    data={jobOrders}
+                    pagination
+                    paginationServer
+                    sortServer
+                    onSort={handleSort}
+                    paginationTotalRows={pagination.total}
+                    onChangeRowsPerPage={handleRowsPerPageChange}
+                    onChangePage={handlePageChange}
+                    paginationPerPage={pagination.perPage}
+                    striped
+                    highlightOnHover
+                    progressPending={isLoading || isRefresh || isSearching}
+                    progressComponent={
+                      <div className="py-8 text-gray-500 text-sm font-medium flex items-center gap-2">
+                        {isSearching ? (
+                          <>
+                            <FaMagnifyingGlass className="animate-ping" />{" "}
+                            Searching {searchTerm && `"${searchTerm}"`}...
+                          </>
                         ) : (
-                          <p className="text-center text-md font-semibold text-gray-600">
-                            No data yet.
-                          </p>
+                          <>
+                            <FaCircleNotch className="animate-spin" />{" "}
+                            Loading...
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    }
+                    persistTableHead
+                    paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+                    defaultSortAsc={sort.sortBy}
+                    defaultSortFieldId={sort.column}
+                    noDataComponent={
+                      <div className="py-12 flex flex-col items-center gap-2 text-gray-400">
+                        {searchTerm ? (
+                          <>
+                            <SearchSlash className="w-8 h-8" />
+                            <span className="text-sm font-medium">
+                              No results for "{searchTerm}"
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Wrench className="w-8 h-8" />
+                            <span className="text-sm font-medium">
+                              No job orders yet
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Top Job Orders Sidebar */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <h3 className="font-semibold text-gray-800 text-sm">
+                    Top Job Requests
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Most requested & parts replaced
+                  </p>
+                </div>
+                <div className="p-4 flex flex-col gap-2">
+                  {isLoading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-16 rounded-xl bg-gray-100 animate-pulse"
+                        style={{ animationDelay: `${i * 0.1}s` }}
+                      />
+                    ))
+                  ) : topJobOrders.length > 0 ? (
+                    topJobOrders.map(
+                      (
+                        {
+                          category,
+                          amount,
+                          type,
+                          quantity,
+                          part_brand,
+                        }: {
+                          category: string;
+                          amount: number;
+                          type: string;
+                          quantity: number;
+                          part_brand: number;
+                        },
+                        index: number,
+                      ) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all duration-200"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-700 truncate">
+                              {category}
+                            </p>
+                            <span
+                              className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${
+                                type === "parts_replacement"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {type.toUpperCase().replace("_", " ")}
+                            </span>
+                            <Activity
+                              mode={
+                                type === "parts_replacement"
+                                  ? "visible"
+                                  : "hidden"
+                              }
+                            >
+                              <p className="text-[11px] text-gray-400 mt-0.5">
+                                Qty: x{quantity} · Brands: {part_brand}
+                              </p>
+                            </Activity>
+                          </div>
+                          <span className="text-sm font-bold text-gray-800 shrink-0">
+                            {phpCurrency(amount)}
+                          </span>
+                        </div>
+                      ),
+                    )
+                  ) : (
+                    <div className="py-8 flex flex-col items-center gap-2 text-gray-400">
+                      <Wrench className="w-7 h-7" />
+                      <p className="text-sm font-medium">No data yet</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </Activity>
+
         <Activity mode={isMechanicOpen ? "visible" : "hidden"}>
-          <div className="flex justify-end mr-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-700">Mechanics</h2>
             <Button
               onClick={() => setIsMechanicOpen(false)}
               type="button"
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-5"
+              className="bg-red-500 hover:bg-red-600 text-white font-medium py-5 px-4"
             >
-              Close Mechanics
+              <X /> Close Mechanics
             </Button>
           </div>
           <Mechanics
@@ -677,51 +684,71 @@ const Dashboard = () => {
         </Activity>
       </div>
 
-      <Modal isOpen={isOpenCreate} className="w-5xl" ref={createRef}>
+      <Modal isOpen={isOpenCreate} className="w-2xl" ref={createRef}>
         <ModalHeader
           onClose={handleOpenCreate}
           centerText
-          className="text-2xl font-bold"
+          className="text-xl font-bold"
         >
-          Choose a Service
+          Create New Job Order
         </ModalHeader>
         <ModalBody>
-          <div className="flex gap-2">
-            <Link href="/motors-job-order-form" className="w-1/2 group">
-              <div className="w-full h-[40vh] bg-gray-100 p-5 hover:bg-gray-200 rounded-lg">
-                <p className="text-6xl font-extrabold text-blue-500 text-center group-hover:underline transition-all duration-300 ease-in-out">
-                  Motors
-                </p>
-                <img
-                  className="w-full h-[90%]"
-                  src="https://imgs.search.brave.com/TcyJNPj5qwOkLO2io86o9qlohZBINWQNBLAEQiA3zgI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNjcv/NjE2LzEyMC9zbWFs/bC9yZXRyby1zdHls/ZS1vcmFuZ2UtYW5k/LXdoaXRlLW1vdG9y/Y3ljbGUtaWxsdXN0/cmF0aW9uLXdpdGgt/ZGV0YWlsZWQtZGVz/aWduLXBuZy5wbmc"
-                  alt="Motors"
-                />
+          <p className="text-center text-sm text-gray-400 mb-5 -mt-1">
+            Select the vehicle type to proceed
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <Link href="/motors-job-order-form" className="group">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+                <div className="p-6 flex flex-col items-center gap-3">
+                  <div className="w-14 h-14 rounded-full bg-blue-500 group-hover:bg-blue-600 flex items-center justify-center shadow-md transition-colors duration-300">
+                    <BikeIcon className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                      Motorcycle
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      2-wheel job order form
+                    </p>
+                  </div>
+                  <img
+                    className="w-full h-32 object-contain drop-shadow-md"
+                    src="https://imgs.search.brave.com/TcyJNPj5qwOkLO2io86o9qlohZBINWQNBLAEQiA3zgI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNjcv/NjE2LzEyMC9zbWFs/bC9yZXRyby1zdHls/ZS1vcmFuZ2UtYW5k/LXdoaXRlLW1vdG9y/Y3ljbGUtaWxsdXN0/cmF0aW9uLXdpdGgt/ZGV0YWlsZWQtZGVz/aWduLXBuZy5wbmc"
+                    alt="Motorcycle"
+                  />
+                  <span className="w-full text-center text-sm font-semibold text-blue-600 bg-blue-100 group-hover:bg-blue-500 group-hover:text-white py-2 rounded-lg transition-all duration-300">
+                    Select Motorcycle →
+                  </span>
+                </div>
               </div>
             </Link>
-            <Link href="/trimotors-job-order-form" className="w-1/2 group">
-              <div className="w-full h-[40vh] bg-gray-100 p-5 hover:bg-gray-200 rounded-lg">
-                <p className="text-6xl font-extrabold text-blue-500 text-center group-hover:underline transition-all duration-300 ease-in-out">
-                  Trimotors
-                </p>
-                <img
-                  className="w-full h-[90%]"
-                  src="https://imgs.search.brave.com/1twD8b623YwlPd4oPNGMpMe37x0othacsDiDj8EXnwA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZHBtY28uY29tL3B1/YmxpYy9pbWFnZXMv/cHJvZHVjdC9icmFu/ZC1uZXctYmFqYWot/cmUucG5n"
-                  alt="Trimotors"
-                />
+            <Link href="/trimotors-job-order-form" className="group">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-indigo-400 bg-gradient-to-br from-indigo-50 to-indigo-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+                <div className="p-6 flex flex-col items-center gap-3">
+                  <div className="w-14 h-14 rounded-full bg-indigo-500 group-hover:bg-indigo-600 flex items-center justify-center shadow-md transition-colors duration-300">
+                    <CarFrontIcon className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">
+                      Trimotors
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      3-wheel job order form
+                    </p>
+                  </div>
+                  <img
+                    className="w-full h-32 object-contain drop-shadow-md"
+                    src="https://imgs.search.brave.com/1twD8b623YwlPd4oPNGMpMe37x0othacsDiDj8EXnwA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZHBtY28uY29tL3B1/YmxpYy9pbWFnZXMv/cHJvZHVjdC9icmFu/ZC1uZXctYmFqYWot/cmUucG5n"
+                    alt="Trimotors"
+                  />
+                  <span className="w-full text-center text-sm font-semibold text-indigo-600 bg-indigo-100 group-hover:bg-indigo-500 group-hover:text-white py-2 rounded-lg transition-all duration-300">
+                    Select Trimotors →
+                  </span>
+                </div>
               </div>
             </Link>
           </div>
         </ModalBody>
-        <ModalFooter>
-          <Button
-            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
-            type="button"
-            onClick={handleOpenCreate}
-          >
-            Cancel
-          </Button>
-        </ModalFooter>
       </Modal>
 
       <Modal isOpen={isOpen} className="w-5xl" ref={modalRef}>
@@ -753,7 +780,7 @@ const Dashboard = () => {
         <ModalFooter>
           <Button
             type="button"
-            className={`bg-green-500 hover:bg-green-600 text-white ${isExporting || !date?.from || !date?.to ? "cursor-not-allowed!" : ""}`}
+            className={`bg-green-500 py-5 hover:bg-green-600 text-white ${isExporting || !date?.from || !date?.to ? "cursor-not-allowed!" : ""}`}
             onClick={handleExport}
             disabled={isExporting || !date?.from || !date?.to}
           >

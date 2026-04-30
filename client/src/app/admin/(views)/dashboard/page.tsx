@@ -11,6 +11,7 @@ import {
   BikeIcon,
   CarFrontIcon,
   UserCog,
+  User,
 } from "lucide-react";
 import { FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -194,10 +195,16 @@ const Dashboard = () => {
       sortField: "customer.name",
     },
     {
-      name: "MECHANIC",
-      selector: (row: any) => row.mechanic.name,
-      sortable: true,
-      sortField: "mechanic.name",
+      name: "MECHANIC(s)",
+      cell: (row: any) => (
+        <div className="flex flex-col gap-1">
+          {row.mechanics.map((mechanic: any) => (
+            <span className="flex gap-1 items-center" key={mechanic.id}>
+              <User size={15} /> {mechanic.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
       name: "TOTAL AMOUNT",
@@ -256,66 +263,107 @@ const Dashboard = () => {
       value: isLoadingStats ? spinner() : data.todaysPrints,
       icon: Clock,
       color: "from-green-500 to-green-400",
+      sub: "Printed today",
     },
     {
       label: "Weekly Prints",
       value: isLoadingStats ? spinner() : data.weeklyPrints,
       icon: Calendar,
       color: "from-purple-500 to-purple-400",
+      sub: "This week",
     },
     {
       label: "Monthly Prints",
       value: isLoadingStats ? spinner() : data.monthlyPrints,
       icon: Calendar,
       color: "from-orange-500 to-orange-400",
+      sub: "This month",
     },
     {
       label: "Total Mechanics",
       value: isLoadingStats ? spinner() : data.totalMechanics,
       icon: UserCog,
       color: "from-indigo-500 to-indigo-400",
+      sub: "Active mechanics",
     },
     {
-      label: "Total Motorcycle Jobs",
+      label: "Motorcycle Jobs",
       value: isLoadingStats ? spinner() : data.totalMotorcycleJobs,
       icon: BikeIcon,
       color: "from-emerald-500 to-emerald-400",
+      sub: "Total revenue",
     },
     {
-      label: "Total Trimotors Jobs",
+      label: "Trimotor Jobs",
       value: isLoadingStats ? spinner() : data.totalTrimotorsJobs,
       icon: CarFrontIcon,
       color: "from-rose-500 to-rose-400",
+      sub: "Total revenue",
     },
   ];
 
+  const rankBadge = (index: number) => {
+    const badges = [
+      "bg-yellow-400 text-yellow-900",
+      "bg-gray-300 text-gray-700",
+      "bg-amber-600 text-amber-100",
+    ];
+    return (
+      <span
+        className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 ${
+          index < 3 ? badges[index] : "bg-gray-100 text-gray-500"
+        }`}
+      >
+        {index + 1}
+      </span>
+    );
+  };
+
+  const skeletonRows = (count = 5, height = "h-12") =>
+    Array.from({ length: count }).map((_, i) => (
+      <div
+        key={i}
+        className={`w-full rounded-lg bg-slate-100 ${height} animate-pulse`}
+        style={{ animationDelay: `${i * 0.1}s` }}
+      />
+    ));
+
   return (
     <>
-      <div className="p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="p-6 space-y-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Job Order Printing System — Admin Overview</p>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Job Prints — with hover breakdown */}
           <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-2">
-                  Total Job Prints
-                </p>
-                <p className="text-2xl font-semibold text-gray-800">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Total Job Prints</p>
+                <p className="text-3xl font-bold text-gray-800">
                   {isLoadingStats ? spinner() : data.totalReceiptPrints}
                 </p>
+                <p className="text-xs text-gray-400 mt-1">Hover to see breakdown</p>
               </div>
-              <div className="p-3 rounded-lg bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-400 shadow-md">
                 <Printer className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-              <p>
-                <span className="font-medium">Motocycle:</span>{" "}
-                {isLoadingStats ? spinner() : data.total_job_motor_print}
-              </p>
-              <p>
-                <span className="font-medium">Trimotors:</span>{" "}
-                {isLoadingStats ? spinner() : data.total_job_trimotor_print}
-              </p>
+            <div className="absolute z-10 top-full left-0 mt-2 w-52 p-3 bg-white border border-gray-200 rounded-xl shadow-lg text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="text-gray-500">Motorcycle</span>
+                <span className="font-semibold">{isLoadingStats ? spinner() : data.total_job_motor_print}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-gray-500">Trimotors</span>
+                <span className="font-semibold">{isLoadingStats ? spinner() : data.total_job_trimotor_print}</span>
+              </div>
             </div>
           </div>
 
@@ -324,20 +372,15 @@ const Dashboard = () => {
             return (
               <div
                 key={index}
-                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group"
+                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-2">
-                      {item.label}
-                    </p>
-                    <p className="text-2xl font-semibold text-gray-800">
-                      {item.value}
-                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{item.label}</p>
+                    <p className="text-3xl font-bold text-gray-800">{item.value}</p>
+                    <p className="text-xs text-gray-400 mt-1">{item.sub}</p>
                   </div>
-                  <div
-                    className={`p-3 rounded-lg bg-linear-to-br ${item.color} shadow-md`}
-                  >
+                  <div className={`p-3 rounded-xl bg-gradient-to-br ${item.color} shadow-md`}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -345,60 +388,57 @@ const Dashboard = () => {
             );
           })}
 
-          <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group col-span-1 sm:col-span-2 lg:col-span-1">
+          {/* Total Amount */}
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-1">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-2">
-                  Total Amount
-                </p>
-                <p className="text-2xl font-semibold text-gray-800">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Total Amount</p>
+                <p className="text-3xl font-bold text-gray-800">
                   {isLoadingStats ? spinner() : data.totalOverAllAmount}
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-amber-400 shadow-md">
                 <PhilippinePeso className="w-5 h-5 text-white" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-10">
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 h-fit">
-            <div className="mb-2 flex justify-end">
-              <Button
-                type="button"
-                disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                  isRefresh && "bg-blue-400! cursor-not-allowed!"
-                }`}
-                onClick={handleRefresh}
-              >
-                {isRefresh ? (
-                  <>
-                    <FaCircleNotch className="animate-spin" /> Refreshing...
-                  </>
-                ) : (
-                  <>
-                    <FaRotateRight /> Refresh
-                  </>
-                )}
-              </Button>
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">
-                Recent Print Job Orders
-              </h2>
-              <div className="relative w-full md:w-1/3">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  onChange={handleSearch}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        {/* Main Content */}
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+          {/* Job Orders Table */}
+          <div className="xl:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Recent Print Job Orders</h2>
+                <p className="text-xs text-gray-400">Latest submitted job orders</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    onChange={handleSearch}
+                    className="border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-48"
+                  />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                </div>
+                <Button
+                  type="button"
+                  disabled={isRefresh}
+                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                    isRefresh && "opacity-60 cursor-not-allowed!"
+                  }`}
+                  onClick={handleRefresh}
+                >
+                  {isRefresh ? (
+                    <><FaCircleNotch className="animate-spin" /> Refreshing...</>
+                  ) : (
+                    <><FaRotateRight /> Refresh</>
+                  )}
+                </Button>
               </div>
             </div>
-
             <div className="overflow-x-auto">
               <DataTable
                 columns={columns}
@@ -415,15 +455,11 @@ const Dashboard = () => {
                 highlightOnHover
                 progressPending={isLoading || isRefresh || isSearching}
                 progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
+                  <div className="py-8 font-semibold text-gray-500 text-sm flex items-center justify-center gap-2">
                     {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
+                      <><FaMagnifyingGlass className="animate-ping" /> Searching {searchTerm && `"${searchTerm}"`}...</>
                     ) : (
-                      "Loading..."
+                      <><CgSpinner className="animate-spin text-blue-500 text-lg" /> Loading...</>
                     )}
                   </div>
                 }
@@ -432,176 +468,98 @@ const Dashboard = () => {
                 defaultSortAsc={sort.sortBy}
                 defaultSortFieldId={sort.column}
                 noDataComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
+                  <div className="py-10 text-gray-400 text-sm flex flex-col items-center gap-2">
                     {searchTerm ? (
-                      <>
-                        <span className="flex gap-1 items-center">
-                          <SearchSlash /> No results for "{searchTerm}"
-                        </span>
-                      </>
+                      <><SearchSlash className="w-8 h-8" /><span>No results for "{searchTerm}"</span></>
                     ) : (
-                      "No job orders yet."
+                      <><Printer className="w-8 h-8" /><span>No job orders yet.</span></>
                     )}
                   </div>
                 }
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 h-fit">
-            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
-              <div className="text-center text-md font-bold text-gray-500 mb-3">
+
+          {/* Rankings */}
+          <div className="xl:col-span-2 grid grid-cols-1 gap-4">
+            {/* Top Overall */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
                 Top 10 Overall Job Orders
-              </div>
-              <div className="flex flex-col space-y-2">
-                {isLoadingStats ? (
-                  <>
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-12 flex justify-between items-center animate-pulse"
-                        key={index}
-                        style={{ animationDelay: `${index * 0.2}s` }}
-                      ></div>
-                    ))}
-                  </>
+              </h3>
+              <div className="flex flex-col gap-2">
+                {isLoadingStats ? skeletonRows(5) : adminStats.top_over_all_job_orders.length > 0 ? (
+                  adminStats.top_over_all_job_orders.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+                      title={item.category}
+                    >
+                      {rankBadge(index)}
+                      <span className="flex-1 text-xs font-medium text-gray-600 line-clamp-1">{item.category}</span>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                    </div>
+                  ))
                 ) : (
-                  <>
-                    {adminStats.top_over_all_job_orders.length > 0 ? (
-                      adminStats.top_over_all_job_orders.map(
-                        (item, index: number) => (
-                          <div
-                            className="w-full p-5 rounded-lg bg-blue-200 hover:bg-blue-300 h-12 flex justify-between items-center"
-                            key={index}
-                            title={item.category}
-                          >
-                            <span className="text-gray-500 font-semibold text-xs line-clamp-1">
-                              {item.category}
-                            </span>
-                            <span className="text-md font-bold text-gray-800">
-                              {phpCurrency(item.amount)}
-                            </span>
-                          </div>
-                        )
-                      )
-                    ) : (
-                      <p className="text-center text-md font-semibold text-gray-600">
-                        No data yet.
-                      </p>
-                    )}
-                  </>
+                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
                 )}
               </div>
             </div>
-            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
-              <div className="text-center text-md font-bold text-gray-500 mb-3">
+
+            {/* Top Branch */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-violet-500 inline-block"></span>
                 Top 10 Branch Job Orders
-              </div>
-              <div className="flex flex-col space-y-2">
-                {isLoadingStats ? (
-                  <>
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-12 flex justify-between items-center animate-pulse"
-                        key={index}
-                        style={{ animationDelay: `${index * 0.2}s` }}
-                      ></div>
-                    ))}
-                  </>
+              </h3>
+              <div className="flex flex-col gap-2">
+                {isLoadingStats ? skeletonRows(5) : adminStats.top_branch_job_orders.length > 0 ? (
+                  adminStats.top_branch_job_orders.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-violet-50 hover:bg-violet-100 transition-colors"
+                      title={item.category}
+                    >
+                      {rankBadge(index)}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-700 line-clamp-1">{`(${item.branch.code}) ${item.branch.name}`}</p>
+                        <p className="text-xs text-gray-400 line-clamp-1">{item.category}</p>
+                      </div>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                    </div>
+                  ))
                 ) : (
-                  <>
-                    {adminStats.top_branch_job_orders.length > 0 ? (
-                      adminStats.top_branch_job_orders.map(
-                        (item, index: number) => (
-                          <div
-                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-12 flex justify-between items-center"
-                            title={item.category}
-                            key={index}
-                          >
-                            <div className="flex-col flex">
-                              <span
-                                className="text-gray-500 font-semibold line-clamp-1 text-sm"
-                                title={item.branch.name}
-                              >
-                                {`(${item.branch.code}) - ${item.branch.name}`}
-                              </span>
-                              <span
-                                className="text-gray-600 text-xs line-clamp-1"
-                                title={item.category}
-                              >
-                                {item.category}
-                              </span>
-                            </div>
-                            <span className="text-md font-bold text-gray-800">
-                              {phpCurrency(item.amount)}
-                            </span>
-                          </div>
-                        )
-                      )
-                    ) : (
-                      <p className="text-center text-md font-semibold text-gray-600">
-                        No data yet.
-                      </p>
-                    )}
-                  </>
+                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
                 )}
               </div>
             </div>
-            <div className="p-5 border-gray-300 border-dashed border rounded-md h-fit">
-              <div className="text-center text-md font-bold text-gray-500 mb-3">
+
+            {/* Top Area Manager */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
                 Top 10 Area Manager Job Orders
-              </div>
-              <div className="flex flex-col space-y-2">
-                {isLoadingStats ? (
-                  <>
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div
-                        className="w-full p-5 rounded-lg bg-slate-200 h-17 flex justify-between items-center animate-pulse"
-                        key={index}
-                        style={{ animationDelay: `${index * 0.2}s` }}
-                      ></div>
-                    ))}
-                  </>
+              </h3>
+              <div className="flex flex-col gap-2">
+                {isLoadingStats ? skeletonRows(5, "h-14") : adminStats.top_area_manager_job_orders.length > 0 ? (
+                  adminStats.top_area_manager_job_orders.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      title={item.category}
+                    >
+                      {rankBadge(index)}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-gray-700 line-clamp-1">{item.area_manager_name}</p>
+                        <p className="text-xs font-medium text-gray-500 line-clamp-1">{`(${item.branch.code}) ${item.branch.name}`}</p>
+                        <p className="text-xs text-gray-400 line-clamp-1">{item.category}</p>
+                      </div>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                    </div>
+                  ))
                 ) : (
-                  <>
-                    {adminStats.top_area_manager_job_orders.length > 0 ? (
-                      adminStats.top_area_manager_job_orders.map(
-                        (item, index: number) => (
-                          <div
-                            className="w-full p-5 rounded-lg bg-violet-200 hover:bg-violet-300 h-17 flex justify-between items-center"
-                            title={item.category}
-                            key={index}
-                          >
-                            <div className="flex-col flex">
-                              <span
-                                className="text-gray-500 font-semibold line-clamp-1 text-md"
-                                title={item.area_manager_name}
-                              >
-                                {item.area_manager_name}
-                              </span>
-                              <span
-                                className="text-gray-500 font-semibold line-clamp-1 text-sm"
-                                title={item.branch.name}
-                              >
-                                {`(${item.branch.code}) - ${item.branch.name}`}
-                              </span>
-                              <span
-                                className="text-gray-600 text-xs line-clamp-1"
-                                title={item.category}
-                              >
-                                {item.category}
-                              </span>
-                            </div>
-                            <span className="text-md font-bold text-gray-800">
-                              {phpCurrency(item.amount)}
-                            </span>
-                          </div>
-                        )
-                      )
-                    ) : (
-                      <p className="text-center text-md font-semibold text-gray-600">
-                        No data yet.
-                      </p>
-                    )}
-                  </>
+                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
                 )}
               </div>
             </div>

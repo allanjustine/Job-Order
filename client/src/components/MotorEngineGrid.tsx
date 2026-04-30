@@ -14,35 +14,45 @@ export default function MotorEngineGrid({
   setEngineUnit,
   setEngineCondition,
   setContentUbox,
+  setOtherRemarks,
+  otherRemarks
 }: any) {
 
-  const [otherRemarks, setOtherRemarks] = useState("");
-  
   return (
     <div className="mb-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">    
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
             <Label>Motorcyle Unit</Label>
-            <Select value={motorcycleUnit} onChange={(e) => setMotorcycleUnit(e.target.value)}>
-              <option value="" disabled>Select Motocycle Unit</option>
+            <Select
+              value={motorcycleUnit}
+              onChange={(e) => setMotorcycleUnit(e.target.value)}
+            >
+              <option value="" disabled>
+                Select Motocycle Unit
+              </option>
               <option value="business">Business</option>
               <option value="automatic">Automatic</option>
               <option value="cub">Cub</option>
               <option value="sports">Sports</option>
             </Select>
-            
+
             <div className="mt-2">
               <Label>Category</Label>
-              <Select value={remarks} onChange={(e) => setRemarks(e.target.value)}>
-                <option value="" disabled>Select Category</option>
-                <option value="repo">Repo recon</option>
-                <option value="service">MC Service</option>
-                <option value="warranty">Under Warranty</option>
-                <option value="regular">Regular Customer</option>
-                <option value="ebike">E-bike</option>
+              <Select
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select Category
+                </option>
+                <option value="Repo Recon">Repo Recon</option>
+                <option value="MC Service">MC Service</option>
+                <option value="Under Warranty">Under Warranty</option>
+                <option value="Regular Customer">Regular Customer</option>
+                <option value="E-Bike">E-Bike</option>
                 <option value="others">Others</option>
-            </Select>
+              </Select>
               {remarks === "others" && (
                 <input
                   type="text"
@@ -55,20 +65,25 @@ export default function MotorEngineGrid({
             </div>
           </div>
         </div>
-        
+
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
             <Label>Engine Unit</Label>
-            <Select value={engineUnit} onChange={(e) => setEngineUnit(e.target.value)}>
-              <option value="" disabled>Select Engine Unit</option>
+            <Select
+              value={engineUnit}
+              onChange={(e) => setEngineUnit(e.target.value)}
+            >
+              <option value="" disabled>
+                Select Engine Unit
+              </option>
               <option value="business_sports">Business/Sports</option>
               <option value="automatic">Automatic</option>
               <option value="cub">Cub</option>
             </Select>
-            
+
             <div className="mt-2">
               <Label>Engine Condition</Label>
-              <Input 
+              <Input
                 placeholder=""
                 className="w-full"
                 value={engineCondition}
@@ -78,10 +93,10 @@ export default function MotorEngineGrid({
           </div>
         </div>
       </div>
-      
+
       <div className="mt-4">
         <Label>Contents inside U-Box</Label>
-        <Input 
+        <Input
           placeholder=""
           className="w-full"
           value={contentUbox}
