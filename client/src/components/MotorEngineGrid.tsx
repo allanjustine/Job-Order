@@ -16,7 +16,7 @@ export default function MotorEngineGrid({
   setContentUbox,
 }: any) {
 
-  const [otherReason, setOtherReason] = useState("");
+  const [otherRemarks, setOtherRemarks] = useState("");
   
   return (
     <div className="mb-6">
@@ -48,8 +48,8 @@ export default function MotorEngineGrid({
                   type="text"
                   placeholder="Please specify"
                   className="mt-2 w-full p-2 border rounded"
-                  value={otherReason}
-                  onChange={(e) => setOtherReason(e.target.value)}
+                  value={otherRemarks}
+                  onChange={(e) => setOtherRemarks(e.target.value)}
                 />
               )}
             </div>
