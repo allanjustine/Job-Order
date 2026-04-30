@@ -2,25 +2,25 @@
 import Input from "./ui/input";
 import { Label } from "./ui/label";
 import phpCurrency from "@/utils/phpCurrency";
-import { PartsAmountsType, PartsReplacement, PartsBrand, PartsNumber, PartsQuantity, PartsOthersItem } from "@/types/jobOrderFormType";
+import { PartsAmountsType, TrimotorsPartsReplacement, TrimotorsPartsBrand, TrimotorsPartsNumber, TrimotorsPartsQuantity, TrimotorsPartsOthersItem, TrimotorsPartsAmountsType } from "@/types/jobOrderFormType";
 import { partsItems } from "@/constants/part-items";
 import { useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
 
 interface TrimotorsPartsReplacementSectionProps {
-  partsReplacement: PartsReplacement;
-  setPartsReplacement: React.Dispatch<React.SetStateAction<PartsReplacement>>;
+  partsReplacement: TrimotorsPartsReplacement;
+  setPartsReplacement: React.Dispatch<React.SetStateAction<TrimotorsPartsReplacement>>;
   partsAmounts: PartsAmountsType;
   handlePartsAmountChange: (key: keyof PartsAmountsType, value: number) => void;
   partsTotal: number;
   setPartsTotal?: (total: number) => void; 
-  partsBrand: PartsBrand;
-  setPartsBrand: React.Dispatch<React.SetStateAction<PartsBrand>>;
-  partsNumber: PartsNumber;
-  setPartsNumber: React.Dispatch<React.SetStateAction<PartsNumber>>;
-  partsQuantity: PartsQuantity;
-  setPartsQuantity: React.Dispatch<React.SetStateAction<PartsQuantity>>;
+  partsBrand: TrimotorsPartsBrand;
+  setPartsBrand: React.Dispatch<React.SetStateAction<TrimotorsPartsBrand>>;
+  partsNumber: TrimotorsPartsNumber;
+  setPartsNumber: React.Dispatch<React.SetStateAction<TrimotorsPartsNumber>>;
+  partsQuantity: TrimotorsPartsQuantity;
+  setPartsQuantity: React.Dispatch<React.SetStateAction<TrimotorsPartsQuantity>>;
 }
   
 // Brand options
@@ -42,7 +42,7 @@ export default function TrimotorsPartsReplacementSection({
 }: TrimotorsPartsReplacementSectionProps) {
   
   // Get parts others items
-  const partsOthersItems: PartsOthersItem[] = partsReplacement.partsOthersItems || [];
+  const partsOthersItems: TrimotorsPartsOthersItem[] = partsReplacement.partsOthersItems || [];
   
   // Calculate total whenever relevant data changes
   useEffect(() => {
@@ -56,9 +56,9 @@ const calculateAndUpdateTotal = useCallback(() => {
   partsItems.forEach(item => {
     const key = item.key;
     if (key !== "partsOthers") {
-      if (partsReplacement[key as keyof PartsReplacement]) {
-        const quantity = partsQuantity[key as keyof PartsQuantity] || 0;
-        const amount = partsAmounts[key as keyof PartsAmountsType] || 0;
+      if (partsReplacement[key as keyof TrimotorsPartsReplacement]) {
+        const quantity = partsQuantity[key as keyof TrimotorsPartsQuantity] || 0;
+        const amount = partsAmounts[key as keyof TrimotorsPartsAmountsType] || 0;
         total += quantity * amount;
       }
     }
@@ -77,21 +77,21 @@ const calculateAndUpdateTotal = useCallback(() => {
   }
 }, [partsReplacement, partsAmounts, partsQuantity, partsOthersItems, setPartsTotal]);
 
-  const handleBrandChange = (key: keyof PartsBrand, value: string) => {
+  const handleBrandChange = (key: keyof TrimotorsPartsBrand, value: string) => {
     setPartsBrand(prev => ({
       ...prev,
       [key]: value
     }));
   };
 
-  const handlePartNumberChange = (key: keyof PartsNumber, value: number) => {
+  const handlePartNumberChange = (key: keyof TrimotorsPartsNumber, value: number) => {
     setPartsNumber(prev => ({
       ...prev,
       [key]: value
     }));
   };
 
-  const handleQuantityChange = (key: keyof PartsQuantity, value: number) => {
+  const handleQuantityChange = (key: keyof TrimotorsPartsQuantity, value: number) => {
     setPartsQuantity(prev => ({
       ...prev,
       [key]: value
@@ -104,24 +104,24 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   // Map partsItems keys to their corresponding type keys
-  const getBrandKey = (itemKey: string): keyof PartsBrand => {
+  const getBrandKey = (itemKey: string): keyof TrimotorsPartsBrand => {
     if (itemKey === "partsOthers") return "partsOthers";
-    return itemKey as keyof PartsBrand;
+    return itemKey as keyof TrimotorsPartsBrand;
   };
 
-  const getPartNumberKey = (itemKey: string): keyof PartsNumber => {
+  const getPartNumberKey = (itemKey: string): keyof TrimotorsPartsNumber => {
     if (itemKey === "partsOthers") return "partsOthers";
-    return itemKey as keyof PartsNumber;
+    return itemKey as keyof TrimotorsPartsNumber;
   };
   
-  const getQuantityKey = (itemKey: string): keyof PartsQuantity => {
+  const getQuantityKey = (itemKey: string): keyof TrimotorsPartsQuantity => {
     if (itemKey === "partsOthers") return "partsOthers";
-    return itemKey as keyof PartsQuantity;
+    return itemKey as keyof TrimotorsPartsQuantity;
   };
 
   // Parts Others functions
   const addPartsOthersItem = () => {
-    const newItem: PartsOthersItem = {
+    const newItem: TrimotorsPartsOthersItem = {
       id: Date.now().toString(),
       description: "",
       brand: "",
@@ -205,7 +205,7 @@ const calculateAndUpdateTotal = useCallback(() => {
   const togglePartsOthers = (checked: boolean) => {
     if (checked) {
       if (partsOthersItems.length === 0) {
-        const newItem: PartsOthersItem = {
+        const newItem: TrimotorsPartsOthersItem = {
           id: Date.now().toString(),
           description: "",
           brand: "",
@@ -266,7 +266,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                         type="checkbox"
                         checked={
                           partsReplacement[
-                            item.key as keyof PartsReplacement
+                            item.key as keyof TrimotorsPartsReplacement
                           ] as boolean
                         }
                         onChange={(e) => {
@@ -287,7 +287,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                     </Label>
                     
                     {(partsReplacement[
-                      item.key as keyof PartsReplacement
+                      item.key as keyof TrimotorsPartsReplacement
                     ] as boolean) && (
                       <>
                           {/* Brand Dropdown */}
@@ -381,7 +381,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                         type="checkbox"
                         checked={
                           partsReplacement[
-                            item.key as keyof PartsReplacement
+                            item.key as keyof TrimotorsPartsReplacement
                           ] as boolean
                         }
                         onChange={(e) => {
@@ -402,7 +402,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                     </Label>
                     
                     {(partsReplacement[
-                      item.key as keyof PartsReplacement
+                      item.key as keyof TrimotorsPartsReplacement
                     ] as boolean) && (
                       <>
                           {/* Brand Dropdown */}

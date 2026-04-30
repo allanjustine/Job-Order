@@ -18,6 +18,15 @@ export interface PartsOthersItem {
   amount: number;
 }
 
+export interface TrimotorsPartsOthersItem {
+  id: string;
+  description: string;
+  brand: string;
+  partNumber: number;
+  quantity: number;
+  amount: number;
+}
+
 export type JobRequest = {
   coupon: boolean;
   selectedCoupon?: string;
@@ -68,34 +77,39 @@ export type PartsReplacement = {
 };
 
 export type TrimotorsJobRequestType = {
-  vehicleWashing: boolean;
-  airFilter: boolean;
-  breather: boolean;
-  checkLights: boolean;
-  oilStrainer: boolean;
-  checkSteering: boolean;
-  cleanSpark: boolean;
-  checkValve: boolean;
-  checkFuel: boolean;
-  checkBattery: boolean;
-  tireRotation: boolean;
-  replaceProp: boolean;
-  replaceOil: boolean;
-  checkCabies: boolean;
-  checkShock: boolean;
-  checkBrake: boolean;
-  deCarbonising: boolean;
-  checkBrakeLiner: boolean;
-  replaceEngine: boolean;
-  replaceDifferential: boolean;
-  greaseSteering: boolean;
-  greaseFront: boolean;
-  greaseNipple: boolean;
-  greasePropeller: boolean;
-  greaseGear: boolean;
-  greaseFare: boolean;
-  speedometer: boolean;
-  petroleum: boolean;
+  pivotPin: boolean
+  detachSteeringColumn: boolean
+  differentialGearOverhaul: boolean
+  topOverhaul: boolean
+  replaceRubberBoots: boolean
+  changeOil: boolean
+  replaceTensioner: boolean
+  replaceBrakeShoe: boolean
+  replaceBrakeLightSwitch: boolean
+  engineOverhauling: boolean
+  tuneUp: boolean
+  replaceHeadlightBulb: boolean
+  rubberBootsGreasing: boolean
+  replaceBrakeReservoir: boolean
+  replaceClutchCable: boolean
+  replaceAcceleratorCable: boolean
+  brakeShoeCleaning: boolean
+  replaceCarbonBrush: boolean
+  replaceGearCable: boolean
+  replaceOilPipeHose: boolean
+  replaceEngineCover: boolean
+  batteryCharging: boolean
+  electricalMinorRepair: boolean
+  electricalMajorRepair: boolean
+  replaceFrontShockAbsorber: boolean
+  replaceFuelStrainer: boolean
+  replaceHandbrakeCable: boolean
+  minorTroubleRepair: boolean
+  majorTroubleRepair: boolean
+  replaceStarterRelay: boolean
+  replaceHeadlightRelay: boolean
+  replaceIsolatorRubber: boolean
+  replaceStatorMagnetoRotorAssy: boolean
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[];
   othersText: string;
@@ -219,34 +233,39 @@ export type PartsAmountsType = {
 };
 
 export type TrimotorsJobAmountType = {
-  vehicleWashing?: number;
-  airFilter?: number;
-  breather?: number;
-  checkLights?: number;
-  oilStrainer?: number;
-  checkSteering?: number;
-  cleanSpark?: number;
-  checkValve?: number;
-  checkFuel?: number;
-  checkBattery?: number;
-  tireRotation?: number;
-  replaceProp?: number;
-  replaceOil?: number;
-  checkCabies?: number;
-  checkShock?: number;
-  checkBrake?: number;
-  deCarbonising?: number;
-  checkBrakeLiner?: number;
-  replaceEngine?: number;
-  replaceDifferential?: number;
-  greaseSteering?: number;
-  greaseFront?: number;
-  greaseNipple?: number;
-  greasePropeller?: number;
-  greaseGear?: number;
-  greaseFare?: number;
-  speedometer?: number;
-  petroleum?: number;
+  pivotPin?: number;
+  detachSteeringColumn?: number;
+  differentialGearOverhaul?: number;
+  topOverhaul?: number;
+  replaceRubberBoots?: number;
+  changeOil?: number;
+  replaceTensioner?: number;
+  replaceBrakeShoe?: number;
+  replaceBrakeLightSwitch?: number;
+  engineOverhauling?: number;
+  tuneUp?: number;
+  replaceHeadlightBulb?: number;
+  rubberBootsGreasing?: number;
+  replaceBrakeReservoir?: number;
+  replaceClutchCable?: number;
+  replaceAcceleratorCable?: number;
+  brakeShoeCleaning?: number;
+  replaceCarbonBrush?: number;
+  replaceGearCable?: number;
+  replaceOilPipeHose?: number;
+  replaceEngineCover?: number;
+  batteryCharging?: number;
+  electricalMinorRepair?: number;
+  electricalMajorRepair?: number;
+  replaceFrontShockAbsorber?: number;
+  replaceFuelStrainer?: number;
+  replaceHandbrakeCable?: number;
+  minorTroubleRepair?: number;
+  majorTroubleRepair?: number;
+  replaceStarterRelay?: number;
+  replaceHeadlightRelay?: number;
+  replaceIsolatorRubber?: number;
+  replaceStatorMagnetoRotorAssy?: number;
   others?: number;
   othersText?: number;
 };
@@ -325,3 +344,155 @@ export type TrimotorsDiagnosisKeys =
   | "spareTire"
   | "sideMirror"
   | "warrantyBooklet";
+
+  export type TrimotorsPartsReplacement = {
+  bajajOil: boolean;
+  oilFilter: boolean;
+  fuelStrainer: boolean;
+  speedometerCable: boolean;
+  handBrakeCable: boolean;
+  clutchCable: boolean;
+  gearCableBlack: boolean;
+  gearCableWhite: boolean;
+  reverseCable: boolean;
+  acceleratorCable: boolean;
+  headlightBulb: boolean;
+  brakeLightBulb: boolean;
+  peanutBulb: boolean;
+  sealHeadCover: boolean;
+  clipSpring: boolean;
+  pivotPin: boolean;
+  fuse10Amp: boolean;
+  brakePipeAssly: boolean;
+  kitMajorTmc: boolean;
+  wheelCylinderAsslyFront: boolean;
+  brakeShoe: boolean;
+  wheelCylinderAsslyRear: boolean;
+  sparkplug: boolean;
+  sparkplugCapRh: boolean;
+  headlightRelay: boolean;
+  partsOthers: boolean;
+  partsOthersText: string;
+  partsOthersItems?: PartsOthersItem[]; // New array for multiple others
+  [key: string]: boolean | string | PartsOthersItem[] | undefined;
+};
+
+export type TrimotorsPartsBrand = {
+  bajajOil?: string;
+  oilFilter?: string;
+  fuelStrainer?: string;
+  speedometerCable?: string;
+  handBrakeCable?: string;
+  clutchCable?: string;    
+  gearCableBlack?: string;
+  gearCableWhite?: string;
+  reverseCable?: string;
+  acceleratorCable?: string;
+  headlightBulb?: string;
+  brakeLightBulb?: string;
+  peanutBulb?: string;
+  sealHeadCover?: string;
+  clipSpring?: string;
+  pivotPin?: string;
+  fuse10Amp?: string;
+  brakePipeAssly?: string;
+  kitMajorTmc?: string;
+  wheelCylinderAsslyFront?: string;
+  brakeShoe?: string;
+  wheelCylinderAsslyRear?: string;
+  sparkplug?: string;
+  sparkplugCapRh?: string;
+  headlightRelay?: string;
+  partsOthers?: string;
+  [key: string]: string | undefined;
+};
+
+export type TrimotorsPartsNumber = {
+  bajajOil?: number;
+  oilFilter?: number;
+  fuelStrainer?: number;
+  speedometerCable?: number;
+  handBrakeCable?: number;
+  clutchCable?: number;
+  gearCableBlack?: number;
+  gearCableWhite?: number;
+  reverseCable?: number;
+  acceleratorCable?: number;
+  headlightBulb?: number;
+  brakeLightBulb?: number;
+  peanutBulb?: number;
+  sealHeadCover?: number;
+  clipSpring?: number;
+  pivotPin?: number;
+  fuse10Amp?: number;
+  brakePipeAssly?: number;
+  kitMajorTmc?: number;
+  wheelCylinderAsslyFront?: number;
+  brakeShoe?: number;
+  wheelCylinderAsslyRear?: number;
+  sparkplug?: number;
+  sparkplugCapRh?: number;
+  headlightRelay?: number;
+  partsOthers?: number;
+  [key: string]: number | undefined;
+};
+
+export type TrimotorsPartsQuantity = {
+  bajajOil?: number;
+  oilFilter?: number;
+  fuelStrainer?: number;
+  speedometerCable?: number;
+  handBrakeCable?: number;
+  clutchCable?: number;
+  gearCableBlack?: number;
+  gearCableWhite?: number;
+  reverseCable?: number;
+  acceleratorCable?: number;
+  headlightBulb?: number;
+  brakeLightBulb?: number;
+  peanutBulb?: number;
+  sealHeadCover?: number;
+  clipSpring?: number;
+  pivotPin?: number;
+  fuse10Amp?: number;
+  brakePipeAssly?: number;
+  kitMajorTmc?: number;
+  wheelCylinderAsslyFront?: number;
+  brakeShoe?: number;
+  wheelCylinderAsslyRear?: number;
+  sparkplug?: number;
+  sparkplugCapRh?: number;
+  headlightRelay?: number;
+  partsOthers?: number;
+  [key: string]: number | undefined;
+};
+
+export type TrimotorsPartsAmountsType = {
+  bajajOil?: number;
+  oilFilter?: number;
+  fuelStrainer?: number;
+  speedometerCable?: number;
+  handBrakeCable?: number;
+  clutchCable?: number;
+  gearCableBlack?: number;
+  gearCableWhite?: number;
+  reverseCable?: number;
+  acceleratorCable?: number;
+  headlightBulb?: number;
+  brakeLightBulb?: number;
+  peanutBulb?: number;
+  sealHeadCover?: number;
+  clipSpring?: number;
+  pivotPin?: number;
+  fuse10Amp?: number;
+  brakePipeAssly?: number;
+  kitMajorTmc?: number;
+  wheelCylinderAsslyFront?: number;
+  brakeShoe?: number;
+  wheelCylinderAsslyRear?: number;
+  sparkplug?: number;
+  sparkplugCapRh?: number;
+  headlightRelay?: number;
+    partsOthers?: number;
+  [key: string]: number | undefined;
+};
