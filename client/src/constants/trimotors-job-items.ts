@@ -9,7 +9,7 @@ export const trimotorsJobItems: TrimotorsJobItem[] = [
   { key: "detachSteeringColumn", label: "Detach Steering Column" },
   { key: "differentialGearOverhaul", label: "Differential Gear Overhaul" },
   { key: "topOverhaul", label: "Top Overhaul" },
-  { key: "replaceRubberBoots", label: "REPLACE RUBBER BOOTS (MAXIMA Z)" },
+  { key: "replaceRubberBoots", label: "Replace rubber boots (MAXIMA Z)" },
   { key: "changeOil", label: "Change Oil" },
   { key: "replaceTensioner", label: "Replace Tensioner" },
   { key: "replaceBrakeShoe", label: "Replace Brake Shoe (Each)" },

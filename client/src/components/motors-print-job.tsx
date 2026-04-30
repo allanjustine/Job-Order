@@ -388,7 +388,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
             </div>
           </div>
           <div className="flex mt-2">
-            <span className="font-bold mr-1">Remarks:</span>
+            <span className="font-bold mr-1">Category:</span>
             <span className="border-b border-black flex-1">{data.remarks}</span>
           </div>
         </div>

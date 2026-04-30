@@ -490,7 +490,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
         <div className="border border-black p-0.5">
-          <div className="font-bold mb-1">MOTORCYCLE UNIT:</div>
+          <div className="font-bold mb-1">TRIMOTOR UNIT:</div>
           <div className="mb-1" style={{ fontSize: "6pt", lineHeight: "0.6" }}>
             <span className="font-bold mr-2">LEGEND:</span>
             <span className="mr-2">X-SCRATCH</span>
