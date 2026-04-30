@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Input from "./ui/input";
 import { Label } from "./ui/label";
 import Select from "./ui/select";
@@ -14,6 +15,9 @@ export default function MotorEngineGrid({
   setEngineCondition,
   setContentUbox,
 }: any) {
+
+  const [otherReason, setOtherReason] = useState("");
+  
   return (
     <div className="mb-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">    
@@ -29,13 +33,25 @@ export default function MotorEngineGrid({
             </Select>
             
             <div className="mt-2">
-              <Label>Remarks</Label>
-              <Input 
-                placeholder=""
-                className="w-full"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
+              <Label>Category</Label>
+              <Select value={remarks} onChange={(e) => setRemarks(e.target.value)}>
+                <option value="" disabled>Select Category</option>
+                <option value="repo">Repo recon</option>
+                <option value="service">MC Service</option>
+                <option value="warranty">Under Warranty</option>
+                <option value="regular">Regular Customer</option>
+                <option value="ebike">E-bike</option>
+                <option value="others">Others</option>
+            </Select>
+              {remarks === "others" && (
+                <input
+                  type="text"
+                  placeholder="Please specify"
+                  className="mt-2 w-full p-2 border rounded"
+                  value={otherReason}
+                  onChange={(e) => setOtherReason(e.target.value)}
+                />
+              )}
             </div>
           </div>
         </div>
