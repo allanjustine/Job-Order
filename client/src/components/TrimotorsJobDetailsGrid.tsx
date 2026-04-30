@@ -5,11 +5,11 @@ import phpCurrency from "@/utils/phpCurrency";
 import { 
   TrimotorsJobAmountType,
   TrimotorsJobRequestType,
-  PartsAmountsType, 
-  PartsReplacement,
-  PartsBrand,
-  PartsNumber,
-  PartsQuantity,
+  TrimotorsPartsAmountsType, 
+  TrimotorsPartsReplacement,
+  TrimotorsPartsBrand,
+  TrimotorsPartsNumber,
+  TrimotorsPartsQuantity,
 } from "@/types/jobOrderFormType";
 import TrimotorsJobRequest from "./TrimotorsJobRequest";
 
@@ -17,18 +17,18 @@ import TrimotorsJobRequest from "./TrimotorsJobRequest";
 interface TrimotorsJobDetailsGridProps {
   jobRequest: TrimotorsJobRequestType;
   setJobRequest: React.Dispatch<React.SetStateAction<TrimotorsJobRequestType>>;
-  partsReplacement: PartsReplacement;
-  setPartsReplacement: React.Dispatch<React.SetStateAction<PartsReplacement>>;
+  partsReplacement: TrimotorsPartsReplacement;
+  setPartsReplacement: React.Dispatch<React.SetStateAction<TrimotorsPartsReplacement>>;
   jobAmounts: TrimotorsJobAmountType;
   handleJobAmountChange: (key: keyof TrimotorsJobAmountType, value: number) => void;
-  partsAmounts: PartsAmountsType;
-  handlePartsAmountChange: (key: keyof PartsAmountsType, value: number) => void;
-  partsBrand: PartsBrand;
-  setPartsBrand: React.Dispatch<React.SetStateAction<PartsBrand>>;
-  partsNumber: PartsNumber;
-  setPartsNumber: React.Dispatch<React.SetStateAction<PartsNumber>>;
-  partsQuantity: PartsQuantity;
-  setPartsQuantity: React.Dispatch<React.SetStateAction<PartsQuantity>>;
+  partsAmounts: TrimotorsPartsAmountsType;
+  handlePartsAmountChange: (key: keyof TrimotorsPartsAmountsType, value: number) => void;
+  partsBrand: TrimotorsPartsBrand;
+  setPartsBrand: React.Dispatch<React.SetStateAction<TrimotorsPartsBrand>>;
+  partsNumber: TrimotorsPartsNumber;
+  setPartsNumber: React.Dispatch<React.SetStateAction<TrimotorsPartsNumber>>;
+  partsQuantity: TrimotorsPartsQuantity;
+  setPartsQuantity: React.Dispatch<React.SetStateAction<TrimotorsPartsQuantity>>;
   jobTotal: number;
   partsTotal: number;
   overallTotal: number;

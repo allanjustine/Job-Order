@@ -1,10 +1,10 @@
 // components/print/TrimotorsPartsTable.tsx
 import React from 'react';
-import { partsItems, PartsItem } from '@/constants/part-items';
+import { trimotorsPartsItems, TrimotorsPartsItem } from '@/constants/trimotors-part-items';
 
 interface TrimotorsPartsTableProps {
   data: any;
-  partsItems: PartsItem[];
+  partsItems: TrimotorsPartsItem[];
   renderCheckbox: (checked: boolean) => string;
   formatPartDetail: (key: string) => string;
   getPartsQuantity: (key: string) => number;
@@ -38,7 +38,7 @@ export const TrimotorsPartsTable: React.FC<TrimotorsPartsTableProps> = ({
     return pairs;
   };
 
-  const renderPartCell = (part: PartsItem | null) => {
+  const renderPartCell = (part: TrimotorsPartsItem | null) => {
     if (!part) {
       return (
         <>
@@ -71,7 +71,7 @@ export const TrimotorsPartsTable: React.FC<TrimotorsPartsTableProps> = ({
     );
   };
 
-  const renderRow = (pair: { left: PartsItem; right: PartsItem | null }, index: number) => {
+  const renderRow = (pair: { left: TrimotorsPartsItem; right: TrimotorsPartsItem | null }, index: number) => {
     return (
       <tr key={`parts-row-${index}`}>
         {renderPartCell(pair.left)}

@@ -3,7 +3,7 @@ import Input from "./ui/input";
 import { Label } from "./ui/label";
 import phpCurrency from "@/utils/phpCurrency";
 import { PartsAmountsType, TrimotorsPartsReplacement, TrimotorsPartsBrand, TrimotorsPartsNumber, TrimotorsPartsQuantity, TrimotorsPartsOthersItem, TrimotorsPartsAmountsType } from "@/types/jobOrderFormType";
-import { partsItems } from "@/constants/part-items";
+import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
@@ -53,7 +53,7 @@ const calculateAndUpdateTotal = useCallback(() => {
   let total = 0;
   
   // Calculate for each regular part item
-  partsItems.forEach(item => {
+  trimotorsPartsItems.forEach(item => {
     const key = item.key;
     if (key !== "partsOthers") {
       if (partsReplacement[key as keyof TrimotorsPartsReplacement]) {
@@ -235,7 +235,7 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   // Split parts items into two columns
-  const regularPartsItems = partsItems.filter((item) => item.key !== "partsOthers");
+  const regularPartsItems = trimotorsPartsItems.filter((item) => item.key !== "partsOthers");
   const midpoint = Math.ceil(regularPartsItems.length / 2);
   const firstColumnParts = regularPartsItems.slice(0, midpoint);
   const secondColumnParts = regularPartsItems.slice(midpoint);
