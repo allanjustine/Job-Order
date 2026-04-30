@@ -160,12 +160,12 @@ const Mechanics = ({
       <div className="p-6">
         <div className="bg-white rounded-md border border-gray-300 shadow">
           <div className="p-6">
-            <div className="mb-2 flex justify-between items-center">
+            <div className="mb-2 flex gap-1 justify-end items-center">
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                  isRefresh && "bg-blue-400! cursor-not-allowed!"
+                className={`bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 py-5 px-3 text-sm shadow-sm ${
+                  isRefresh && "cursor-not-allowed! opacity-60"
                 }`}
                 onClick={handleRefresh}
               >

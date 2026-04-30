@@ -1,0 +1,31 @@
+<?php
+
+use App\Models\JobOrder;
+use App\Models\Mechanic;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('job_order_mechanic', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(JobOrder::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Mechanic::class)->constrained()->cascadeOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_order_mechanic');
+    }
+};

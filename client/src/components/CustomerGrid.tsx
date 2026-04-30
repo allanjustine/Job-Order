@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
 import Input from "./ui/input";
 import { Label } from "./ui/label";
-import Select from "./ui/select";
-import { api } from "@/lib/api";
 import { MultiMechanic } from "./MultiMechanic";
 
 export default function CustomerGrid({
@@ -31,27 +28,8 @@ export default function CustomerGrid({
   setRepairEnd,
   setFuelLevel,
   setMechanic,
+  mechanics,
 }: any) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [mechanics, setMechanics] = useState<any>([]);
-  useEffect(() => {
-    async function fetchMechanics() {
-      setIsLoading(true);
-      try {
-        const response = await api.get("/branch-mechanics");
-        if (response.status === 200) {
-          setMechanics(response.data.data);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchMechanics();
-  }, []);
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <div className="col-span-1">
@@ -105,7 +83,7 @@ export default function CustomerGrid({
       </div>
       <div className="col-span-1">
         <Label>Model</Label>
-        <Input 
+        <Input
           type="text"
           error={errors.model}
           value={model}
@@ -193,7 +171,12 @@ export default function CustomerGrid({
       </div>
 
       <div className="col-span-1">
-       <MultiMechanic />
+        <Label>Select Mechanic</Label>
+        <MultiMechanic
+          mechanics={mechanics}
+          setMechanic={setMechanic}
+          mechanic={mechanic}
+        />
       </div>
     </div>
   );

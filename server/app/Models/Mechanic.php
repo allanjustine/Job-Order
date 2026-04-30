@@ -8,6 +8,10 @@ class Mechanic extends Model
 {
     protected $guarded = [];
 
+    protected $hidden = [
+        'pivot'
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -15,6 +19,7 @@ class Mechanic extends Model
 
     public function jobOrders()
     {
-        return $this->hasMany(JobOrder::class);
+        return $this->belongsToMany(JobOrder::class)
+            ->withTimestamps();
     }
 }

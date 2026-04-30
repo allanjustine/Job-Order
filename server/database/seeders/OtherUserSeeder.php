@@ -216,29 +216,29 @@ class OtherUserSeeder extends Seeder
             ['DAP Bayog', 'BAYOG', 5],
         ];
 
+        $password = Hash::make('Smct123456');
 
-    $password = Hash::make('Smct123456');
-    $now = now();
+        $now = now();
 
-    $employeeRole = Role::query()
+        $employeeRole = Role::query()
             ->where("name", RoleName::EMPLOYEE?->value)
             ->first();
 
+        $users = collect($rawUsers)->map(fn($u) => [
+            'name'       => $u[0],
+            'code'       => $u[1],
+            'email'      => strtolower($u[1]) . '@gmail.com',
+            'password'   => $password,
+            'branch_id'  => $u[2],
+            'created_at' => $now,
+            'updated_at' => $now,
+        ])->values()
+            ->toArray();
 
-    $users = collect($rawUsers)->map(fn ($u) => [
-        'name'       => $u[0],
-        'code'       => $u[1],
-        'email'      => strtolower($u[1]) . '@gmail.com',
-        'password'   => $password,
-        'branch_id'  => $u[2],
-        'created_at'=> $now,
-        'updated_at'=> $now,
-    ])->values()->toArray();
+        User::insert($users);
 
-    User::insert($users);
+        $users_uploaded = User::whereIn('code', collect($users)->pluck('code'))->get();
 
-    $users_uploaded = User::whereIn('code', collect($users)->pluck('code'))->get();
-
-    $users_uploaded->each->assignRole($employeeRole);
-}
+        $users_uploaded->each->assignRole($employeeRole);
+    }
 }

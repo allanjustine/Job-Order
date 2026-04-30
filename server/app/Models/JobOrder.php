@@ -28,8 +28,9 @@ class JobOrder extends Model
         return $this->hasMany(JobOrderDetail::class);
     }
 
-    public function mechanic()
+    public function mechanics()
     {
-        return $this->belongsTo(Mechanic::class);
+        return $this->belongsToMany(Mechanic::class)
+            ->withTimestamps();
     }
 }

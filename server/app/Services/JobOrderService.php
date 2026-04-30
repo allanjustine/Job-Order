@@ -4,10 +4,8 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\JobOrder;
-use App\Models\Mechanic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class JobOrderService
 {
@@ -21,15 +19,14 @@ class JobOrderService
 
         $column = match ($sort['column']) {
             'customer.name' => Customer::query()->select('name')->whereColumn('customers.id', 'job_orders.customer_id'),
-            'mechanic.name' => Mechanic::query()->select('name')->whereColumn('mechanics.id', 'job_orders.mechanic_id'),
             default => $sort['column']
         };
 
         $jobOrders = JobOrder::query()
-            ->select('id', 'job_order_number', 'mechanic_id', 'customer_id', 'created_at')
+            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'created_at')
             ->with([
                 'customer:id,name',
-                'mechanic:id,name'
+                'mechanics:id,name'
             ])
             ->withSum('jobOrderDetails as total_amount', 'amount')
             ->when(
@@ -44,7 +41,7 @@ class JobOrderService
                     "%{$search}%"
                 )
                     ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
-                    ->orWhereRelation('mechanic', 'name', 'like', "%{$search}%")
+                    ->orWhereRelation('mechanics', 'name', 'like', "%{$search}%")
             )
             ->whereRelation('customer.user', 'id', Auth::id())
             ->orderBy(
@@ -105,6 +102,8 @@ class JobOrderService
             $job_order
                 ->jobOrderDetails()
                 ->createMany($data);
+
+            $job_order->mechanics()->attach($request->mechanic_ids);
 
             return $customer;
         });

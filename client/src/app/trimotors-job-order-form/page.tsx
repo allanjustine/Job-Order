@@ -80,7 +80,9 @@ const TrimotorsJobOrderForm = () => {
   // Amounts state
   // Amounts state
   const [jobAmounts, setJobAmounts] = useState<TrimotorsJobAmountType>({});
-  const [partsAmounts, setPartsAmounts] = useState<TrimotorsPartsAmountsType>({});
+  const [partsAmounts, setPartsAmounts] = useState<TrimotorsPartsAmountsType>(
+    {},
+  );
   const [partsBrand, setPartsBrand] = useState<TrimotorsPartsBrand>({});
   const [partsNumber, setPartsNumber] = useState<TrimotorsPartsNumber>({});
 
@@ -184,35 +186,36 @@ const TrimotorsJobOrderForm = () => {
     warrantyBooklet: { status: null, remarks: "" },
   });
 
-  const [partsReplacement, setPartsReplacement] = useState<TrimotorsPartsReplacement>({
-    bajajOil: false,
-    oilFilter: false,
-    fuelStrainer: false,
-    speedometerCable: false,
-    handBrakeCable: false,
-    clutchCable: false,
-    gearCableBlack: false,
-    gearCableWhite: false,
-    reverseCable: false,
-    acceleratorCable: false,
-    headlightBulb: false,
-    brakeLightBulb: false,
-    peanutBulb: false,
-    sealHeadCover: false,
-    clipSpring: false,
-    pivotPin: false,
-    fuse10Amp: false,
-    brakePipeAssly: false,
-    kitMajorTmc: false,
-    wheelCylinderAsslyFront: false,
-    brakeShoe: false,
-    wheelCylinderAsslyRear: false,
-    sparkplug: false,
-    sparkplugCapRh: false,
-    headlightRelay: false,
-    partsOthers: false,
-    partsOthersText: "",
-  });
+  const [partsReplacement, setPartsReplacement] =
+    useState<TrimotorsPartsReplacement>({
+      bajajOil: false,
+      oilFilter: false,
+      fuelStrainer: false,
+      speedometerCable: false,
+      handBrakeCable: false,
+      clutchCable: false,
+      gearCableBlack: false,
+      gearCableWhite: false,
+      reverseCable: false,
+      acceleratorCable: false,
+      headlightBulb: false,
+      brakeLightBulb: false,
+      peanutBulb: false,
+      sealHeadCover: false,
+      clipSpring: false,
+      pivotPin: false,
+      fuse10Amp: false,
+      brakePipeAssly: false,
+      kitMajorTmc: false,
+      wheelCylinderAsslyFront: false,
+      brakeShoe: false,
+      wheelCylinderAsslyRear: false,
+      sparkplug: false,
+      sparkplugCapRh: false,
+      headlightRelay: false,
+      partsOthers: false,
+      partsOthersText: "",
+    });
 
   const [partsQuantity, setPartsQuantity] = useState<TrimotorsPartsQuantity>({
     bajajOil: 1,
@@ -252,6 +255,22 @@ const TrimotorsJobOrderForm = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
+  const [mechanics, setMechanics] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchMechanics() {
+      try {
+        const response = await api.get("/branch-mechanics");
+        if (response.status === 200) {
+          setMechanics(response.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchMechanics();
+  }, []);
 
   useEffect(() => {
     fetchJobOrderNumber();
@@ -442,6 +461,9 @@ const TrimotorsJobOrderForm = () => {
     branchManager: signatures.branchManager,
     mechanic,
     jobOrderNumber,
+    assignedMechanics: mechanics.filter((mech: any) =>
+      mechanic.includes(mech.id),
+    ),
   };
 
   useEffect(() => {
@@ -504,7 +526,9 @@ const TrimotorsJobOrderForm = () => {
     }));
 
   const partsReplacements = trimotorsPartsItems
-    .filter((item) => partsReplacement[item.key as keyof TrimotorsPartsReplacement])
+    .filter(
+      (item) => partsReplacement[item.key as keyof TrimotorsPartsReplacement],
+    )
     .map((item) => ({
       category: item.key === "partsOthers" ? "other_items" : item.label,
       amount: partsAmounts[item.key as keyof TrimotorsPartsAmountsType] || 0,
@@ -528,7 +552,6 @@ const TrimotorsJobOrderForm = () => {
       date: date,
       branch_manager: signatures.branchManager,
       general_remarks: generalRemarks,
-      mechanic_id: mechanic.split("_")[0],
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
@@ -538,6 +561,7 @@ const TrimotorsJobOrderForm = () => {
       engine_number: engineFrameNo,
     },
     job_order_details: itemsData,
+    mechanic_ids: mechanic,
   };
 
   const handleSavePrint = async () => {
@@ -603,39 +627,39 @@ const TrimotorsJobOrderForm = () => {
 
     // Reset job request
     setJobRequest({
-       pivotPin: false,
-        detachSteeringColumn: false,
-        differentialGearOverhaul: false,
-        topOverhaul: false,
-        replaceRubberBoots: false,
-        changeOil: false,
-        replaceTensioner: false,
-        replaceBrakeShoe: false,
-        replaceBrakeLightSwitch: false,
-        engineOverhauling: false,
-        tuneUp: false,
-        replaceHeadlightBulb: false,
-        rubberBootsGreasing: false,
-        replaceBrakeReservoir: false,
-        replaceClutchCable: false,
-        replaceAcceleratorCable: false,
-        brakeShoeCleaning: false,
-        replaceCarbonBrush: false,
-        replaceGearCable: false,
-        replaceOilPipeHose: false,
-        replaceEngineCover: false,
-        batteryCharging: false,
-        electricalMinorRepair: false,
-        electricalMajorRepair: false,
-        replaceFrontShockAbsorber: false,
-        replaceFuelStrainer: false,
-        replaceHandbrakeCable: false,
-        minorTroubleRepair: false,
-        majorTroubleRepair: false,
-        replaceStarterRelay: false,
-        replaceHeadlightRelay: false,
-        replaceIsolatorRubber: false,
-        replaceStatorMagnetoRotorAssy: false,
+      pivotPin: false,
+      detachSteeringColumn: false,
+      differentialGearOverhaul: false,
+      topOverhaul: false,
+      replaceRubberBoots: false,
+      changeOil: false,
+      replaceTensioner: false,
+      replaceBrakeShoe: false,
+      replaceBrakeLightSwitch: false,
+      engineOverhauling: false,
+      tuneUp: false,
+      replaceHeadlightBulb: false,
+      rubberBootsGreasing: false,
+      replaceBrakeReservoir: false,
+      replaceClutchCable: false,
+      replaceAcceleratorCable: false,
+      brakeShoeCleaning: false,
+      replaceCarbonBrush: false,
+      replaceGearCable: false,
+      replaceOilPipeHose: false,
+      replaceEngineCover: false,
+      batteryCharging: false,
+      electricalMinorRepair: false,
+      electricalMajorRepair: false,
+      replaceFrontShockAbsorber: false,
+      replaceFuelStrainer: false,
+      replaceHandbrakeCable: false,
+      minorTroubleRepair: false,
+      majorTroubleRepair: false,
+      replaceStarterRelay: false,
+      replaceHeadlightRelay: false,
+      replaceIsolatorRubber: false,
+      replaceStatorMagnetoRotorAssy: false,
       others: false,
       othersText: "",
       othersItems: [],
@@ -893,6 +917,7 @@ const TrimotorsJobOrderForm = () => {
                   setRepairEnd={setRepairEnd}
                   setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
+                  mechanics={mechanics}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
@@ -950,7 +975,7 @@ const TrimotorsJobOrderForm = () => {
                     <Button
                       type="button"
                       onClick={handleReset}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white"
+                      className="bg-yellow-500 hover:bg-yellow-700 text-white py-5"
                     >
                       <FaRotate /> Reset
                     </Button>
@@ -958,7 +983,7 @@ const TrimotorsJobOrderForm = () => {
                     <Button
                       ref={modalButtonRef}
                       type="submit"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-5"
                     >
                       <FaEye /> Preview
                     </Button>
@@ -977,14 +1002,14 @@ const TrimotorsJobOrderForm = () => {
             <ModalFooter>
               <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-600 text-white"
+                className="bg-gray-500 hover:bg-gray-600 text-white py-5"
                 onClick={handlePreviewPrint}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-5"
                 onClick={handlePrint}
               >
                 <FaPrint /> Print Job Order

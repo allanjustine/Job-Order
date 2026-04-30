@@ -56,7 +56,7 @@ const formSchema = z.object({
   fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
-  mechanic: z.string().min(1, "Mechanic is required"),
+  mechanic: z.array(z.number().min(1, "Mechanic is required")),
   // remarks: z.string().min(1, "Remarks is required"),
   // engineCondition: z.string().min(1, "Engine condition is required"),
   // contentUbox: z.string().min(1, "Content inside Ubox is required"),
@@ -77,7 +77,7 @@ const JobOrderForm = () => {
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
   const [fuelLevel, setFuelLevel] = useState("");
-  const [mechanic, setMechanic] = useState("");
+  const [mechanic, setMechanic] = useState<any>([]);
   const [motorcycleUnit, setMotorcycleUnit] = useState("");
   const [remarks, setRemarks] = useState("");
   const [engineUnit, setEngineUnit] = useState("");
@@ -198,6 +198,23 @@ const JobOrderForm = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
+  const [otherRemarks, setOtherRemarks] = useState("");
+  const [mechanics, setMechanics] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchMechanics() {
+      try {
+        const response = await api.get("/branch-mechanics");
+        if (response.status === 200) {
+          setMechanics(response.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchMechanics();
+  }, []);
 
   useEffect(() => {
     fetchJobOrderNumber();
@@ -403,7 +420,7 @@ const JobOrderForm = () => {
     fuelLevel,
     mechanic,
     motorcycleUnit,
-    remarks,
+    remarks: remarks === "others" ? otherRemarks : remarks,
     engineUnit,
     engineCondition,
     contentUbox,
@@ -421,6 +438,9 @@ const JobOrderForm = () => {
     jobOrderNumber,
     partsBrand,
     partsNumber,
+    assignedMechanics: mechanics.filter((mech: any) =>
+      mechanic.includes(mech.id),
+    ),
   };
 
   useEffect(() => {
@@ -467,7 +487,6 @@ const JobOrderForm = () => {
       date: date,
       branch_manager: signatures.branchManager,
       general_remarks: generalRemarks,
-      mechanic_id: mechanic.split("_")[0],
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
@@ -477,6 +496,7 @@ const JobOrderForm = () => {
       engine_number: engineFrameNo,
     },
     job_order_details: itemsData,
+    mechanic_ids: mechanic,
   };
 
   const handleSavePrint = async () => {
@@ -549,7 +569,7 @@ const JobOrderForm = () => {
     setNextScheduleDate("");
     setNextScheduleKms("");
     setGeneralRemarks("");
-    setMechanic("");
+    setMechanic([]);
 
     // Reset amounts
     setJobAmounts({});
@@ -792,6 +812,7 @@ const JobOrderForm = () => {
                   setRepairEnd={setRepairEnd}
                   setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
+                  mechanics={mechanics}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
@@ -811,6 +832,8 @@ const JobOrderForm = () => {
                   setEngineUnit={setEngineUnit}
                   setEngineCondition={setEngineCondition}
                   setContentUbox={setContentUbox}
+                  setOtherRemarks={setOtherRemarks}
+                  otherRemarks={otherRemarks}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
@@ -867,7 +890,7 @@ const JobOrderForm = () => {
                     <Button
                       type="button"
                       onClick={handleReset}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white"
+                      className="bg-yellow-500 hover:bg-yellow-700 text-white py-5"
                     >
                       <FaRotate /> Reset
                     </Button>
@@ -875,7 +898,7 @@ const JobOrderForm = () => {
                     <Button
                       ref={modalButtonRef}
                       type="submit"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-5"
                     >
                       <FaEye /> Preview
                     </Button>
@@ -894,14 +917,14 @@ const JobOrderForm = () => {
             <ModalFooter>
               <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-600 text-white"
+                className="bg-gray-500 hover:bg-gray-600 text-white py-5"
                 onClick={handlePreviewPrint}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-5"
                 onClick={handlePrint}
               >
                 <FaPrint /> Print Job Order
