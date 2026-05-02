@@ -84,7 +84,7 @@ const calculateAndUpdateTotal = useCallback(() => {
     }));
   };
 
-  const handlePartNumberChange = (key: keyof TrimotorsPartsNumber, value: number) => {
+  const handlePartNumberChange = (key: keyof TrimotorsPartsNumber, value: string) => {
     setPartsNumber(prev => ({
       ...prev,
       [key]: value
@@ -125,7 +125,7 @@ const calculateAndUpdateTotal = useCallback(() => {
       id: Date.now().toString(),
       description: "",
       brand: "",
-      partNumber: 0,
+      partNumber: "",
       quantity: 1,
       amount: 0,
     };
@@ -166,7 +166,7 @@ const calculateAndUpdateTotal = useCallback(() => {
     });
   };
 
-  const updatePartsOthersPartNumber = (id: string, partNumber: number) => {
+  const updatePartsOthersPartNumber = (id: string, partNumber: string) => {
     const updatedItems = partsOthersItems.map(item =>
       item.id === id ? { ...item, partNumber } : item
     );
@@ -209,7 +209,7 @@ const calculateAndUpdateTotal = useCallback(() => {
           id: Date.now().toString(),
           description: "",
           brand: "",
-          partNumber: 0,
+          partNumber: "",
           quantity: 1,
           amount: 0,
         };
@@ -277,7 +277,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           // Reset brand, part number, quantity, and amount when unchecked
                           if (!e.target.checked) {
                             handleBrandChange(brandKey, "");
-                            handlePartNumberChange(partNumberKey, 0);
+                            handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
                             handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
                           }
@@ -308,10 +308,10 @@ const calculateAndUpdateTotal = useCallback(() => {
                         {partsBrand[brandKey] && (
                           <>
                             <Input
-                              type="number"
+                              type="text"
                               placeholder="Part No."
                               value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) => handlePartNumberChange(partNumberKey, Number(e.target.value))}
+                              onChange={(e) => handlePartNumberChange(partNumberKey, e.target.value)}
                               className="w-28 text-center"
                               required
                             />
@@ -392,7 +392,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           // Reset brand, part number, quantity, and amount when unchecked
                           if (!e.target.checked) {
                             handleBrandChange(brandKey, "");
-                            handlePartNumberChange(partNumberKey, 0);
+                            handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
                             handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
                           }
@@ -423,10 +423,10 @@ const calculateAndUpdateTotal = useCallback(() => {
                         {partsBrand[brandKey] && (
                           <>
                             <Input
-                              type="number"
+                              type="text"
                               placeholder="Part No."
                               value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) => handlePartNumberChange(partNumberKey, Number(e.target.value))}
+                              onChange={(e) => handlePartNumberChange(partNumberKey,e.target.value)}
                               className="w-28 text-center"
                               required
                             />
@@ -540,10 +540,10 @@ const calculateAndUpdateTotal = useCallback(() => {
                     {item.brand && (
                       <>
                         <Input
-                          type="number"
+                          type="text"
                           placeholder="Part No."
                           value={item.partNumber || ""}
-                          onChange={(e) => updatePartsOthersPartNumber(item.id, Number(e.target.value))}
+                          onChange={(e) => updatePartsOthersPartNumber(item.id, e.target.value)}
                           className="w-30 text-center"
                         />
                         

@@ -22,7 +22,7 @@ export interface TrimotorsPartsOthersItem {
   id: string;
   description: string;
   brand: string;
-  partNumber: number;
+  partNumber: string;
   quantity: number;
   amount: number;
 }
@@ -408,33 +408,33 @@ export type TrimotorsPartsBrand = {
 };
 
 export type TrimotorsPartsNumber = {
-  bajajOil?: number;
-  oilFilter?: number;
-  fuelStrainer?: number;
-  speedometerCable?: number;
-  handBrakeCable?: number;
-  clutchCable?: number;
-  gearCableBlack?: number;
-  gearCableWhite?: number;
-  reverseCable?: number;
-  acceleratorCable?: number;
-  headlightBulb?: number;
-  brakeLightBulb?: number;
-  peanutBulb?: number;
-  sealHeadCover?: number;
-  clipSpring?: number;
-  pivotPin?: number;
-  fuse10Amp?: number;
-  brakePipeAssly?: number;
-  kitMajorTmc?: number;
-  wheelCylinderAsslyFront?: number;
-  brakeShoe?: number;
-  wheelCylinderAsslyRear?: number;
-  sparkplug?: number;
-  sparkplugCapRh?: number;
-  headlightRelay?: number;
-  partsOthers?: number;
-  [key: string]: number | undefined;
+  bajajOil?: string;
+  oilFilter?: string;
+  fuelStrainer?: string;
+  speedometerCable?: string;
+  handBrakeCable?: string;
+  clutchCable?: string;
+  gearCableBlack?: string;
+  gearCableWhite?: string;
+  reverseCable?: string;
+  acceleratorCable?: string;
+  headlightBulb?: string;
+  brakeLightBulb?: string;
+  peanutBulb?: string;
+  sealHeadCover?: string;
+  clipSpring?: string;
+  pivotPin?: string;
+  fuse10Amp?: string;
+  brakePipeAssly?: string;
+  kitMajorTmc?: string;
+  wheelCylinderAsslyFront?: string;
+  brakeShoe?: string;
+  wheelCylinderAsslyRear?: string;
+  sparkplug?: string;
+  sparkplugCapRh?: string;
+  headlightRelay?: string;
+  partsOthers?: string;
+  [key: string]: string | undefined;
 };
 
 export type TrimotorsPartsQuantity = {
