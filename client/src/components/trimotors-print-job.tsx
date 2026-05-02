@@ -180,7 +180,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       isOthers?: boolean;
       description?: string;
       brand?: string;
-      partNumber?: number;
+      partNumber?: string;
     }> = [];
 
     // Add regular selected parts
