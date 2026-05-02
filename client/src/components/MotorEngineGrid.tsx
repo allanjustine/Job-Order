@@ -4,6 +4,7 @@ import { Label } from "./ui/label";
 import Select from "./ui/select";
 
 export default function MotorEngineGrid({
+  errors,
   motorcycleUnit,
   remarks,
   engineUnit,
@@ -61,6 +62,9 @@ export default function MotorEngineGrid({
                   value={otherRemarks}
                   onChange={(e) => setOtherRemarks(e.target.value)}
                 />
+              )}
+              {errors.remarks && (
+                <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
               )}
             </div>
           </div>

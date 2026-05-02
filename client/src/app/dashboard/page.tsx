@@ -393,7 +393,7 @@ const Dashboard = () => {
     <>
       <div className="min-h-screen bg-gray-50 p-6">
         {/* Welcome Banner */}
-        <div className="mb-6 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl shadow-lg p-6 text-white flex items-center justify-between gap-4">
+        <div className="mb-6 bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl shadow-lg p-6 text-white flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold shrink-0">
               {user?.name?.[0]?.toUpperCase()}

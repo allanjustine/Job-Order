@@ -57,7 +57,7 @@ const formSchema = z.object({
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
   mechanic: z.array(z.number().min(1, "Mechanic is required")),
-  // remarks: z.string().min(1, "Remarks is required"),
+  remarks: z.string().min(1, "Category is required"),
   // engineCondition: z.string().min(1, "Engine condition is required"),
   // contentUbox: z.string().min(1, "Content inside Ubox is required"),
   generalRemarks: z.string().min(1, "General remarks is required"),
@@ -319,6 +319,7 @@ const JobOrderForm = () => {
         repairStart,
         repairEnd,
         mechanic,
+        remarks,
         generalRemarks,
       });
       setErrors({});
@@ -822,7 +823,7 @@ const JobOrderForm = () => {
 
                 {/* Repair Dates - Full width */}
                 <MotorEngineGrid
-                  // errors={errors}
+                  errors={errors}
                   motorcycleUnit={motorcycleUnit}
                   remarks={remarks}
                   engineUnit={engineUnit}
