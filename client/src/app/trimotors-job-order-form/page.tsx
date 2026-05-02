@@ -51,6 +51,14 @@ const formSchema = z.object({
   customerName: z.string().min(1, "Customer name is required"),
   model: z.string().min(1, "Model is required"),
   purchaseDate: z.string().min(1, "Purchase date is required"),
+  contact: z.string().min(1, "Contact is required"),
+  engineFrameNo: z.string().min(1, "Engine frame number is required"),
+  mileage: z.string().min(1, "Mileage is required"),
+  fuelLevel: z.string().min(1, "Fuel level is required"),
+  repairStart: z.string().min(1, "Repair start is required"),
+  repairEnd: z.string().min(1, "Repair end is required"),
+  mechanic: z.array(z.number().min(1, "Mechanic is required")),
+  generalRemarks: z.string().min(1, "General remarks is required"),
 });
 
 const TrimotorsJobOrderForm = () => {
@@ -374,6 +382,14 @@ const TrimotorsJobOrderForm = () => {
         branch,
         model,
         purchaseDate,
+        contact,
+        engineFrameNo,
+        mileage,
+        fuelLevel,
+        repairStart,
+        repairEnd,
+        mechanic,
+        generalRemarks,
       });
       setErrors({});
       return true;
@@ -595,6 +611,18 @@ const TrimotorsJobOrderForm = () => {
     e.preventDefault();
     if (validateForm()) {
       handlePreviewPrint();
+    } else {
+      toast.error("Please fill in all required fields.", {
+        position: "bottom-center",
+        duration: 5000,
+        icon: "😒",
+        style: {
+          borderRadius: "15px",
+          background: "red",
+          color: "#fff",
+          padding: "15px",
+        },
+      });
     }
   };
 

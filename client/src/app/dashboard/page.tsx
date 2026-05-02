@@ -698,7 +698,7 @@ const Dashboard = () => {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Link href="/motors-job-order-form" className="group">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-blue-400 bg-linear-to-br from-blue-50 to-blue-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
                 <div className="p-6 flex flex-col items-center gap-3">
                   <div className="w-14 h-14 rounded-full bg-blue-500 group-hover:bg-blue-600 flex items-center justify-center shadow-md transition-colors duration-300">
                     <BikeIcon className="w-7 h-7 text-white" />
@@ -723,7 +723,7 @@ const Dashboard = () => {
               </div>
             </Link>
             <Link href="/trimotors-job-order-form" className="group">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-indigo-400 bg-gradient-to-br from-indigo-50 to-indigo-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-transparent group-hover:border-indigo-400 bg-linear-to-br from-indigo-50 to-indigo-100 transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
                 <div className="p-6 flex flex-col items-center gap-3">
                   <div className="w-14 h-14 rounded-full bg-indigo-500 group-hover:bg-indigo-600 flex items-center justify-center shadow-md transition-colors duration-300">
                     <CarFrontIcon className="w-7 h-7 text-white" />
