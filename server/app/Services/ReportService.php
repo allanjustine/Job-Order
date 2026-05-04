@@ -239,7 +239,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name',
             ])
@@ -285,6 +285,7 @@ class ReportService
                     'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
                     'General Remarks '  => $item->jobOrder?->general_remarks,
                     'JO Category'       => $item->jobOrder?->category,
+                    'JO Status'         => $item->jobOrder?->status,
                 ];
             });
 
