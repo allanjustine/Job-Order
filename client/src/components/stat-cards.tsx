@@ -46,7 +46,7 @@ export default function StatCards({
 
   const stats = [
     {
-      label: "Monthly Target Income",
+      label: "Monthly Service Target Income",
       value: isLoading ? spinner() : data.monthly_target_income,
       icon: Wrench,
       color: "from-emerald-500 to-emerald-400",
