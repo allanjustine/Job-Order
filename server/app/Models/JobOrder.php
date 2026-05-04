@@ -33,4 +33,10 @@ class JobOrder extends Model
         return $this->belongsToMany(Mechanic::class)
             ->withTimestamps();
     }
+
+    public function jobOrderDetailsByJobRequestType()
+    {
+        return $this->hasMany(JobOrderDetail::class)
+            ->where('type', 'job_request');
+    }
 }
