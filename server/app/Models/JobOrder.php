@@ -39,4 +39,10 @@ class JobOrder extends Model
         return $this->hasMany(JobOrderDetail::class)
             ->where('type', 'job_request');
     }
+
+    public function jobOrderDetailsByPartsReplacementType()
+    {
+        return $this->hasMany(JobOrderDetail::class)
+            ->where('type', 'parts_replacement');
+    }
 }

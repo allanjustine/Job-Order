@@ -52,7 +52,7 @@ export default function StatCards({
       color: "from-emerald-500 to-emerald-400",
     },
     {
-      label: "Monthly Shop Income",
+      label: "Monthly Service Income",
       value: isLoading ? spinner() : data.monthly_shop_income,
       icon: PillBottleIcon,
       color: "from-rose-500 to-rose-400",
@@ -173,20 +173,20 @@ export default function StatCards({
           </div>
         </div>
 
-        {/* <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+        <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <p>
-            <span className="font-medium">PMS:</span>{" "}
-            {isLoading ? spinner() : data.pmsAmount}
+            <span className="font-medium">Job Request Total:</span>{" "}
+            {isLoading
+              ? spinner()
+              : phpCurrency(data.sum_by_types.sum_of_job_request || 0)}
           </p>
           <p>
-            <span className="font-medium">Repair:</span>{" "}
-            {isLoading ? spinner() : data.repairAmount}
+            <span className="font-medium">Parts Replacement Total:</span>{" "}
+            {isLoading
+              ? spinner()
+              : phpCurrency(data.sum_by_types.sum_of_parts_replacement)}
           </p>
-          <p>
-            <span className="font-medium">Warranty Claim:</span>{" "}
-            {isLoading ? spinner() : data.warrantyClaimAmount}
-          </p>
-        </div> */}
+        </div>
       </div>
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
         <div className="flex items-start justify-between">

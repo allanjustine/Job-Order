@@ -44,7 +44,7 @@ class TargetIncomeService
             $jobOrderIncome = JobOrder::query()
                 ->whereRelation('customer.user', 'id', $target->user_id)
                 ->withSum([
-                    'jobOrderDetailsByJobRequestType as jobOrderDetails'
+                    'jobOrderDetailsByJobRequestType'
                     =>
                     fn($jobOrderDetail)
                     =>
@@ -52,7 +52,7 @@ class TargetIncomeService
                         ->whereYear('created_at', now()->year)
                 ], 'amount')
                 ->get()
-                ->sum('job_order_details_sum_amount');
+                ->sum('job_order_details_by_job_request_type_sum_amount');
 
             return [
                 'id'            => $target->id,

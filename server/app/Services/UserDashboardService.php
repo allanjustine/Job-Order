@@ -56,7 +56,7 @@ class UserDashboardService
         return JobOrder::query()
             ->whereRelation('customer.user', 'id', Auth::id())
             ->withSum([
-                'jobOrderDetailsByJobRequestType as jobOrderDetails'
+                'jobOrderDetailsByJobRequestType'
                 =>
                 fn($jobOrderDetail)
                 =>
@@ -64,14 +64,14 @@ class UserDashboardService
                     ->whereYear('created_at', now()->year)
             ], 'amount')
             ->get()
-            ->sum('job_order_details_sum_amount');
+            ->sum('job_order_details_by_job_request_type_sum_amount');
     }
 
     private function totalAmount()
     {
         return JobOrder::query()
             ->whereRelation('customer.user', 'id', Auth::id())
-            ->withSum('jobOrderDetailsByJobRequestType as jobOrderDetails', 'amount')
+            ->withSum('jobOrderDetails', 'amount')
             ->get()
             ->sum('job_order_details_sum_amount');
     }
@@ -111,6 +111,27 @@ class UserDashboardService
         ];
     }
 
+    public function sumByTypes()
+    {
+        $sum_of_job_request = JobOrder::query()
+            ->whereRelation('customer.user', 'id', Auth::id())
+            ->withSum('jobOrderDetailsByJobRequestType', 'amount')
+            ->get()
+            ->sum('job_order_details_by_job_request_type_sum_amount');
+
+        $sum_of_parts_replacement = JobOrder::query()
+            ->whereRelation('customer.user', 'id', Auth::id())
+            ->withSum('jobOrderDetailsByPartsReplacementType', 'amount')
+            ->get()
+            ->sum('job_order_details_by_parts_replacement_type_sum_amount');
+
+
+        return [
+            'sum_of_job_request'       => $sum_of_job_request,
+            'sum_of_parts_replacement' => $sum_of_parts_replacement,
+        ];
+    }
+
     public function getUserDashboard()
     {
         return [
@@ -121,6 +142,7 @@ class UserDashboardService
             'total_mechanics'       => $this->totalMechanics(),
             'target_data'           => $this->targetData(),
             'top_job_orders'        => $this->getTopJobOrders(),
+            'sum_by_types'          => $this->sumByTypes()
         ];
     }
 }
