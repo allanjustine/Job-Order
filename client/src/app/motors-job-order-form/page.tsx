@@ -549,6 +549,7 @@ const JobOrderForm = () => {
   };
 
   const handlePreviewPrint = () => {
+    fetchJobOrderNumber();
     setIsOpen(!isOpen);
   };
 
