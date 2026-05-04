@@ -63,17 +63,17 @@ const Reports = () => {
     return function () {
       Swal.fire({
         title: "Are you sure?",
-        text: "After deleting, you will not be able to recover this data!",
+        text: "After cancelling, you will not be able to uncancel this data!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: "Yes, cancel it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
           Swal.fire({
             icon: "info",
-            title: "Deleting...",
+            title: "Cancelling...",
             text: "Please wait...",
             allowOutsideClick: false,
             didOpen: () => {
@@ -235,11 +235,14 @@ const Reports = () => {
           <Button
             type="button"
             onClick={handleDeleteJobOrder(row?.id)}
-            className="text-red-500 hover:text-red-600"
-            variant={"link"}
-            size={"icon"}
+            disabled={row.status === "void"}
+            className={`px-10 py-2 ${
+              row.status === "cancelled"
+                ? "bg-gray-200 cursor-not-allowed text-red-600"
+                : "bg-red-500 text-white"
+            }`}
           >
-            <Trash className="size-5" />
+            {row.status === "cancelled" ? "Cancelled" : "Cancel"}
           </Button>
         </div>
       ),

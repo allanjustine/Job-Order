@@ -51,10 +51,12 @@ class JobOrderController extends Controller
             ], 404);
         }
 
-        $jobOrder->delete();
+           $jobOrder->update([
+            'status' => 'cancelled'
+    ]);
 
         return response()->json([
-            'message' => 'Job Order deleted successfully.'
+            'message' => 'Job Order cancelled successfully.'
         ], 200);
     }
 }
