@@ -753,10 +753,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
                     const othersItem = getJobOthersItemByIndex(othersIndex);
                     if (othersItem) {
                       jobLabel = `${othersItem.description}`;
-                      jobAmount =
-                        othersItem.amount > 0
-                          ? phpCurrency(othersItem.amount)
-                          : "";
+                      jobAmount = phpCurrency(othersItem.amount);
                       jobCheckbox = "[✓] ";
                     }
                   } else if (typeof job === "string") {
@@ -780,8 +777,8 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
                     } else {
                       jobLabel = jobLabelText;
                     }
-                    jobAmount =
-                      jobAmountValue > 0 ? phpCurrency(jobAmountValue) : "";
+                    jobAmount = phpCurrency(jobAmountValue);
+                      
                     jobCheckbox = "[✓] ";
                   }
                 }
@@ -815,10 +812,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
                             (partsOthersItem.partNumber
                               ? `#${partsOthersItem.partNumber}`
                               : "");
-                      partAmount =
-                        partsOthersItem.amount > 0
-                          ? formatCurrency(partsOthersItem.amount)
-                          : "";
+                      partAmount = formatCurrency(partsOthersItem.amount)
                       partCheckbox = "[✓] ";
                     }
                   } else if (typeof part === "string") {
@@ -831,10 +825,7 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
                     partLabel = partLabelText;
                     partQty = partQtyValue > 0 ? partQtyValue.toString() : "";
                     partDetail = partDetailText;
-                    partAmount =
-                      partAmountValue > 0
-                        ? formatCurrency(partAmountValue)
-                        : "";
+                    partAmount = formatCurrency(partAmountValue);
                     partCheckbox = "[✓] ";
                   }
                 }

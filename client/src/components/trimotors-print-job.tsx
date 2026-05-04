@@ -666,7 +666,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
                     } else {
                       jobLabel = job.label;
                     }
-                    jobAmount = job.amount > 0 ? phpCurrency(job.amount) : "";
+                    jobAmount =  phpCurrency(job.amount);
                     jobCheckbox = "[✓] ";
                   }
 
@@ -685,8 +685,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
                     }
                     partQty = part.quantity > 0 ? part.quantity.toString() : "";
                     partDetail = part.detail;
-                    partAmount =
-                      part.amount > 0 ? formatCurrency(part.amount) : "";
+                    partAmount = formatCurrency(part.amount)
                     partCheckbox = "[✓] ";
                   }
 
