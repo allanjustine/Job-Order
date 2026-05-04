@@ -141,7 +141,6 @@ export default function TrimotorsJobRequest({
                   Number(e.target.value)
                 );
               }}
-              min="0"
               step="0.01"
               className="pl-8 pr-3 text-right text-sm"
               required
@@ -229,7 +228,6 @@ export default function TrimotorsJobRequest({
                             placeholder="0.00"
                             value={item.amount || ""}
                             onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
-                            min="0"
                             step="0.01"
                             className="pl-8 pr-3 text-right text-sm"
                           />

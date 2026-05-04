@@ -347,7 +347,6 @@ const calculateAndUpdateTotal = useCallback(() => {
                                       Number(e.target.value)
                                     )
                                   }
-                                  min="0"
                                   step="0.01"
                                   className="pl-8 pr-3 text-right"
                                 />
@@ -462,7 +461,6 @@ const calculateAndUpdateTotal = useCallback(() => {
                                       Number(e.target.value)
                                     )
                                   }
-                                  min="0"
                                   step="0.01"
                                   className="pl-8 pr-3 text-right"
                                 />
@@ -570,7 +568,6 @@ const calculateAndUpdateTotal = useCallback(() => {
                               placeholder="0.00"
                               value={item.amount || ""}
                               onChange={(e) => updatePartsOthersAmount(item.id, Number(e.target.value))}
-                              min="0"
                               step="0.01"
                               className="pl-8 pr-3 text-right"
                             />

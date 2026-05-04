@@ -236,7 +236,6 @@ export default function SpecificJobRequest({
                         onChange={(e) =>
                           handleJobAmountChange("selectedCoupon", Number(e.target.value))
                         }
-                        min="0"
                         step="0.01"
                         className="pl-8 pr-3 text-right w-full"
                         required
@@ -288,7 +287,6 @@ export default function SpecificJobRequest({
                           Number(e.target.value),
                         )
                       }
-                      min="0"
                       step="0.01"
                       className="pl-8 pr-3 text-right"
                       required
@@ -354,7 +352,6 @@ export default function SpecificJobRequest({
                       placeholder="0.00"
                       value={item.amount || ""}
                       onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
-                      min="0"
                       step="0.01"
                       className="pl-8 pr-3 text-right"
                       required
