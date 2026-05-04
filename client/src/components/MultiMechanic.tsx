@@ -19,47 +19,56 @@ export function MultiMechanic({
   mechanics,
   setMechanic,
   mechanic,
+  inputError,
 }: {
   mechanics: any;
   setMechanic: React.Dispatch<SetStateAction<any>>;
   mechanic: any;
+  inputError: string;
 }) {
   const anchor = useComboboxAnchor();
 
   return (
-    <Combobox
-      multiple
-      autoHighlight
-      items={mechanics}
-      onValueChange={setMechanic}
-      value={mechanic}
-    >
-      <ComboboxChips ref={anchor} className="w-full">
-        <ComboboxValue>
-          {(items) => (
-            <React.Fragment>
-              {mechanics
-                .filter((mechanic: any) => items.includes(mechanic.id))
-                .map((mechanic: any) => (
-                  <ComboboxChip key={mechanic.id}>
-                    {mechanic?.name}
-                  </ComboboxChip>
-                ))}
-              <ComboboxChipsInput />
-            </React.Fragment>
-          )}
-        </ComboboxValue>
-      </ComboboxChips>
-      <ComboboxContent anchor={anchor}>
-        <ComboboxEmpty>No mechanics found.</ComboboxEmpty>
-        <ComboboxList>
-          {(item) => (
-            <ComboboxItem key={item.id} value={item.id}>
-              {item.name}
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
+    <>
+      <Combobox
+        multiple
+        autoHighlight
+        items={mechanics}
+        onValueChange={setMechanic}
+        value={mechanic}
+      >
+        <ComboboxChips
+          ref={anchor}
+          className={`w-full ${inputError ? "border-red-500" : "border-gray-300"} border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+        >
+          <ComboboxValue>
+            {(items) => (
+              <React.Fragment>
+                {mechanics
+                  .filter((mechanic: any) => items.includes(mechanic.id))
+                  .map((mechanic: any) => (
+                    <ComboboxChip key={mechanic.id}>
+                      {mechanic?.name}
+                    </ComboboxChip>
+                  ))}
+                <ComboboxChipsInput />
+              </React.Fragment>
+            )}
+          </ComboboxValue>
+        </ComboboxChips>
+        <ComboboxContent anchor={anchor}>
+          <ComboboxEmpty>No mechanics found.</ComboboxEmpty>
+          <ComboboxList>
+            {(item) => (
+              <ComboboxItem key={item.id} value={item.id}>
+                {item.name}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+
+      {inputError && <p className="text-red-500 text-xs mt-1">{inputError}</p>}
+    </>
   );
 }

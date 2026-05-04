@@ -211,6 +211,18 @@ const Dashboard = () => {
       sortField: "total_amount",
     },
     {
+      name: "STATUS",
+      cell: (row: any) => (
+        <span
+          className={`font-bold text-md text-gray-600 ${row.status ? "text-red-500" : "text-green-500"}`}
+        >
+          {row.status ? row.status?.toUpperCase() : "RECORDED"}
+        </span>
+      ),
+      sortable: true,
+      sortField: "status",
+    },
+    {
       name: "PRINTED ON",
       cell: (row: any) => (
         <div>
@@ -426,6 +438,7 @@ const Dashboard = () => {
           mechanicAdded={mechanicAdded}
           setTopJobOrders={setTopJobOrders}
           isScale={isScale}
+          isRefreshing={isRefresh}
         />
 
         {/* Data Table Section */}
@@ -502,7 +515,7 @@ const Dashboard = () => {
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
               {/* Table Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit">
                 <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <h3 className="font-semibold text-gray-800">
@@ -546,7 +559,7 @@ const Dashboard = () => {
                           </>
                         ) : (
                           <>
-                            <FaCircleNotch className="animate-spin" />{" "}
+                            <FaCircleNotch className="animate-spin text-blue-500 text-lg" />{" "}
                             Loading...
                           </>
                         )}

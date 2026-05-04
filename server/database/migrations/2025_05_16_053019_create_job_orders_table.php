@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('mileage');
             $table->string('engine_number');
             $table->string('category')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

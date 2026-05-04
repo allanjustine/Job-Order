@@ -23,7 +23,7 @@ class JobOrderService
         };
 
         $jobOrders = JobOrder::query()
-            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'created_at')
+            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'status', 'created_at')
             ->with([
                 'customer:id,name',
                 'mechanics:id,name'
@@ -35,7 +35,8 @@ class JobOrderService
                 =>
                 $jobOrder->whereAny(
                     [
-                        'job_order_number'
+                        'job_order_number',
+                        'status'
                     ],
                     'like',
                     "%{$search}%"

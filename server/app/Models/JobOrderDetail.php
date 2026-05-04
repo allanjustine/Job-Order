@@ -10,6 +10,7 @@ class JobOrderDetail extends Model
 
     public function jobOrder()
     {
-        return $this->belongsTo(JobOrder::class);
+        return $this->belongsTo(JobOrder::class)
+        ->whereNull('status');
     }
 }

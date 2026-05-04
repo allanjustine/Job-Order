@@ -176,6 +176,7 @@ export default function CustomerGrid({
           mechanics={mechanics}
           setMechanic={setMechanic}
           mechanic={mechanic}
+          inputError={errors.mechanic}
         />
       </div>
     </div>
