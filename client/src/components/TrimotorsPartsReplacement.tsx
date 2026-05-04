@@ -24,7 +24,7 @@ interface TrimotorsPartsReplacementSectionProps {
 }
   
 // Brand options
-const brandChoices = ["Bajaj"," BG Powerstroke"];
+const brandChoices = ["Bajaj"," BG Powerstroke","Kawasaki","Honda","Yamaha","Suzuki","Hatasu"];
 
 export default function TrimotorsPartsReplacementSection({
   partsReplacement,
