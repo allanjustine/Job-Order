@@ -57,7 +57,9 @@ const formSchema = z.object({
   fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
-  mechanic: z.array(z.number().min(1, "Mechanic is required")).min(1, "At least one mechanic must be selected"),
+  mechanic: z
+    .array(z.number().min(1, "Mechanic is required"))
+    .min(1, "At least one mechanic must be selected"),
   generalRemarks: z.string().min(1, "General remarks is required"),
 });
 
@@ -627,6 +629,7 @@ const TrimotorsJobOrderForm = () => {
   };
 
   const handlePreviewPrint = () => {
+    fetchJobOrderNumber();
     setIsOpen(!isOpen);
   };
 
