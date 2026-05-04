@@ -21,6 +21,7 @@ export default function StatCards({
   mechanicAdded,
   setTopJobOrders,
   isScale,
+  isRefreshing,
 }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
@@ -42,25 +43,31 @@ export default function StatCards({
     }
 
     fetchDashboardData();
-  }, []);
+  }, [isRefreshing]);
 
   const stats = [
     {
       label: "Monthly Service Target Income",
-      value: isLoading ? spinner() : data.monthly_target_income,
+      value: isLoading || isRefreshing ? spinner() : data.monthly_target_income,
       icon: Wrench,
       color: "from-emerald-500 to-emerald-400",
     },
     {
       label: "Monthly Service Income",
-      value: isLoading ? spinner() : data.monthly_shop_income,
+      value: isLoading || isRefreshing ? spinner() : data.monthly_shop_income,
       icon: PillBottleIcon,
       color: "from-rose-500 to-rose-400",
     },
     {
       label: "Target Income Statistics",
-      value: isLoading ? spinner() : data.target_data.total_remaining_target,
-      percentage: isLoading ? spinner() : data.target_data.target_percentage,
+      value:
+        isLoading || isRefreshing
+          ? spinner()
+          : data.target_data.total_remaining_target,
+      percentage:
+        isLoading || isRefreshing
+          ? spinner()
+          : data.target_data.target_percentage,
       icon: ChartSpline,
       color: "from-violet-500 to-violet-400",
     },
@@ -92,7 +99,9 @@ export default function StatCards({
               Total Job Prints
             </p>
             <p className="text-2xl font-semibold text-gray-800">
-              {isLoading ? spinner() : data.total_job_prints.total}
+              {isLoading || isRefreshing
+                ? spinner()
+                : data.total_job_prints.total}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
@@ -103,11 +112,15 @@ export default function StatCards({
         <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <p>
             <span className="font-medium">Motocycle:</span>{" "}
-            {isLoading ? spinner() : data.total_job_prints.total_motors}
+            {isLoading || isRefreshing
+              ? spinner()
+              : data.total_job_prints.total_motors}
           </p>
           <p>
             <span className="font-medium">Trimotors:</span>{" "}
-            {isLoading ? spinner() : data.total_job_prints.total_trimotors}
+            {isLoading || isRefreshing
+              ? spinner()
+              : data.total_job_prints.total_trimotors}
           </p>
         </div>
       </div>
@@ -128,17 +141,24 @@ export default function StatCards({
                 <p
                   className={`text-2xl font-semibold text-gray-800 items-center flex gap-2 ${item.value < 0 && "text-green-500"}`}
                 >
-                  {isLoading
+                  {isLoading || isRefreshing
                     ? item.value
                     : phpCurrency(item.value).replace("-", "+")}{" "}
                   <Activity mode={item.percentage ? "visible" : "hidden"}>
                     <span
                       className={`text-xs flex gap-1 items-center ${percentageColor(
-                        Number(!isLoading && item?.percentage?.split(".")[0]),
+                        Number(
+                          !isLoading &&
+                            !isRefreshing &&
+                            item?.percentage?.split(".")[0],
+                        ),
                       )}`}
                     >
-                      {Number(!isLoading && item?.percentage?.split(".")[0]) >
-                      100 ? (
+                      {Number(
+                        !isLoading &&
+                          !isRefreshing &&
+                          item?.percentage?.split(".")[0],
+                      ) > 100 ? (
                         <ArrowUp className="size-3" />
                       ) : (
                         <ArrowDown className="size-3" />
@@ -165,7 +185,9 @@ export default function StatCards({
               Total Amount
             </p>
             <p className="text-2xl font-semibold text-gray-800">
-              {isLoading ? spinner() : phpCurrency(data.total_amount)}
+              {isLoading || isRefreshing
+                ? spinner()
+                : phpCurrency(data.total_amount)}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
@@ -176,13 +198,13 @@ export default function StatCards({
         <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <p>
             <span className="font-medium">Job Request Total:</span>{" "}
-            {isLoading
+            {isLoading || isRefreshing
               ? spinner()
               : phpCurrency(data.sum_by_types.sum_of_job_request || 0)}
           </p>
           <p>
             <span className="font-medium">Parts Replacement Total:</span>{" "}
-            {isLoading
+            {isLoading || isRefreshing
               ? spinner()
               : phpCurrency(data.sum_by_types.sum_of_parts_replacement)}
           </p>
@@ -196,7 +218,9 @@ export default function StatCards({
             </p>
             <div className="flex gap-2 items-center">
               <p className="text-2xl font-semibold text-gray-800">
-                {isLoading ? spinner() : data.total_mechanics + mechanicAdded}
+                {isLoading || isRefreshing
+                  ? spinner()
+                  : data.total_mechanics + mechanicAdded}
               </p>
               <Activity mode={isMechanicOpen ? "hidden" : "visible"}>
                 <Button

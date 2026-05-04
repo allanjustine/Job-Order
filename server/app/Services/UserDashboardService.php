@@ -55,6 +55,7 @@ class UserDashboardService
     {
         return JobOrder::query()
             ->whereRelation('customer.user', 'id', Auth::id())
+            ->whereNull('status')
             ->withSum([
                 'jobOrderDetailsByJobRequestType'
                 =>
@@ -71,6 +72,7 @@ class UserDashboardService
     {
         return JobOrder::query()
             ->whereRelation('customer.user', 'id', Auth::id())
+            ->whereNull('status')
             ->withSum('jobOrderDetails', 'amount')
             ->get()
             ->sum('job_order_details_sum_amount');

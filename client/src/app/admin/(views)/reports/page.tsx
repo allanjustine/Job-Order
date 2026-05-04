@@ -235,14 +235,14 @@ const Reports = () => {
           <Button
             type="button"
             onClick={handleDeleteJobOrder(row?.id)}
-            disabled={row.status === "void"}
+            disabled={row.status}
             className={`px-10 py-2 ${
-              row.status === "cancelled"
+              row.status
                 ? "bg-gray-200 cursor-not-allowed text-red-600"
                 : "bg-red-500 text-white"
             }`}
           >
-            {row.status === "cancelled" ? "Cancelled" : "Cancel"}
+            {row.status ? "Cancelled" : "Cancel"}
           </Button>
         </div>
       ),
