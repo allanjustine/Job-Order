@@ -28,6 +28,7 @@ class AreaManagerController extends Controller
     public function areaManagerSelectionOptions()
     {
         $areaManagers = AreaManager::query()
+            ->has('users.customers')
             ->get(['id', 'name']);
 
         return response()->json([

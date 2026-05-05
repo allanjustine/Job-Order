@@ -68,7 +68,9 @@ class UsersController extends Controller
     {
         $type = request('type', null);
 
-        $users = User::where(
+        $users = User::query()
+        ->has('customers')
+        ->where(
             fn($query)
             =>
             $query->whereNot('id', Auth::id())
