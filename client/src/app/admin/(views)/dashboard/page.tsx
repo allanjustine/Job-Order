@@ -407,7 +407,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
           {/* Job Orders Table */}
-          <div className="xl:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="xl:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 h-fit">
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-gray-800">Recent Print Job Orders</h2>
