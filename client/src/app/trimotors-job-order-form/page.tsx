@@ -44,6 +44,7 @@ import FormHeader from "@/components/form-header";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
+import { sign } from "crypto";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -61,6 +62,8 @@ const formSchema = z.object({
     .array(z.number().min(1, "Mechanic is required"))
     .min(1, "At least one mechanic must be selected"),
   generalRemarks: z.string().min(1, "General remarks is required"),
+  serviceAdvisor: z.string().min(1, "Service Advisor is required"),
+  branchManager: z.string().min(1, "Branch Manager is required"),
 });
 
 const TrimotorsJobOrderForm = () => {
@@ -392,6 +395,8 @@ const TrimotorsJobOrderForm = () => {
         repairEnd,
         mechanic,
         generalRemarks,
+        serviceAdvisor: signatures.serviceAdvisor,
+        branchManager: signatures.branchManager,
       });
       setErrors({});
       return true;

@@ -13,6 +13,7 @@ export default function ServiceAndManager({
           <Label> Salesrep/Service Advisor</Label>
           <Input
             type="text"
+            error={errors.serviceAdvisor}
             value={signatures.serviceAdvisor}
             onChange={(e) =>
               setSignatures((prev: any) => ({
@@ -29,6 +30,7 @@ export default function ServiceAndManager({
           <Label>BM/BS</Label>
           <Input
             type="text"
+            error={errors.branchManager}
             value={signatures.branchManager}
             onChange={(e) => setSignatures((prev: any) => ({
                 ...prev,

@@ -61,6 +61,8 @@ const formSchema = z.object({
   // engineCondition: z.string().min(1, "Engine condition is required"),
   // contentUbox: z.string().min(1, "Content inside Ubox is required"),
   generalRemarks: z.string().min(1, "General remarks is required"),
+  serviceAdvisor: z.string().min(1, "Service Advisor is required"),
+  branchManager: z.string().min(1, "Branch Manager is required"),
 });
 
 const JobOrderForm = () => {
@@ -321,6 +323,8 @@ const JobOrderForm = () => {
         mechanic,
         remarks,
         generalRemarks,
+        serviceAdvisor: signatures.serviceAdvisor,
+        branchManager: signatures.branchManager,
       });
       setErrors({});
       return true;
