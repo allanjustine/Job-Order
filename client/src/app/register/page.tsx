@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,6 @@ import { FORM_INPUTS } from "@/constants/formInputs";
 import { FormInputType } from "@/types/formInputType";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { useAuth } from "@/context/authContext";
 import Swal from "sweetalert2";
 import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
@@ -27,8 +26,23 @@ const RegisterPage = () => {
     password: "",
   });
   const [formInputs, setFormInputs] = useState<FormInputType>(FORM_INPUTS);
-  const { branches } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [branches, setBranches] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await api.get("/branches");
+        if (response.status === 200) {
+          setBranches(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchBranches();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

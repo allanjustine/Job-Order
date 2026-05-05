@@ -33,7 +33,8 @@ class AreaManagerService
             'created_at' => $area_manager->created_at,
             'users'      => $area_manager->users->map(fn($user) => [
                 'id'     => $user->id,
-                'code'   => $user->code
+                'code'   => $user->code,
+                'name'   => $user->name,
             ])
         ]);
     }

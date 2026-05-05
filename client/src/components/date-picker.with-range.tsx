@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import {
   Popover,
   PopoverContent,
@@ -22,13 +22,12 @@ export function DatePickerWithRange({
 }) {
   return (
     <Field className="mx-auto w-full gap-0">
-      <FieldLabel htmlFor="date-picker-range">Date Picker Range</FieldLabel>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             id="date-picker-range"
-            className="px-2.5 font-normal h-12"
+            className="px-2.5 font-normal h-10"
           >
             <CalendarIcon />
             {date?.from ? (

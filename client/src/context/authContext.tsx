@@ -1,6 +1,5 @@
 "use client";
 
-import { api } from "@/lib/api";
 import { fetchProfile, login, logout } from "@/lib/sanctum";
 import { AuthContextType } from "@/types/authContextType";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -10,26 +9,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthContextProvider = ({ children }: any) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  const [branches, setBranches] = useState([]);
   const [error, setError] = useState<any>("");
   const [user, setUser] = useState<any | null>(null);
   const [errors, setErrors] = useState<any>({});
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        const response = await api.get("/branches");
-        if (response.status === 200) {
-          setBranches(response.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchBranches();
-  }, []);
 
   useEffect(() => {
     fetchProfileData();
@@ -102,7 +85,6 @@ export const AuthContextProvider = ({ children }: any) => {
         isAuthenticated,
         handleLogin,
         handleLogout,
-        branches,
         error,
         user,
         errors,
