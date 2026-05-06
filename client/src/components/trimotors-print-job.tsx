@@ -167,7 +167,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
     if (couponData) {
       selectedJobs.push({
         key: 'coupon',
-        label: `Coupon: ${couponData.selectedCoupon}${couponData.couponBrand ? ` (${couponData.couponBrand})` : ''}`,
+        label: `${couponData.selectedCoupon}${couponData.couponBrand ? ` - ${couponData.couponBrand}` : ''}`,
         amount: couponData.amount,
         isCoupon: true,
       });
