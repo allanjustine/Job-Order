@@ -5,6 +5,7 @@ export interface TrimotorsJobItem {
 }
 
 export const trimotorsJobItems: TrimotorsJobItem[] = [
+  { key: "selectedCoupon", label: "Coupon" },
   { key: "pivotPin", label: "Replace Pivot PIN (with pivot PIN remover)" },
   { key: "detachSteeringColumn", label: "Detach Steering Column" },
   { key: "differentialGearOverhaul", label: "Differential Gear Overhaul" },

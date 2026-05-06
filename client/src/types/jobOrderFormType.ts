@@ -77,6 +77,9 @@ export type PartsReplacement = {
 };
 
 export type TrimotorsJobRequestType = {
+  coupon: boolean;
+  selectedCoupon?: string;
+  couponBrand?: string;
   pivotPin: boolean
   detachSteeringColumn: boolean
   differentialGearOverhaul: boolean
@@ -233,6 +236,8 @@ export type PartsAmountsType = {
 };
 
 export type TrimotorsJobAmountType = {
+  coupon?: number;
+  selectedCoupon?: number;
   pivotPin?: number;
   detachSteeringColumn?: number;
   differentialGearOverhaul?: number;

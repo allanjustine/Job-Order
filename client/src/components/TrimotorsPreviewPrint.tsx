@@ -57,11 +57,21 @@ interface TrimotorsPreviewJobOrderProps {
 const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
 
-  // Safely calculate totals with fallbacks
-  const jobTotal = Object.values(data.jobAmounts || {}).reduce(
-    (s: number = 0, v) => s + (Number(v) || 0),
-    0,
-  )!;
+  // Safely calculate totals with fallbacks including coupon
+  const jobTotal = (() => {
+    let total = 0;
+    Object.entries(data.jobAmounts || {}).forEach(([key, value]) => {
+      if (key !== 'selectedCoupon') {
+        total += Number(value) || 0;
+      }
+    });
+    // Add coupon amount if present
+    if ((data.jobAmounts as any).selectedCoupon) {
+      total += Number((data.jobAmounts as any).selectedCoupon);
+    }
+    return total;
+  })();
+  
   const partsTotal = Object.values(data.partsAmounts || {}).reduce(
     (s: number = 0, v) => s + (Number(v) || 0),
     0,
@@ -130,19 +140,46 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
     return !!data.jobRequest[jobKey as keyof TrimotorsJobRequestType];
   };
 
-  // Get all selected jobs including multiple others items
+  // Get coupon data
+  const getCouponData = () => {
+    if ((data.jobRequest as any).coupon && (data.jobRequest as any).selectedCoupon) {
+      return {
+        selectedCoupon: (data.jobRequest as any).selectedCoupon,
+        couponBrand: (data.jobRequest as any).couponBrand,
+        amount: (data.jobAmounts as any).selectedCoupon || 0
+      };
+    }
+    return null;
+  };
+
+  // Get all selected jobs including coupon, regular jobs, and multiple others items
   const getSelectedJobs = () => {
     const selectedJobs: Array<{
       key: string;
       label: string;
       amount: number;
       isOthers?: boolean;
+      isCoupon?: boolean;
       description?: string;
     }> = [];
 
+    // Add coupon as a job item if selected
+    const couponData = getCouponData();
+      if (couponData) {
+        selectedJobs.push({
+          key: 'coupon',
+          label: `Coupon: ${couponData.selectedCoupon}${couponData.couponBrand ? ` (${couponData.couponBrand})` : ''}`,
+          amount: couponData.amount,
+          isCoupon: true,
+        });
+      }
+
     // Add regular selected jobs
     trimotorsJobItems.forEach((item) => {
-      if (item.key !== "others" && isJobSelected(item.key)) {
+      if(item.key === "selectedCoupon"){
+        return; // Skip coupon as it's handled separately
+      }
+      else if (item.key !== "others" && isJobSelected(item.key)) {
         selectedJobs.push({
           key: item.key,
           label: item.label,
@@ -661,7 +698,9 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                   let jobCheckbox = "";
 
                   if (job) {
-                    if (job.isOthers) {
+                    if (job.isCoupon) {
+                      jobLabel = job.label;
+                    } else if (job.isOthers) {
                       jobLabel = `${job.label}`;
                     } else {
                       jobLabel = job.label;

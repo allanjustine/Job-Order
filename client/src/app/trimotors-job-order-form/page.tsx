@@ -108,6 +108,7 @@ const TrimotorsJobOrderForm = () => {
   });
 
   const [jobRequest, setJobRequest] = useState<TrimotorsJobRequestType>({
+    coupon: false,
     pivotPin: false,
     detachSteeringColumn: false,
     differentialGearOverhaul: false,
@@ -540,7 +541,12 @@ const TrimotorsJobOrderForm = () => {
   const jobRequests = trimotorsJobItems
     .filter((item) => jobRequest[item.key as keyof TrimotorsJobRequestType])
     .map((item) => ({
-      category: item.key === "others" ? "other_items" : item.label,
+      category:         
+      item.key === "others"
+          ? "other_items"
+          : item.key === "selectedCoupon"
+            ? jobRequest.selectedCoupon
+            : item.label,
       amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
       type: "job_request",
       part_brand: "n/a",
@@ -663,6 +669,7 @@ const TrimotorsJobOrderForm = () => {
 
     // Reset job request
     setJobRequest({
+      coupon: false,
       pivotPin: false,
       detachSteeringColumn: false,
       differentialGearOverhaul: false,

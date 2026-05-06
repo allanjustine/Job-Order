@@ -4,6 +4,7 @@ import phpCurrency from "@/utils/phpCurrency";
 import {
   TrimotorsJobAmountType,
   TrimotorsJobRequestType,
+  CouponType,
 } from "@/types/jobOrderFormType";
 import {
   TrimotorsJobItem,
@@ -40,9 +41,9 @@ export default function TrimotorsJobRequest({
   jobTotal,
   setJobTotal,
 }: TrimotorsJobRequestProps) {
-  const firstColumnItems = trimotorsJobItems.slice(
-    0,
-    Math.ceil(trimotorsJobItems.length / 2)
+  const firstColumnItems = trimotorsJobItems
+  .filter((item) => item.key !== "selectedCoupon").
+  slice(0,Math.ceil(trimotorsJobItems.length / 2)
   );
   const secondColumnItems = trimotorsJobItems
     .filter((item) => item.key !== "others")
@@ -98,6 +99,16 @@ export default function TrimotorsJobRequest({
     setOthersItems(updated);
     syncToParent(updated);
   };
+  const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu", "BG Powerstroke"];
+  
+  const coupons: CouponType[] = [
+    { id: 1, name: "Coupon 1" },
+    { id: 2, name: "Coupon 2" },
+    { id: 3, name: "Coupon 3" },
+    { id: 4, name: "Coupon 4" },
+    { id: 5, name: "Coupon 5" },
+    { id: 6, name: "Coupon 6" },
+  ];
 
   const renderJobItem = (item: TrimotorsJobItem) => (
     <div
@@ -159,7 +170,106 @@ export default function TrimotorsJobRequest({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
         {/* First Column */}
-        <div className="space-y-2">{firstColumnItems.map(renderJobItem)}</div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-4 text-sm">
+            <Label className="flex items-center gap-2 whitespace-nowrap w-32">
+              <Input
+                type="checkbox"
+                checked={jobRequest.coupon}
+                onChange={(e) =>
+                  setJobRequest({
+                    ...jobRequest,
+                    coupon: e.target.checked,
+                    // Reset selected coupon and brand when unchecking
+                    ...(e.target.checked === false && {
+                      selectedCoupon: undefined,
+                      couponBrand: undefined,
+                    }),
+                  })
+                }
+              />
+              Coupon
+            </Label>
+  
+            {/* Show coupon fields when coupon is checked - nasa tabi mismo */}
+            {jobRequest.coupon && (
+              <div className="flex items-center gap-2 flex-1">
+                {/* Coupon dropdown */}
+                <div className="w-40">
+                  <select
+                    value={jobRequest.selectedCoupon || ""}
+                    onChange={(e) =>
+                      setJobRequest({
+                        ...jobRequest,
+                        selectedCoupon: e.target.value || undefined,
+                      })
+                    }
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select Coupon
+                    </option>
+                    {coupons.map((coupon) => (
+                      <option key={coupon.id} value={coupon.name}>
+                        {coupon.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+  
+                {/* Brand dropdown - lalabas after pumili ng coupon */}
+                {jobRequest.selectedCoupon && (
+                  <>
+                    <div className="flex-1">
+                      <select
+                          value={jobRequest.couponBrand || ""}
+                          onChange={(e) =>
+                            setJobRequest({
+                              ...jobRequest,
+                              couponBrand: e.target.value || undefined,
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          required
+                        >
+                          <option value="" disabled>
+                            Select Brand
+                          </option>
+                          {brandChoices.map((brand) => (
+                            <option key={brand} value={brand}>
+                              {brand}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+  
+                    {/* Amount input field */}
+                    <div className="w-40">
+                    
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                          ₱
+                        </span>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          value={jobAmounts.selectedCoupon || ""}
+                          onChange={(e) =>
+                            handleJobAmountChange("selectedCoupon", Number(e.target.value))
+                          }
+                          step="0.01"
+                          className="pl-8 pr-3 text-right w-full"
+                          required
+                        />
+              
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+          {firstColumnItems.map(renderJobItem)}
+        </div>
 
         {/* Second Column */}
         <div className="space-y-2">
