@@ -324,7 +324,6 @@ const calculateAndUpdateTotal = useCallback(() => {
 
                             {/* Unit Price Field */}
                           <div className="w-32">
-                            <div className="relative">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                                 ₱
                               </span>
@@ -343,7 +342,6 @@ const calculateAndUpdateTotal = useCallback(() => {
                                 step="0.01"
                                 className="pl-8 pr-3 text-right"
                               />
-                            </div>
                           </div>
                         </>
                       )}
@@ -436,7 +434,6 @@ const calculateAndUpdateTotal = useCallback(() => {
 
                         {/* Unit Price Field */}
                         <div className="w-32">
-                          <div className="relative">
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                               ₱
                             </span>
@@ -448,7 +445,6 @@ const calculateAndUpdateTotal = useCallback(() => {
                               step="0.01"
                               className="pl-8 pr-3 text-right"
                             />
-                          </div>
                         </div>
                       </>
                     )}

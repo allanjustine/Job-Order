@@ -273,7 +273,6 @@ export default function SpecificJobRequest({
               </Label>
               {(jobRequest[item.key as keyof JobRequest] as boolean) && (
                 <div className="w-40">
-                  <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                       ₱
                     </span>
@@ -291,7 +290,6 @@ export default function SpecificJobRequest({
                       className="pl-8 pr-3 text-right"
                       required
                     />
-                  </div>
                 </div>
               )}
             </div>
@@ -343,7 +341,6 @@ export default function SpecificJobRequest({
                   </div>
                 </div>
                 <div className="w-40">
-                  <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                       ₱
                     </span>
@@ -356,7 +353,6 @@ export default function SpecificJobRequest({
                       className="pl-8 pr-3 text-right"
                       required
                     />
-                  </div>
                 </div>
                 <Button
                   type="button"

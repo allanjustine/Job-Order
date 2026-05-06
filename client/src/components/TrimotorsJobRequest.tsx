@@ -138,7 +138,6 @@ export default function TrimotorsJobRequest({
       </Label>
       {(jobRequest[item.key as keyof TrimotorsJobRequestType] as boolean) && (
         <div className="w-32 min-w-[8rem]">
-          <div className="relative">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
               ₱
             </span>
@@ -157,7 +156,6 @@ export default function TrimotorsJobRequest({
               required
             />
           </div>
-        </div>
       )}
     </div>
   );
@@ -328,8 +326,7 @@ export default function TrimotorsJobRequest({
                       />
                       
                       {/* Amount Field */}
-                      <div className="w-32">
-                        <div className="relative">
+                      <div className="w-32">                     
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                             ₱
                           </span>
@@ -341,8 +338,7 @@ export default function TrimotorsJobRequest({
                             step="0.01"
                             className="pl-8 pr-3 text-right text-sm"
                           />
-                        </div>
-                      </div>
+                        </div>                      
                     </div>
                   </div>
                   <Button
