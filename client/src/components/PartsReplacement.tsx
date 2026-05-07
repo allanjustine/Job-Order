@@ -253,8 +253,8 @@ const calculateAndUpdateTotal = useCallback(() => {
                 key={item.key}
                 className="flex items-center gap-4 text-sm"
               >
-                <div className="flex items-center gap-4 flex-1">
-                  <Label className="whitespace-nowrap">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Label className="flex-1">
                     <Input
                       type="checkbox"
                       checked={
