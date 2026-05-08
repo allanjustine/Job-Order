@@ -239,7 +239,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name',
             ])
@@ -263,6 +263,7 @@ class ReportService
                     ->orWhereRelation('jobOrder.mechanics', 'name', 'like', "%{$search}%")
             )
             ->orderBy('type', 'asc')
+            ->orderBy(JobOrder::select('job_order_number')->whereColumn('job_orders.id', 'job_order_details.job_order_id'), 'asc')
             ->where(
                 fn($item)
                 =>
@@ -272,7 +273,7 @@ class ReportService
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'              => $item->created_at->format('Y-m-d H:i:s'),
+                    'Date'              => $item->jobOrder?->date->format('m-d-Y'),
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
