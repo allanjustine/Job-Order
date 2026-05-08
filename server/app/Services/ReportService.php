@@ -262,7 +262,7 @@ class ReportService
                     ->orWhereRelation('jobOrder.customer', 'name', 'like', "%{$search}%")
                     ->orWhereRelation('jobOrder.mechanics', 'name', 'like', "%{$search}%")
             )
-            ->orderBy('type', 'asc')
+            // ->orderBy('type', 'asc')
             ->orderBy(JobOrder::select('job_order_number')->whereColumn('job_orders.id', 'job_order_details.job_order_id'), 'asc')
             ->where(
                 fn($item)
@@ -270,13 +270,23 @@ class ReportService
                 $item->whereBetween('created_at', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
             )
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'Date'              => $item->jobOrder?->date->format('m-d-Y'),
-                    'JO Number'         => $item->jobOrder?->job_order_number,
+            ->get();
+
+        $lastJoNumber = null;
+
+        $jobOrders = $jobOrders->map(function ($item) use (&$lastJoNumber) {
+
+        $currentJoNumber = $item->jobOrder?->job_order_number;
+
+        $showHeader = $lastJoNumber !== $currentJoNumber;
+
+        $lastJoNumber = $currentJoNumber;
+
+        return [
+                    'Date'              => $showHeader ? $item->jobOrder?->date->format('m-d-Y') : '',
+                    'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
-                    'Customer Name'     => $item->jobOrder?->customer?->name,
+                    'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
                     'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                     'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
                     'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',
