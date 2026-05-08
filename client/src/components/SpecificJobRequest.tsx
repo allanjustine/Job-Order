@@ -21,7 +21,7 @@ interface SpecificJobRequestProps {
 }
 
 // Brand options (same as parts section)
-const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu", "BG Powerstroke"];
+const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Hatasu"];
 
 export const coupons: CouponType[] = [
   { id: 1, name: "Coupon 1" },

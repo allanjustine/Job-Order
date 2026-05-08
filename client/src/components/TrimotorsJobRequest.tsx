@@ -99,7 +99,7 @@ export default function TrimotorsJobRequest({
     setOthersItems(updated);
     syncToParent(updated);
   };
-  const brandChoices = ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Bajaj", "Hatatsu", "BG Powerstroke"];
+  const brandChoices = ["Bajaj"];
   
   const coupons: CouponType[] = [
     { id: 1, name: "Coupon 1" },
