@@ -204,6 +204,8 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
       "plasticParts",
       "brakeFluid",
       "coolant",
+      "gearOil",
+      "oilFilter",
     ];
     return allParts.filter((partKey) => isPartSelected(partKey));
   };

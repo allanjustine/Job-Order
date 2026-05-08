@@ -205,6 +205,8 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       "plasticParts",
       "brakeFluid",
       "coolant",
+      "gearOil",
+      "oilFilter",
     ];
     return allParts.filter((partKey) => isPartSelected(partKey));
   };
