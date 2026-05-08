@@ -70,6 +70,8 @@ export type PartsReplacement = {
   plasticParts: boolean;
   brakeFluid: boolean;
   coolant: boolean;
+  gearOil: boolean;
+  oilFilter: boolean;
   partsOthers: boolean;
   partsOthersText: string;
   partsOthersItems?: PartsOthersItem[]; // New array for multiple others
@@ -161,6 +163,8 @@ export type PartsBrand = {
   plasticParts?: string;
   brakeFluid?: string;
   coolant?: string;
+  gearOil?: string;
+  oilFilter?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -184,6 +188,8 @@ export type PartsNumber = {
   plasticParts?: string;
   brakeFluid?: string;
   coolant?: string;
+  gearOil?: string;
+  oilFilter?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -207,6 +213,8 @@ export type PartsQuantity = {
   plasticParts?: number;
   brakeFluid?: number;
   coolant?: number;
+  gearOil?: number;
+  oilFilter?: number;
   partsOthers?: number;
   [key: string]: number | undefined;
 };
@@ -230,6 +238,8 @@ export type PartsAmountsType = {
   plasticParts?: number;
   brakeFluid?: number;
   coolant?: number;
+  gearOil?: number;
+  oilFilter?: number;
   total?: any;
   partsOthers?: number;
   [key: string]: number | undefined;

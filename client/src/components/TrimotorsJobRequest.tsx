@@ -169,7 +169,7 @@ export default function TrimotorsJobRequest({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
         {/* First Column */}
         <div className="space-y-2">
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-4 text-sm flex-1 flex-wrap">
             <Label className="flex items-center gap-2 whitespace-nowrap w-32">
               <Input
                 type="checkbox"
@@ -191,7 +191,7 @@ export default function TrimotorsJobRequest({
   
             {/* Show coupon fields when coupon is checked - nasa tabi mismo */}
             {jobRequest.coupon && (
-              <div className="flex items-center gap-2 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
                 {/* Coupon dropdown */}
                 <div className="w-40">
                   <select
@@ -228,7 +228,7 @@ export default function TrimotorsJobRequest({
                               couponBrand: e.target.value || undefined,
                             })
                           }
-                          className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                           required
                         >
                           <option value="" disabled>
@@ -243,7 +243,7 @@ export default function TrimotorsJobRequest({
                     </div>
   
                     {/* Amount input field */}
-                    <div className="w-40">
+                    <div className="w-32">
                     
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                           ₱

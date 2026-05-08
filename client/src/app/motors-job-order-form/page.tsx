@@ -144,6 +144,8 @@ const JobOrderForm = () => {
     plasticParts: false,
     brakeFluid: false,
     coolant: false,
+    gearOil: false,
+    oilFilter: false,
     partsOthers: false,
     partsOthersText: "",
   });
@@ -167,6 +169,8 @@ const JobOrderForm = () => {
     plasticParts: 1,
     brakeFluid: 1,
     coolant: 1,
+    gearOil: 1,
+    oilFilter: 1,
     partsOthers: 1,
   });
 
@@ -625,6 +629,8 @@ const JobOrderForm = () => {
       plasticParts: false,
       brakeFluid: false,
       coolant: false,
+      gearOil: false,
+      oilFilter: false,
       partsOthers: false,
       partsOthersText: "",
     });
