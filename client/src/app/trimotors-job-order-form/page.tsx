@@ -45,6 +45,7 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { sign } from "crypto";
+import TrimotorsCategory from "@/components/TrimotorsCategory";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -61,6 +62,7 @@ const formSchema = z.object({
   mechanic: z
     .array(z.number().min(1, "Mechanic is required"))
     .min(1, "At least one mechanic must be selected"),
+  remarks: z.string().min(1, "Category is required"),
   generalRemarks: z.string().min(1, "General remarks is required"),
   serviceAdvisor: z.string().min(1, "Service Advisor is required"),
   branchManager: z.string().min(1, "Branch Manager is required"),
@@ -270,6 +272,7 @@ const TrimotorsJobOrderForm = () => {
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
+  const [otherRemarks, setOtherRemarks] = useState("");
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -398,6 +401,7 @@ const TrimotorsJobOrderForm = () => {
         generalRemarks,
         serviceAdvisor: signatures.serviceAdvisor,
         branchManager: signatures.branchManager,
+        remarks,
       });
       setErrors({});
       return true;
@@ -588,6 +592,7 @@ const TrimotorsJobOrderForm = () => {
       model: model,
       mileage: mileage,
       engine_number: engineFrameNo,
+      category: remarks === "others" ? otherRemarks : remarks,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -962,6 +967,14 @@ const TrimotorsJobOrderForm = () => {
                   setMechanic={setMechanic}
                   mechanics={mechanics}
                 />
+
+                   <TrimotorsCategory
+                      errors={errors}
+                      remarks={remarks}
+                      setRemarks={setRemarks}
+                      setOtherRemarks={setOtherRemarks}
+                      otherRemarks={otherRemarks}
+                    />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
                   TRIMOTORS' DIAGNOSIS

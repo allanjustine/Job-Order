@@ -546,6 +546,8 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
                 className="w-full h-full object-cover"
               />
             </div>
+            <span className="font-bold mr-1">Category:</span>
+            <span className="border-b border-black flex-1">{data.remarks}</span>
           </div>
         </div>
       </div>
