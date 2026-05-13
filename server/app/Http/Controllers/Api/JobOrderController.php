@@ -41,6 +41,22 @@ class JobOrderController extends Controller
         ], 200);
     }
 
+    public function show(JobOrder $jobOrder)
+    {
+        return response()->json([
+            'message' => 'Job Order fetched successfully.',
+            'data'    => $jobOrder->load([
+                'customer',
+                'mechanics',
+                'jobOrderDetails',
+                'customer.user'
+            ])
+                ->loadSum('jobOrderDetails', 'amount')
+                ->loadSum(['jobOrderDetails as total_job_request' => fn($tjr) => $tjr->where('type', 'job_request')], 'amount')
+                ->loadSum(['jobOrderDetails as total_parts_used' => fn($tjr) => $tjr->where('type', 'parts_replacement')], 'amount')
+        ], 200);
+    }
+
     public function destroy($id)
     {
         $jobOrder = JobOrder::find($id);
@@ -51,9 +67,9 @@ class JobOrderController extends Controller
             ], 404);
         }
 
-           $jobOrder->update([
+        $jobOrder->update([
             'status' => 'cancelled'
-    ]);
+        ]);
 
         return response()->json([
             'message' => 'Job Order cancelled successfully.'

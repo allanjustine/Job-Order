@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:employee')->group(function () {
         Route::controller(JobOrderController::class)->group(function () {
             Route::get('job-orders', 'index');
+            Route::get('job-orders/{job_order}/browse', 'show');
             Route::get('export-branch-reports', [JobOrderController::class, 'exportBranchData']);
         });
         Route::controller(JobOrderController::class)->group(function () {

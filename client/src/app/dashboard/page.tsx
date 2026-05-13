@@ -22,7 +22,6 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@/components/ui/modal";
-import PreviewData from "@/components/PreviewData";
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
@@ -45,8 +44,8 @@ import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import formatDate from "@/utils/format-date";
-import MotorsView from "@/components/motors-view";
-import TrimotorsPreviewJobOrder from "@/components/TrimotorsView";
+import ViewJobOrder from "@/components/view-job-order";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
   const {
@@ -68,7 +67,7 @@ const Dashboard = () => {
   const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isBrowsing, setIsBrowsing] = useState<boolean>(false);
   const [isMechanicOpen, setIsMechanicOpen] = useState<boolean>(false);
   const [topJobOrders, setTopJobOrders] = useState<
     {
@@ -84,7 +83,6 @@ const Dashboard = () => {
   const createRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, handleLogout: handleLogoutUser } = useAuth();
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [isExport, setIsExport] = useState<boolean>(false);
@@ -107,13 +105,6 @@ const Dashboard = () => {
       ) {
         setIsOpen(false);
         setViewData(null);
-      }
-
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
       }
     };
 
@@ -166,9 +157,19 @@ const Dashboard = () => {
     };
   }, []);
 
-  const handleView = (row: any) => () => {
-    setIsOpen(!isOpen);
-    setViewData(row);
+  const handleView = (id: number) => async () => {
+    setIsOpen(true);
+    setIsBrowsing(true);
+    try {
+      const response = await api.get(`/job-orders/${id}/browse`);
+      if (response.status === 200) {
+        setViewData(response?.data?.data);
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setIsBrowsing(false);
+    }
   };
 
   const columns = [
@@ -246,7 +247,7 @@ const Dashboard = () => {
       cell: (row: any) => (
         <div>
           <button
-            onClick={handleView(row)}
+            onClick={handleView(row.id)}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             View
@@ -257,15 +258,6 @@ const Dashboard = () => {
       sortable: true,
     },
   ];
-
-  const handleDropdownSelect = (type: string) => {
-    if (type === "motorcycle") {
-      router.push("/job-order-form");
-    } else if (type === "trimotors") {
-      router.push("/trimotors-job-order-form");
-    }
-    setIsDropdownOpen(false);
-  };
 
   const handleOpenCreate = () => {
     if (!hasMechanic) {
@@ -415,19 +407,6 @@ const Dashboard = () => {
     if (h < 12) return "Good morning";
     if (h < 18) return "Good afternoon";
     return "Good evening";
-  };
-
-  // Function to render the correct preview component based on job type
-  const renderPreviewComponent = () => {
-    if (!viewData) return null;
-    
-    // Check job_order_type to determine which component to render
-    if (viewData.job_order_type === "trimotors") {
-      return <TrimotorsPreviewJobOrder data={viewData} />;
-    } else {
-      // Default to motors view for "motors" or any other type
-      return <MotorsView data={viewData} />;
-    }
   };
 
   return (
@@ -794,23 +773,44 @@ const Dashboard = () => {
       </Modal>
 
       <Modal isOpen={isOpen} className="w-3xl" ref={modalRef}>
-        <ModalHeader onClose={() => {
-          setIsOpen(false);
-          setViewData(null);
-        }}>
+        <ModalHeader
+          onClose={() => {
+            setIsOpen(false);
+            setViewData(null);
+          }}
+        >
           Viewing {viewData?.customer.name}&apos;s Job Order
           {viewData?.job_order_type && (
-            <span className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
-              viewData.job_order_type === "trimotors" 
-                ? "bg-indigo-100 text-indigo-700" 
-                : "bg-blue-100 text-blue-700"
-            }`}>
+            <span
+              className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
+                viewData.job_order_type === "trimotors"
+                  ? "bg-indigo-100 text-indigo-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
               {viewData.job_order_type.toUpperCase()}
             </span>
           )}
         </ModalHeader>
         <ModalBody>
-          {renderPreviewComponent()}
+          {isBrowsing ? (
+            <div className="flex flex-col gap-2">
+              <div className="space-y-2">
+                <Skeleton className="w-1/8 h-6" />
+                <Skeleton className="w-2/6 h-6" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="w-full h-45" />
+                <Skeleton className="w-full h-45" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="w-11/12 h-6" />
+                <Skeleton className="w-6/12 h-6" />
+              </div>
+            </div>
+          ) : (
+            <ViewJobOrder data={viewData} />
+          )}
         </ModalBody>
         <ModalFooter>
           <Button
@@ -825,7 +825,7 @@ const Dashboard = () => {
           </Button>
         </ModalFooter>
       </Modal>
-      
+
       <Modal isOpen={isExport} className="w-md">
         <ModalHeader onClose={handleViewExport}>
           Filter Date and Export

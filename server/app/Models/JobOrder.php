@@ -15,6 +15,7 @@ class JobOrder extends Model
             'next_schedule_date' => 'datetime',
             'date'               => 'datetime',
             'job_order_type'     => JobOrderType::class,
+            'purchase_date'      => 'datetime',
         ];
     }
 
