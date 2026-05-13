@@ -470,7 +470,7 @@ const TrimotorsJobOrderForm = () => {
     repairEnd,
     fuelLevel,
     motorcycleUnit,
-    remarks,
+    remarks: remarks === "others" ? otherRemarks : remarks,
     engineUnit,
     engineCondition,
     contentUbox,
