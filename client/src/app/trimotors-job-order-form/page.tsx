@@ -545,8 +545,8 @@ const TrimotorsJobOrderForm = () => {
   const jobRequests = trimotorsJobItems
     .filter((item) => jobRequest[item.key as keyof TrimotorsJobRequestType])
     .map((item) => ({
-      category:         
-      item.key === "others"
+      category:
+        item.key === "others"
           ? "other_items"
           : item.key === "selectedCoupon"
             ? jobRequest.selectedCoupon
@@ -593,6 +593,7 @@ const TrimotorsJobOrderForm = () => {
       mileage: mileage,
       engine_number: engineFrameNo,
       category: remarks === "others" ? otherRemarks : remarks,
+      purchase_date: purchaseDate,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -968,13 +969,13 @@ const TrimotorsJobOrderForm = () => {
                   mechanics={mechanics}
                 />
 
-                   <TrimotorsCategory
-                      errors={errors}
-                      remarks={remarks}
-                      setRemarks={setRemarks}
-                      setOtherRemarks={setOtherRemarks}
-                      otherRemarks={otherRemarks}
-                    />
+                <TrimotorsCategory
+                  errors={errors}
+                  remarks={remarks}
+                  setRemarks={setRemarks}
+                  setOtherRemarks={setOtherRemarks}
+                  otherRemarks={otherRemarks}
+                />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
                   TRIMOTORS' DIAGNOSIS
