@@ -45,6 +45,8 @@ import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import formatDate from "@/utils/format-date";
+import MotorsView from "@/components/motors-view";
+import TrimotorsPreviewJobOrder from "@/components/TrimotorsView";
 
 const Dashboard = () => {
   const {
@@ -107,7 +109,6 @@ const Dashboard = () => {
         setViewData(null);
       }
 
-      // Close dropdown when clicking outside
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
@@ -164,6 +165,11 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleView = (row: any) => () => {
+    setIsOpen(!isOpen);
+    setViewData(row);
+  };
 
   const columns = [
     {
@@ -235,6 +241,21 @@ const Dashboard = () => {
       sortField: "created_at",
       sortable: true,
     },
+    {
+      name: "ACTION",
+      cell: (row: any) => (
+        <div>
+          <button
+            onClick={handleView(row)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            View
+          </button>
+        </div>
+      ),
+      sortField: "created_at",
+      sortable: true,
+    },
   ];
 
   const handleDropdownSelect = (type: string) => {
@@ -244,11 +265,6 @@ const Dashboard = () => {
       router.push("/trimotors-job-order-form");
     }
     setIsDropdownOpen(false);
-  };
-
-  const handleView = (row: any) => () => {
-    setIsOpen(!isOpen);
-    setViewData(row);
   };
 
   const handleOpenCreate = () => {
@@ -399,6 +415,19 @@ const Dashboard = () => {
     if (h < 12) return "Good morning";
     if (h < 18) return "Good afternoon";
     return "Good evening";
+  };
+
+  // Function to render the correct preview component based on job type
+  const renderPreviewComponent = () => {
+    if (!viewData) return null;
+    
+    // Check job_order_type to determine which component to render
+    if (viewData.job_order_type === "trimotors") {
+      return <TrimotorsPreviewJobOrder data={viewData} />;
+    } else {
+      // Default to motors view for "motors" or any other type
+      return <MotorsView data={viewData} />;
+    }
   };
 
   return (
@@ -764,23 +793,39 @@ const Dashboard = () => {
         </ModalBody>
       </Modal>
 
-      <Modal isOpen={isOpen} className="w-5xl" ref={modalRef}>
-        <ModalHeader onClose={handleView(null)}>
+      <Modal isOpen={isOpen} className="w-3xl" ref={modalRef}>
+        <ModalHeader onClose={() => {
+          setIsOpen(false);
+          setViewData(null);
+        }}>
           Viewing {viewData?.customer.name}&apos;s Job Order
+          {viewData?.job_order_type && (
+            <span className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
+              viewData.job_order_type === "trimotors" 
+                ? "bg-indigo-100 text-indigo-700" 
+                : "bg-blue-100 text-blue-700"
+            }`}>
+              {viewData.job_order_type.toUpperCase()}
+            </span>
+          )}
         </ModalHeader>
         <ModalBody>
-          <PreviewData data={viewData} />
+          {renderPreviewComponent()}
         </ModalBody>
         <ModalFooter>
           <Button
             className="bg-gray-400 hover:bg-gray-500 text-white py-5"
             type="button"
-            onClick={handleView(null)}
+            onClick={() => {
+              setIsOpen(false);
+              setViewData(null);
+            }}
           >
             Close
           </Button>
         </ModalFooter>
       </Modal>
+      
       <Modal isOpen={isExport} className="w-md">
         <ModalHeader onClose={handleViewExport}>
           Filter Date and Export
