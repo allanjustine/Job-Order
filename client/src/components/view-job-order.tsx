@@ -197,7 +197,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
                           style={{ padding: "2px 4px" }}
                         >
                           <span>
-                            [✓] {job.description || job.name || job.label}
+                            [✓] {job.category}
                           </span>
                         </td>
                         <td
@@ -247,7 +247,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
                           style={{ padding: "2px 4px" }}
                         >
                           <span>
-                            [✓] {job.description || job.name || job.label}
+                            [✓] {job.category}
                           </span>
                         </td>
                         <td
@@ -260,9 +260,9 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
                           className="border border-black p-0.5 text-left text-[7pt] h-3"
                           style={{ padding: "2px 4px" }}
                         >
-                          {job?.brand && job?.part_number
-                            ? `${job.brand}-${job.part_number}`
-                            : job?.brand ||
+                          {job?.part_brand && job?.part_number
+                            ? `${job.part_brand}-${job.part_number}`
+                            : job?.part_brand ||
                               (job?.part_number
                                 ? `#${job.part_number}`
                                 : "N/A")}
