@@ -24,14 +24,6 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
     return phpCurrency(amount);
   };
 
-  const getBranchDisplay = () => {
-    if (!data.branch) return "";
-    return data.branch.replace("(", "").replace(")", "").split(" ")[0] || "N/A";
-  };
-
-  const jobsList = data.jobs || data.jobsList || [];
-  const partsList = data.parts || data.partsList || [];
-
   if (!data) {
     return (
       <EmptyItem
@@ -65,8 +57,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
             />
             <div className="flex-1 flex justify-end items-center">
               <h3 className="text-right font-bold">
-                {getBranchDisplay()}-
-                {data.jobOrderNumber || data.job_order_number || "N/A"}
+                {`${data?.customer?.user?.code}-${data.job_order_number || "N/A"}`}
               </h3>
             </div>
           </div>
