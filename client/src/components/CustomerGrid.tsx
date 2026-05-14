@@ -5,6 +5,7 @@ import { MultiMechanic } from "./MultiMechanic";
 export default function CustomerGrid({
   errors,
   customerName,
+  address,
   date,
   branch,
   contact,
@@ -14,9 +15,10 @@ export default function CustomerGrid({
   purchaseDate,
   repairStart,
   repairEnd,
-  fuelLevel,
+  // fuelLevel,
   mechanic,
   setCustomerName,
+  setAddress,
   setDate,
   setBranch,
   setContact,
@@ -26,7 +28,7 @@ export default function CustomerGrid({
   setPurchaseDate,
   setRepairStart,
   setRepairEnd,
-  setFuelLevel,
+  // setFuelLevel,
   setMechanic,
   mechanics,
 }: any) {
@@ -113,8 +115,8 @@ export default function CustomerGrid({
           value={mileage}
           onChange={(e) => setMileage(e.target.value)}
         />
-        {errors.contact && (
-          <p className="text-red-500 text-xs mt-1">{errors.contact}</p>
+        {errors.mileage && (
+          <p className="text-red-500 text-xs mt-1">{errors.mileage}</p>
         )}
       </div>
       <div className="col-span-1">
@@ -130,15 +132,15 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Fuel Level</Label>
+        <Label>Address</Label>
         <Input
           type="text"
-          error={errors.fuelLevel}
-          value={fuelLevel}
-          onChange={(e) => setFuelLevel(e.target.value)}
+          error={errors.address}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
-        {errors.fuelLevel && (
-          <p className="text-red-500 text-xs mt-1">{errors.fuelLevel}</p>
+        {errors.address && (
+          <p className="text-red-500 text-xs mt-1">{errors.address}</p>
         )}
       </div>
       <div className="col-span-1">

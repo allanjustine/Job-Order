@@ -21,6 +21,7 @@ interface TrimotorsPreviewJobOrderProps {
   data: {
     branch: string;
     customerName: string;
+    address: string;
     date: string;
     contact: string;
     model: string;
@@ -28,7 +29,7 @@ interface TrimotorsPreviewJobOrderProps {
     purchaseDate: string;
     repairStart: string;
     repairEnd: string;
-    fuelLevel: string;
+    // fuelLevel: string;
     mileage: string;
     motorcycleUnit: string;
     remarks: string;
@@ -508,8 +509,8 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
           <span className="border-b border-black flex-1">{data.repairEnd}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-32">Fuel Level:</span>
-          <span className="border-b border-black flex-1">{data.fuelLevel}</span>
+          <span className="font-bold w-32">Address:</span>
+          <span className="border-b border-black flex-1">{data.address}</span>
         </div>
         <div className="flex">
           <span className="font-bold w-40">Mechanic Name:</span>
