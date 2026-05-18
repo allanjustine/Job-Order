@@ -39,12 +39,10 @@ import {
 } from "@/components/ui/modal";
 import TrimotorsPreviewPrint from "@/components/TrimotorsPreviewPrint";
 import TrimotorsPrintJobOrder from "@/components/trimotors-print-job";
-import TrimotorsJobRequest from "@/components/TrimotorsJobRequest";
 import FormHeader from "@/components/form-header";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
-import { sign } from "crypto";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
 
 // Schema for form validation
@@ -273,6 +271,7 @@ const TrimotorsJobOrderForm = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
+  const [transactionCode, setTransactionCode] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [otherRemarks, setOtherRemarks] = useState("");
 
@@ -301,6 +300,7 @@ const TrimotorsJobOrderForm = () => {
 
       if (response.status === 200) {
         setJobOrderNumber(response.data.job_order_number);
+        setTransactionCode(response.data.transaction_code);
       }
     } catch (error) {
       console.error(error);
@@ -493,6 +493,7 @@ const TrimotorsJobOrderForm = () => {
     branchManager: signatures.branchManager,
     mechanic,
     jobOrderNumber,
+    transactionCode,
     assignedMechanics: mechanics.filter((mech: any) =>
       mechanic.includes(mech.id),
     ),

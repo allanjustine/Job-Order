@@ -1,14 +1,12 @@
 // components/ViewJobOrder.tsx
 "use client";
 
-import { format } from "date-fns";
 import phpCurrency from "@/utils/phpCurrency";
 import MotorsImage from "./motors-image";
 import TriMotorsImage from "./trimotors-image";
 import { EmptyItem } from "./empty-item";
 import { Wrench } from "lucide-react";
 import formatDate from "@/utils/format-date";
-import { jobItems } from "@/constants/job-items";
 
 interface PreviewJobOrderProps {
   data?: any;
@@ -49,7 +47,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
         {/* Header */}
         <div className="flex flex-col justify-center items-center mb-1">
           <div className="flex justify-between items-center w-full">
-            <div className="flex-1"></div>
+            <div className="flex-1 font-bold">{data.transaction_code}</div>
             <img
               src="/smct-header.jpg"
               alt="Company Logo"
@@ -187,9 +185,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
                           className="border border-black p-0.5 h-3"
                           style={{ padding: "2px 4px" }}
                         >
-                          <span>
-                            [✓] {job.category}
-                          </span>
+                          <span>[✓] {job.category}</span>
                         </td>
                         <td
                           className="border border-black p-0.5 text-left h-3"
@@ -237,9 +233,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
                           className="border border-black p-0.5 h-3"
                           style={{ padding: "2px 4px" }}
                         >
-                          <span>
-                            [✓] {job.category}
-                          </span>
+                          <span>[✓] {job.category}</span>
                         </td>
                         <td
                           className="border border-black p-0.5 text-center h-3"

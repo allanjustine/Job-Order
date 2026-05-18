@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Customer::class)->constrained()->cascadeOnDelete();
             $table->string('job_order_type');
             $table->string('job_order_number');
+            $table->string('transaction_code')->nullable();
             $table->dateTime('date');
             $table->string('branch_manager');
             $table->string('general_remarks');

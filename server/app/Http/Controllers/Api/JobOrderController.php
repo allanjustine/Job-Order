@@ -11,7 +11,6 @@ use App\Models\JobOrder;
 
 class JobOrderController extends Controller
 {
-
     public function index(JobOrderService $jobOrderService)
     {
         $jobOrders = $jobOrderService->getBranchJobOrders();
@@ -73,6 +72,33 @@ class JobOrderController extends Controller
 
         return response()->json([
             'message' => 'Job Order cancelled successfully.'
+        ], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'transaction_code'        => ['required', 'exists:job_orders,transaction_code']
+        ], [
+            'transaction_code.exists' => "Job Order with transaction code of \"{$request->transaction_code}\" you searched for does not exist."
+        ]);
+
+        $job_order = JobOrder::query()
+            ->with([
+                'customer',
+                'mechanics',
+                'jobOrderDetails',
+                'customer.user'
+            ])
+            ->withSum('jobOrderDetails', 'amount')
+            ->withSum(['jobOrderDetails as total_job_request' => fn($tjr) => $tjr->where('type', 'job_request')], 'amount')
+            ->withSum(['jobOrderDetails as total_parts_used' => fn($tjr) => $tjr->where('type', 'parts_replacement')], 'amount')
+            ->where('transaction_code', $request->transaction_code)
+            ->first();
+
+        return response()->json([
+            'message' => 'Job Order fetched successfully.',
+            'data'    => $job_order
         ], 200);
     }
 }

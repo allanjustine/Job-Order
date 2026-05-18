@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\JobOrder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class JobOrderService
 {
@@ -71,7 +73,8 @@ class JobOrderService
                 ->jobOrders()
                 ->create([
                     ...$request->job_order,
-                    'job_order_number' => $job_order_number
+                    'job_order_number' => $job_order_number,
+                    'transaction_code' => Cache::get('jo_transaction_code')
                 ]);
 
             $data = [];
@@ -108,6 +111,8 @@ class JobOrderService
 
             return $customer;
         });
+
+        Cache::delete('jo_transaction_code');
 
         return $customer;
     }
