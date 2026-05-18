@@ -58,7 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('job-orders', 'index');
             Route::get('job-orders/{job_order}/browse', 'show');
             Route::get('export-branch-reports', [JobOrderController::class, 'exportBranchData']);
-            Route::post('job-order/search', 'search')->middleware('throttle:50,1');
         });
         Route::controller(JobOrderController::class)->group(function () {
             Route::post('create-job-order', 'store');
@@ -109,3 +108,5 @@ Route::get('toks/{any}', function () {
         'message' => $test
     ], 200);
 });
+
+Route::post('job-order/search', [JobOrderController::class, 'search'])->middleware('throttle:50,1');
