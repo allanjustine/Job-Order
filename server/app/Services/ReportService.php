@@ -240,7 +240,7 @@ class ReportService
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
             ->with([
                 'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
-                'jobOrder.customer:id,name',
+                'jobOrder.customer:id,name,address',
                 'jobOrder.mechanics:id,name',
             ])
             ->when(
@@ -287,6 +287,8 @@ class ReportService
                     'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
+                    'Address'           => $showHeader ? $item->jobOrder?->customer?->address : '',
+                    'Mechanics'         => $showHeader ? $item->jobOrder?->mechanics->pluck('name')->join(', ') : '',
                     'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                     'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
                     'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',

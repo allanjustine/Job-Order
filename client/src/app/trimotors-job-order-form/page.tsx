@@ -49,12 +49,13 @@ import TrimotorsCategory from "@/components/TrimotorsCategory";
 const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
   customerName: z.string().min(1, "Customer name is required"),
+  address: z.string().min(1, "Address is required"),
   model: z.string().min(1, "Model is required"),
   // purchaseDate: z.string().min(1, "Purchase date is required"),
   contact: z.string().min(1, "Contact is required"),
   engineFrameNo: z.string().min(1, "Engine frame number is required"),
   mileage: z.string().min(1, "Mileage is required"),
-  fuelLevel: z.string().min(1, "Fuel level is required"),
+  // fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
   mechanic: z
@@ -76,10 +77,11 @@ const TrimotorsJobOrderForm = () => {
   const [model, setModel] = useState("");
   const [engineFrameNo, setEngineFrameNo] = useState("");
   const [mileage, setMileage] = useState("");
+  const [address, setAddress] = useState("");
   const [purchaseDate, setPurchaseDate] = useState("");
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
-  const [fuelLevel, setFuelLevel] = useState("");
+  // const [fuelLevel, setFuelLevel] = useState("");
   const [mechanic, setMechanic] = useState<any>([]);
   const [motorcycleUnit, setMotorcycleUnit] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -387,6 +389,7 @@ const TrimotorsJobOrderForm = () => {
     try {
       formSchema.parse({
         customerName,
+        address,
         date,
         branch,
         model,
@@ -394,7 +397,7 @@ const TrimotorsJobOrderForm = () => {
         contact,
         engineFrameNo,
         mileage,
-        fuelLevel,
+        // fuelLevel,
         repairStart,
         repairEnd,
         mechanic,
@@ -460,6 +463,7 @@ const TrimotorsJobOrderForm = () => {
   const TrimotorsjobOrderData = {
     branch: branch || "Main Branch",
     customerName,
+    address,
     date,
     contact,
     model,
@@ -468,7 +472,7 @@ const TrimotorsJobOrderForm = () => {
     purchaseDate,
     repairStart,
     repairEnd,
-    fuelLevel,
+    // fuelLevel,
     motorcycleUnit,
     remarks: remarks === "others" ? otherRemarks : remarks,
     engineUnit,
@@ -580,6 +584,7 @@ const TrimotorsJobOrderForm = () => {
     customer: {
       name: customerName,
       contact_number: contact,
+      address: address,
     },
     job_order: {
       job_order_type: "trimotors",
@@ -589,7 +594,7 @@ const TrimotorsJobOrderForm = () => {
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
-      fuel_level: fuelLevel,
+      // fuel_level: fuelLevel,
       model: model,
       mileage: mileage,
       engine_number: engineFrameNo,
@@ -660,7 +665,8 @@ const TrimotorsJobOrderForm = () => {
     setPurchaseDate("");
     setRepairStart("");
     setRepairEnd("");
-    setFuelLevel("");
+    // setFuelLevel("");
+    setAddress("");
     setMotorcycleUnit("");
     setRemarks("");
     setEngineUnit("");
@@ -944,6 +950,7 @@ const TrimotorsJobOrderForm = () => {
                 <CustomerGrid
                   errors={errors}
                   customerName={customerName}
+                  address={address}
                   date={date}
                   branch={branch}
                   contact={contact}
@@ -953,9 +960,10 @@ const TrimotorsJobOrderForm = () => {
                   purchaseDate={purchaseDate}
                   repairStart={repairStart}
                   repairEnd={repairEnd}
-                  fuelLevel={fuelLevel}
+                  // fuelLevel={fuelLevel}
                   mechanic={mechanic}
                   setCustomerName={setCustomerName}
+                  setAddress={setAddress}
                   setDate={setDate}
                   setBranch={setBranch}
                   setContact={setContact}
@@ -965,7 +973,7 @@ const TrimotorsJobOrderForm = () => {
                   setPurchaseDate={setPurchaseDate}
                   setRepairStart={setRepairStart}
                   setRepairEnd={setRepairEnd}
-                  setFuelLevel={setFuelLevel}
+                  // setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
                   mechanics={mechanics}
                 />

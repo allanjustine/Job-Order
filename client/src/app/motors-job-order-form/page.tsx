@@ -48,12 +48,13 @@ import { partsItems } from "@/constants/part-items";
 const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
   customerName: z.string().min(1, "Customer name is required"),
+  address: z.string().min(1, "Address is required"),
   model: z.string().min(1, "Model is required"),
   // purchaseDate: z.string().min(1, "Purchase date is required"),
   contact: z.string().min(1, "Contact is required"),
   engineFrameNo: z.string().min(1, "Engine frame number is required"),
   mileage: z.string().min(1, "Mileage is required"),
-  fuelLevel: z.string().min(1, "Fuel level is required"),
+  // fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
   mechanic: z.array(z.number().min(1, "Mechanic is required")).min(1, "At least one mechanic must be selected"),
@@ -72,13 +73,14 @@ const JobOrderForm = () => {
   const [date, setDate] = useState("");
   const [branch, setBranch] = useState(`(${user?.code}) - ${user?.name}`);
   const [contact, setContact] = useState("");
+  const [address, setAddress] = useState("");
   const [model, setModel] = useState("");
   const [engineFrameNo, setEngineFrameNo] = useState("");
   const [mileage, setMileage] = useState("");
   const [purchaseDate, setPurchaseDate] = useState("");
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
-  const [fuelLevel, setFuelLevel] = useState("");
+  // const [fuelLevel, setFuelLevel] = useState("");
   const [mechanic, setMechanic] = useState<any>([]);
   const [motorcycleUnit, setMotorcycleUnit] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -316,6 +318,7 @@ const JobOrderForm = () => {
     try {
       formSchema.parse({
         customerName,
+        address,
         date,
         branch,
         model,
@@ -323,7 +326,7 @@ const JobOrderForm = () => {
         contact,
         engineFrameNo,
         mileage,
-        fuelLevel,
+        // fuelLevel,
         repairStart,
         repairEnd,
         mechanic,
@@ -425,10 +428,11 @@ const JobOrderForm = () => {
     model,
     engineFrameNo,
     mileage,
+    address,
     purchaseDate,
     repairStart,
     repairEnd,
-    fuelLevel,
+    // fuelLevel,
     mechanic,
     motorcycleUnit,
     remarks: remarks === "others" ? otherRemarks : remarks,
@@ -493,6 +497,7 @@ const JobOrderForm = () => {
     customer: {
       name: customerName,
       contact_number: contact,
+      address: address,
     },
     job_order: {
       job_order_type: "motors",
@@ -502,7 +507,7 @@ const JobOrderForm = () => {
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
-      fuel_level: fuelLevel,
+      // fuel_level: fuelLevel,
       model: model,
       mileage: mileage,
       engine_number: engineFrameNo,
@@ -572,10 +577,11 @@ const JobOrderForm = () => {
     setModel("");
     setEngineFrameNo("");
     setMileage("");
+    setAddress("");
     setPurchaseDate("");
     setRepairStart("");
     setRepairEnd("");
-    setFuelLevel("");
+    // setFuelLevel("");
     setMotorcycleUnit("");
     setRemarks("");
     setEngineUnit("");
@@ -806,6 +812,7 @@ const JobOrderForm = () => {
                 <CustomerGrid
                   errors={errors}
                   customerName={customerName}
+                  address={address}
                   date={date}
                   branch={branch}
                   contact={contact}
@@ -815,9 +822,10 @@ const JobOrderForm = () => {
                   purchaseDate={purchaseDate}
                   repairStart={repairStart}
                   repairEnd={repairEnd}
-                  fuelLevel={fuelLevel}
+                  // fuelLevel={fuelLevel}
                   mechanic={mechanic}
                   setCustomerName={setCustomerName}
+                  setAddress={setAddress}
                   setDate={setDate}
                   setBranch={setBranch}
                   setContact={setContact}
@@ -827,7 +835,7 @@ const JobOrderForm = () => {
                   setPurchaseDate={setPurchaseDate}
                   setRepairStart={setRepairStart}
                   setRepairEnd={setRepairEnd}
-                  setFuelLevel={setFuelLevel}
+                  // setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
                   mechanics={mechanics}
                 />

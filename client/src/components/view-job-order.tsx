@@ -99,7 +99,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
           <div className="flex">
             <span className="font-bold w-32">Customer Name:</span>
             <span className="border-b border-black flex-1">
-              {data.customer?.name || data.customerName || "N/A"}
+              {data.customer?.name || "N/A"}
             </span>
           </div>
           <div className="flex">
@@ -135,9 +135,9 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Fuel Level:</span>
+            <span className="font-bold w-32">Address:</span>
             <span className="border-b border-black flex-1">
-              {data.fuel_level || "N/A"}
+              {data.customer?.address || "N/A"}
             </span>
           </div>
           <div className="flex">
