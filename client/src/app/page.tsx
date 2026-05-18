@@ -1,10 +1,8 @@
 "use client";
 
-import GlobalLoader from "@/components/GlobalLoaders";
 import { useAuth } from "@/context/authContext";
 import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const Home = () => {
   const { isAuthenticated, user } = useAuth();
@@ -37,7 +35,7 @@ const Home = () => {
                 providers.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex sm:flex-row gap-4">
               {isAuthenticated ? (
                 <Link
                   href={user?.redirect_url}
@@ -53,6 +51,12 @@ const Home = () => {
                   Get Started
                 </Link>
               )}
+              <Link
+                href="/search"
+                className="text-lg px-8 py-6 bg-violet-500 text-white rounded-lg cursor-pointer hover:bg-violet-700"
+              >
+                Search Job Order
+              </Link>
             </div>
           </div>
         </div>
