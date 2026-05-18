@@ -14,7 +14,10 @@ use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\UserDashboardController;
+use App\Models\JobOrder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', function (Request $request) {
@@ -55,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('job-orders', 'index');
             Route::get('job-orders/{job_order}/browse', 'show');
             Route::get('export-branch-reports', [JobOrderController::class, 'exportBranchData']);
+            Route::post('job-order/search', 'search')->middleware('throttle:50,1');
         });
         Route::controller(JobOrderController::class)->group(function () {
             Route::post('create-job-order', 'store');
@@ -64,10 +68,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get-job-order-number', function () {
             $lastJobOrderNumber = Auth::user()->jobOrders()->max('job_order_number') ?? 0;
 
+            Cache::delete('jo_transaction_code');
+
             $jobOrderNumber = sprintf('%07d', $lastJobOrderNumber + 1);
 
+            do {
+                $generated_code = "JO-" . Str::upper(Str::random(15));
+            } while (JobOrder::query()->where('transaction_code', "JO-{$generated_code}")->exists());
+
+            Cache::put('jo_transaction_code', $generated_code, now()->addMinutes(30));
+
             return response()->json([
-                'job_order_number' => $jobOrderNumber
+                'job_order_number' => $jobOrderNumber,
+                'transaction_code' => $generated_code
             ], 200);
         });
     });
