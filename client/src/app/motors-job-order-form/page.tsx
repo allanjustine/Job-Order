@@ -204,6 +204,7 @@ const JobOrderForm = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
+  const [transactionCode, setTransactionCode] = useState("");
   const [otherRemarks, setOtherRemarks] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
 
@@ -232,6 +233,7 @@ const JobOrderForm = () => {
 
       if (response.status === 200) {
         setJobOrderNumber(response.data.job_order_number);
+        setTransactionCode(response.data.transaction_code);
       }
     } catch (error) {
       console.error(error);
@@ -445,6 +447,7 @@ const JobOrderForm = () => {
     serviceAdvisor: signatures.serviceAdvisor,
     branchManager: signatures.branchManager,
     jobOrderNumber,
+    transactionCode,
     partsBrand,
     partsNumber,
     assignedMechanics: mechanics.filter((mech: any) =>

@@ -52,6 +52,7 @@ interface PrintJobOrderProps {
     branchManager: string;
     mechanic: string[];
     jobOrderNumber: string;
+    transactionCode: string;
     assignedMechanics: string[]
   };
 }
@@ -270,7 +271,7 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       {/* Honda Header */}
       <div className="flex flex-col justify-center items-center mb-1">
         <div className="flex justify-between items-center w-full">
-          <div className="flex-1"></div>
+          <div className="flex-1 font-bold">{data.transactionCode}</div>
           <img
             src="/smct-header.jpg"
             alt="Company Logo"
