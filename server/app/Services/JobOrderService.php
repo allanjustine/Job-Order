@@ -31,6 +31,7 @@ class JobOrderService
                 'mechanics:id,name'
             ])
             ->withSum('jobOrderDetails as total_amount', 'amount')
+            ->whereRelation('customer.user', 'id', Auth::id())
             ->when(
                 $search,
                 fn($jobOrder)
@@ -46,7 +47,6 @@ class JobOrderService
                     ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
                     ->orWhereRelation('mechanics', 'name', 'like', "%{$search}%")
             )
-            ->whereRelation('customer.user', 'id', Auth::id())
             ->orderBy(
                 $column,
                 $sort['direction']
