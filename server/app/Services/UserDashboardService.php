@@ -15,15 +15,18 @@ class UserDashboardService
     private function totalJobPrints()
     {
         $total = JobOrder::query()
+            ->whereNull('status')
             ->whereRelation('customer.user', 'id', Auth::id())
             ->count();
 
         $totalMotors = JobOrder::query()
+            ->whereNull('status')
             ->whereRelation('customer.user', 'id', Auth::id())
             ->where('job_order_type', JobOrderType::MOTORS?->value)
             ->count();
 
         $totalTrimotors = JobOrder::query()
+            ->whereNull('status')
             ->whereRelation('customer.user', 'id', Auth::id())
             ->where('job_order_type', JobOrderType::TRIMOTORS?->value)
             ->count();
@@ -38,7 +41,7 @@ class UserDashboardService
 
     private function monthlyTargetIncome()
     {
-        $targetIncome =  TargetIncome::query()
+        $targetIncome = TargetIncome::query()
             ->where('user_id', Auth::id())
             ->where(
                 fn($targetIncome)
@@ -89,6 +92,7 @@ class UserDashboardService
     {
         return JobOrderDetail::query()
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
+            ->whereRelation('jobOrder', 'status', null)
             ->get()
             ->groupBy('category')
             ->map(fn($items, $category) => [
@@ -116,12 +120,14 @@ class UserDashboardService
     public function sumByTypes()
     {
         $sum_of_job_request = JobOrder::query()
+            ->whereNull('status')
             ->whereRelation('customer.user', 'id', Auth::id())
             ->withSum('jobOrderDetailsByJobRequestType', 'amount')
             ->get()
             ->sum('job_order_details_by_job_request_type_sum_amount');
 
         $sum_of_parts_replacement = JobOrder::query()
+            ->whereNull('status')
             ->whereRelation('customer.user', 'id', Auth::id())
             ->withSum('jobOrderDetailsByPartsReplacementType', 'amount')
             ->get()
