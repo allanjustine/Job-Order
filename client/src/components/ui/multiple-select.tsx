@@ -53,7 +53,7 @@ export function MultipleSelect({
         <ComboboxEmpty>No items found.</ComboboxEmpty>
         <ComboboxList>
           {(item) => (
-            <ComboboxItem key={item.id} value={item.id}>
+            <ComboboxItem key={item.id} value={String(item.id)}>
               {`(${item.code}) ${item.name}`}
             </ComboboxItem>
           )}
