@@ -216,9 +216,7 @@ const Reports = () => {
       cell: (row: any) => (
         <>
           <div className="flex flex-col">
-            <span className="text-sm">
-              {format(row.date, "MMM dd, yyyy hh:mm a")}
-            </span>
+            <span className="text-sm">{format(row.date, "MMM dd, yyyy")}</span>
             <span className="text-gray-500 text-xs font-bold">
               {formatDistanceToNowStrict(row.date, { addSuffix: true })}
             </span>
