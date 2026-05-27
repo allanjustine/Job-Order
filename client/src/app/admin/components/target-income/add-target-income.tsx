@@ -212,7 +212,7 @@ export default function AddTargetIncome({
                 type="button"
                 onClick={handleSyncWithLastMonth}
                 disabled={isSubmitting || isLoading || isSyncing}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+                className="bg-green-500 hover:bg-green-600 text-white py-5"
               >
                 {isSyncing ? (
                   <>
