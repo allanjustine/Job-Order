@@ -16,7 +16,7 @@ class ReportService
     {
         $per_page = request('perPage', 10);
 
-        $sort = request('sort', ["column" => "id", "direction" => "asc"]);
+        $sort = request('sort', ["column" => "created_at", "direction" => "asc"]);
 
         $filter_item = request('filter_item', '');
 
@@ -208,7 +208,7 @@ class ReportService
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'              => $item->date->format('Y-m-d H:i:s'),
+                    'Date'              => $item->date->format('Y-m-d'),
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
