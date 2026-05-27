@@ -106,7 +106,7 @@ class TargetIncomeService
         return $targetIncome->delete();
     }
 
-    public function sameAsLastMonth()
+    public function syncWithLastMonth()
     {
         $targetIncome = TargetIncome::query()
             ->whereYear('month_of', now()->year);

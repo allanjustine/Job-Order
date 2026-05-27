@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('user-selection-options', 'userSelectionOptions');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
-        Route::post('target-incomes/same-as-last-month', [TargetIncomeController::class, 'sameAsLastMonth']);
+        Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
         Route::resource('area-managers', AreaManagerController::class);
         Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);

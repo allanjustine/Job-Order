@@ -5,7 +5,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@/components/ui/modal";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Activity, Dispatch, SetStateAction, useEffect, useState } from "react";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -128,10 +128,10 @@ export default function AddTargetIncome({
       }
     }
   }
-  async function handleSameAsLastMonth() {
+  async function handleSyncWithLastMonth() {
     setIsSyncing(true);
     try {
-      const response = await api.post("/target-incomes/same-as-last-month");
+      const response = await api.post("/target-incomes/sync-with-last-month");
 
       if (response.status === 201) {
         setIsOpen(false);
@@ -188,37 +188,6 @@ export default function AddTargetIncome({
                   </p>
                 )}
               </div>
-              {/* <div>
-                <Label htmlFor="user_id">Select branch</Label>
-                {isLoading ? (
-                  <Skeleton className="h-12 w-full rounded-md" />
-                ) : (
-                  <Select
-                    className="py-2.5"
-                    {...register("user_id", { required: true })}
-                  >
-                    <option value="" disabled>
-                      Select branch
-                    </option>
-                    {users.length < 0 ? (
-                      <option value="" disabled>
-                        No branches found
-                      </option>
-                    ) : (
-                      users.map((user: UserData, index: number) => (
-                        <option key={index} value={String(user.id)}>
-                          {`(${user.code}) - ${user.name}`}
-                        </option>
-                      ))
-                    )}
-                  </Select>
-                )}
-                {errors.user_id && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.user_id.message}
-                  </p>
-                )}
-              </div> */}
               <div>
                 <Label htmlFor="target_income">Target Income</Label>
                 <Input
@@ -238,22 +207,24 @@ export default function AddTargetIncome({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button
-              type="button"
-              onClick={handleSameAsLastMonth}
-              disabled={isSubmitting || isLoading || isSyncing}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
-            >
-              {isSyncing ? (
-                <>
-                  <Spinner /> Please wait...
-                </>
-              ) : (
-                <>
-                  <Plus /> Same as last month
-                </>
-              )}
-            </Button>
+            <Activity mode={users?.length > 0 ? "visible" : "hidden"}>
+              <Button
+                type="button"
+                onClick={handleSyncWithLastMonth}
+                disabled={isSubmitting || isLoading || isSyncing}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+              >
+                {isSyncing ? (
+                  <>
+                    <Spinner /> Syncing...
+                  </>
+                ) : (
+                  <>
+                    <Plus /> Sync with Last Month
+                  </>
+                )}
+              </Button>
+            </Activity>
             <Button
               type="submit"
               disabled={isSubmitting || isLoading || isSyncing}

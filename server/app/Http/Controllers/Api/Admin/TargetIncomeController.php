@@ -75,9 +75,9 @@ class TargetIncomeController extends Controller
         ], 200);
     }
 
-    public function sameAsLastMonth(TargetIncomeService $targetIncomeService)
+    public function syncWithLastMonth(TargetIncomeService $targetIncomeService)
     {
-        $targetIncomes = $targetIncomeService->sameAsLastMonth();
+        $targetIncomes = $targetIncomeService->syncWithLastMonth();
 
         return response()->json([
             'message' => 'All data from last month synced successfully',
