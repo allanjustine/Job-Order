@@ -122,6 +122,17 @@ const Dashboard = () => {
         const response = await api.get("mechanic-checking");
 
         if (response.status === 200) {
+          toast.success(response.data.message, {
+            position: "bottom-left",
+            duration: 10000,
+            icon: "🧑‍🔧🛠️",
+            style: {
+              borderRadius: "15px",
+              background: "oklch(70.7% 0.165 254.624)",
+              color: "#fff",
+              padding: "15px",
+            },
+          });
           setHasMechanic(response.data.has_mechanic);
         }
       } catch (error) {

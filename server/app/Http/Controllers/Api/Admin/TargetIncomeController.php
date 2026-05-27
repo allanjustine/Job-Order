@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateTargetIncomeRequest;
 use App\Models\TargetIncome;
 use App\Services\TargetIncomeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TargetIncomeController extends Controller
 {
@@ -31,10 +32,12 @@ class TargetIncomeController extends Controller
     {
         $request->validated();
 
-        $targetIncome = $targetIncomeService->store($request);
+        $count = $targetIncomeService->store($request);
+
+        $pluralized = Str::plural('branch', $count);
 
         return response()->json([
-            'message' => "Target Income of \"({$targetIncome->user->code}) - {$targetIncome->user->name}\" created successfully.",
+            'message' => "Target Income of {$count} {$pluralized} created successfully.",
         ], 201);
     }
 
@@ -70,5 +73,15 @@ class TargetIncomeController extends Controller
         return response()->json([
             'message' => "Target Income of \"({$targetIncome->user->code}) - {$targetIncome->user->name}\" deleted successfully.",
         ], 200);
+    }
+
+    public function syncWithLastMonth(TargetIncomeService $targetIncomeService)
+    {
+        $targetIncomes = $targetIncomeService->syncWithLastMonth();
+
+        return response()->json([
+            'message' => 'All data from last month synced successfully',
+            'data' => $targetIncomes
+        ], 201);
     }
 }

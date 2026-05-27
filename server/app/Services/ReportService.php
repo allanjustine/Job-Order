@@ -38,7 +38,7 @@ class ReportService
                 'customer.user:id,name,code',
                 'mechanics:id,name'
             ])
-            ->select('id', 'job_order_number', 'job_order_type', 'created_at', 'customer_id','status')
+            ->select('id', 'job_order_number', 'job_order_type', 'date', 'customer_id', 'status')
             ->withCount([
                 'jobOrderDetails'
                 =>
@@ -98,7 +98,7 @@ class ReportService
                 $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereBetween('created_at', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
+                $query->whereBetween('date', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
             )
             ->when(
                 $sort['column'] !== 'user.name',
@@ -133,7 +133,7 @@ class ReportService
         $date = explode(", ", $filter_item);
 
         return JobOrderDetail::query()
-            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'date')
             ->with([
                 'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status',
                 'jobOrder.customer:id,name',
@@ -190,7 +190,7 @@ class ReportService
                 $filter_by === 'date' && $filter_item !== "",
                 fn($query)
                 =>
-                $query->whereBetween('created_at', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
+                $query->whereBetween('date', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
             )
             ->when(
                 $filter_by === 'job_order_type',
@@ -208,7 +208,7 @@ class ReportService
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'              => $item->created_at->format('Y-m-d H:i:s'),
+                    'Date'              => $item->date->format('Y-m-d H:i:s'),
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
@@ -237,7 +237,7 @@ class ReportService
         $to = request('to', '');
 
         $jobOrders = JobOrderDetail::query()
-            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'created_at')
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'date')
             ->with([
                 'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
                 'jobOrder.customer:id,name,address',
@@ -267,7 +267,7 @@ class ReportService
             ->where(
                 fn($item)
                 =>
-                $item->whereBetween('created_at', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
+                $item->whereBetween('date', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
             )
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get();
@@ -276,31 +276,31 @@ class ReportService
 
         $jobOrders = $jobOrders->map(function ($item) use (&$lastJoNumber) {
 
-        $currentJoNumber = $item->jobOrder?->job_order_number;
+            $currentJoNumber = $item->jobOrder?->job_order_number;
 
-        $showHeader = $lastJoNumber !== $currentJoNumber;
+            $showHeader = $lastJoNumber !== $currentJoNumber;
 
-        $lastJoNumber = $currentJoNumber;
+            $lastJoNumber = $currentJoNumber;
 
-        return [
-                    'Date'              => $showHeader ? $item->jobOrder?->date->format('m-d-Y') : '',
-                    'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
-                    'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
-                    'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
-                    'Address'           => $showHeader ? $item->jobOrder?->customer?->address : '',
-                    'Mechanics'         => $showHeader ? $item->jobOrder?->mechanics->pluck('name')->join(', ') : '',
-                    'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
-                    'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
-                    'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',
-                    'Quantity'          => $item->type === 'parts_replacement' ? $item->quantity : '',
-                    'Part Brand'        => $item->type === 'parts_replacement' ? $item->part_brand : '',
-                    'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
-                    'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
-                    'General Remarks '  => $item->jobOrder?->general_remarks,
-                    'JO Category'       => $item->jobOrder?->category,
-                    'JO Status'         => $item->jobOrder?->status,
-                ];
-            });
+            return [
+                'Date'              => $showHeader ? $item->jobOrder?->date->format('m-d-Y') : '',
+                'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
+                'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
+                'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
+                'Address'           => $showHeader ? $item->jobOrder?->customer?->address : '',
+                'Mechanics'         => $showHeader ? $item->jobOrder?->mechanics->pluck('name')->join(', ') : '',
+                'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
+                'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
+                'Part Used'         => $item->type === 'parts_replacement' ? $item->category : '',
+                'Quantity'          => $item->type === 'parts_replacement' ? $item->quantity : '',
+                'Part Brand'        => $item->type === 'parts_replacement' ? $item->part_brand : '',
+                'Part Number'       => $item->type === 'parts_replacement' ? $item->part_number : '',
+                'Part Used Amount ' => $item->type === 'parts_replacement' ? $item->amount : '',
+                'General Remarks '  => $item->jobOrder?->general_remarks,
+                'JO Category'       => $item->jobOrder?->category,
+                'JO Status'         => $item->jobOrder?->status,
+            ];
+        });
 
         return $jobOrders;
     }

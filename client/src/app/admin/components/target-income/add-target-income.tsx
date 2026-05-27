@@ -5,9 +5,9 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@/components/ui/modal";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Activity, Dispatch, SetStateAction, useEffect, useState } from "react";
 import z from "zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import Input from "@/components/ui/input";
@@ -17,21 +17,22 @@ import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { MultipleSelect } from "@/components/ui/multiple-select";
 
 const schema = z.object({
   target_income: z
     .number()
     .min(1, "Target income must be at least 1")
     .max(999999, "Target income must be less than 999999"),
-  user_id: z.string().nonempty("Branch selection is required"),
+  user_ids: z.array(z.string()).min(1, "Branch selection is required"),
 });
 
 interface FormItem {
   target_income: number;
-  user_id: string;
+  user_ids: string[];
 }
 
-interface UserData {
+export interface UserData {
   id: number;
   name: string;
   code: string;
@@ -48,17 +49,20 @@ export default function AddTargetIncome({
 }) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [value, setValue] = useState<string[]>([]);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm<FormItem>({
     resolver: zodResolver(schema),
     defaultValues: {
       target_income: 0,
-      user_id: "",
+      user_ids: [],
     },
   });
 
@@ -89,8 +93,7 @@ export default function AddTargetIncome({
     try {
       const response = await api.post("/target-incomes", {
         target_income: data.target_income,
-        user_id: data.user_id,
-        month_of: data.month_of,
+        user_ids: data.user_ids,
       });
 
       if (response.status === 201) {
@@ -125,6 +128,33 @@ export default function AddTargetIncome({
       }
     }
   }
+  async function handleSyncWithLastMonth() {
+    setIsSyncing(true);
+    try {
+      const response = await api.post("/target-incomes/sync-with-last-month");
+
+      if (response.status === 201) {
+        setIsOpen(false);
+        reset();
+        toast.success(response.data.message, {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "👍",
+          style: {
+            borderRadius: "15px",
+            background: "#333",
+            color: "#fff",
+            padding: "15px",
+          },
+        });
+        fetchData();
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setIsSyncing(false);
+    }
+  }
 
   return (
     <>
@@ -136,33 +166,25 @@ export default function AddTargetIncome({
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="user_id">Select branch</Label>
                 {isLoading ? (
                   <Skeleton className="h-12 w-full rounded-md" />
                 ) : (
-                  <Select
-                    className="py-2.5"
-                    {...register("user_id", { required: true })}
-                  >
-                    <option value="" disabled>
-                      Select branch
-                    </option>
-                    {users.length < 0 ? (
-                      <option value="" disabled>
-                        No branches found
-                      </option>
-                    ) : (
-                      users.map((user: UserData, index: number) => (
-                        <option key={index} value={String(user.id)}>
-                          {`(${user.code}) - ${user.name}`}
-                        </option>
-                      ))
+                  <Controller
+                    name="user_ids"
+                    control={control}
+                    render={({ field }) => (
+                      <MultipleSelect
+                        value={field.value}
+                        setValue={field.onChange}
+                        userLists={users}
+                        placeholder="Select branches"
+                      />
                     )}
-                  </Select>
+                  />
                 )}
-                {errors.user_id && (
+                {errors.user_ids && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.user_id.message}
+                    {errors.user_ids.message}
                   </p>
                 )}
               </div>
@@ -185,9 +207,27 @@ export default function AddTargetIncome({
             </div>
           </ModalBody>
           <ModalFooter>
+            <Activity mode={users?.length > 0 ? "visible" : "hidden"}>
+              <Button
+                type="button"
+                onClick={handleSyncWithLastMonth}
+                disabled={isSubmitting || isLoading || isSyncing}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+              >
+                {isSyncing ? (
+                  <>
+                    <Spinner /> Syncing...
+                  </>
+                ) : (
+                  <>
+                    <Plus /> Sync with Last Month
+                  </>
+                )}
+              </Button>
+            </Activity>
             <Button
               type="submit"
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || isSyncing}
               className="bg-blue-500 hover:bg-blue-600 text-white py-5"
             >
               {isSubmitting ? (

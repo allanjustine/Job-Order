@@ -12,7 +12,7 @@ import {
   SearchSlash,
   Trash,
 } from "lucide-react";
-import { Activity, useState } from "react";
+import { Activity, ChangeEvent, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
@@ -27,11 +27,17 @@ import { diffForHumans } from "@/utils/diff-for-humans";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
+import { format } from "date-fns";
+import Select from "@/components/ui/select";
 
 const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
   const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
+  const [filters, setFilters] = useState<{ query: string; value: string }>({
+    query: "",
+    value: "",
+  });
   const {
     data: targetIncomes,
     isLoading,
@@ -47,7 +53,61 @@ const Reports = () => {
     handleSearch,
     handleRefresh,
     fetchData,
-  } = useFetch("/target-incomes");
+  } = useFetch("/target-incomes", {
+    filterItem: filters?.value,
+    filterBy: filters?.query,
+  });
+
+  const DATES = [
+    {
+      label: "January",
+      value: 1,
+    },
+    {
+      label: "February",
+      value: 2,
+    },
+    {
+      label: "March",
+      value: 3,
+    },
+    {
+      label: "April",
+      value: 4,
+    },
+    {
+      label: "May",
+      value: 5,
+    },
+    {
+      label: "June",
+      value: 6,
+    },
+    {
+      label: "July",
+      value: 7,
+    },
+    {
+      label: "August",
+      value: 8,
+    },
+    {
+      label: "September",
+      value: 9,
+    },
+    {
+      label: "October",
+      value: 10,
+    },
+    {
+      label: "November",
+      value: 11,
+    },
+    {
+      label: "December",
+      value: 12,
+    },
+  ];
 
   const columns = [
     {
@@ -64,6 +124,16 @@ const Reports = () => {
         <div>
           <span className="font-bold text-gray-600">
             ({row.user.code}) - {row.user.name}
+          </span>
+        </div>
+      ),
+    },
+    {
+      name: "MONTH OF",
+      cell: (row: any) => (
+        <div>
+          <span className="font-extrabold text-gray-800 capitalize">
+            {format(row.month_of, "MMMM yyyy")}
           </span>
         </div>
       ),
@@ -216,14 +286,38 @@ const Reports = () => {
               <h2 className="text-xl font-semibold text-gray-600">
                 Target Incomes
               </h2>
-              <div className="relative w-full md:w-1/3">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  onChange={handleSearch}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <div className="flex gap-1 items-center">
+                <div>
+                  <Select
+                    value={filters?.value}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                      setFilters({
+                        query: "month_of",
+                        value: e.target.value,
+                      });
+                    }}
+                    className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
+                  >
+                    <option value="" selected disabled>
+                      Select Month
+                    </option>
+                    <option value="">This Month</option>
+                    {DATES?.map(({ label, value }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="relative w-full">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    onChange={handleSearch}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                </div>
               </div>
             </div>
             <div className="overflow-x-auot">

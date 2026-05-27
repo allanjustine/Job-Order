@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 
 export default function useFetch(
   url: string,
-  { filterItem, filterBy }: { filterItem?: string; filterBy?: string } = {}
+  { filterItem, filterBy }: { filterItem?: string; filterBy?: string } = {},
 ) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
