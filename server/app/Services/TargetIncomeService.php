@@ -119,6 +119,10 @@ class TargetIncomeService
             ->whereMonth('month_of', now()->subMonth()->month)
             ->get(['user_id', 'target_income']);
 
+        if ($targetIncomes->isEmpty()) {
+            abort(400, 'No target income data found for last month to sync.');
+        }
+
         $toInsert = $targetIncomes->map(fn($ti) => [
             'user_id'       => $ti->user_id,
             'target_income' => $ti->target_income,
