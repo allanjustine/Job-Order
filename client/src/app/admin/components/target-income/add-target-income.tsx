@@ -151,6 +151,19 @@ export default function AddTargetIncome({
       }
     } catch (error: any) {
       console.error(error);
+      if (error.response.status === 400) {
+        toast.error(error.response.data.message, {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "❌",
+          style: {
+            borderRadius: "15px",
+            background: "#FF0000",
+            color: "#fff",
+            padding: "15px",
+          },
+        });
+      }
     } finally {
       setIsSyncing(false);
     }
