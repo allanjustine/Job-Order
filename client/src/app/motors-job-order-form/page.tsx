@@ -399,7 +399,7 @@ const JobOrderForm = () => {
             : item.label,
       amount: jobAmounts[item.key as keyof JobAmountsType] || 0,
       type: "job_request",
-      part_brand: "n/a",
+      part_brand: item.key === "selectedCoupon" ? jobRequest.couponBrand : "n/a",
       part_number: "n/a",
       is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
