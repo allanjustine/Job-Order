@@ -212,21 +212,21 @@ const Reports = () => {
       sortField: "job_order_details_count",
     },
     {
-      name: "CREATED AT",
+      name: "DATE",
       cell: (row: any) => (
         <>
           <div className="flex flex-col">
             <span className="text-sm">
-              {format(row.created_at, "MMM dd, yyyy hh:mm a")}
+              {format(row.date, "MMM dd, yyyy hh:mm a")}
             </span>
             <span className="text-gray-500 text-xs font-bold">
-              {formatDistanceToNowStrict(row.created_at, { addSuffix: true })}
+              {formatDistanceToNowStrict(row.date, { addSuffix: true })}
             </span>
           </div>
         </>
       ),
       sortable: true,
-      sortField: "created_at",
+      sortField: "date",
     },
     {
       name: "ACTIONS",

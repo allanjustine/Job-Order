@@ -54,6 +54,7 @@ class TargetIncomeService
                     $filter_item ? $jobOrderDetail->whereMonth('created_at', $filter_item) : $jobOrderDetail->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
                 ], 'amount')
+                ->whereNull('status')
                 ->get()
                 ->sum('job_order_details_by_job_request_type_sum_amount');
 
