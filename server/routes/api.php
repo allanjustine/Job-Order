@@ -26,9 +26,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('mechanic-checking', function (Request $request) {
         $has_mechanic = $request->user()->mechanics();
+        $word_pluralize = Str::plural('mechanic', $has_mechanic->count());
 
         return response()->json([
-            "message"      => "You have a mechanic: {$has_mechanic->count()}",
+            "message"      => "{$has_mechanic->count()} {$word_pluralize} found. You can now create a job order.",
             "has_mechanic" => $has_mechanic->exists()
         ], 200);
     });
@@ -43,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('user-selection-options', 'userSelectionOptions');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
+        Route::post('target-incomes/same-as-last-month', [TargetIncomeController::class, 'sameAsLastMonth']);
         Route::resource('area-managers', AreaManagerController::class);
         Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);
