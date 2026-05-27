@@ -237,7 +237,7 @@ class ReportService
         $to = request('to', '');
 
         $jobOrders = JobOrderDetail::query()
-            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'date')
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
                 'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
                 'jobOrder.customer:id,name,address',
@@ -264,11 +264,13 @@ class ReportService
             )
             // ->orderBy('type', 'asc')
             ->orderBy(JobOrder::select('job_order_number')->whereColumn('job_orders.id', 'job_order_details.job_order_id'), 'asc')
-            ->where(
-                fn($item)
-                =>
-                $item->whereBetween('date', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
-            )
+            ->whereHas('jobOrder', function ($q) use ($from, $to) {
+                $q->where(
+                    fn($item)
+                    =>
+                    $item->whereBetween('date', [Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay()])
+                );
+            })
             ->whereRelation('jobOrder.customer.user', 'id', Auth::id())
             ->get();
 
