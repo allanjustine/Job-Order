@@ -9,8 +9,8 @@ import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash, Trash, User } from "lucide-react";
-import { Activity, ChangeEvent, useEffect, useState } from "react";
+import { CircleX, Eye, Search, SearchSlash, User } from "lucide-react";
+import { Activity, ChangeEvent, useEffect, useState, useRef } from "react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
@@ -24,6 +24,14 @@ import { DatePickerWithRange } from "@/components/date-picker.with-range";
 import { DateRange } from "react-day-picker";
 import Swal from "sweetalert2";
 import { toast } from "react-hot-toast";
+import ViewJobOrder from "@/components/view-job-order";
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "@/components/ui/modal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Reports = () => {
   const [filterItem, setFilterItem] = useState<string | undefined>("");
@@ -58,6 +66,31 @@ const Reports = () => {
     from: new Date(),
     to: new Date(),
   });
+  const [viewData, setViewData] = useState<any>(null);
+  const [isBrowsing, setIsBrowsing] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setViewData(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   function handleDeleteJobOrder(id: number) {
     return function () {
@@ -110,6 +143,21 @@ const Reports = () => {
       });
     };
   }
+
+  const handleView = (id: number) => async () => {
+    setIsOpen(true);
+    setIsBrowsing(true);
+    try {
+      const response = await api.get(`/job-orders/${id}/browse`);
+      if (response.status === 200) {
+        setViewData(response?.data?.data);
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setIsBrowsing(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -232,15 +280,23 @@ const Reports = () => {
         <div className="flex items-center gap-2">
           <Button
             type="button"
+            onClick={handleView(row.id)}
+            className="p-2 bg-blue-500 text-white"
+            ref={buttonRef}
+          >
+            <Eye /> View
+          </Button>
+          <Button
+            type="button"
             onClick={handleDeleteJobOrder(row?.id)}
             disabled={row.status}
-            className={`px-10 py-2 ${
+            className={`p-2 ${
               row.status
                 ? "bg-gray-200 cursor-not-allowed text-red-600"
                 : "bg-red-500 text-white"
             }`}
           >
-            {row.status ? "Cancelled" : "Cancel"}
+            <CircleX /> {row.status ? "Canceled" : "Cancel"}
           </Button>
         </div>
       ),
@@ -634,6 +690,59 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      <Modal isOpen={isOpen} className="w-3xl" ref={modalRef}>
+        <ModalHeader
+          onClose={() => {
+            setIsOpen(false);
+            setViewData(null);
+          }}
+        >
+          Viewing {viewData?.customer.name}&apos;s Job Order
+          {viewData?.job_order_type && (
+            <span
+              className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
+                viewData.job_order_type === "trimotors"
+                  ? "bg-indigo-100 text-indigo-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {viewData.job_order_type.toUpperCase()}
+            </span>
+          )}
+        </ModalHeader>
+        <ModalBody>
+          {isBrowsing ? (
+            <div className="flex flex-col gap-2">
+              <div className="space-y-2">
+                <Skeleton className="w-1/8 h-6" />
+                <Skeleton className="w-2/6 h-6" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="w-full h-45" />
+                <Skeleton className="w-full h-45" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="w-11/12 h-6" />
+                <Skeleton className="w-6/12 h-6" />
+              </div>
+            </div>
+          ) : (
+            <ViewJobOrder data={viewData} />
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              setViewData(null);
+            }}
+          >
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };
