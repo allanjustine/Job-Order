@@ -11,6 +11,7 @@ import {
   BikeIcon,
   CarFrontIcon,
   User,
+  Eye,
 } from "lucide-react";
 import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -257,12 +258,13 @@ const Dashboard = () => {
       name: "ACTION",
       cell: (row: any) => (
         <div>
-          <button
+          <Button
             onClick={handleView(row.id)}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            ref={buttonRef}
           >
-            View
-          </button>
+            <Eye /> View
+          </Button>
         </div>
       ),
       sortField: "created_at",
