@@ -63,7 +63,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   const jobTotal = (() => {
     let total = 0;
     Object.entries(data.jobAmounts || {}).forEach(([key, value]) => {
-      if (key !== 'selectedCoupon') {
+      if (key !== "selectedCoupon") {
         total += Number(value) || 0;
       }
     });
@@ -73,7 +73,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
     }
     return total;
   })();
-  
+
   const partsTotal = Object.values(data.partsAmounts || {}).reduce(
     (s: number = 0, v) => s + (Number(v) || 0),
     0,
@@ -144,11 +144,14 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
 
   // Get coupon data
   const getCouponData = () => {
-    if ((data.jobRequest as any).coupon && (data.jobRequest as any).selectedCoupon) {
+    if (
+      (data.jobRequest as any).coupon &&
+      (data.jobRequest as any).selectedCoupon
+    ) {
       return {
         selectedCoupon: (data.jobRequest as any).selectedCoupon,
         couponBrand: (data.jobRequest as any).couponBrand,
-        amount: (data.jobAmounts as any).selectedCoupon || 0
+        amount: (data.jobAmounts as any).selectedCoupon || 0,
       };
     }
     return null;
@@ -167,21 +170,20 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
 
     // Add coupon as a job item if selected
     const couponData = getCouponData();
-      if (couponData) {
-        selectedJobs.push({
-          key: 'coupon',
-          label: `${couponData.selectedCoupon}${couponData.couponBrand ? ` - ${couponData.couponBrand}` : ''}`,
-          amount: couponData.amount,
-          isCoupon: true,
-        });
-      }
+    if (couponData) {
+      selectedJobs.push({
+        key: "coupon",
+        label: `${couponData.selectedCoupon}${couponData.couponBrand ? ` - ${couponData.couponBrand}` : ""}`,
+        amount: couponData.amount,
+        isCoupon: true,
+      });
+    }
 
     // Add regular selected jobs
     trimotorsJobItems.forEach((item) => {
-      if(item.key === "selectedCoupon"){
+      if (item.key === "selectedCoupon") {
         return; // Skip coupon as it's handled separately
-      }
-      else if (item.key !== "others" && isJobSelected(item.key)) {
+      } else if (item.key !== "others" && isJobSelected(item.key)) {
         selectedJobs.push({
           key: item.key,
           label: item.label,

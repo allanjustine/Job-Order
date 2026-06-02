@@ -112,7 +112,7 @@ class JobOrderService
             return $customer;
         });
 
-        Cache::delete('jo_transaction_code');
+        Cache::forget('jo_transaction_code');
 
         return $customer;
     }

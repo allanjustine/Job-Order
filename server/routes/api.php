@@ -69,13 +69,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get-job-order-number', function () {
             $lastJobOrderNumber = Auth::user()->jobOrders()->max('job_order_number') ?? 0;
 
-            Cache::delete('jo_transaction_code');
+            Cache::forget('jo_transaction_code');
 
             $jobOrderNumber = sprintf('%07d', $lastJobOrderNumber + 1);
 
             do {
                 $generated_code = "JO-" . Str::upper(Str::random(15));
-            } while (JobOrder::query()->where('transaction_code', "JO-{$generated_code}")->exists());
+            } while (JobOrder::query()->where('transaction_code', "{$generated_code}")->exists());
 
             Cache::put('jo_transaction_code', $generated_code, now()->addMinutes(30));
 

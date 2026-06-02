@@ -44,6 +44,30 @@ import FormHeader from "@/components/form-header";
 import { jobItems } from "@/constants/job-items";
 import { partsItems } from "@/constants/part-items";
 
+const QUANTITY_DATA = {
+  engineOil: 1,
+  drainPlugWasher: 1,
+  tappetORing: 1,
+  sparkPlug: 1,
+  airCleanerElement: 1,
+  brakeShoePads: 1,
+  gaskets: 1,
+  battery: 1,
+  chainSprocketBelt: 1,
+  fuelHose: 1,
+  tiresTubesFlaps: 1,
+  bulbs: 1,
+  bearings: 1,
+  springs: 1,
+  rubberPartsOilSeal: 1,
+  plasticParts: 1,
+  brakeFluid: 1,
+  coolant: 1,
+  gearOil: 1,
+  oilFilter: 1,
+  partsOthers: 1,
+};
+
 // Schema for form validation
 const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -57,7 +81,9 @@ const formSchema = z.object({
   // fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
-  mechanic: z.array(z.number().min(1, "Mechanic is required")).min(1, "At least one mechanic must be selected"),
+  mechanic: z
+    .array(z.number().min(1, "Mechanic is required"))
+    .min(1, "At least one mechanic must be selected"),
   remarks: z.string().min(1, "Category is required"),
   // engineCondition: z.string().min(1, "Engine condition is required"),
   // contentUbox: z.string().min(1, "Content inside Ubox is required"),
@@ -152,29 +178,8 @@ const JobOrderForm = () => {
     partsOthersText: "",
   });
 
-  const [partsQuantity, setPartsQuantity] = useState<PartsQuantity>({
-    engineOil: 1,
-    drainPlugWasher: 1,
-    tappetORing: 1,
-    sparkPlug: 1,
-    airCleanerElement: 1,
-    brakeShoePads: 1,
-    gaskets: 1,
-    battery: 1,
-    chainSprocketBelt: 1,
-    fuelHose: 1,
-    tiresTubesFlaps: 1,
-    bulbs: 1,
-    bearings: 1,
-    springs: 1,
-    rubberPartsOilSeal: 1,
-    plasticParts: 1,
-    brakeFluid: 1,
-    coolant: 1,
-    gearOil: 1,
-    oilFilter: 1,
-    partsOthers: 1,
-  });
+  const [partsQuantity, setPartsQuantity] =
+    useState<PartsQuantity>(QUANTITY_DATA);
 
   const [diagnosis, setDiagnosis] = useState<
     Record<DiagnosisKeys, DiagnosisState>
@@ -399,7 +404,8 @@ const JobOrderForm = () => {
             : item.label,
       amount: jobAmounts[item.key as keyof JobAmountsType] || 0,
       type: "job_request",
-      part_brand: item.key === "selectedCoupon" ? jobRequest.couponBrand : "n/a",
+      part_brand:
+        item.key === "selectedCoupon" ? jobRequest.couponBrand : "n/a",
       part_number: "n/a",
       is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
@@ -675,7 +681,7 @@ const JobOrderForm = () => {
     setPartsAmounts({});
     setPartsBrand({});
     setPartsNumber({});
-    setPartsQuantity({});
+    setPartsQuantity(QUANTITY_DATA);
 
     // Reset errors
     setErrors({});
