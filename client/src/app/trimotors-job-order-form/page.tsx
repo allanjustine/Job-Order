@@ -45,6 +45,35 @@ import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
 
+const QUANTITY_DATA = {
+  bajajOil: 1,
+  oilFilter: 1,
+  fuelStrainer: 1,
+  speedometerCable: 1,
+  handBrakeCable: 1,
+  clutchCable: 1,
+  gearCableBlack: 1,
+  gearCableWhite: 1,
+  reverseCable: 1,
+  acceleratorCable: 1,
+  headlightBulb: 1,
+  brakeLightBulb: 1,
+  peanutBulb: 1,
+  sealHeadCover: 1,
+  clipSpring: 1,
+  pivotPin: 1,
+  fuse10Amp: 1,
+  brakePipeAssly: 1,
+  kitMajorTmc: 1,
+  wheelCylinderAsslyFront: 1,
+  brakeShoe: 1,
+  wheelCylinderAsslyRear: 1,
+  sparkplug: 1,
+  sparkplugCapRh: 1,
+  headlightRelay: 1,
+  partsOthers: 1,
+};
+
 // Schema for form validation
 const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -233,34 +262,8 @@ const TrimotorsJobOrderForm = () => {
       partsOthersText: "",
     });
 
-  const [partsQuantity, setPartsQuantity] = useState<TrimotorsPartsQuantity>({
-    bajajOil: 1,
-    oilFilter: 1,
-    fuelStrainer: 1,
-    speedometerCable: 1,
-    handBrakeCable: 1,
-    clutchCable: 1,
-    gearCableBlack: 1,
-    gearCableWhite: 1,
-    reverseCable: 1,
-    acceleratorCable: 1,
-    headlightBulb: 1,
-    brakeLightBulb: 1,
-    peanutBulb: 1,
-    sealHeadCover: 1,
-    clipSpring: 1,
-    pivotPin: 1,
-    fuse10Amp: 1,
-    brakePipeAssly: 1,
-    kitMajorTmc: 1,
-    wheelCylinderAsslyFront: 1,
-    brakeShoe: 1,
-    wheelCylinderAsslyRear: 1,
-    sparkplug: 1,
-    sparkplugCapRh: 1,
-    headlightRelay: 1,
-    partsOthers: 1,
-  });
+  const [partsQuantity, setPartsQuantity] =
+    useState<TrimotorsPartsQuantity>(QUANTITY_DATA);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPrint, setIsPrint] = useState(false);
@@ -558,7 +561,8 @@ const TrimotorsJobOrderForm = () => {
             : item.label,
       amount: jobAmounts[item.key as keyof TrimotorsJobAmountType] || 0,
       type: "job_request",
-      part_brand: item.key === "selectedCoupon" ? jobRequest.couponBrand : "n/a",
+      part_brand:
+        item.key === "selectedCoupon" ? jobRequest.couponBrand : "n/a",
       part_number: "n/a",
       is_others_items: item.key === "others" && jobRequest.othersItems,
     }));
@@ -816,7 +820,7 @@ const TrimotorsJobOrderForm = () => {
     setPartsAmounts({});
     setPartsBrand({});
     setPartsNumber({});
-    setPartsQuantity({});
+    setPartsQuantity(QUANTITY_DATA);
   };
 
   const handleLogoutUser = () => {
