@@ -283,7 +283,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
             </div>
           </div>
 
-          {/* <div className="py-2">
+          <div className="py-2">
             <span className="font-bold mr-2">
               Your Next Service Schedule is:
             </span>
@@ -295,7 +295,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
               {data.nextScheduleKms || data.next_schedule_kms || "N/A"}
             </span>
             <span> kms (whichever comes first)</span>
-          </div> */}
+          </div>
 
           <div className="flex mt-2">
             <span className="font-semibold mr-2">General Remarks:</span>

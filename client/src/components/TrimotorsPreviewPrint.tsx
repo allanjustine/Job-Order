@@ -17,6 +17,8 @@ import {
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
+import NextServiceScheduleView from "./NextServiceScheduleView";
+import CustomerGridView from "./CustomerGridView";
 
 interface TrimotorsPreviewJobOrderProps {
   data: {
@@ -333,75 +335,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
       </div>
 
       {/* Vehicle Information - Compact Grid */}
-      <div
-        className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1"
-        style={{ fontSize: "8pt", lineHeight: "0.8" }}
-      >
-        <div className="flex">
-          <span className="font-bold w-32">Date:</span>
-          <span className="border-b border-black flex-1">
-            {format(new Date(data.date), "MM/dd/yyyy")}
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Engine/Frame No.:</span>
-          <span className="border-b border-black flex-1">
-            {data.engineFrameNo}
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-32">Branch Name:</span>
-          <span className="border-b border-black flex-1">{data.branch}</span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Mileage:</span>
-          <span className="border-b border-black flex-1">
-            {data.mileage} km
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-32">Customer Name:</span>
-          <span className="border-b border-black flex-1">
-            {data.customerName}
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Purchased Date:</span>
-          <span className="border-b border-black flex-1">
-            {data.purchaseDate}
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-32">Contact Number:</span>
-          <span className="border-b border-black flex-1">{data.contact}</span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Repair Start Time:</span>
-          <span className="border-b border-black flex-1">
-            {data.repairStart}
-          </span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-32">Model:</span>
-          <span className="border-b border-black flex-1">{data.model}</span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Repair End Time:</span>
-          <span className="border-b border-black flex-1">{data.repairEnd}</span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-32">Address:</span>
-          <span className="border-b border-black flex-1">{data.address}</span>
-        </div>
-        <div className="flex">
-          <span className="font-bold w-40">Mechanic Name:</span>
-          <span className="border-b border-black flex-1">
-            {data.assignedMechanics
-              ?.map((mechanic: any) => mechanic.name)
-              ?.join(", ")}
-          </span>
-        </div>
-      </div>
+      <CustomerGridView data={data} />
 
       {/* Motorcycle Unit & Engine Unit */}
       <div
@@ -664,63 +598,9 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
             Grand Total: {phpCurrency(grandTotal)}
           </div>
         </div>
-
-        {/* Next Service Schedule */}
-        <div className="py-2">
-          <span className="font-bold mr-2">Your Next Service Schedule is:</span>
-          <span className="border-b border-black w-18 inline-block">
-            {data.nextScheduleDate}
-          </span>
-          <span> or </span>
-          <span className="border-b border-black w-25 inline-block">
-            {data.nextScheduleKms}
-          </span>
-          <span> kms </span>
-          <span className="text-xs ml-2">(whichever comes first)</span>
-        </div>
-
-        {/* General Remarks */}
-        <div className="flex">
-          <span className="font-semibold mr-2">General Remarks:</span>
-          <span className="border-b border-black flex-1">
-            {data.generalRemarks}
-          </span>
-        </div>
       </div>
 
-      {/* Signatures */}
-      <div
-        className="mt-0.5 grid grid-cols-3 gap-2 text-xs"
-        style={{ fontSize: "8pt", lineHeight: "0.8" }}
-      >
-        <div className="text-center p-0.5">
-          <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Prepared by:</p>
-          <p className="underline">{data.serviceAdvisor}</p>
-          <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
-            (Signature Over Printed Name)
-          </p>
-          <p className="text-xxs">Salesrep/Service Advisor</p>
-        </div>
-        <div className="text-center p-0.5">
-          <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Checked by:</p>
-          <p className="underline">{data.branchManager}</p>
-          <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
-            (Signature Over Printed Name)
-          </p>
-          <p className="text-xxs">BM/BS</p>
-        </div>
-        <div className="text-center p-0.5">
-          <div className="mb-1 pb-1 h-6"></div>
-          <p className="text-xs text-left">Conformed by:</p>
-          <p className="underline">{data.customerName}</p>
-          <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
-            (Signature Over Printed Name)
-          </p>
-          <p className="text-xxs">Customer</p>
-        </div>
-      </div>
+      <NextServiceScheduleView data={data} />
 
       {/* Footer Note */}
       <p className="mt-2 text-center" style={{ fontSize: "6pt" }}>
