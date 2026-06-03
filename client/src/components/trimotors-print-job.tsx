@@ -16,6 +16,7 @@ import {
 } from "@/types/jobOrderFormType";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { trimotorsJobItems } from "@/constants/trimotors-job-items";
+import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 
 interface TrimotorsPrintJobOrderProps {
   data: {
@@ -52,7 +53,7 @@ interface TrimotorsPrintJobOrderProps {
     mechanic: string;
     jobOrderNumber: string;
     transactionCode: string;
-    assignedMechanics: string[]
+    assignedMechanics: string[];
   };
 }
 
@@ -263,152 +264,29 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
     return selectedParts;
   };
 
-  const diagnosisRows = [
-    {
-      leftLabel: "Windshield",
-      leftKey: "windhsield",
-      rightLabel: "Tape Hood",
-      rightKey: "tapeHood",
-    },
-    {
-      leftLabel: "Wipe Arm",
-      leftKey: "wipeArm",
-      rightLabel: "Aluminum",
-      rightKey: "alumninum",
-    },
-    {
-      leftLabel: "Front Indicator L/R",
-      leftKey: "frontIndicator",
-      rightLabel: "Nails & Screw",
-      rightKey: "nailScrew",
-    },
-    {
-      leftLabel: "Headlamp",
-      leftKey: "frontHeadLamp",
-      rightLabel: "Dashboard",
-      rightKey: "dashboard",
-    },
-    {
-      leftLabel: "Housing Scudo",
-      leftKey: "housingScudo",
-      rightLabel: "Seats Driver",
-      rightKey: "seatsDriver",
-    },
-    {
-      leftLabel: "Housing Headlamp L/R",
-      leftKey: "housingHeadlamp",
-      rightLabel: "Seats Passenger",
-      rightKey: "seatsPassenger",
-    },
-    {
-      leftLabel: "Front Fender",
-      leftKey: "frontFender",
-      rightLabel: "Seat Belts 4pcs",
-      rightKey: "seatBelts",
-    },
-    {
-      leftLabel: "Mud Flap",
-      leftKey: "mudFlapFront",
-      rightLabel: "Handle Leather",
-      rightKey: "handleLeather",
-    },
-    {
-      leftLabel: "Scudo/Front Paint",
-      leftKey: "scudoFront",
-      rightLabel: "Rubber Matting (F/R/C)",
-      rightKey: "rubberMatting",
-    },
-    {
-      leftLabel: "Emblem Logo",
-      leftKey: "frontEmblem",
-      rightLabel: "Underseat Cover",
-      rightKey: "underseatCover",
-    },
-    {
-      leftLabel: "Tail Lamp L/R",
-      leftKey: "tailLamp",
-      rightLabel: "Headlamp/Park Lamp",
-      rightKey: "headlamp",
-    },
-    {
-      leftLabel: "Bumper",
-      leftKey: "bumper",
-      rightLabel: "High/Low Beam",
-      rightKey: "beam",
-    },
-    {
-      leftLabel: "Mud Flap L/R",
-      leftKey: "mudFlapRear",
-      rightLabel: "Signal Lamps",
-      rightKey: "signalLamp",
-    },
-    {
-      leftLabel: "Rear Door",
-      leftKey: "rearDoor",
-      rightLabel: "Hazard Lamps",
-      rightKey: "hazardlamp",
-    },
-    {
-      leftLabel: "Emblem Logo",
-      leftKey: "rearEmblem",
-      rightLabel: "Wiper Motor",
-      rightKey: "wiper",
-    },
-    {
-      leftLabel: "Tail End Body Paint",
-      leftKey: "tailEnd",
-      rightLabel: "Lamps (Interior/Engine)",
-      rightKey: "interiorLamp",
-    },
-    {
-      leftLabel: "Beading",
-      leftKey: "leftBeading",
-      rightLabel: "Gauge Lamps",
-      rightKey: "gaugeLamp",
-    },
-    {
-      leftLabel: "Left Side Body Paint",
-      leftKey: "leftBodyPaint",
-      rightLabel: "Car Charger w/ Cap",
-      rightKey: "carCharger",
-    },
-    {
-      leftLabel: "Mud Guard",
-      leftKey: "mudGuard",
-      rightLabel: "Tools",
-      rightKey: "tools",
-    },
-    {
-      leftLabel: "Beading",
-      leftKey: "rightBeading",
-      rightLabel: "Battery",
-      rightKey: "battery",
-    },
-    {
-      leftLabel: "Right Side Body Paint",
-      leftKey: "rightBodyPaint",
-      rightLabel: "Jack",
-      rightKey: "jack",
-    },
-    {
-      leftLabel: "Check for Holes/Torn",
-      leftKey: "checkHoles",
-      rightLabel: "Spare Tire",
-      rightKey: "spareTire",
-    },
-    {
-      leftLabel: "Damage Stitching",
-      leftKey: "damageStitching",
-      rightLabel: "Side Mirror L/R",
-      rightKey: "sideMirror",
-    },
-    {
-      leftLabel: "Cover Hood Top",
-      leftKey: "coverHood",
-      rightLabel: "Warranty Booklet",
-      rightKey: "warrantyBooklet",
-    },
-  ];
+  const getNGDiagnosisItems = () => {
+    // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
+    const diagnosisItems = trimotorsdiagnosisItems; // This should be the correct list of diagnosis items
+  
+    return diagnosisItems.filter(
+      (item) => data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.status === "ng"
+    );
+  };
+  
+  // Check if any diagnosis is NG
+  const hasNGDiagnosis = () => {
+    return getNGDiagnosisItems().length > 0;
+  };
+  
+  // Check if all diagnosis are OK (no NG and at least one diagnosis exists)
+  const allDiagnosisOK = () => {
+    if (!data.diagnosis) return false;
+    const diagnosisValues = Object.values(data.diagnosis);
+    if (diagnosisValues.length === 0) return false;
+    return diagnosisValues.every(
+      (item) => item.status === "ok" || item.status === "na"
+    );
+  };
 
   // Helper function for diagnosis cells
   const renderStatusCell = (dataKey: string, statusType: string) => {
@@ -559,76 +437,42 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           TRIMOTORS' DIAGNOSIS
         </h3>
-        <table
-          className="w-full border-collapse border border-black my-0"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
-        >
-          <thead>
-            <tr className="bg-gray-40">
-              <th className="border border-black p-0.5 text-center"></th>
-              <th className="border border-black p-0.5 text-center w-8">OK</th>
-              <th className="border border-black p-0.5 text-center w-8">NG</th>
-              <th className="border border-black p-0.5 text-center w-8">N/A</th>
-              <th
-                className="border border-black p-0.5 text-center w-24"
-                colSpan={2}
-              >
-                Remarks
-              </th>
-              <th className="border border-black p-0.5 text-center"></th>
-              <th className="border border-black p-0.5 text-center w-8">OK</th>
-              <th className="border border-black p-0.5 text-center w-8">NG</th>
-              <th className="border border-black p-0.5 text-center w-8">N/A</th>
-              <th
-                className="border border-black p-0.5 text-center w-24"
-                colSpan={2}
-              >
-                Remarks
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {diagnosisRows.map((row, index) => {
-              const leftItem =
-                data.diagnosis?.[row.leftKey as keyof typeof data.diagnosis];
-              const rightItem =
-                data.diagnosis?.[row.rightKey as keyof typeof data.diagnosis];
-
-              return (
-                <tr key={index}>
-                  <td className="border border-black p-0.5">{row.leftLabel}</td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.leftKey, "ok")}
+        
+        {allDiagnosisOK() && (
+          <div className="border border-black p-2 text-center">
+            <p className="font-semibold">All diagnosis are OK</p>
+          </div>
+        )}
+        
+        {hasNGDiagnosis() && (
+          <table
+            className="w-full border-collapse border border-black my-0"
+            style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          >
+            <thead>
+              <tr className="bg-gray-40">
+                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
+                <th className="border border-black p-0.5 text-center">Status</th>
+                <th className="border border-black p-0.5 text-left">Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getNGDiagnosisItems().map((item) => (
+                <tr key={item.key}>
+                  <td className="border border-black p-0.5 w-1/3">
+                    {item.label}
                   </td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.leftKey, "ng")}
+                  <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                    NG
                   </td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.leftKey, "na")}
-                  </td>
-                  <td className="border border-black p-0.5" colSpan={2}>
-                    {leftItem?.remarks || ""}
-                  </td>
-                  <td className="border border-black p-0.5">
-                    {row.rightLabel}
-                  </td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.rightKey, "ok")}
-                  </td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.rightKey, "ng")}
-                  </td>
-                  <td className="border border-black p-0.5 text-center">
-                    {renderStatusCell(row.rightKey, "na")}
-                  </td>
-                  <td className="border border-black p-0.5" colSpan={2}>
-                    {rightItem?.remarks || ""}
+                  <td className="border border-black p-0.5 w-1/3">
+                    {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.remarks || ""}
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}

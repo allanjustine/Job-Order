@@ -18,6 +18,7 @@ import {
 } from "@/types/jobOrderFormType";
 import { jobItems } from "@/constants/job-items";
 import { partsItems } from "@/constants/part-items";
+import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 
 interface PrintJobOrderProps {
   data: {
@@ -54,7 +55,7 @@ interface PrintJobOrderProps {
     mechanic: string[];
     jobOrderNumber: string;
     transactionCode: string;
-    assignedMechanics: string[]
+    assignedMechanics: string[];
   };
 }
 
@@ -258,6 +259,31 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
     return items[index] || null;
   };
 
+  // Get NG diagnosis items// Get NG diagnosis items
+const getNGDiagnosisItems = () => {
+  // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
+  const diagnosisItems = motorsdiagnosisItems; // This should be the correct list of diagnosis items
+
+  return diagnosisItems.filter(
+    (item) => data.diagnosis?.[item.key as DiagnosisKeys]?.status === "ng"
+  );
+};
+
+// Check if any diagnosis is NG
+const hasNGDiagnosis = () => {
+  return getNGDiagnosisItems().length > 0;
+};
+
+// Check if all diagnosis are OK (no NG and at least one diagnosis exists)
+const allDiagnosisOK = () => {
+  if (!data.diagnosis) return false;
+  const diagnosisValues = Object.values(data.diagnosis);
+  if (diagnosisValues.length === 0) return false;
+  return diagnosisValues.every(
+    (item) => item.status === "ok" || item.status === "na"
+  );
+};
+
   return (
     <div
       className="p-1 font-sans bg-white text-black leading-tight border-2 border-black"
@@ -357,7 +383,6 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
         <div className="flex">
           <span className="font-bold w-40">Mechanic Name:</span>
           <span className="border-b border-black flex-1">
-            {" "}
             {data.assignedMechanics
               ?.map((mechanic: any) => mechanic.name)
               ?.join(", ")}
@@ -431,271 +456,42 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           MOTORCYCLE'S DIAGNOSIS
         </h3>
-        <table
-          className="w-full border-collapse border border-black my-0"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
-        >
-          <thead>
-            <tr className="bg-gray-40">
-              <th className="border border-black p-0.5 text-center"></th>
-              <th className="border border-black p-0.5 text-center w-8">OK</th>
-              <th className="border border-black p-0.5 text-center w-8">NG</th>
-              <th className="border border-black p-0.5 text-center w-8">N/A</th>
-              <th
-                className="border border-black p-0.5 text-center w-24"
-                colSpan={2}
-              >
-                Remarks
-              </th>
-              <th className="border border-black p-0.5 text-center"></th>
-              <th className="border border-black p-0.5 text-center w-8">OK</th>
-              <th className="border border-black p-0.5 text-center w-8">NG</th>
-              <th className="border border-black p-0.5 text-center w-8">N/A</th>
-              <th
-                className="border border-black p-0.5 text-center w-24"
-                colSpan={2}
-              >
-                Remarks
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-black p-0.5">
-                Lights (HL/TL/SL/BL/MP)
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.lights?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.lights?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.lights?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.lights?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Suspension (FR/RR)</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.suspension?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.suspension?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.suspension?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.suspension?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">Horn</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.horn?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.horn?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.horn?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.horn?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Idle Speed</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.idleSpeed?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.idleSpeed?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.idleSpeed?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.idleSpeed?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">
-                Switches (IS/SS/SLS/HS)
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.switches?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.switches?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.switches?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.switches?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Side/Main Stand</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.sideMain?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.sideMain?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.sideMain?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.sideMain?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">Brakes (FR/RR)</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakes?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakes?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakes?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.brakes?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">
-                Engine Oil/Final Drive Oil Level
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.engineOil?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.engineOil?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.engineOil?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.engineOil?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">Tires (FR/RR)</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.tires?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.tires?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.tires?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.tires?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Coolant Level</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.coolantLevel?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.coolantLevel?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.coolantLevel?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.coolantLevel?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">
-                Spokes Wheels (FR/RR)
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.spokesWheels?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.spokesWheels?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.spokesWheels?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.spokesWheels?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Brake Fluid Level</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakeFluid?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakeFluid?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.brakeFluid?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.brakeFluid?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">Drive Chain/Belt</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.driveChain?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.driveChain?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.driveChain?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.driveChain?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">Battery</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.battery?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.battery?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.battery?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.battery?.remarks || ""}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-0.5">Steering</td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.steering?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.steering?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.steering?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.steering?.remarks || ""}
-              </td>
-              <td className="border border-black p-0.5">
-                Cable Operation (CL/BR/CBS)
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.cableOperation?.status === "ok" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.cableOperation?.status === "ng" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5 text-center">
-                {data.diagnosis?.cableOperation?.status === "na" ? "✓" : ""}
-              </td>
-              <td className="border border-black p-0.5" colSpan={2}>
-                {data.diagnosis?.cableOperation?.remarks || ""}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        
+        {allDiagnosisOK() && (
+          <div className="border border-black p-2 text-center">
+            <p className="font-semibold">All diagnosis are OK</p>
+          </div>
+        )}
+        
+        {hasNGDiagnosis() && (
+          <table
+            className="w-full border-collapse border border-black my-0"
+            style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          >
+            <thead>
+              <tr className="bg-gray-40">
+                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
+                <th className="border border-black p-0.5 text-center">Status</th>
+                <th className="border border-black p-0.5 text-left">Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getNGDiagnosisItems().map((item) => (
+                <tr key={item.key}>
+                  <td className="border border-black p-0.5 w-1/3">
+                    {item.label}
+                  </td>
+                  <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                    NG
+                  </td>
+                  <td className="border border-black p-0.5 w-1/3">
+                    {data.diagnosis?.[item.key as DiagnosisKeys]?.remarks || ""}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* JOB ORDER - Fixed 17 rows (16 data rows + 1 totals row) */}
