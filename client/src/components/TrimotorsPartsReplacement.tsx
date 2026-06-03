@@ -349,6 +349,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                                   }
                                   step="0.01"
                                   className="pl-8 pr-3 text-right"
+                                  required
                                 />
                               </div>
                           </>
@@ -462,6 +463,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                                   }
                                   step="0.01"
                                   className="pl-8 pr-3 text-right"
+                                  required
                                 />
                               </div>
                           </>
