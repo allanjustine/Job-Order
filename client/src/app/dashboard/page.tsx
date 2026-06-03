@@ -827,6 +827,15 @@ const Dashboard = () => {
         </ModalBody>
         <ModalFooter>
           <Button
+            className="bg-blue-400 hover:bg-blue-500 text-white py-5"
+            type="button"
+            onClick={() => {
+              window.print(); 
+            }}
+          >
+            Print
+          </Button>
+          <Button
             className="bg-gray-400 hover:bg-gray-500 text-white py-5"
             type="button"
             onClick={() => {
