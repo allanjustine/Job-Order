@@ -295,6 +295,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           value={partsBrand[brandKey] || ""}
                           onChange={(e) => handleBrandChange(brandKey, e.target.value)}
                           className="w-32 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         >
                           <option value="" disabled>Select Brand</option>
                           {brandChoices.map((brand) => (
@@ -407,6 +408,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           value={partsBrand[brandKey] || ""}
                           onChange={(e) => handleBrandChange(brandKey, e.target.value)}
                           className="w-32 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         >
                           <option value="" disabled>Select Brand</option>
                           {brandChoices.map((brand) => (
@@ -514,6 +516,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                       onChange={(e) => updatePartsOthersDescription(item.id, e.target.value)}
                       placeholder="Enter part description"
                       className="w-80"
+                      required
                     />
                     
                     {/* Brand Dropdown */}
@@ -521,6 +524,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                       value={item.brand || ""}
                       onChange={(e) => updatePartsOthersBrand(item.id, e.target.value)}
                       className="w-28 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
                     >
                       <option value="" disabled>Select Brand</option>
                       {brandChoices.map((brand) => (
@@ -539,6 +543,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           value={item.partNumber || ""}
                           onChange={(e) => updatePartsOthersPartNumber(item.id, e.target.value)}
                           className="w-30 text-center"
+                          required
                         />
                         
                         {/* Quantity Field */}
@@ -565,6 +570,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                               onChange={(e) => updatePartsOthersAmount(item.id, Number(e.target.value))}
                               step="0.01"
                               className="pl-8 pr-3 text-right"
+                              required
                             />
                           </div>
                       </>

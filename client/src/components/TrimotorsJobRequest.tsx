@@ -323,6 +323,7 @@ export default function TrimotorsJobRequest({
                         onChange={(e) => updateOthersDescription(item.id, e.target.value)}
                         placeholder="Enter job description"
                         className="flex-1 text-sm"
+                         required
                       />
                       
                       {/* Amount Field */}
@@ -337,6 +338,7 @@ export default function TrimotorsJobRequest({
                             onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
                             step="0.01"
                             className="pl-8 pr-3 text-right text-sm"
+                             required
                           />
                         </div>                      
                     </div>
