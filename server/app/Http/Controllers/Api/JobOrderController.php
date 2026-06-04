@@ -48,7 +48,8 @@ class JobOrderController extends Controller
                 'customer',
                 'mechanics',
                 'jobOrderDetails',
-                'customer.user'
+                'customer.user',
+                'jobOrderDiagnosis:id,job_order_id,title,status,remarks',
             ])
                 ->loadSum('jobOrderDetails', 'amount')
                 ->loadSum(['jobOrderDetails as total_job_request' => fn($tjr) => $tjr->where('type', 'job_request')], 'amount')
@@ -88,7 +89,8 @@ class JobOrderController extends Controller
                 'customer',
                 'mechanics',
                 'jobOrderDetails',
-                'customer.user'
+                'customer.user',
+                'jobOrderDiagnosis:id,job_order_id,title,status,remarks',
             ])
             ->withSum('jobOrderDetails', 'amount')
             ->withSum(['jobOrderDetails as total_job_request' => fn($tjr) => $tjr->where('type', 'job_request')], 'amount')
