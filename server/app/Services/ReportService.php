@@ -209,7 +209,7 @@ class ReportService
             ->get()
             ->map(function ($item) {
                 return [
-                    'Date'              => $item->date->format('Y-m-d'),
+                    'Date'              => $item->jobOrder?->date->format('Y-m-d'),
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
