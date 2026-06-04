@@ -7,15 +7,19 @@ import TriMotorsImage from "./trimotors-image";
 import { EmptyItem } from "./empty-item";
 import { Wrench } from "lucide-react";
 import formatDate from "@/utils/format-date";
+import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
+import { Ref } from "react";
+import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 
 interface PreviewJobOrderProps {
-  data?: any;
+  data?: Record<string, any>;
+  isReprint?: boolean;
 }
 
-const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
-  const jobTotal = Number(data.total_job_request) || 0;
-  const partsTotal = Number(data.total_parts_used) || 0;
-  const grandTotal = Number(data.job_order_details_sum_amount) || 0;
+const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
+  const jobTotal = Number(data?.total_job_request) || 0;
+  const partsTotal = Number(data?.total_parts_used) || 0;
+  const grandTotal = Number(data?.job_order_details_sum_amount) || 0;
 
   const formatCurrency = (amount: number | undefined): string => {
     if (!amount || amount === 0) return "";
@@ -35,7 +39,7 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
   return (
     <div>
       <div
-        className="p-1 font-sans bg-white text-black leading-tight border-2 border-black"
+        className={`p-1 font-sans bg-white text-black leading-tight border-2 border-black ${isReprint ? "h-screen" : ""}`}
         style={{
           fontSize: "8pt",
           maxWidth: "210mm",
@@ -155,6 +159,63 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
         ) : (
           <TriMotorsImage data={data} />
         )}
+
+        {/* here */}
+        <div className="mb-2 text-xs">
+          <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+            MOTORCYCLE'S DIAGNOSIS
+          </h3>
+
+          {data?.job_order_diagnosis?.length > 0 ? (
+            <table
+              className="w-full border-collapse border border-black my-0"
+              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+            >
+              <thead>
+                <tr className="bg-gray-40">
+                  <th className="border border-black p-0.5 text-left">
+                    Diagnosis Item
+                  </th>
+                  <th className="border border-black p-0.5 text-center">
+                    Status
+                  </th>
+                  <th className="border border-black p-0.5 text-left">
+                    Remarks
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data?.job_order_diagnosis?.map(
+                  (item: {
+                    id: number;
+                    title: string;
+                    status: string;
+                    remarks: string;
+                  }) => (
+                    <tr key={item.id}>
+                      <td className="border border-black p-0.5 w-1/3">
+                        {[
+                          ...trimotorsdiagnosisItems,
+                          ...motorsdiagnosisItems,
+                        ].find((it) => it.key === item.title)?.label || "N/A"}
+                      </td>
+                      <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                        {item?.status?.toUpperCase() || "N/A"}
+                      </td>
+                      <td className="border border-black p-0.5 w-1/3">
+                        {item.remarks || "N/A"}
+                      </td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <div className="border border-black p-2 text-center">
+              <p className="font-semibold">All diagnosis are OK</p>
+            </div>
+          )}
+        </div>
 
         {/* JOB ORDER */}
         <div
@@ -287,11 +348,11 @@ const ViewJobOrder = ({ data }: PreviewJobOrderProps) => {
             <span className="font-bold mr-2">
               Your Next Service Schedule is:
             </span>
-            <span className="border-b border-black w-18 inline-block">
-              {data.nextScheduleDate || data.next_schedule_date || "N/A"}
+            <span className="underline inline-block">
+              {formatDate(data.nextScheduleDate || data.next_schedule_date)}
             </span>
             <span> or </span>
-            <span className="border-b border-black w-25 inline-block">
+            <span className="underline inline-block">
               {data.nextScheduleKms || data.next_schedule_kms || "N/A"}
             </span>
             <span> kms (whichever comes first)</span>

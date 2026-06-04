@@ -1,27 +1,21 @@
 export default function NextServiceScheduleView({ data }: { data: any }) {
-    return (
-        <>
-          <div className="py-2">
-            <span className="font-bold mr-2">Your Next Service Schedule is:</span>
-            <span className="border-b border-black w-18 inline-block">
-                {data.nextScheduleDate}
-            </span>
-            <span> or </span>
-            <span className="border-b border-black w-25 inline-block">
-                {data.nextScheduleKms}
-            </span>
-            <span> kms </span>
-            <span className="text-xs ml-2">(whichever comes first)</span>
-          </div>
+  return (
+    <>
+      <div className="py-2">
+        <span className="font-bold mr-2">Your Next Service Schedule is:</span>
+        <span className="inline-block underline">{data.nextScheduleDate}</span>
+        <span> or </span>
+        <span className="inline-block underline">{data.nextScheduleKms}</span>
+        <span> kms </span>
+        <span className="text-xs ml-2">(whichever comes first)</span>
+      </div>
 
-        <div className="flex">
-          <span className="font-semibold mr-2">General Remarks:</span>
-          <span className="flex-1 underline">
-            {data.generalRemarks}
-          </span>
-        </div>
+      <div className="flex">
+        <span className="font-semibold mr-2">General Remarks:</span>
+        <span className="flex-1 underline">{data.generalRemarks}</span>
+      </div>
 
-         <div
+      <div
         className="mt-0.5 grid grid-cols-3 gap-2 text-xs"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -53,7 +47,6 @@ export default function NextServiceScheduleView({ data }: { data: any }) {
           <p className="text-xxs">Customer</p>
         </div>
       </div>
-
-        </>
-    )
+    </>
+  );
 }

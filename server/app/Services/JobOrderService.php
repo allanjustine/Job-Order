@@ -25,10 +25,11 @@ class JobOrderService
         };
 
         $jobOrders = JobOrder::query()
-            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'status', 'created_at')
+            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'status', 'next_schedule_date', 'next_schedule_kms', 'created_at')
             ->with([
                 'customer:id,name',
-                'mechanics:id,name'
+                'mechanics:id,name',
+                'jobOrderDiagnosis:id,job_order_id,title,status,remarks'
             ])
             ->withSum('jobOrderDetails as total_amount', 'amount')
             ->whereRelation('customer.user', 'id', Auth::id())
@@ -108,6 +109,8 @@ class JobOrderService
                 ->createMany($data);
 
             $job_order->mechanics()->attach($request->mechanic_ids);
+
+            $job_order->jobOrderDiagnosis()->createMany($request->diagnosis);
 
             return $customer;
         });

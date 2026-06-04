@@ -36,7 +36,8 @@ class ReportService
             ->with([
                 'customer:id,name,user_id',
                 'customer.user:id,name,code',
-                'mechanics:id,name'
+                'mechanics:id,name',
+                'jobOrderDiagnosis:id,job_order_id,title,status,remarks',
             ])
             ->select('id', 'job_order_number', 'job_order_type', 'date', 'customer_id', 'status')
             ->withCount([
@@ -133,9 +134,9 @@ class ReportService
         $date = explode(", ", $filter_item);
 
         return JobOrderDetail::query()
-            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number', 'date')
+            ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name,user_id',
                 'jobOrder.mechanics.user',

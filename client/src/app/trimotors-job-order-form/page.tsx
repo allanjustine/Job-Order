@@ -584,6 +584,15 @@ const TrimotorsJobOrderForm = () => {
 
   const itemsData = [...jobRequests, ...partsReplacements];
 
+  const mergedDiagnosis = Object.entries(diagnosis)
+    .map(([key, value]) => {
+      return {
+        ...value,
+        title: key,
+      };
+    })
+    .filter((item) => item.status === "ng");
+
   const itemToStore = {
     customer: {
       name: customerName,
@@ -604,9 +613,12 @@ const TrimotorsJobOrderForm = () => {
       engine_number: engineFrameNo,
       category: remarks === "others" ? otherRemarks : remarks,
       purchase_date: purchaseDate,
+      next_schedule_kms: nextScheduleKms,
+      next_schedule_date: nextScheduleDate,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
+    diagnosis: mergedDiagnosis,
   };
 
   const handleSavePrint = async () => {

@@ -32,6 +32,8 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->string('status')->nullable();
             $table->dateTime('purchase_date')->nullable();
+            $table->dateTime('next_schedule_date')->nullable();
+            $table->string('next_schedule_kms')->nullable();
             $table->timestamps();
         });
     }
