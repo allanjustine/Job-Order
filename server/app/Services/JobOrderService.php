@@ -110,7 +110,7 @@ class JobOrderService
 
             $job_order->mechanics()->attach($request->mechanic_ids);
 
-            $job_order->jobOrderDiagnosis()->createMany($request->diagnosis);
+            $job_order->jobOrderDiagnosis()->createMany($request->diagnosis ?? []);
 
             return $customer;
         });
