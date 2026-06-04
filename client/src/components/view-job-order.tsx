@@ -349,7 +349,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
               Your Next Service Schedule is:
             </span>
             <span className="underline inline-block">
-              {formatDate(data.nextScheduleDate || data.next_schedule_date)}
+              {formatDate(data.nextScheduleDate || data.next_schedule_date ) || "N/A"}
             </span>
             <span> or </span>
             <span className="underline inline-block">
@@ -373,7 +373,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
         >
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left">Prepared by:</p>
+            <p className="text-xs mb-2 text-left mb-5">Prepared by:</p>
             <p className="underline">{data.service_advisor || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
@@ -382,7 +382,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
           </div>
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left">Checked by:</p>
+            <p className="text-xs mb-2 text-left mb-5">Checked by:</p>
             <p className="underline">{data.branch_manager || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
@@ -391,7 +391,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
           </div>
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left">Conformed by:</p>
+            <p className="text-xs mb-2 text-left mb-5">Conformed by:</p>
             <p className="underline">{data.customer?.name || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
