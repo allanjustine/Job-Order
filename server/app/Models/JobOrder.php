@@ -48,4 +48,9 @@ class JobOrder extends Model
             ->where('type', 'parts_replacement')
             ->where('amount', '>', 0);
     }
+
+    public function jobOrderDiagnosis()
+    {
+        return $this->hasMany(JobOrderDiagnosis::class);
+    }
 }
