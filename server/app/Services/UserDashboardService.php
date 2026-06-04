@@ -58,14 +58,9 @@ class UserDashboardService
         return JobOrder::query()
             ->whereRelation('customer.user', 'id', Auth::id())
             ->whereNull('status')
-            ->withSum([
-                'jobOrderDetailsByJobRequestType'
-                =>
-                fn($jobOrderDetail)
-                =>
-                $jobOrderDetail->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
-            ], 'amount')
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->withSum('jobOrderDetailsByJobRequestType', 'amount')
             ->get()
             ->sum('job_order_details_by_job_request_type_sum_amount');
     }
