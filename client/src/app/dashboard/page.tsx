@@ -12,6 +12,7 @@ import {
   CarFrontIcon,
   User,
   Eye,
+  Printer,
 } from "lucide-react";
 import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -95,6 +96,21 @@ const Dashboard = () => {
     useState<boolean>(false);
   const [hasMechanic, setHasMechanic] = useState<boolean>(false);
   const [isScale, setIsScale] = useState<boolean>(false);
+  const [isReprint, setIsReprint] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isReprint) return;
+
+    window.onafterprint = () => {
+      setIsReprint(false);
+    };
+
+    window.print();
+
+    return () => {
+      window.onafterprint = null;
+    };
+  }, [isReprint]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -421,6 +437,10 @@ const Dashboard = () => {
     if (h < 18) return "Good afternoon";
     return "Good evening";
   };
+
+  if (isReprint) {
+    return <ViewJobOrder data={viewData} isReprint={isReprint} />;
+  }
 
   return (
     <>
@@ -822,7 +842,7 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <ViewJobOrder data={viewData} />
+            <ViewJobOrder data={viewData} isReprint={isReprint} />
           )}
         </ModalBody>
         <ModalFooter>
@@ -830,10 +850,10 @@ const Dashboard = () => {
             className="bg-blue-400 hover:bg-blue-500 text-white py-5"
             type="button"
             onClick={() => {
-              window.print(); 
+              (setIsReprint(true), toast.dismiss());
             }}
           >
-            Print
+            <Printer /> Print
           </Button>
           <Button
             className="bg-gray-400 hover:bg-gray-500 text-white py-5"
