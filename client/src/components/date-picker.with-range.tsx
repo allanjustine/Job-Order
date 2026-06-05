@@ -16,9 +16,11 @@ import { type DateRange } from "react-day-picker";
 export function DatePickerWithRange({
   date,
   setDate,
+  setIsRefresh,
 }: {
   date: DateRange | undefined;
   setDate: Dispatch<SetStateAction<DateRange | undefined>>;
+  setIsRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
     <Field className="mx-auto w-full gap-0">
@@ -49,7 +51,10 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={(newDate) => {
+              setDate(newDate);
+              setIsRefresh(true);
+            }}
             captionLayout="dropdown"
             numberOfMonths={2}
             disabled={{
