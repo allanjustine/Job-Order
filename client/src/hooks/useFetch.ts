@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 
 export default function useFetch(
   url: string,
-  { filterItem }: { filterItem?: filterDataType } = {},
+  { filterItems }: { filterItems?: Record<string, any> } = {},
 ) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
@@ -32,7 +32,7 @@ export default function useFetch(
         direction: sort.sortBy,
       },
       search: searchTerm,
-      ...filterItem,
+      ...filterItems,
     };
 
     try {
@@ -85,7 +85,7 @@ export default function useFetch(
     sort.column,
     sort.sortBy,
     searchTerm,
-    filterItem,
+    filterItems,
   ]);
 
   const handleSort = (column: any, direction: any) => {
