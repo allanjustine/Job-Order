@@ -53,7 +53,7 @@ export type filterDataType = {
 };
 
 const Reports = () => {
-  const [filterItem, setFilterItem] = useState<filterDataType>(FILTER_DATA);
+  const [filterItems, setFilterItems] = useState<filterDataType>(FILTER_DATA);
   const {
     data: reports,
     isLoading,
@@ -74,7 +74,7 @@ const Reports = () => {
     fetchData,
     setIsRefresh,
   } = useFetch(`/reports`, {
-    filterItem,
+    filterItems,
   });
   const [branches, setBranches] = useState([]);
   const [areaManagers, setAreaManagers] = useState([]);
@@ -90,7 +90,7 @@ const Reports = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const HAS_FILTER_APPLIED =
-    Object.values(filterItem)?.some((value) => value !== "") ||
+    Object.values(filterItems)?.some((value) => value !== "") ||
     searchTerm !== "";
 
   useEffect(() => {
@@ -221,7 +221,7 @@ const Reports = () => {
   useEffect(() => {
     if (!date?.from || !date?.to) return;
 
-    setFilterItem((prev) => ({
+    setFilterItems((prev) => ({
       ...prev,
       date_range: `${format(date?.from || new Date(), "yyyy-MM-dd")}, ${format(date?.to || new Date(), "yyyy-MM-dd")}`,
     }));
@@ -352,9 +352,9 @@ const Reports = () => {
     { value: "job_order_detail_type", label: "Job Order Detail Type" },
   ];
 
-  const handleFilterItem = (title: string) => (e: any) => {
+  const handleFilterItems = (title: string) => (e: any) => {
     const { value } = e.target;
-    setFilterItem((prev) => ({
+    setFilterItems((prev) => ({
       ...prev,
       [title]: value,
     }));
@@ -366,7 +366,7 @@ const Reports = () => {
     try {
       const response = await api.get("/export-reports", {
         params: {
-          ...filterItem,
+          ...filterItems,
           search: searchTerm,
         },
       });
@@ -386,20 +386,20 @@ const Reports = () => {
 
         let item: any = {};
 
-        if (filterItem.branch) {
+        if (filterItems.branch) {
           item.branch = branches.find(
-            (branch: any) => branch.id === Number(filterItem.branch),
+            (branch: any) => branch.id === Number(filterItems.branch),
           );
         }
 
-        if (filterItem.area_manager) {
+        if (filterItems.area_manager) {
           item.area_manager = areaManagers.find(
             (areaManager: any) =>
-              areaManager.id === Number(filterItem.area_manager),
+              areaManager.id === Number(filterItems.area_manager),
           );
         }
 
-        const fileName = `${filterItem.branch && `branch-${item?.branch?.name}-`}${filterItem.area_manager && `area-manager-${item?.area_manager?.name}-`}${filterItem.date_range && `date-${filterItem.date_range}-`}${filterItem.job_order_type && `job-order-type-${filterItem.job_order_type}-`}reports.xlsx`;
+        const fileName = `${filterItems.branch && `branch-${item?.branch?.name}-`}${filterItems.area_manager && `area-manager-${item?.area_manager?.name}-`}${filterItems.date_range && `date-${filterItems.date_range}-`}${filterItems.job_order_type && `job-order-type-${filterItems.job_order_type}-`}reports.xlsx`;
 
         const saveFileName = !HAS_FILTER_APPLIED
           ? "all-data-of-job-request-reports.xlsx"
@@ -454,8 +454,8 @@ const Reports = () => {
                 <Skeleton className="h-10 w-full" />
               ) : (
                 <Select
-                  value={filterItem.branch}
-                  onChange={handleFilterItem("branch")}
+                  value={filterItems.branch}
+                  onChange={handleFilterItems("branch")}
                   className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
@@ -481,8 +481,8 @@ const Reports = () => {
                 <Skeleton className="h-10 w-full" />
               ) : (
                 <Select
-                  value={filterItem.area_manager}
-                  onChange={handleFilterItem("area_manager")}
+                  value={filterItems.area_manager}
+                  onChange={handleFilterItems("area_manager")}
                   className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
@@ -514,8 +514,8 @@ const Reports = () => {
                 Job Order Type
               </Label>
               <Select
-                value={filterItem.job_order_type}
-                onChange={handleFilterItem("job_order_type")}
+                value={filterItems.job_order_type}
+                onChange={handleFilterItems("job_order_type")}
                 className="h-10 rounded-lg border-gray-200 text-sm"
               >
                 <option value="" disabled>
@@ -535,7 +535,7 @@ const Reports = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  setFilterItem(FILTER_DATA);
+                  setFilterItems(FILTER_DATA);
                   setDate({ from: new Date(), to: new Date() });
                   setSearchTerm("");
                   setDefaultSearch("");
@@ -584,7 +584,7 @@ const Reports = () => {
               </Button>
               <Activity
                 mode={
-                  (filterItem || searchTerm) &&
+                  (filterItems || searchTerm) &&
                   !isRefresh &&
                   !isLoading &&
                   reports.length > 0

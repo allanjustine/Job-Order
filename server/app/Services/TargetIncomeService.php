@@ -23,14 +23,14 @@ class TargetIncomeService
 
         $search = request('search', '');
 
-        $filter_item = request('filter_item', '');
+        $month = request('month', '');
 
         $targetIncome = TargetIncome::query()
             ->with('user:id,code,name')
             ->where(
                 fn($targetIncome)
                 =>
-                $filter_item ? $targetIncome->whereMonth('month_of', $filter_item) : $targetIncome->whereMonth('month_of', now()->month)
+                $month ? $targetIncome->whereMonth('month_of', $month) : $targetIncome->whereMonth('month_of', now()->month)
                     ->whereYear('month_of', now()->year)
             )
             ->when(
@@ -43,7 +43,7 @@ class TargetIncomeService
             ->orderBy($column, $sort['direction'])
             ->paginate($per_page, ['id', 'target_income', 'month_of', 'user_id', 'created_at']);
 
-        $targetIncome->through(function ($target) use ($filter_item) {
+        $targetIncome->through(function ($target) use ($month) {
             $jobOrderIncome = JobOrder::query()
                 ->whereRelation('customer.user', 'id', $target->user_id)
                 ->withSum([
@@ -51,7 +51,7 @@ class TargetIncomeService
                     =>
                     fn($jobOrderDetail)
                     =>
-                    $filter_item ? $jobOrderDetail->whereMonth('created_at', $filter_item) : $jobOrderDetail->whereMonth('created_at', now()->month)
+                    $month ? $jobOrderDetail->whereMonth('created_at', $month) : $jobOrderDetail->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
                 ], 'amount')
                 ->whereNull('status')
