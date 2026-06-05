@@ -65,7 +65,6 @@ const Dashboard = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
-    setIsRefresh,
   } = useFetch("/job-orders");
   const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -878,7 +877,7 @@ const Dashboard = () => {
             <DatePickerWithRange
               date={date}
               setDate={setDate}
-              setIsRefresh={setIsRefresh}
+              setIsRefresh={() => {}}
             />
           </div>
         </ModalBody>
