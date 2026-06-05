@@ -1,3 +1,4 @@
+import { filterDataType } from "@/app/admin/(views)/reports/page";
 import { PAGINATION } from "@/constants/pagination";
 import { SORT } from "@/constants/sort";
 import { api } from "@/lib/api";
@@ -8,7 +9,7 @@ import Swal from "sweetalert2";
 
 export default function useFetch(
   url: string,
-  { filterItem, filterBy }: { filterItem?: string; filterBy?: string } = {},
+  { filterItem }: { filterItem?: filterDataType } = {},
 ) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
@@ -31,8 +32,7 @@ export default function useFetch(
         direction: sort.sortBy,
       },
       search: searchTerm,
-      filter_item: filterItem,
-      filter_by: filterBy,
+      ...filterItem,
     };
 
     try {
@@ -86,7 +86,6 @@ export default function useFetch(
     sort.sortBy,
     searchTerm,
     filterItem,
-    filterBy,
   ]);
 
   const handleSort = (column: any, direction: any) => {

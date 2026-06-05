@@ -68,7 +68,8 @@ class JobOrderController extends Controller
         }
 
         $jobOrder->update([
-            'status' => 'cancelled'
+            'status'                  => 'cancelled',
+            'reason_for_cancellation' => request('reason')
         ]);
 
         return response()->json([

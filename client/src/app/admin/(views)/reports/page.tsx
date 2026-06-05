@@ -10,7 +10,7 @@ import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { CircleX, Eye, Search, SearchSlash, User } from "lucide-react";
-import { Activity, ChangeEvent, useEffect, useState, useRef } from "react";
+import { Activity, useEffect, useState, useRef } from "react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
@@ -32,10 +32,28 @@ import {
   ModalHeader,
 } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+
+export const FILTER_DATA = {
+  branch: "",
+  area_manager: "",
+  date_range: `${format(new Date(), "yyyy-MM-dd")}, ${format(new Date(), "yyyy-MM-dd")}`,
+  job_order_type: "",
+};
+
+export type filterDataType = {
+  branch: string;
+  area_manager: string;
+  date_range: string;
+  job_order_type: string;
+};
 
 const Reports = () => {
-  const [filterItem, setFilterItem] = useState<string | undefined>("");
-  const [filterBy, setFilterBy] = useState("all");
+  const [filterItem, setFilterItem] = useState<filterDataType>(FILTER_DATA);
   const {
     data: reports,
     isLoading,
@@ -54,9 +72,9 @@ const Reports = () => {
     setDefaultSearch,
     setSearchTerm,
     fetchData,
+    setIsRefresh,
   } = useFetch(`/reports`, {
     filterItem,
-    filterBy,
   });
   const [branches, setBranches] = useState([]);
   const [areaManagers, setAreaManagers] = useState([]);
@@ -71,6 +89,9 @@ const Reports = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const HAS_FILTER_APPLIED =
+    Object.values(filterItem)?.some((value) => value !== "") ||
+    searchTerm !== "";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -198,21 +219,13 @@ const Reports = () => {
   }, []);
 
   useEffect(() => {
-    if (filterBy !== "date" || !date?.from || !date?.to) return;
+    if (!date?.from || !date?.to) return;
 
-    setFilterItem(
-      `${format(date?.from, "yyyy-MM-dd")}, ${format(date?.to, "yyyy-MM-dd")}`,
-    );
-  }, [date?.from, date?.to, filterBy]);
-
-  useEffect(() => {
-    if (filterBy === "all") {
-      handleRefresh();
-      setFilterItem("all");
-    }
-    setDefaultSearch("");
-    setSearchTerm("");
-  }, [filterBy]);
+    setFilterItem((prev) => ({
+      ...prev,
+      date_range: `${format(date?.from || new Date(), "yyyy-MM-dd")}, ${format(date?.to || new Date(), "yyyy-MM-dd")}`,
+    }));
+  }, [date?.from, date?.to]);
 
   const columns = [
     {
@@ -300,32 +313,34 @@ const Reports = () => {
           >
             <Eye /> View
           </Button>
-          <Button
-            type="button"
-            onClick={handleDeleteJobOrder(row?.id)}
-            disabled={row.status}
-            className={`p-2 ${
-              row.status
-                ? "bg-gray-200 cursor-not-allowed text-red-600"
-                : "bg-red-500 text-white"
-            }`}
-          >
-            <CircleX /> {row.status ? "Canceled" : "Cancel"}
-          </Button>
+          <HoverCard>
+            <HoverCardTrigger>
+              <Button
+                type="button"
+                onClick={handleDeleteJobOrder(row?.id)}
+                disabled={row.status}
+                className={`p-2 ${
+                  row.status
+                    ? "bg-gray-200 cursor-not-allowed text-red-600"
+                    : "bg-red-500 text-white"
+                }`}
+              >
+                <CircleX /> {row.status ? "Canceled" : "Cancel"}
+              </Button>
+            </HoverCardTrigger>
+            {row.status && (
+              <HoverCardContent side={"left"}>
+                <div className="flex flex-col gap-1">
+                  <h4 className="font-medium">Reason</h4>
+                  <p>{row.reason_for_cancellation || "N/A"}</p>
+                </div>
+              </HoverCardContent>
+            )}
+          </HoverCard>
         </div>
       ),
     },
   ];
-
-  const handleSelectFilter = (e: ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-
-    if (value !== "all") {
-      setFilterItem("");
-    }
-
-    setFilterBy(value);
-  };
 
   const options = [
     { value: "all", label: "All" },
@@ -337,9 +352,13 @@ const Reports = () => {
     { value: "job_order_detail_type", label: "Job Order Detail Type" },
   ];
 
-  const handleFilterItem = (e: any) => {
+  const handleFilterItem = (title: string) => (e: any) => {
     const { value } = e.target;
-    setFilterItem(value);
+    setFilterItem((prev) => ({
+      ...prev,
+      [title]: value,
+    }));
+    setIsRefresh(true);
   };
 
   const handleExport = async () => {
@@ -347,8 +366,7 @@ const Reports = () => {
     try {
       const response = await api.get("/export-reports", {
         params: {
-          filter_item: filterItem,
-          filter_by: filterBy,
+          ...filterItem,
           search: searchTerm,
         },
       });
@@ -366,35 +384,26 @@ const Reports = () => {
           type: "application/octet-stream",
         });
 
-        let item: any;
+        let item: any = {};
 
-        if (filterBy === "branch") {
-          item = branches.find(
-            (branch: any) => branch.id === Number(filterItem),
-          );
-        } else if (filterBy === "area_manager") {
-          item = areaManagers.find(
-            (areaManager: any) => areaManager.id === Number(filterItem),
+        if (filterItem.branch) {
+          item.branch = branches.find(
+            (branch: any) => branch.id === Number(filterItem.branch),
           );
         }
 
-        const saveFileName =
-          filterBy === "all"
-            ? "all-data-of-job-request-reports.xlsx"
-            : filterBy === "job_order_detail_type" ||
-                filterBy === "job_order_type"
-              ? `${filterBy}-(${filterItem})-data-of-job-request-reports.xlsx`
-              : filterBy === "branch"
-                ? `${filterBy}-(${item?.code})-${item?.name}-data-of-job-request-reports.xlsx`
-                : filterBy === "search"
-                  ? `${filterBy}-(${searchTerm?.toLowerCase()})-data-of-job-request-reports.xlsx`
-                  : filterBy === "date"
-                    ? date?.from &&
-                      date?.to &&
-                      `${filterBy}-(${format(date?.from, "LLL dd, y")} - ${format(date?.to, "LLL dd, y")})-data-of-job-request-reports.xlsx`
-                    : filterBy === "area_manager"
-                      ? `${filterBy}-${item?.name}-data-of-job-request-reports.xlsx`
-                      : `reports.xlsx`;
+        if (filterItem.area_manager) {
+          item.area_manager = areaManagers.find(
+            (areaManager: any) =>
+              areaManager.id === Number(filterItem.area_manager),
+          );
+        }
+
+        const fileName = `${filterItem.branch && `branch-${item?.branch?.name}-`}${filterItem.area_manager && `area-manager-${item?.area_manager?.name}-`}${filterItem.date_range && `date-${filterItem.date_range}-`}${filterItem.job_order_type && `job-order-type-${filterItem.job_order_type}-`}reports.xlsx`;
+
+        const saveFileName = !HAS_FILTER_APPLIED
+          ? "all-data-of-job-request-reports.xlsx"
+          : fileName;
 
         saveAs(blob, saveFileName);
       }
@@ -405,90 +414,48 @@ const Reports = () => {
     }
   };
 
-  const activeFilterLabel = options.find((o) => o.value === filterBy)?.label;
-
   return (
     <>
       <div className="p-6 space-y-5">
-        {/* Page Header */}
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Reports</h1>
           <p className="text-sm text-gray-400 mt-0.5">
             Filter, view, and export job order reports
           </p>
         </div>
-
-        {/* Filter Panel */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
-              <h2 className="text-sm font-semibold text-gray-700">Filters</h2>
-            </div>
-            {filterBy !== "all" && (
-              <span className="text-xs bg-blue-50 text-blue-600 font-medium px-3 py-1 rounded-full border border-blue-100">
-                Active: {activeFilterLabel}
-              </span>
-            )}
-          </div>
-
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <div className="w-full">
               <Label
                 className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                htmlFor="filter_type"
+                htmlFor="search"
               >
-                Filter by
+                Search
               </Label>
-              <Select
-                disabled={isDataLoading}
-                value={filterBy}
-                onChange={handleSelectFilter}
-                className="h-10 rounded-lg border-gray-200 text-sm"
-              >
-                <option value="" disabled>
-                  Select filter type
-                </option>
-                {options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            <Activity mode={filterBy === "search" ? "visible" : "hidden"}>
-              <div className="w-full">
-                <Label
-                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  htmlFor="search"
-                >
-                  Search
-                </Label>
-                <div className="relative">
-                  <Input
-                    value={defaultSearch}
-                    type="search"
-                    placeholder="Search..."
-                    onChange={handleSearch}
-                    className="h-10 rounded-lg border-gray-200 pl-9 text-sm"
-                  />
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                </div>
+              <div className="relative">
+                <Input
+                  value={defaultSearch}
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="h-10 rounded-lg border-gray-200 pl-9 text-sm"
+                />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               </div>
-            </Activity>
-
-            <Activity mode={filterBy === "branch" ? "visible" : "hidden"}>
-              <div className="w-full">
-                <Label
-                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  htmlFor="branch"
-                >
-                  Branch
-                </Label>
+            </div>
+            <div className="w-full">
+              <Label
+                className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                htmlFor="branch"
+              >
+                Branch
+              </Label>
+              {isDataLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
                 <Select
-                  value={filterItem}
-                  onChange={handleFilterItem}
+                  value={filterItem.branch}
+                  onChange={handleFilterItem("branch")}
                   className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
@@ -501,20 +468,21 @@ const Reports = () => {
                     >{`(${branch.code}) - ${branch.name}`}</option>
                   ))}
                 </Select>
-              </div>
-            </Activity>
-
-            <Activity mode={filterBy === "area_manager" ? "visible" : "hidden"}>
-              <div className="w-full">
-                <Label
-                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  htmlFor="area_manager"
-                >
-                  Area Manager
-                </Label>
+              )}
+            </div>
+            <div className="w-full">
+              <Label
+                className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                htmlFor="area_manager"
+              >
+                Area Manager
+              </Label>
+              {isDataLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
                 <Select
-                  value={filterItem}
-                  onChange={handleFilterItem}
+                  value={filterItem.area_manager}
+                  onChange={handleFilterItem("area_manager")}
                   className="h-10 rounded-lg border-gray-200 text-sm"
                 >
                   <option value="" disabled>
@@ -526,65 +494,59 @@ const Reports = () => {
                     </option>
                   ))}
                 </Select>
-              </div>
-            </Activity>
-
-            <Activity mode={filterBy === "date" ? "visible" : "hidden"}>
-              <div className="w-full">
-                <Label className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Date Range
-                </Label>
-                <DatePickerWithRange date={date} setDate={setDate} />
-              </div>
-            </Activity>
-
-            <Activity
-              mode={filterBy === "job_order_detail_type" ? "visible" : "hidden"}
-            >
-              <div className="w-full">
-                <Label
-                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  htmlFor="detail_type"
-                >
-                  Job Order Detail Type
-                </Label>
-                <Select
-                  value={filterItem}
-                  onChange={handleFilterItem}
-                  className="h-10 rounded-lg border-gray-200 text-sm"
-                >
-                  <option value="" disabled>
-                    Select detail type
-                  </option>
-                  <option value="job_request">Job Request</option>
-                  <option value="parts_replacement">Parts Replacement</option>
-                </Select>
-              </div>
-            </Activity>
-
-            <Activity
-              mode={filterBy === "job_order_type" ? "visible" : "hidden"}
-            >
-              <div className="w-full">
-                <Label
-                  className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  htmlFor="order_type"
-                >
-                  Job Order Type
-                </Label>
-                <Select
-                  value={filterItem}
-                  onChange={handleFilterItem}
-                  className="h-10 rounded-lg border-gray-200 text-sm"
-                >
-                  <option value="" disabled>
-                    Select order type
-                  </option>
-                  <option value="motors">Motors</option>
-                  <option value="trimotors">Trimotors</option>
-                </Select>
-              </div>
-            </Activity>
+              )}
+            </div>
+            <div className="w-full">
+              <Label className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Date Range
+              </Label>
+              <DatePickerWithRange
+                date={date}
+                setDate={setDate}
+                setIsRefresh={setIsRefresh}
+              />
+            </div>
+            <div className="w-full">
+              <Label
+                className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                htmlFor="order_type"
+              >
+                Job Order Type
+              </Label>
+              <Select
+                value={filterItem.job_order_type}
+                onChange={handleFilterItem("job_order_type")}
+                className="h-10 rounded-lg border-gray-200 text-sm"
+              >
+                <option value="" disabled>
+                  Select order type
+                </option>
+                <option value="motors">Motors</option>
+                <option value="trimotors">Trimotors</option>
+              </Select>
+            </div>
+            <div className="w-full">
+              <Label
+                className="mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                htmlFor="reset"
+              >
+                Reset Filters
+              </Label>
+              <Button
+                type="button"
+                onClick={() => {
+                  setFilterItem(FILTER_DATA);
+                  setDate({ from: new Date(), to: new Date() });
+                  setSearchTerm("");
+                  setDefaultSearch("");
+                  setIsRefresh(true);
+                }}
+                disabled={!HAS_FILTER_APPLIED}
+                className="h-10 rounded-lg border-gray-200 text-sm w-full bg-gray-600 hover:bg-gray-500 text-white"
+              >
+                Reset Filters
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -622,7 +584,6 @@ const Reports = () => {
               </Button>
               <Activity
                 mode={
-                  filterBy &&
                   (filterItem || searchTerm) &&
                   !isRefresh &&
                   !isLoading &&
