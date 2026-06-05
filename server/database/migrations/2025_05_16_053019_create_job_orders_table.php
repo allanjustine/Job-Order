@@ -34,6 +34,7 @@ return new class extends Migration
             $table->dateTime('purchase_date')->nullable();
             $table->dateTime('next_schedule_date')->nullable();
             $table->string('next_schedule_kms')->nullable();
+            $table->string('reason_for_cancellation')->nullable();
             $table->timestamps();
         });
     }
