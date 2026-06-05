@@ -98,12 +98,21 @@ const Reports = () => {
         title: "Are you sure?",
         text: "After cancelling, you will not be able to uncancel this data!",
         icon: "warning",
+        input: "text",
+        inputPlaceholder: "Enter reason for cancellation",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, cancel it!",
+        inputValidator: (value) => {
+          if (!value) {
+            return "Please enter a cancellation reason!";
+          }
+        },
       }).then(async (result) => {
         if (result.isConfirmed) {
+          const reason = result.value;
+
           Swal.fire({
             icon: "info",
             title: "Cancelling...",
@@ -113,8 +122,13 @@ const Reports = () => {
               Swal.showLoading();
             },
           });
+
           try {
-            const response = await api.delete(`/delete-job-order/${id}`);
+            const response = await api.delete(`/delete-job-order/${id}`, {
+              data: {
+                reason,
+              },
+            });
 
             if (response.status === 200) {
               toast.success(response.data.message, {
