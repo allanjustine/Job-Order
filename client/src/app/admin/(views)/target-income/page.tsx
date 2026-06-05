@@ -34,9 +34,8 @@ const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
   const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
-  const [filters, setFilters] = useState<{ query: string; value: string }>({
-    query: "",
-    value: "",
+  const [filters, setFilters] = useState<{ month: string }>({
+    month: "",
   });
   const {
     data: targetIncomes,
@@ -53,10 +52,7 @@ const Reports = () => {
     handleSearch,
     handleRefresh,
     fetchData,
-  } = useFetch("/target-incomes", {
-    filterItem: filters?.value,
-    filterBy: filters?.query,
-  });
+  } = useFetch("/target-incomes", { filterItems: filters });
 
   const DATES = [
     {
@@ -289,11 +285,10 @@ const Reports = () => {
               <div className="flex gap-1 items-center">
                 <div>
                   <Select
-                    value={filters?.value}
+                    value={filters?.month}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                       setFilters({
-                        query: "month_of",
-                        value: e.target.value,
+                        month: e.target.value,
                       });
                     }}
                     className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
