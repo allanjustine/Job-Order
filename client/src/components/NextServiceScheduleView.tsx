@@ -11,7 +11,7 @@ export default function NextServiceScheduleView({ data }: { data: any }) {
       </div>
 
       <div className="flex">
-        <span className="font-semibold mr-2">General Remarks:</span>
+        <span className="font-bold mr-2">General Remarks:</span>
         <span className="flex-1 underline">{data.generalRemarks}</span>
       </div>
 

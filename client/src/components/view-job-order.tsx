@@ -359,8 +359,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
           </div>
 
           <div className="flex mt-2">
-            <span className="font-semibold mr-2">General Remarks:</span>
-            <span className="border-b border-black flex-1">
+            <span className="font-bold mr-2">General Remarks:</span>
+            <span className="underline flex-1">
               {data.general_remarks || "N/A"}
             </span>
           </div>
@@ -373,7 +373,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
         >
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left mb-5">Prepared by:</p>
+            <p className="text-xs text-left mb-5">Prepared by:</p>
             <p className="underline">{data.service_advisor || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
@@ -382,7 +382,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
           </div>
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left mb-5">Checked by:</p>
+            <p className="text-xs text-left mb-5">Checked by:</p>
             <p className="underline">{data.branch_manager || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
@@ -391,7 +391,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
           </div>
           <div className="text-center p-0.5">
             <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs mb-2 text-left mb-5">Conformed by:</p>
+            <p className="text-xs text-left mb-5">Conformed by:</p>
             <p className="underline">{data.customer?.name || "N/A"}</p>
             <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
@@ -399,6 +399,17 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             <p className="text-xxs">Customer</p>
           </div>
         </div>
+        
+        {/* Footer Note */}
+              <p className="mt-10 text-center text-red-600 font-bold text-xl">
+                {data.status === "cancelled" ? "CANCELLED" : ""}
+              </p>
+
+               <p className="mt-1 text-center text-black text-s">
+                {data.reason_for_cancellation ? data.reason_for_cancellation : ""}
+              </p>
+              
+            
       </div>
     </div>
   );
