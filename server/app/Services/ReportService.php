@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\AreaManager;
 use App\Models\Customer;
 use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
@@ -18,17 +17,19 @@ class ReportService
 
         $sort = request('sort', ["column" => "created_at", "direction" => "asc"]);
 
-        $filter_item = request('filter_item', '');
+        $date_range = explode(", ", request('date_range', ''));
 
-        $filter_by = request('filter_by', 'all');
+        $branch = request('branch', '');
+
+        $area_manager = request('area_manager', '');
+
+        $job_order_type = request('job_order_type', '');
 
         $column = match ($sort['column']) {
             'customer.name'      => Customer::query()->select('name')->whereColumn('customers.id', 'job_orders.customer_id'),
             'customer.user.name' => User::query()->select('users.name')->where('users.id', Customer::query()->select('customers.user_id')->whereColumn('customers.id', 'job_orders.customer_id')),
             default              => $sort['column']
         };
-
-        $date = explode(", ", $filter_item);
 
         $search = request('search', '');
 
@@ -39,19 +40,8 @@ class ReportService
                 'mechanics:id,name',
                 'jobOrderDiagnosis:id,job_order_id,title,status,remarks',
             ])
-            ->select('id', 'job_order_number', 'job_order_type', 'date', 'customer_id', 'status')
-            ->withCount([
-                'jobOrderDetails'
-                =>
-                fn($item)
-                =>
-                $item->when(
-                    $filter_by === 'job_order_detail_type',
-                    fn($item)
-                    =>
-                    $item->where('type', $filter_item)
-                )
-            ])
+            ->select('id', 'job_order_number', 'job_order_type', 'date', 'customer_id', 'status', 'reason_for_cancellation')
+            ->withCount('jobOrderDetails')
             ->when(
                 $search,
                 fn($jobOrder)
@@ -76,30 +66,30 @@ class ReportService
                 )
             )
             ->when(
-                $filter_by === 'branch',
+                $branch,
                 fn($jobOrder)
                 =>
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('customer.user', 'id', $filter_item)
+                    $item->whereRelation('customer.user', 'id', $branch)
                 )
             )
             ->when(
-                $filter_by === 'area_manager',
+                $area_manager,
                 fn($jobOrder)
                 =>
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('customer.user.areaManagers', 'area_manager_id', $filter_item)
+                    $item->whereRelation('customer.user.areaManagers', 'area_manager_id', $area_manager)
                 )
             )
             ->when(
-                $filter_by === 'date' && $filter_item !== "",
+                $date_range && $date_range[0] && $date_range[1],
                 fn($query)
                 =>
-                $query->whereBetween('date', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
+                $query->whereBetween('date', [Carbon::parse($date_range[0])->startOfDay(), Carbon::parse($date_range[1])->endOfDay()])
             )
             ->when(
                 $sort['column'] !== 'user.name',
@@ -107,16 +97,10 @@ class ReportService
                 $jobOrder->orderBy($column, $sort['direction'])
             )
             ->when(
-                $filter_by === 'job_order_detail_type',
+                $job_order_type,
                 fn($item)
                 =>
-                $item->whereRelation('jobOrderDetails', 'type', $filter_item)
-            )
-            ->when(
-                $filter_by === 'job_order_type',
-                fn($item)
-                =>
-                $item->where('job_order_type', $filter_item)
+                $item->where('job_order_type', $job_order_type)
             )
             ->paginate($per_page);
     }
@@ -125,13 +109,15 @@ class ReportService
     {
         Auth::user()->userExportLog()->create();
 
-        $filter_item = request('filter_item', '');
+        $date_range = explode(", ", request('date_range', ''));
 
-        $filter_by = request('filter_by', 'all');
+        $branch = request('branch', '');
+
+        $area_manager = request('area_manager', '');
+
+        $job_order_type = request('job_order_type', '');
 
         $search = request('search', '');
-
-        $date = explode(", ", $filter_item);
 
         return JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
@@ -168,42 +154,36 @@ class ReportService
                 )
             )
             ->when(
-                $filter_by === 'branch',
+                $branch,
                 fn($jobOrder)
                 =>
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('jobOrder.customer.user', 'id', $filter_item)
+                    $item->whereRelation('jobOrder.customer.user', 'id', $branch)
                 )
             )
             ->when(
-                $filter_by === 'area_manager',
+                $area_manager,
                 fn($jobOrder)
                 =>
                 $jobOrder->where(
                     fn($item)
                     =>
-                    $item->whereRelation('jobOrder.customer.user.areaManagers', 'area_manager_id', $filter_item)
+                    $item->whereRelation('jobOrder.customer.user.areaManagers', 'area_manager_id', $area_manager)
                 )
             )
             ->when(
-                $filter_by === 'date' && $filter_item !== "",
+                $date_range[0] && $date_range[1],
                 fn($query)
                 =>
-                $query->whereBetween('date', [Carbon::parse($date[0])->startOfDay(), Carbon::parse($date[1])->endOfDay()])
+                $query->whereBetween('date', [Carbon::parse($date_range[0])->startOfDay(), Carbon::parse($date_range[1])->endOfDay()])
             )
             ->when(
-                $filter_by === 'job_order_type',
+                $job_order_type,
                 fn($item)
                 =>
-                $item->whereRelation('jobOrder', 'job_order_type', $filter_item)
-            )
-            ->when(
-                $filter_by === 'job_order_detail_type',
-                fn($item)
-                =>
-                $item->where('type', $filter_item)
+                $item->whereRelation('jobOrder', 'job_order_type', $job_order_type)
             )
             ->orderBy('type', 'asc')
             ->get()
