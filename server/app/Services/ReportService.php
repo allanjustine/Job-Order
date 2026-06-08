@@ -122,7 +122,7 @@ class ReportService
         return JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation',
                 'jobOrder.customer:id,name',
                 'jobOrder.mechanics:id,name,user_id',
                 'jobOrder.mechanics.user',
@@ -175,9 +175,13 @@ class ReportService
             )
             ->when(
                 $date_range[0] && $date_range[1],
-                fn($query)
-                =>
-                $query->whereBetween('date', [Carbon::parse($date_range[0])->startOfDay(), Carbon::parse($date_range[1])->endOfDay()])
+                fn($query) =>
+                $query->whereHas('jobOrder', function ($q) use ($date_range) {
+                    $q->whereBetween('date', [
+                        Carbon::parse($date_range[0])->startOfDay(),
+                        Carbon::parse($date_range[1])->endOfDay()
+                    ]);
+                })
             )
             ->when(
                 $job_order_type,
@@ -203,6 +207,7 @@ class ReportService
                     'General Remarks '  => $item->jobOrder?->general_remarks,
                     'JO Category'       => $item->jobOrder?->category,
                     'JO Status'         => $item->jobOrder?->status,
+                    'Reason for Cancellation' => $item->jobOrder?->reason_for_cancellation,
                 ];
             });
     }
@@ -220,7 +225,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation',
                 'jobOrder.customer:id,name,address',
                 'jobOrder.mechanics:id,name',
             ])
@@ -282,6 +287,7 @@ class ReportService
                 'General Remarks '  => $item->jobOrder?->general_remarks,
                 'JO Category'       => $item->jobOrder?->category,
                 'JO Status'         => $item->jobOrder?->status,
+                'Reason for Cancellation' => $item->jobOrder?->reason_for_cancellation,
             ];
         });
 
