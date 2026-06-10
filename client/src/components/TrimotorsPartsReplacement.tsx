@@ -280,6 +280,12 @@ const calculateAndUpdateTotal = useCallback(() => {
                             handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
                             handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
+                          } else {
+                           // Initialize quantity to 1 when checking
+                            const currentQuantity = partsQuantity[quantityKey];
+                            if (!currentQuantity || currentQuantity === 0) {
+                              handleQuantityChange(quantityKey, 1);
+                            }
                           }
                         }}
                       />
@@ -394,7 +400,13 @@ const calculateAndUpdateTotal = useCallback(() => {
                             handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
                             handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
-                          }
+                          } else {
+                           // Initialize quantity to 1 when checking
+                            const currentQuantity = partsQuantity[quantityKey];
+                            if (!currentQuantity || currentQuantity === 0) {
+                              handleQuantityChange(quantityKey, 1);
+                            }
+                          }      
                         }}
                       />
                       {item.label}
