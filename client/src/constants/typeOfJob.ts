@@ -1,6 +1,6 @@
 export const TYPE_OF_JOB = {
   coupon: "Coupon",
-  changeOil: "Change Oil/Tune-up",
+  changeOil: "Change Oil",
   overhaul: "Top/Major Overhaul",
   chainSprocket: "Chain & Sprocket/Drive Belt",
   carburetor: "Carburetor/Fuel Injection",

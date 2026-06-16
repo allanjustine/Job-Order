@@ -4,7 +4,7 @@ interface JobItem {
 }
 
 export const jobItems: JobItem[] = [
-  { key: "changeOil", label: "Change Oil / Tune-up" },
+  { key: "changeOil", label: "Change Oil" },
   { key: "overhaul", label: "Top / major Overhaul" },
   { key: "chainSprocket", label: "Chain & Sprocket / Drive Belt" },
   { key: "selectedCoupon", label: "Coupon" },
