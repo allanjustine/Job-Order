@@ -177,8 +177,14 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersQuantity = (id: string, quantity: number) => {
+    // ✅ Initialize to 1 if value is 0 or invalid
+    let safeQuantity = quantity;
+    if (safeQuantity <= 0 || isNaN(safeQuantity)) {
+      safeQuantity = 1;
+    }
+    
     const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, quantity } : item
+      item.id === id ? { ...item, quantity: safeQuantity } : item
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -393,8 +399,8 @@ const calculateAndUpdateTotal = useCallback(() => {
             partsReplacement.partsOthers && partsOthersItems.map((item, index) => (
               <div key={item.id} className="flex items-center gap-3 p-3 rounded-md">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-gray-500 w-3">#{index + 1}</span>
                     <Input
                       type="text"
                       value={item.description}
@@ -408,7 +414,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                     <select
                       value={item.brand || ""}
                       onChange={(e) => updatePartsOthersBrand(item.id, e.target.value)}
-                      className="w-28 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     >
                       <option value="" disabled>Select Brand</option>
@@ -427,7 +433,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           placeholder="Part No."
                           value={item.partNumber || ""}
                           onChange={(e) => updatePartsOthersPartNumber(item.id,e.target.value)}
-                          className="w-24 text-center"
+                          className="w-28 text-center"
                           required
                         />
                         
@@ -444,7 +450,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                         </div>
 
                         {/* Unit Price Field */}
-                        <div className="w-32">
+                        <div className="w-26">
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                               ₱
                             </span>

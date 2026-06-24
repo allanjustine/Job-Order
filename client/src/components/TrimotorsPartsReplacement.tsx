@@ -177,8 +177,14 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersQuantity = (id: string, quantity: number) => {
+    // ✅ Initialize to 1 if value is 0 or invalid
+    let safeQuantity = quantity;
+    if (safeQuantity <= 0 || isNaN(safeQuantity)) {
+      safeQuantity = 1;
+    }
+    
     const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, quantity } : item
+      item.id === id ? { ...item, quantity: safeQuantity } : item
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -522,7 +528,7 @@ const calculateAndUpdateTotal = useCallback(() => {
             partsReplacement.partsOthers && partsOthersItems.map((item, index) => (
               <div key={item.id} className="flex items-center gap-3 p-3 rounded-md">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
                     <Input
                       type="text"
@@ -556,7 +562,7 @@ const calculateAndUpdateTotal = useCallback(() => {
                           placeholder="Part No."
                           value={item.partNumber || ""}
                           onChange={(e) => updatePartsOthersPartNumber(item.id, e.target.value)}
-                          className="w-30 text-center"
+                          className="w-40 text-center"
                           required
                         />
                         
