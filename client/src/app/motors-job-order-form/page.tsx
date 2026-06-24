@@ -661,6 +661,7 @@ const JobOrderForm = () => {
       oilFilter: false,
       partsOthers: false,
       partsOthersText: "",
+      partsOthersItems: [],
     });
 
     // Reset diagnosis

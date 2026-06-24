@@ -823,6 +823,7 @@ const TrimotorsJobOrderForm = () => {
       headlightRelay: false,
       partsOthers: false,
       partsOthersText: "",
+      partsOthersItems: [],
     });
 
     // Reset errors
