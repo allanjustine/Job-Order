@@ -88,6 +88,7 @@ const formSchema = z.object({
   // engineCondition: z.string().min(1, "Engine condition is required"),
   // contentUbox: z.string().min(1, "Content inside Ubox is required"),
   generalRemarks: z.string().min(1, "General remarks is required"),
+  estimatedRepairTime: z.string().min(1, "Estimated repair time is required"),
   serviceAdvisor: z.string().min(1, "Service Advisor is required"),
   branchManager: z.string().min(1, "Branch Manager is required"),
 });
@@ -116,6 +117,7 @@ const JobOrderForm = () => {
   const [nextScheduleDate, setNextScheduleDate] = useState("");
   const [nextScheduleKms, setNextScheduleKms] = useState("");
   const [generalRemarks, setGeneralRemarks] = useState("");
+  const [estimatedRepairTime, setEstimatedRepairTime] = useState("");
 
   // Amounts state
   const [jobAmounts, setJobAmounts] = useState<JobAmountsType>({});
@@ -332,6 +334,7 @@ const JobOrderForm = () => {
         engineFrameNo,
         mileage,
         // fuelLevel,
+        estimatedRepairTime,
         repairStart,
         repairEnd,
         mechanic,
@@ -436,6 +439,7 @@ const JobOrderForm = () => {
     mileage,
     address,
     purchaseDate,
+    estimatedRepairTime,
     repairStart,
     repairEnd,
     // fuelLevel,
@@ -519,6 +523,7 @@ const JobOrderForm = () => {
       date: date,
       branch_manager: signatures.branchManager,
       general_remarks: generalRemarks,
+      estimated_repair_time: estimatedRepairTime,
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
@@ -608,6 +613,7 @@ const JobOrderForm = () => {
     setNextScheduleDate("");
     setNextScheduleKms("");
     setGeneralRemarks("");
+    setEstimatedRepairTime("");
     setMechanic([]);
 
     // Reset amounts
@@ -843,6 +849,10 @@ const JobOrderForm = () => {
                   repairEnd={repairEnd}
                   // fuelLevel={fuelLevel}
                   mechanic={mechanic}
+                  mechanics={mechanics}
+                  remarks={remarks}
+                  otherRemarks={otherRemarks}
+                  estimatedRepairTime={estimatedRepairTime}
                   setCustomerName={setCustomerName}
                   setAddress={setAddress}
                   setDate={setDate}
@@ -856,7 +866,9 @@ const JobOrderForm = () => {
                   setRepairEnd={setRepairEnd}
                   // setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
-                  mechanics={mechanics}
+                  setRemarks={setRemarks}
+                  setOtherRemarks={setOtherRemarks}
+                  setEstimatedRepairTime={setEstimatedRepairTime}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
@@ -866,18 +878,14 @@ const JobOrderForm = () => {
                 {/* Repair Dates - Full width */}
                 <MotorEngineGrid
                   errors={errors}
-                  motorcycleUnit={motorcycleUnit}
-                  remarks={remarks}
+                  motorcycleUnit={motorcycleUnit}            
                   engineUnit={engineUnit}
                   engineCondition={engineCondition}
                   contentUbox={contentUbox}
                   setMotorcycleUnit={setMotorcycleUnit}
-                  setRemarks={setRemarks}
                   setEngineUnit={setEngineUnit}
                   setEngineCondition={setEngineCondition}
                   setContentUbox={setContentUbox}
-                  setOtherRemarks={setOtherRemarks}
-                  otherRemarks={otherRemarks}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">

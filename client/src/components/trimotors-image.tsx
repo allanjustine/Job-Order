@@ -24,10 +24,10 @@ export default function TriMotorsImage({ data }: { data: any }) {
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="font-bold mr-1">Category:</span>
+          {/* <span className="font-bold mr-1">Category:</span>
           <span className="border-b border-black flex-1">
             {data.category || ""}{" "}
-          </span>
+          </span> */}
         </div>
       </div>
     </div>

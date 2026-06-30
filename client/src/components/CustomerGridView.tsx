@@ -46,9 +46,9 @@ export default function CustomerGridView({ data }: { data: any }) {
                   <span className="border-b border-black flex-1">{data.contact}</span>
                 </div>
                 <div className="flex">
-                  <span className="font-bold w-40">Repair Start Time:</span>
+                  <span className="font-bold w-40">Estimated Repair Time:</span>
                   <span className="border-b border-black flex-1">
-                    {data.repairStart}
+                    {data.estimatedRepairTime}
                   </span>
                 </div>
                 <div className="flex">
@@ -56,12 +56,20 @@ export default function CustomerGridView({ data }: { data: any }) {
                   <span className="border-b border-black flex-1">{data.model}</span>
                 </div>
                 <div className="flex">
-                  <span className="font-bold w-40">Repair End Time:</span>
-                  <span className="border-b border-black flex-1">{data.repairEnd}</span>
+                  <span className="font-bold w-40">Repair Start Time:</span>
+                  <span className="border-b border-black flex-1">{data.repairStart}</span>
                 </div>
                 <div className="flex">
                   <span className="font-bold w-32">Address:</span>
                   <span className="border-b border-black flex-1">{data.address}</span>
+                </div>
+                <div className="flex">
+                  <span className="font-bold w-40">Repair End Time:</span>
+                  <span className="border-b border-black flex-1">{data.repairEnd}</span>
+                </div>
+                <div className="flex">
+                  <span className="font-bold w-32">Category:</span>
+                  <span className="border-b border-black flex-1">{data.remarks}</span>
                 </div>
                 <div className="flex">
                   <span className="font-bold w-40">Mechanic Name:</span>

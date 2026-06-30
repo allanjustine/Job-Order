@@ -350,10 +350,6 @@ const allDiagnosisOK = () => {
               />
             </div>
           </div>
-          <div className="flex mt-2">
-            <span className="font-bold mr-1">Category:</span>
-            <span className="border-b border-black flex-1">{data.remarks}</span>
-          </div>
         </div>
         <div className="border border-black p-0.5">
           <div className="font-bold mb-1">ENGINE UNIT:</div>

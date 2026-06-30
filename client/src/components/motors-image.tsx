@@ -26,10 +26,10 @@ export default function MotorsImage({ data }: { data: any }) {
           </div>
         </div>
         <div className="flex mt-2">
-          <span className="font-bold mr-1">Category:</span>
+          {/* <span className="font-bold mr-1">Category:</span>
           <span className="border-b border-black flex-1">
             {data.category || ""}
-          </span>
+          </span> */}
         </div>
       </div>
       <div className="border border-black p-0.5">

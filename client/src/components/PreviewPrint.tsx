@@ -32,6 +32,7 @@ interface PreviewJobOrderProps {
     model: string;
     engineFrameNo: string;
     purchaseDate: string;
+    estimatedRepairTime: string;
     repairStart: string;
     repairEnd: string;
     // fuelLevel: string;
@@ -349,10 +350,6 @@ const allDiagnosisOK = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-          </div>
-          <div className="flex mt-2">
-            <span className="font-bold mr-1">Category:</span>
-            <span className="border-b border-black flex-1">{data.remarks}</span>
           </div>
         </div>
         <div className="border border-black p-0.5">

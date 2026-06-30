@@ -86,6 +86,7 @@ const formSchema = z.object({
   mileage: z.string().min(1, "Mileage is required"),
   // fuelLevel: z.string().min(1, "Fuel level is required"),
   repairStart: z.string().min(1, "Repair start is required"),
+  estimatedRepairTime: z.string().min(1, "Estimated repair time is required"),
   repairEnd: z.string().min(1, "Repair end is required"),
   mechanic: z
     .array(z.number().min(1, "Mechanic is required"))
@@ -110,6 +111,7 @@ const TrimotorsJobOrderForm = () => {
   const [purchaseDate, setPurchaseDate] = useState("");
   const [repairStart, setRepairStart] = useState("");
   const [repairEnd, setRepairEnd] = useState("");
+  const [estimatedRepairTime, setEstimatedRepairTime] = useState("");
   // const [fuelLevel, setFuelLevel] = useState("");
   const [mechanic, setMechanic] = useState<any>([]);
   const [motorcycleUnit, setMotorcycleUnit] = useState("");
@@ -401,6 +403,7 @@ const TrimotorsJobOrderForm = () => {
         engineFrameNo,
         mileage,
         // fuelLevel,
+        estimatedRepairTime,
         repairStart,
         repairEnd,
         mechanic,
@@ -473,6 +476,7 @@ const TrimotorsJobOrderForm = () => {
     engineFrameNo,
     mileage,
     purchaseDate,
+    estimatedRepairTime,
     repairStart,
     repairEnd,
     // fuelLevel,
@@ -604,6 +608,7 @@ const TrimotorsJobOrderForm = () => {
       date: date,
       branch_manager: signatures.branchManager,
       general_remarks: generalRemarks,
+      estimated_repair_time: estimatedRepairTime,
       repair_end: repairEnd,
       repair_start: repairStart,
       service_advisor: signatures.serviceAdvisor,
@@ -681,6 +686,7 @@ const TrimotorsJobOrderForm = () => {
     setPurchaseDate("");
     setRepairStart("");
     setRepairEnd("");
+    setEstimatedRepairTime("");
     // setFuelLevel("");
     setAddress("");
     setMotorcycleUnit("");
@@ -975,6 +981,7 @@ const TrimotorsJobOrderForm = () => {
                   engineFrameNo={engineFrameNo}
                   mileage={mileage}
                   purchaseDate={purchaseDate}
+                  estimatedRepairTime={estimatedRepairTime}
                   repairStart={repairStart}
                   repairEnd={repairEnd}
                   // fuelLevel={fuelLevel}
@@ -988,15 +995,12 @@ const TrimotorsJobOrderForm = () => {
                   setEngineFrameNo={setEngineFrameNo}
                   setMileage={setMileage}
                   setPurchaseDate={setPurchaseDate}
+                  setEstimatedRepairTime={setEstimatedRepairTime}
                   setRepairStart={setRepairStart}
                   setRepairEnd={setRepairEnd}
                   // setFuelLevel={setFuelLevel}
                   setMechanic={setMechanic}
                   mechanics={mechanics}
-                />
-
-                <TrimotorsCategory
-                  errors={errors}
                   remarks={remarks}
                   setRemarks={setRemarks}
                   setOtherRemarks={setOtherRemarks}

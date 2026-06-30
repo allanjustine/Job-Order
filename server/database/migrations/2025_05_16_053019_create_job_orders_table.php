@@ -22,6 +22,7 @@ return new class extends Migration
             $table->dateTime('date');
             $table->string('branch_manager');
             $table->string('general_remarks');
+            $table->string('estimated_repair_time');
             $table->time('repair_end');
             $table->time('repair_start');
             $table->string('service_advisor');

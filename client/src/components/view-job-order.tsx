@@ -121,9 +121,9 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Repair Start Time:</span>
+            <span className="font-bold w-40">Estimated Repair Time:</span>
             <span className="border-b border-black flex-1">
-              {data.repair_start || "N/A"}
+              {data.estimated_repair_time || "N/A"}
             </span>
           </div>
           <div className="flex">
@@ -133,15 +133,27 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Repair End Time:</span>
+            <span className="font-bold w-40">Repair Start Time:</span>
             <span className="border-b border-black flex-1">
-              {data.repair_end || "N/A"}
+              {data.repair_start || "N/A"}
             </span>
           </div>
           <div className="flex">
             <span className="font-bold w-32">Address:</span>
             <span className="border-b border-black flex-1">
               {data.customer?.address || "N/A"}
+            </span>
+          </div>
+          <div className="flex">
+            <span className="font-bold w-40">Repair End Time:</span>
+            <span className="border-b border-black flex-1">
+              {data.repair_end || "N/A"}
+            </span>
+          </div>
+          <div className="flex">
+            <span className="font-bold w-32">Category:</span>
+            <span className="border-b border-black flex-1">
+              {data.category || "N/A"}
             </span>
           </div>
           <div className="flex">

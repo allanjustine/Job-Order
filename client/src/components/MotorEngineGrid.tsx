@@ -39,33 +39,13 @@ export default function MotorEngineGrid({
             </Select>
 
             <div className="mt-2">
-              <Label>Category</Label>
-              <Select
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              >
-                <option value="" disabled>
-                  Select Category
-                </option>
-                <option value="Repo Recon">Repo Recon</option>
-                <option value="MC Service">MC Service</option>
-                <option value="Under Warranty">Under Warranty</option>
-                <option value="Regular Customer">Regular Customer</option>
-                <option value="E-Bike">E-Bike</option>
-                <option value="others">Others</option>
-              </Select>
-              {remarks === "others" && (
-                <input
-                  type="text"
-                  placeholder="Please specify"
-                  className="mt-2 w-full p-2 border rounded"
-                  value={otherRemarks}
-                  onChange={(e) => setOtherRemarks(e.target.value)}
-                />
-              )}
-              {errors.remarks && (
-                <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
-              )}
+              <Label>Contents inside U-Box</Label>
+              <Input
+                placeholder=""
+                className="w-full"
+                value={contentUbox}
+                onChange={(e) => setContentUbox(e.target.value)}
+              />
             </div>
           </div>
         </div>
@@ -99,13 +79,7 @@ export default function MotorEngineGrid({
       </div>
 
       <div className="mt-4">
-        <Label>Contents inside U-Box</Label>
-        <Input
-          placeholder=""
-          className="w-full"
-          value={contentUbox}
-          onChange={(e) => setContentUbox(e.target.value)}
-        />
+        
       </div>
     </div>
   );

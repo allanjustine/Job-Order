@@ -1,6 +1,7 @@
 import Input from "./ui/input";
 import { Label } from "./ui/label";
 import { MultiMechanic } from "./MultiMechanic";
+import Select from "./ui/select";
 
 export default function CustomerGrid({
   errors,
@@ -17,6 +18,11 @@ export default function CustomerGrid({
   repairEnd,
   // fuelLevel,
   mechanic,
+  remarks,
+  estimatedRepairTime,
+  setRemarks,
+  setOtherRemarks,
+  otherRemarks,
   setCustomerName,
   setAddress,
   setDate,
@@ -31,6 +37,7 @@ export default function CustomerGrid({
   // setFuelLevel,
   setMechanic,
   mechanics,
+  setEstimatedRepairTime
 }: any) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -144,6 +151,18 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
+        <Label>Estimated Repair Time</Label>
+        <Input
+          type="text"
+          error={errors.estimatedRepairTime}
+          value={estimatedRepairTime}
+          onChange={(e) => setEstimatedRepairTime(e.target.value)}
+        />
+        {errors.estimatedRepairTime && (
+          <p className="text-red-500 text-xs mt-1">{errors.estimatedRepairTime}</p>
+        )}
+      </div>
+      <div className="col-span-1">
         <Label>Repair Start Time</Label>
         <Input
           type="time"
@@ -169,6 +188,35 @@ export default function CustomerGrid({
         />
         {errors.repairEnd && (
           <p className="text-red-500 text-xs mt-1">{errors.repairEnd}</p>
+        )}
+      </div>
+      <div className="mt-2">
+        <Label>Category</Label>
+        <Select
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
+        >
+          <option value="" disabled>
+            Select Category
+          </option>
+          <option value="Repo Recon">Repo Recon</option>
+          <option value="MC Service">MC Service</option>
+          <option value="Under Warranty">Under Warranty</option>
+          <option value="Regular Customer">Regular Customer</option>
+          <option value="E-Bike">E-Bike</option>
+          <option value="others">Others</option>
+        </Select>
+        {remarks === "others" && (
+          <input
+            type="text"
+            placeholder="Please specify"
+            className="mt-2 w-full p-2 border rounded"
+            value={otherRemarks}
+            onChange={(e) => setOtherRemarks(e.target.value)}
+          />
+        )}
+        {errors.remarks && (
+          <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
         )}
       </div>
 
