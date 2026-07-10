@@ -59,6 +59,8 @@ class ReportService
                     )
                         ->orWhereRelation('customer', 'name', 'like', "%{$search}%")
                         ->orWhereRelation('mechanics', 'name', 'like', "%{$search}%")
+                        ->orWhereRelation('jobOrderDetails', 'category', 'like', "%{$search}%")
+                        ->orWhereRelation('jobOrderDetails', 'part_number', 'like', "%{$search}%")
                         ->orWhereHas('customer.user', function ($q) use ($search) {
                             $q->where('name', 'like', "%{$search}%")
                                 ->orWhere('code', 'like', "%{$search}%");
