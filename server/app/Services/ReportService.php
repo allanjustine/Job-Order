@@ -192,6 +192,9 @@ class ReportService
                 $item->whereRelation('jobOrder', 'job_order_type', $job_order_type)
             )
             ->orderBy('type', 'asc')
+            ->orderBy(
+                JobOrder::query()->select('category')->whereColumn('job_orders.id', 'job_order_details.job_order_id'),
+            )
             ->get()
             ->map(function ($item) {
                 return [
@@ -251,7 +254,7 @@ class ReportService
                     ->orWhereRelation('jobOrder.mechanics', 'name', 'like', "%{$search}%")
             )
             // ->orderBy('type', 'asc')
-            ->orderBy(JobOrder::select('job_order_number')->whereColumn('job_orders.id', 'job_order_details.job_order_id'), 'asc')
+            ->orderBy(JobOrder::query()->select('job_order_number')->whereColumn('job_orders.id', 'job_order_details.job_order_id'), 'asc')
             ->whereHas('jobOrder', function ($q) use ($from, $to) {
                 $q->where(
                     fn($item)
