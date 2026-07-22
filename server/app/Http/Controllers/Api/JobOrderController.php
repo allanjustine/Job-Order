@@ -23,9 +23,7 @@ class JobOrderController extends Controller
 
     public function store(Request $request, JobOrderService $jobOrderService)
     {
-        $user = Auth::user();
-
-        $customer = $jobOrderService->store($request, $user);
+        $customer = $jobOrderService->store($request);
 
         return response()->json("\"{$customer->name}\" Job Order has been printed successfully.", 201);
     }
@@ -103,5 +101,16 @@ class JobOrderController extends Controller
             'message' => 'Job Order fetched successfully.',
             'data'    => $job_order
         ], 200);
+    }
+
+    public function verifyingJobOrder(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->is_locked_date && !now()->isSameDay($request->job_order_date)) {
+            abort(400, 'Submissions of job orders are only allowed on today\'s date. Please make sure the date is correct.');
+        }
+
+        return response()->noContent();
     }
 }
