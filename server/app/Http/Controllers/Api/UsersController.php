@@ -56,8 +56,9 @@ class UsersController extends Controller
                 "email"           => $user->email,
                 "branch"          => $user->branch,
                 "user_export_log" => $user->userExportLog?->created_at?->diffForHumans(),
+                "is_locked_date"  => $user->is_locked_date,
                 "roles"           => $user->roles,
-                'created_at'      => $user->created_at,
+                "created_at"      => $user->created_at,
             ])
         ]);
 
@@ -69,13 +70,13 @@ class UsersController extends Controller
         $type = request('type', null);
 
         $users = User::query()
-        ->has('customers')
-        ->where(
-            fn($query)
-            =>
-            $query->whereNot('id', Auth::id())
-                ->whereDoesntHaveRelation('roles', 'name', RoleName::ADMIN?->value)
-        )
+            ->has('customers')
+            ->where(
+                fn($query)
+                =>
+                $query->whereNot('id', Auth::id())
+                    ->whereDoesntHaveRelation('roles', 'name', RoleName::ADMIN?->value)
+            )
             ->when(
                 $type === 'target-income',
                 fn($query)
@@ -138,9 +139,17 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $user->update([
+            "is_locked_date" => !$user->is_locked_date
+        ]);
+
+        $status = $user->is_locked_date ? "locked" : "unlocked";
+
+        return response()->json([
+            'message' => "User date picker is now {$status} successfully."
+        ], 200);
     }
 
     /**

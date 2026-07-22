@@ -39,10 +39,9 @@ export default function SpecificJobRequest({
   handleJobAmountChange,
   jobTotal,
 }: SpecificJobRequestProps) {
-  
   // Get others items from jobRequest or initialize empty array
   const othersItems: JobOthersItem[] = jobRequest.othersItems || [];
-  
+
   // Add new others item
   const addOthersItem = () => {
     const newItem: JobOthersItem = {
@@ -56,61 +55,64 @@ export default function SpecificJobRequest({
       othersItems: updatedItems,
     });
   };
-  
+
   // Remove others item
   const removeOthersItem = (id: string) => {
-    const updatedItems = othersItems.filter(item => item.id !== id);
+    const updatedItems = othersItems.filter((item) => item.id !== id);
     setJobRequest({
       ...jobRequest,
       othersItems: updatedItems,
     });
-    
+
     // If no items left, uncheck the others checkbox
     if (updatedItems.length === 0) {
-      setJobRequest(prev => ({
+      setJobRequest((prev) => ({
         ...prev,
         others: false,
       }));
     }
   };
-  
+
   // Update others item description
   const updateOthersDescription = (id: string, description: string) => {
-    const updatedItems = othersItems.map(item =>
-      item.id === id ? { ...item, description } : item
+    const updatedItems = othersItems.map((item) =>
+      item.id === id ? { ...item, description } : item,
     );
     setJobRequest({
       ...jobRequest,
       othersItems: updatedItems,
     });
   };
-  
+
   // Update others item brand
   const updateOthersBrand = (id: string, brand: string) => {
-    const updatedItems = othersItems.map(item =>
-      item.id === id ? { ...item, brand } : item
+    const updatedItems = othersItems.map((item) =>
+      item.id === id ? { ...item, brand } : item,
     );
     setJobRequest({
       ...jobRequest,
       othersItems: updatedItems,
     });
   };
-  
+
   // Update others item amount
   const updateOthersAmount = (id: string, amount: number) => {
-    const updatedItems = othersItems.map(item =>
-      item.id === id ? { ...item, amount } : item
+    const updatedItems = othersItems.map((item) =>
+      item.id === id ? { ...item, amount } : item,
     );
     setJobRequest({
       ...jobRequest,
       othersItems: updatedItems,
     });
-    
+
     // Update the total others amount in jobAmounts
-    const totalOthersAmount = updatedItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    const totalOthersAmount = updatedItems.reduce(
+      (sum, item) => sum + (item.amount || 0),
+      0,
+    );
     handleJobAmountChange("others", totalOthersAmount);
   };
-  
+
   // Toggle others checkbox
   const toggleOthers = (checked: boolean) => {
     if (checked) {
@@ -202,45 +204,46 @@ export default function SpecificJobRequest({
                 <>
                   <div className="flex-1">
                     <select
-                        value={jobRequest.couponBrand || ""}
-                        onChange={(e) =>
-                          setJobRequest({
-                            ...jobRequest,
-                            couponBrand: e.target.value || undefined,
-                          })
-                        }
-                        className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        required
-                      >
-                        <option value="" disabled>
-                          Select Brand
+                      value={jobRequest.couponBrand || ""}
+                      onChange={(e) =>
+                        setJobRequest({
+                          ...jobRequest,
+                          couponBrand: e.target.value || undefined,
+                        })
+                      }
+                      className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      required
+                    >
+                      <option value="" disabled>
+                        Select Brand
+                      </option>
+                      {brandChoices.map((brand) => (
+                        <option key={brand} value={brand}>
+                          {brand}
                         </option>
-                        {brandChoices.map((brand) => (
-                          <option key={brand} value={brand}>
-                            {brand}
-                          </option>
-                        ))}
+                      ))}
                     </select>
                   </div>
 
                   {/* Amount input field */}
                   <div className="w-32">
-                 
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                    {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                         ₱
-                      </span>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        value={jobAmounts.selectedCoupon || ""}
-                        onChange={(e) =>
-                          handleJobAmountChange("selectedCoupon", Number(e.target.value))
-                        }
-                        step="0.01"
-                        className="pl-8 pr-3 text-right w-full"
-                        required
-                      />
-           
+                      </span> */}
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={jobAmounts.selectedCoupon || ""}
+                      onChange={(e) =>
+                        handleJobAmountChange(
+                          "selectedCoupon",
+                          Number(e.target.value),
+                        )
+                      }
+                      step="0.01"
+                      className="pl-8 pr-3 text-right w-full"
+                      required
+                    />
                   </div>
                 </>
               )}
@@ -273,23 +276,23 @@ export default function SpecificJobRequest({
               </Label>
               {(jobRequest[item.key as keyof JobRequest] as boolean) && (
                 <div className="w-40">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                      ₱
-                    </span>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={jobAmounts[item.key as keyof JobAmountsType] || ""}
-                      onChange={(e) =>
-                        handleJobAmountChange(
-                          item.key as keyof JobAmountsType,
-                          Number(e.target.value),
-                        )
-                      }
-                      step="0.01"
-                      className="pl-8 pr-3 text-right"
-                      required
-                    />
+                  {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                    ₱
+                  </span> */}
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={jobAmounts[item.key as keyof JobAmountsType] || ""}
+                    onChange={(e) =>
+                      handleJobAmountChange(
+                        item.key as keyof JobAmountsType,
+                        Number(e.target.value),
+                      )
+                    }
+                    step="0.01"
+                    className="pl-8 pr-3 text-right"
+                    required
+                  />
                 </div>
               )}
             </div>
@@ -319,21 +322,29 @@ export default function SpecificJobRequest({
               </Button>
             )}
           </div>
-          
+
           {jobRequest.others && othersItems.length === 0 ? (
             <div className="text-center text-gray-400 text-sm py-4 border border-dashed border-gray-300 rounded-md">
               No custom jobs added. Click "Add Job" to add.
             </div>
           ) : (
-            jobRequest.others && othersItems.map((item, index) => (
-              <div key={item.id} className="flex items-center gap-2 p-2 rounded-md">
+            jobRequest.others &&
+            othersItems.map((item, index) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-2 p-2 rounded-md"
+              >
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
+                    <span className="text-sm text-gray-500 w-8">
+                      #{index + 1}
+                    </span>
                     <Input
                       type="text"
                       value={item.description}
-                      onChange={(e) => updateOthersDescription(item.id, e.target.value)}
+                      onChange={(e) =>
+                        updateOthersDescription(item.id, e.target.value)
+                      }
                       placeholder="Enter job description"
                       className="flex-1"
                       required
@@ -341,18 +352,20 @@ export default function SpecificJobRequest({
                   </div>
                 </div>
                 <div className="w-40">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                      ₱
-                    </span>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={item.amount || ""}
-                      onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
-                      step="0.01"
-                      className="pl-8 pr-3 text-right"
-                      required
-                    />
+                  {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                    ₱
+                  </span> */}
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={item.amount || ""}
+                    onChange={(e) =>
+                      updateOthersAmount(item.id, Number(e.target.value))
+                    }
+                    step="0.01"
+                    className="pl-8 pr-3 text-right"
+                    required
+                  />
                 </div>
                 <Button
                   type="button"

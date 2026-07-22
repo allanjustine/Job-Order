@@ -11,6 +11,7 @@ import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
 import { Lock } from "lucide-react";
 import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
 
 const LoginPage = () => {
   const { handleLogin, error, errors } = useAuth();
@@ -55,15 +56,15 @@ const LoginPage = () => {
       icon: "info",
       title: "Forgot Password",
       text: "Please contact the system administrator to reset your password.",
-      confirmButtonText: "Done",
+      confirmButtonText: "Okay",
     });
   }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-100 to-transparent opacity-70"></div>
-        <div className="absolute top-0 right-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-100 to-transparent opacity-70 w-1/2 h-full"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--tw-gradient-stops))] from-blue-100 to-transparent opacity-70"></div>
+        <div className="absolute top-0 right-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-indigo-100 to-transparent opacity-70 w-1/2 h-full"></div>
       </div>
 
       <div className="relative w-full max-w-md">
@@ -221,12 +222,27 @@ const LoginPage = () => {
 
             <div className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => {
+                  Swal.fire({
+                    icon: "info",
+                    title: "Contact Administrator",
+                    text: "Please contact the system administrator to register your account.",
+                    confirmButtonText: "Okay",
+                  });
+                }}
+                className="px-0 text-blue-500"
+              >
+                Please contact the system administrator.
+              </Button>
+              {/* <Link
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
               >
                 Sign Up
-              </Link>
+              </Link> */}
             </div>
           </form>
         </div>

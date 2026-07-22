@@ -43,6 +43,7 @@ import PreviewPrint from "@/components/PreviewPrint";
 import FormHeader from "@/components/form-header";
 import { jobItems } from "@/constants/job-items";
 import { partsItems } from "@/constants/part-items";
+import { Spinner } from "@/components/ui/spinner";
 
 const QUANTITY_DATA = {
   engineOil: 1,
@@ -216,6 +217,7 @@ const JobOrderForm = () => {
   const [transactionCode, setTransactionCode] = useState("");
   const [otherRemarks, setOtherRemarks] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -492,8 +494,8 @@ const JobOrderForm = () => {
     if (!isPrint) return;
 
     window.onafterprint = () => {
-      handlePrint();
       handleSavePrint();
+      fetchJobOrderNumber();
     };
 
     window.print();
@@ -556,9 +558,9 @@ const JobOrderForm = () => {
             padding: "15px",
           },
         });
-        handlePreviewPrint();
+        setIsOpen(false);
+        setIsPrint(false);
         handleReset();
-        fetchJobOrderNumber();
       }
     } catch (error) {
       console.error(error);
@@ -588,14 +590,34 @@ const JobOrderForm = () => {
     }
   };
 
-  const handlePreviewPrint = () => {
-    fetchJobOrderNumber();
-    setIsOpen(!isOpen);
+  const handlePreviewPrint = async () => {
+    setIsVerifying(true);
+    try {
+      const response = await api.post("/verifying-job-order", {
+        job_order_date: itemToStore.job_order.date,
+      });
+
+      if (response.status === 204) {
+        fetchJobOrderNumber();
+        setIsOpen(!isOpen);
+      }
+    } catch (error: any) {
+      console.error(error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          icon: "error",
+          title: "Ops! Something went wrong.",
+          text: error.response.data.message,
+        });
+      }
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleReset = () => {
     setCustomerName("");
-    setDate("");
+    setDate(user.is_locked_date ? new Date().toISOString().split("T")[0] : "");
     setContact("");
     setModel("");
     setEngineFrameNo("");
@@ -878,7 +900,7 @@ const JobOrderForm = () => {
                 {/* Repair Dates - Full width */}
                 <MotorEngineGrid
                   errors={errors}
-                  motorcycleUnit={motorcycleUnit}            
+                  motorcycleUnit={motorcycleUnit}
                   engineUnit={engineUnit}
                   engineCondition={engineCondition}
                   contentUbox={contentUbox}
@@ -951,8 +973,17 @@ const JobOrderForm = () => {
                       ref={modalButtonRef}
                       type="submit"
                       className="bg-blue-600 hover:bg-blue-700 text-white py-5"
+                      disabled={isVerifying}
                     >
-                      <FaEye /> Preview
+                      {isVerifying ? (
+                        <>
+                          <Spinner /> Verifying
+                        </>
+                      ) : (
+                        <>
+                          <FaEye /> Preview
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>

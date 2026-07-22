@@ -24,16 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()->load('roles:id,name', 'branch:id,branch_name,branch_code');
     });
 
-    Route::get('mechanic-checking', function (Request $request) {
-        $has_mechanic = $request->user()->mechanics();
-        $word_pluralize = Str::plural('mechanic', $has_mechanic->count());
-
-        return response()->json([
-            "message"      => "{$has_mechanic->count()} {$word_pluralize} found. You can now create a job order.",
-            "has_mechanic" => $has_mechanic->exists()
-        ], 200);
-    });
-
     // ADMIN ROLE ROUTES
     Route::middleware('role:admin')->group(function () {
         Route::controller(CustomersController::class)->group(function () {
@@ -42,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::controller(UsersController::class)->group(function () {
             Route::get('users', 'index');
             Route::get('user-selection-options', 'userSelectionOptions');
+            Route::patch('users/{user}/update', 'update');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
@@ -67,7 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('branch-mechanics', [MechanicController::class, 'branchMechanic']);
         Route::get('branch-stats', [UserDashboardController::class, 'index']);
         Route::get('get-job-order-number', function () {
-            $lastJobOrderNumber = Auth::user()->jobOrders()->max('job_order_number') ?? 0;
+            $user = Auth::user();
+
+            $lastJobOrderNumber = $user->jobOrders()->max('job_order_number') ?? 0;
 
             Cache::forget('jo_transaction_code');
 
@@ -84,6 +77,16 @@ Route::middleware('auth:sanctum')->group(function () {
                 'transaction_code' => $generated_code
             ], 200);
         });
+        Route::get('mechanic-checking', function (Request $request) {
+            $has_mechanic = $request->user()->mechanics();
+            $word_pluralize = Str::plural('mechanic', $has_mechanic->count());
+
+            return response()->json([
+                "message"      => "{$has_mechanic->count()} {$word_pluralize} found. You can now create a job order.",
+                "has_mechanic" => $has_mechanic->exists()
+            ], 200);
+        });
+        Route::post('verifying-job-order', [JobOrderController::class, 'verifyingJobOrder']);
     });
 
     // GLOBAL AUTHENTICATED ROUTES
@@ -97,12 +100,10 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::controller(BranchController::class)->group(function () {
     Route::get('branches', 'index');
 });
-
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'store');
     Route::post('login', 'login');
 });
-
 Route::get('toks/{any}', function () {
     $test2 = "0000242";
     $test = sprintf('%07d', $test2);
@@ -110,5 +111,4 @@ Route::get('toks/{any}', function () {
         'message' => $test
     ], 200);
 });
-
 Route::post('job-order/search', [JobOrderController::class, 'search'])->middleware('throttle:50,1');

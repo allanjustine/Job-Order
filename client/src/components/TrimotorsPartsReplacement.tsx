@@ -2,7 +2,15 @@
 import Input from "./ui/input";
 import { Label } from "./ui/label";
 import phpCurrency from "@/utils/phpCurrency";
-import { PartsAmountsType, TrimotorsPartsReplacement, TrimotorsPartsBrand, TrimotorsPartsNumber, TrimotorsPartsQuantity, TrimotorsPartsOthersItem, TrimotorsPartsAmountsType } from "@/types/jobOrderFormType";
+import {
+  PartsAmountsType,
+  TrimotorsPartsReplacement,
+  TrimotorsPartsBrand,
+  TrimotorsPartsNumber,
+  TrimotorsPartsQuantity,
+  TrimotorsPartsOthersItem,
+  TrimotorsPartsAmountsType,
+} from "@/types/jobOrderFormType";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
@@ -10,21 +18,33 @@ import { Plus, Trash2 } from "lucide-react";
 
 interface TrimotorsPartsReplacementSectionProps {
   partsReplacement: TrimotorsPartsReplacement;
-  setPartsReplacement: React.Dispatch<React.SetStateAction<TrimotorsPartsReplacement>>;
+  setPartsReplacement: React.Dispatch<
+    React.SetStateAction<TrimotorsPartsReplacement>
+  >;
   partsAmounts: PartsAmountsType;
   handlePartsAmountChange: (key: keyof PartsAmountsType, value: number) => void;
   partsTotal: number;
-  setPartsTotal?: (total: number) => void; 
+  setPartsTotal?: (total: number) => void;
   partsBrand: TrimotorsPartsBrand;
   setPartsBrand: React.Dispatch<React.SetStateAction<TrimotorsPartsBrand>>;
   partsNumber: TrimotorsPartsNumber;
   setPartsNumber: React.Dispatch<React.SetStateAction<TrimotorsPartsNumber>>;
   partsQuantity: TrimotorsPartsQuantity;
-  setPartsQuantity: React.Dispatch<React.SetStateAction<TrimotorsPartsQuantity>>;
+  setPartsQuantity: React.Dispatch<
+    React.SetStateAction<TrimotorsPartsQuantity>
+  >;
 }
-  
+
 // Brand options
-const brandChoices = ["Bajaj"," BG Powerstroke","Kawasaki","Honda","Yamaha","Suzuki","Hatasu"];
+const brandChoices = [
+  "Bajaj",
+  " BG Powerstroke",
+  "Kawasaki",
+  "Honda",
+  "Yamaha",
+  "Suzuki",
+  "Hatasu",
+];
 
 export default function TrimotorsPartsReplacementSection({
   partsReplacement,
@@ -37,69 +57,86 @@ export default function TrimotorsPartsReplacementSection({
   setPartsBrand,
   partsNumber,
   setPartsNumber,
-  partsQuantity, 
-  setPartsQuantity, 
+  partsQuantity,
+  setPartsQuantity,
 }: TrimotorsPartsReplacementSectionProps) {
-  
   // Get parts others items
-  const partsOthersItems: TrimotorsPartsOthersItem[] = partsReplacement.partsOthersItems || [];
-  
+  const partsOthersItems: TrimotorsPartsOthersItem[] =
+    partsReplacement.partsOthersItems || [];
+
   // Calculate total whenever relevant data changes
   useEffect(() => {
     calculateAndUpdateTotal();
   }, [partsReplacement, partsAmounts, partsQuantity, partsOthersItems]);
 
-const calculateAndUpdateTotal = useCallback(() => {
-  let total = 0;
-  
-  // Calculate for each regular part item
-  trimotorsPartsItems.forEach(item => {
-    const key = item.key;
-    if (key !== "partsOthers") {
-      if (partsReplacement[key as keyof TrimotorsPartsReplacement]) {
-        const quantity = partsQuantity[key as keyof TrimotorsPartsQuantity] || 0;
-        const amount = partsAmounts[key as keyof TrimotorsPartsAmountsType] || 0;
-        total += quantity * amount;
+  const calculateAndUpdateTotal = useCallback(() => {
+    let total = 0;
+
+    // Calculate for each regular part item
+    trimotorsPartsItems.forEach((item) => {
+      const key = item.key;
+      if (key !== "partsOthers") {
+        if (partsReplacement[key as keyof TrimotorsPartsReplacement]) {
+          const quantity =
+            partsQuantity[key as keyof TrimotorsPartsQuantity] || 0;
+          const amount =
+            partsAmounts[key as keyof TrimotorsPartsAmountsType] || 0;
+          total += quantity * amount;
+        }
       }
-    }
-  });
-  
-  // Calculate for multiple "Others" 
-  if (partsReplacement.partsOthers && partsOthersItems.length > 0) {
-    partsOthersItems.forEach(item => {
-      total += item.amount || 0;  // Direct amount na lang
     });
-  }
-  
-  // Update parent if function provided
-  if (setPartsTotal) {
-    setPartsTotal(total);
-  }
-}, [partsReplacement, partsAmounts, partsQuantity, partsOthersItems, setPartsTotal]);
+
+    // Calculate for multiple "Others"
+    if (partsReplacement.partsOthers && partsOthersItems.length > 0) {
+      partsOthersItems.forEach((item) => {
+        total += item.amount || 0; // Direct amount na lang
+      });
+    }
+
+    // Update parent if function provided
+    if (setPartsTotal) {
+      setPartsTotal(total);
+    }
+  }, [
+    partsReplacement,
+    partsAmounts,
+    partsQuantity,
+    partsOthersItems,
+    setPartsTotal,
+  ]);
 
   const handleBrandChange = (key: keyof TrimotorsPartsBrand, value: string) => {
-    setPartsBrand(prev => ({
+    setPartsBrand((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
-  const handlePartNumberChange = (key: keyof TrimotorsPartsNumber, value: string) => {
-    setPartsNumber(prev => ({
+  const handlePartNumberChange = (
+    key: keyof TrimotorsPartsNumber,
+    value: string,
+  ) => {
+    setPartsNumber((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
-  const handleQuantityChange = (key: keyof TrimotorsPartsQuantity, value: number) => {
-    setPartsQuantity(prev => ({
+  const handleQuantityChange = (
+    key: keyof TrimotorsPartsQuantity,
+    value: number,
+  ) => {
+    setPartsQuantity((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
   // Wrapper for amount change to ensure total updates
-  const handleAmountChangeWithTotal = (key: keyof PartsAmountsType, value: number) => {
+  const handleAmountChangeWithTotal = (
+    key: keyof PartsAmountsType,
+    value: number,
+  ) => {
     handlePartsAmountChange(key, value);
   };
 
@@ -113,7 +150,7 @@ const calculateAndUpdateTotal = useCallback(() => {
     if (itemKey === "partsOthers") return "partsOthers";
     return itemKey as keyof TrimotorsPartsNumber;
   };
-  
+
   const getQuantityKey = (itemKey: string): keyof TrimotorsPartsQuantity => {
     if (itemKey === "partsOthers") return "partsOthers";
     return itemKey as keyof TrimotorsPartsQuantity;
@@ -138,7 +175,7 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const removePartsOthersItem = (id: string) => {
-    const updatedItems = partsOthersItems.filter(item => item.id !== id);
+    const updatedItems = partsOthersItems.filter((item) => item.id !== id);
     setPartsReplacement({
       ...partsReplacement,
       partsOthersItems: updatedItems,
@@ -147,8 +184,8 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersDescription = (id: string, description: string) => {
-    const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, description } : item
+    const updatedItems = partsOthersItems.map((item) =>
+      item.id === id ? { ...item, description } : item,
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -157,8 +194,8 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersBrand = (id: string, brand: string) => {
-    const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, brand } : item
+    const updatedItems = partsOthersItems.map((item) =>
+      item.id === id ? { ...item, brand } : item,
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -167,8 +204,8 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersPartNumber = (id: string, partNumber: string) => {
-    const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, partNumber } : item
+    const updatedItems = partsOthersItems.map((item) =>
+      item.id === id ? { ...item, partNumber } : item,
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -182,9 +219,9 @@ const calculateAndUpdateTotal = useCallback(() => {
     if (safeQuantity <= 0 || isNaN(safeQuantity)) {
       safeQuantity = 1;
     }
-    
-    const updatedItems = partsOthersItems.map(item =>
-      item.id === id ? { ...item, quantity: safeQuantity } : item
+
+    const updatedItems = partsOthersItems.map((item) =>
+      item.id === id ? { ...item, quantity: safeQuantity } : item,
     );
     setPartsReplacement({
       ...partsReplacement,
@@ -194,18 +231,21 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   const updatePartsOthersAmount = (id: string, amount: number) => {
-  const updatedItems = partsOthersItems.map(item =>
-    item.id === id ? { ...item, amount } : item
-  );
-  setPartsReplacement({
-    ...partsReplacement,
-    partsOthersItems: updatedItems,
-  });
-  
-  // Total ay sum ng amount lang, hindi na quantity * amount
-  const totalOthersAmount = updatedItems.reduce((sum, item) => sum + item.amount, 0);
-  handlePartsAmountChange("partsOthers", totalOthersAmount);
-};
+    const updatedItems = partsOthersItems.map((item) =>
+      item.id === id ? { ...item, amount } : item,
+    );
+    setPartsReplacement({
+      ...partsReplacement,
+      partsOthersItems: updatedItems,
+    });
+
+    // Total ay sum ng amount lang, hindi na quantity * amount
+    const totalOthersAmount = updatedItems.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
+    handlePartsAmountChange("partsOthers", totalOthersAmount);
+  };
 
   // Toggle parts others checkbox
   const togglePartsOthers = (checked: boolean) => {
@@ -241,7 +281,9 @@ const calculateAndUpdateTotal = useCallback(() => {
   };
 
   // Split parts items into two columns
-  const regularPartsItems = trimotorsPartsItems.filter((item) => item.key !== "partsOthers");
+  const regularPartsItems = trimotorsPartsItems.filter(
+    (item) => item.key !== "partsOthers",
+  );
   const midpoint = Math.ceil(regularPartsItems.length / 2);
   const firstColumnParts = regularPartsItems.slice(0, midpoint);
   const secondColumnParts = regularPartsItems.slice(midpoint);
@@ -260,7 +302,7 @@ const calculateAndUpdateTotal = useCallback(() => {
               const brandKey = getBrandKey(item.key);
               const partNumberKey = getPartNumberKey(item.key);
               const quantityKey = getQuantityKey(item.key);
-              
+
               return (
                 <div
                   key={item.key}
@@ -285,9 +327,12 @@ const calculateAndUpdateTotal = useCallback(() => {
                             handleBrandChange(brandKey, "");
                             handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
-                            handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
+                            handleAmountChangeWithTotal(
+                              item.key as keyof PartsAmountsType,
+                              0,
+                            );
                           } else {
-                           // Initialize quantity to 1 when checking
+                            // Initialize quantity to 1 when checking
                             const currentQuantity = partsQuantity[quantityKey];
                             if (!currentQuantity || currentQuantity === 0) {
                               handleQuantityChange(quantityKey, 1);
@@ -297,19 +342,23 @@ const calculateAndUpdateTotal = useCallback(() => {
                       />
                       {item.label}
                     </Label>
-                    
+
                     {(partsReplacement[
                       item.key as keyof TrimotorsPartsReplacement
                     ] as boolean) && (
                       <>
-                          {/* Brand Dropdown */}
+                        {/* Brand Dropdown */}
                         <select
                           value={partsBrand[brandKey] || ""}
-                          onChange={(e) => handleBrandChange(brandKey, e.target.value)}
+                          onChange={(e) =>
+                            handleBrandChange(brandKey, e.target.value)
+                          }
                           className="w-32 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           required
                         >
-                          <option value="" disabled>Select Brand</option>
+                          <option value="" disabled>
+                            Select Brand
+                          </option>
                           {brandChoices.map((brand) => (
                             <option key={brand} value={brand}>
                               {brand}
@@ -324,46 +373,60 @@ const calculateAndUpdateTotal = useCallback(() => {
                               type="text"
                               placeholder="Part No."
                               value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) => handlePartNumberChange(partNumberKey, e.target.value)}
+                              onChange={(e) =>
+                                handlePartNumberChange(
+                                  partNumberKey,
+                                  e.target.value,
+                                )
+                              }
                               className="w-28 text-center"
                               required
                             />
 
-                            {/* Quantity Field */}  
+                            {/* Quantity Field */}
                             <div className="flex items-center gap-1">
-                              <span className="text-sm text-gray-600">Qty:</span>
+                              <span className="text-sm text-gray-600">
+                                Qty:
+                              </span>
                               <Input
                                 type="number"
                                 min="1"
                                 value={partsQuantity[quantityKey] || 1}
-                                onChange={(e) => handleQuantityChange(quantityKey, Number(e.target.value))}
+                                onChange={(e) =>
+                                  handleQuantityChange(
+                                    quantityKey,
+                                    Number(e.target.value),
+                                  )
+                                }
                                 className="w-16 text-center"
                                 required
                               />
                             </div>
 
-                              {/* Unit Price Field */}
+                            {/* Unit Price Field */}
                             <div className="w-32">
-                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                              {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                                   ₱
-                                </span>
-                                <Input
-                                  type="number"
-                                  placeholder="0.00"
-                                  value={
-                                    partsAmounts[item.key as keyof PartsAmountsType] || ""
-                                  }
-                                  onChange={(e) =>
-                                    handleAmountChangeWithTotal(
-                                      item.key as keyof PartsAmountsType,
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                  step="0.01"
-                                  className="pl-8 pr-3 text-right"
-                                  required
-                                />
-                              </div>
+                                </span> */}
+                              <Input
+                                type="number"
+                                placeholder="0.00"
+                                value={
+                                  partsAmounts[
+                                    item.key as keyof PartsAmountsType
+                                  ] || ""
+                                }
+                                onChange={(e) =>
+                                  handleAmountChangeWithTotal(
+                                    item.key as keyof PartsAmountsType,
+                                    Number(e.target.value),
+                                  )
+                                }
+                                step="0.01"
+                                className="pl-8 pr-3 text-right"
+                                required
+                              />
+                            </div>
                           </>
                         )}
                       </>
@@ -380,7 +443,7 @@ const calculateAndUpdateTotal = useCallback(() => {
               const brandKey = getBrandKey(item.key);
               const partNumberKey = getPartNumberKey(item.key);
               const quantityKey = getQuantityKey(item.key);
-              
+
               return (
                 <div
                   key={item.key}
@@ -405,31 +468,38 @@ const calculateAndUpdateTotal = useCallback(() => {
                             handleBrandChange(brandKey, "");
                             handlePartNumberChange(partNumberKey, "");
                             handleQuantityChange(quantityKey, 1);
-                            handleAmountChangeWithTotal(item.key as keyof PartsAmountsType, 0);
+                            handleAmountChangeWithTotal(
+                              item.key as keyof PartsAmountsType,
+                              0,
+                            );
                           } else {
-                           // Initialize quantity to 1 when checking
+                            // Initialize quantity to 1 when checking
                             const currentQuantity = partsQuantity[quantityKey];
                             if (!currentQuantity || currentQuantity === 0) {
                               handleQuantityChange(quantityKey, 1);
                             }
-                          }      
+                          }
                         }}
                       />
                       {item.label}
                     </Label>
-                    
+
                     {(partsReplacement[
                       item.key as keyof TrimotorsPartsReplacement
                     ] as boolean) && (
                       <>
-                          {/* Brand Dropdown */}
+                        {/* Brand Dropdown */}
                         <select
                           value={partsBrand[brandKey] || ""}
-                          onChange={(e) => handleBrandChange(brandKey, e.target.value)}
+                          onChange={(e) =>
+                            handleBrandChange(brandKey, e.target.value)
+                          }
                           className="w-32 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           required
                         >
-                          <option value="" disabled>Select Brand</option>
+                          <option value="" disabled>
+                            Select Brand
+                          </option>
                           {brandChoices.map((brand) => (
                             <option key={brand} value={brand}>
                               {brand}
@@ -444,46 +514,60 @@ const calculateAndUpdateTotal = useCallback(() => {
                               type="text"
                               placeholder="Part No."
                               value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) => handlePartNumberChange(partNumberKey,e.target.value)}
+                              onChange={(e) =>
+                                handlePartNumberChange(
+                                  partNumberKey,
+                                  e.target.value,
+                                )
+                              }
                               className="w-28 text-center"
                               required
                             />
 
-                            {/* Quantity Field */}  
+                            {/* Quantity Field */}
                             <div className="flex items-center gap-1">
-                              <span className="text-sm text-gray-600">Qty:</span>
+                              <span className="text-sm text-gray-600">
+                                Qty:
+                              </span>
                               <Input
                                 type="number"
                                 min="1"
                                 value={partsQuantity[quantityKey] || 1}
-                                onChange={(e) => handleQuantityChange(quantityKey, Number(e.target.value))}
+                                onChange={(e) =>
+                                  handleQuantityChange(
+                                    quantityKey,
+                                    Number(e.target.value),
+                                  )
+                                }
                                 className="w-16 text-center"
                                 required
                               />
                             </div>
 
-                              {/* Unit Price Field */}
+                            {/* Unit Price Field */}
                             <div className="w-32">
-                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                                  ₱
-                                </span>
-                                <Input
-                                  type="number"
-                                  placeholder="0.00"
-                                  value={
-                                    partsAmounts[item.key as keyof PartsAmountsType] || ""
-                                  }
-                                  onChange={(e) =>
-                                    handleAmountChangeWithTotal(
-                                      item.key as keyof PartsAmountsType,
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                  step="0.01"
-                                  className="pl-8 pr-3 text-right"
-                                  required
-                                />
-                              </div>
+                              {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                                ₱
+                              </span> */}
+                              <Input
+                                type="number"
+                                placeholder="0.00"
+                                value={
+                                  partsAmounts[
+                                    item.key as keyof PartsAmountsType
+                                  ] || ""
+                                }
+                                onChange={(e) =>
+                                  handleAmountChangeWithTotal(
+                                    item.key as keyof PartsAmountsType,
+                                    Number(e.target.value),
+                                  )
+                                }
+                                step="0.01"
+                                className="pl-8 pr-3 text-right"
+                                required
+                              />
+                            </div>
                           </>
                         )}
                       </>
@@ -519,34 +603,46 @@ const calculateAndUpdateTotal = useCallback(() => {
               </Button>
             )}
           </div>
-          
+
           {partsReplacement.partsOthers && partsOthersItems.length === 0 ? (
             <div className="text-center text-gray-400 text-sm py-4 border border-dashed border-gray-300 rounded-md">
               No custom parts added. Click "Add Part" to add.
             </div>
           ) : (
-            partsReplacement.partsOthers && partsOthersItems.map((item, index) => (
-              <div key={item.id} className="flex items-center gap-3 p-3 rounded-md">
+            partsReplacement.partsOthers &&
+            partsOthersItems.map((item, index) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-3 p-3 rounded-md"
+              >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
+                    <span className="text-sm text-gray-500 w-8">
+                      #{index + 1}
+                    </span>
                     <Input
                       type="text"
                       value={item.description}
-                      onChange={(e) => updatePartsOthersDescription(item.id, e.target.value)}
+                      onChange={(e) =>
+                        updatePartsOthersDescription(item.id, e.target.value)
+                      }
                       placeholder="Enter part description"
                       className="w-80"
                       required
                     />
-                    
+
                     {/* Brand Dropdown */}
                     <select
                       value={item.brand || ""}
-                      onChange={(e) => updatePartsOthersBrand(item.id, e.target.value)}
+                      onChange={(e) =>
+                        updatePartsOthersBrand(item.id, e.target.value)
+                      }
                       className="w-28 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     >
-                      <option value="" disabled>Select Brand</option>
+                      <option value="" disabled>
+                        Select Brand
+                      </option>
                       {brandChoices.map((brand) => (
                         <option key={brand} value={brand}>
                           {brand}
@@ -561,11 +657,13 @@ const calculateAndUpdateTotal = useCallback(() => {
                           type="text"
                           placeholder="Part No."
                           value={item.partNumber || ""}
-                          onChange={(e) => updatePartsOthersPartNumber(item.id, e.target.value)}
+                          onChange={(e) =>
+                            updatePartsOthersPartNumber(item.id, e.target.value)
+                          }
                           className="w-40 text-center"
                           required
                         />
-                        
+
                         {/* Quantity Field */}
                         <div className="flex items-center gap-1">
                           <span className="text-sm text-gray-600">Qty:</span>
@@ -573,26 +671,36 @@ const calculateAndUpdateTotal = useCallback(() => {
                             type="number"
                             min="1"
                             value={item.quantity || 1}
-                            onChange={(e) => updatePartsOthersQuantity(item.id, Number(e.target.value))}
+                            onChange={(e) =>
+                              updatePartsOthersQuantity(
+                                item.id,
+                                Number(e.target.value),
+                              )
+                            }
                             className="w-16 text-center"
                           />
                         </div>
 
                         {/* Unit Price Field */}
                         <div className="w-32">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                              ₱
-                            </span>
-                            <Input
-                              type="number"
-                              placeholder="0.00"
-                              value={item.amount || ""}
-                              onChange={(e) => updatePartsOthersAmount(item.id, Number(e.target.value))}
-                              step="0.01"
-                              className="pl-8 pr-3 text-right"
-                              required
-                            />
-                          </div>
+                          {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                            ₱
+                          </span> */}
+                          <Input
+                            type="number"
+                            placeholder="0.00"
+                            value={item.amount || ""}
+                            onChange={(e) =>
+                              updatePartsOthersAmount(
+                                item.id,
+                                Number(e.target.value),
+                              )
+                            }
+                            step="0.01"
+                            className="pl-8 pr-3 text-right"
+                            required
+                          />
+                        </div>
                       </>
                     )}
                   </div>

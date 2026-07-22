@@ -2,6 +2,7 @@ import Input from "./ui/input";
 import { Label } from "./ui/label";
 import { MultiMechanic } from "./MultiMechanic";
 import Select from "./ui/select";
+import { useAuth } from "@/context/authContext";
 
 export default function CustomerGrid({
   errors,
@@ -37,8 +38,10 @@ export default function CustomerGrid({
   // setFuelLevel,
   setMechanic,
   mechanics,
-  setEstimatedRepairTime
+  setEstimatedRepairTime,
 }: any) {
+  const { user } = useAuth();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <div className="col-span-1">
@@ -47,7 +50,10 @@ export default function CustomerGrid({
           type="date"
           error={errors.date}
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) =>
+            setDate(user.is_locked_date ? new Date() : e.target.value)
+          }
+          readOnly={user.is_locked_date}
         />
         {errors.date && (
           <p className="text-red-500 text-xs mt-1">{errors.date}</p>
@@ -159,7 +165,9 @@ export default function CustomerGrid({
           onChange={(e) => setEstimatedRepairTime(e.target.value)}
         />
         {errors.estimatedRepairTime && (
-          <p className="text-red-500 text-xs mt-1">{errors.estimatedRepairTime}</p>
+          <p className="text-red-500 text-xs mt-1">
+            {errors.estimatedRepairTime}
+          </p>
         )}
       </div>
       <div className="col-span-1">
@@ -192,10 +200,7 @@ export default function CustomerGrid({
       </div>
       <div className="mt-2">
         <Label>Category</Label>
-        <Select
-          value={remarks}
-          onChange={(e) => setRemarks(e.target.value)}
-        >
+        <Select value={remarks} onChange={(e) => setRemarks(e.target.value)}>
           <option value="" disabled>
             Select Category
           </option>
