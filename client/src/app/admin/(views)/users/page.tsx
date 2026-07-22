@@ -123,7 +123,12 @@ const Users = () => {
     {
       name: "LOCK DATE RANGE",
       cell: (row: any) => (
-        <Button type="button" variant="link" onClick={handleLockDate(row.id)}>
+        <Button
+          type="button"
+          variant="link"
+          className={row.is_locked_date ? "text-green-500" : "text-blue-500"}
+          onClick={handleLockDate(row.id, row.is_locked_date)}
+        >
           {row.is_locked_date ? <LockKeyhole /> : <LockKeyholeOpen />}
         </Button>
       ),
@@ -131,14 +136,15 @@ const Users = () => {
     },
   ];
 
-  const handleLockDate = (userId: string | number) => () => {
+  const handleLockDate = (userId: string | number, isLocked: boolean) => () => {
     Swal.fire({
       icon: "info",
       title: "Lock Date Picker",
-      text: "Are you sure you want to lock date picker?",
+      text: `Are you sure you want to ${isLocked ? "unlock" : "lock"} date picker?`,
       confirmButtonText: "Yes",
       confirmButtonColor: "#3085d6",
       showCancelButton: true,
+      cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -162,6 +168,7 @@ const Users = () => {
       }
     });
   };
+
   return (
     <>
       <div className="p-6">
