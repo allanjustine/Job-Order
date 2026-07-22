@@ -178,6 +178,18 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
       "installAccessories",
       "generalCheckup",
       "warrantyRepair",
+      "cvtCleaning",
+      "minorTuneUp",
+      "majorTuneUp",
+      "throttleBodyCleaning",
+      "replaceBrakePad",
+      "replaceBrakeShoe",
+      "checkUpCVT",
+      "replaceCVTParts",
+      "replaceCoolant",
+      "adjustBallRace",
+      "replaceBallRace",
+      "replaceForkOilAndOilSeal",
     ];
     return jobKeys.filter((key) => isRegularJobSelected(key));
   };

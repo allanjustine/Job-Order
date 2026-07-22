@@ -598,7 +598,7 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
          <NextServiceScheduleView data={data} />
 
       {/* Footer Note */}
-      <p className="mt-2 text-center" style={{ fontSize: "6pt" }}>
+      <p className="mt-2 text-center float-left" style={{ fontSize: "6pt" }}>
         Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
       </p>
     </div>

@@ -177,6 +177,18 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
       "installAccessories",
       "generalCheckup",
       "warrantyRepair",
+      "cvtCleaning",
+      "minorTuneUp",
+      "majorTuneUp",
+      "throttleBodyCleaning",
+      "replaceBrakePad",
+      "replaceBrakeShoe",
+      "checkUpCVT",
+      "replaceCVTParts",
+      "replaceCoolant",
+      "adjustBallRace",
+      "replaceBallRace",
+      "replaceForkOilAndOilSeal",
     ];
     return jobKeys.filter((key) => isRegularJobSelected(key));
   };
@@ -649,7 +661,7 @@ const allDiagnosisOK = () => {
       <NextServiceScheduleView data={data} />
 
       {/* Footer Note */}
-      <p className="mt-2 text-center" style={{ fontSize: "6pt" }}>
+      <p className="mt-2 text-center float-left" style={{ fontSize: "6pt" }}>
         Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
       </p>
     </div>

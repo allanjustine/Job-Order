@@ -46,6 +46,18 @@ export type JobRequest = {
   installAccessories: boolean;
   generalCheckup: boolean;
   warrantyRepair: boolean;
+  cvtCleaning: boolean;
+  minorTuneUp: boolean;
+  majorTuneUp: boolean;
+  throttleBodyCleaning: boolean;
+  replaceBrakePad: boolean;
+  replaceBrakeShoe: boolean;
+  checkUpCVT: boolean;
+  replaceCVTParts: boolean;
+  replaceCoolant: boolean;
+  adjustBallRace: boolean;
+  replaceBallRace: boolean;
+  replaceForkOilAndOilSeal: boolean;
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[]; // Array of custom job items
   othersText: string;
@@ -138,6 +150,18 @@ export type JobAmountsType = {
   installAccessories?: number;
   generalCheckup?: number;
   warrantyRepair?: number;
+  cvtCleaning?: number;
+  minorTuneUp?: number;
+  majorTuneUp?: number;
+  throttleBodyCleaning?: number;
+  replaceBrakePad?: number;
+  replaceBrakeShoe?: number;
+  checkUpCVT?: number;
+  replaceCVTParts?: number;
+  replaceCoolant?: number;
+  adjustBallRace?: number;
+  replaceBallRace?: number;
+  replaceForkOilAndOilSeal?: number;
   others?: number;
   selectedCoupon?: number;
   total?: any;
