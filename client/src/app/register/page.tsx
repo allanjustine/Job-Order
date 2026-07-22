@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/ui/select";
@@ -13,6 +13,8 @@ import Swal from "sweetalert2";
 import withoutAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
 import { Lock } from "lucide-react";
+import { CONFIG } from "@/config/app";
+import NotFound from "../not-found";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -28,6 +30,7 @@ const RegisterPage = () => {
   const [formInputs, setFormInputs] = useState<FormInputType>(FORM_INPUTS);
   const [showPassword, setShowPassword] = useState(false);
   const [branches, setBranches] = useState<any[]>([]);
+  const magicWord = useSearchParams().get("magic_word");
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -86,11 +89,13 @@ const RegisterPage = () => {
     setShowPassword(!showPassword);
   };
 
+  if (magicWord !== CONFIG.MAGIC_WORD) return <NotFound />;
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-100 to-transparent opacity-70"></div>
-        <div className="absolute top-0 right-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-100 to-transparent opacity-70 w-1/2 h-full"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--tw-gradient-stops))] from-blue-100 to-transparent opacity-70"></div>
+        <div className="absolute top-0 right-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-indigo-100 to-transparent opacity-70 w-1/2 h-full"></div>
       </div>
 
       <div className="relative w-full max-w-md">
