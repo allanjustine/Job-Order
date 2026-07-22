@@ -57,14 +57,17 @@ class JobOrderService
         return $jobOrders;
     }
 
-    public function store($request, $user)
+    public function store($request)
     {
-        $customer = DB::transaction(function () use ($request, $user) {
-            $lastJobOrderNumber = $user
-                ->jobOrders()
-                ->max('job_order_number') ?? 0;
+        $user = Auth::user();
 
-            $job_order_number = \sprintf('%07d', $lastJobOrderNumber + 1);
+        $lastJobOrderNumber = $user
+            ->jobOrders()
+            ->max('job_order_number') ?? 0;
+
+        $job_order_number = \sprintf('%07d', $lastJobOrderNumber + 1);
+
+        $customer = DB::transaction(function () use ($request, $user, $job_order_number) {
 
             $customer = $user
                 ->customers()
