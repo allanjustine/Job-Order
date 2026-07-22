@@ -27,7 +27,7 @@ interface TrimotorsJobRequestProps {
   jobAmounts: TrimotorsJobAmountType;
   handleJobAmountChange: (
     key: keyof TrimotorsJobAmountType,
-    value: number
+    value: number,
   ) => void;
   jobTotal: number;
   setJobTotal?: (total: number) => void;
@@ -42,9 +42,8 @@ export default function TrimotorsJobRequest({
   setJobTotal,
 }: TrimotorsJobRequestProps) {
   const firstColumnItems = trimotorsJobItems
-  .filter((item) => item.key !== "selectedCoupon").
-  slice(0,Math.ceil(trimotorsJobItems.length / 2)
-  );
+    .filter((item) => item.key !== "selectedCoupon")
+    .slice(0, Math.ceil(trimotorsJobItems.length / 2));
   const secondColumnItems = trimotorsJobItems
     .filter((item) => item.key !== "others")
     .slice(Math.ceil(trimotorsJobItems.length / 2));
@@ -56,19 +55,29 @@ export default function TrimotorsJobRequest({
 
   const computedTotal = useMemo(() => {
     const standardTotal = Object.entries(jobAmounts)
-      .filter(([key]) => key !== 'others')
+      .filter(([key]) => key !== "others")
       .reduce((sum, [, value]) => sum + (value || 0), 0);
-    const othersTotal = othersItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    const othersTotal = othersItems.reduce(
+      (sum, item) => sum + (item.amount || 0),
+      0,
+    );
     return standardTotal + othersTotal;
   }, [jobAmounts, othersItems]);
 
   const syncToParent = (items: OthersJobItem[]) => {
-    const othersTotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+    const othersTotal = items.reduce(
+      (sum, item) => sum + (item.amount || 0),
+      0,
+    );
     handleJobAmountChange("others", othersTotal);
-    setJobRequest((prev) => ({ ...prev, others: items.length > 0, othersItems: items as any }));
+    setJobRequest((prev) => ({
+      ...prev,
+      others: items.length > 0,
+      othersItems: items as any,
+    }));
     if (setJobTotal) {
       const standardTotal = Object.entries(jobAmounts)
-        .filter(([key]) => key !== 'others')
+        .filter(([key]) => key !== "others")
         .reduce((sum, [, value]) => sum + (value || 0), 0);
       setJobTotal(standardTotal + othersTotal);
     }
@@ -76,31 +85,39 @@ export default function TrimotorsJobRequest({
 
   // Add new others item
   const addOthersItem = () => {
-    const newItem: OthersJobItem = { id: Date.now().toString(), description: "", amount: 0 };
+    const newItem: OthersJobItem = {
+      id: Date.now().toString(),
+      description: "",
+      amount: 0,
+    };
     const updated = [...othersItems, newItem];
     setOthersItems(updated);
     syncToParent(updated);
   };
 
   const removeOthersItem = (id: string) => {
-    const updated = othersItems.filter(item => item.id !== id);
+    const updated = othersItems.filter((item) => item.id !== id);
     setOthersItems(updated);
     syncToParent(updated);
   };
 
   const updateOthersDescription = (id: string, description: string) => {
-    const updated = othersItems.map(item => item.id === id ? { ...item, description } : item);
+    const updated = othersItems.map((item) =>
+      item.id === id ? { ...item, description } : item,
+    );
     setOthersItems(updated);
     syncToParent(updated);
   };
 
   const updateOthersAmount = (id: string, amount: number) => {
-    const updated = othersItems.map(item => item.id === id ? { ...item, amount } : item);
+    const updated = othersItems.map((item) =>
+      item.id === id ? { ...item, amount } : item,
+    );
     setOthersItems(updated);
     syncToParent(updated);
   };
   const brandChoices = ["Bajaj"];
-  
+
   const coupons: CouponType[] = [
     { id: 1, name: "Coupon 1" },
     { id: 2, name: "Coupon 2" },
@@ -129,7 +146,7 @@ export default function TrimotorsJobRequest({
             if (!e.target.checked) {
               handleJobAmountChange(
                 item.key as keyof TrimotorsJobAmountType,
-                0
+                0,
               );
             }
           }}
@@ -138,24 +155,24 @@ export default function TrimotorsJobRequest({
       </Label>
       {(jobRequest[item.key as keyof TrimotorsJobRequestType] as boolean) && (
         <div className="w-32 min-w-[8rem]">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+          {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
               ₱
-            </span>
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={jobAmounts[item.key as keyof TrimotorsJobAmountType] || ""}
-              onChange={(e) => {
-                handleJobAmountChange(
-                  item.key as keyof TrimotorsJobAmountType,
-                  Number(e.target.value)
-                );
-              }}
-              step="0.01"
-              className="pl-8 pr-3 text-right text-sm"
-              required
-            />
-          </div>
+            </span> */}
+          <Input
+            type="number"
+            placeholder="0.00"
+            value={jobAmounts[item.key as keyof TrimotorsJobAmountType] || ""}
+            onChange={(e) => {
+              handleJobAmountChange(
+                item.key as keyof TrimotorsJobAmountType,
+                Number(e.target.value),
+              );
+            }}
+            step="0.01"
+            className="pl-8 pr-3 text-right text-sm"
+            required
+          />
+        </div>
       )}
     </div>
   );
@@ -188,7 +205,7 @@ export default function TrimotorsJobRequest({
               />
               Coupon
             </Label>
-  
+
             {/* Show coupon fields when coupon is checked - nasa tabi mismo */}
             {jobRequest.coupon && (
               <div className="flex items-center gap-2 flex-wrap">
@@ -215,51 +232,52 @@ export default function TrimotorsJobRequest({
                     ))}
                   </select>
                 </div>
-  
+
                 {/* Brand dropdown - lalabas after pumili ng coupon */}
                 {jobRequest.selectedCoupon && (
                   <>
                     <div className="flex-1">
                       <select
-                          value={jobRequest.couponBrand || ""}
-                          onChange={(e) =>
-                            setJobRequest({
-                              ...jobRequest,
-                              couponBrand: e.target.value || undefined,
-                            })
-                          }
-                          className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          required
-                        >
-                          <option value="" disabled>
-                            Select Brand
+                        value={jobRequest.couponBrand || ""}
+                        onChange={(e) =>
+                          setJobRequest({
+                            ...jobRequest,
+                            couponBrand: e.target.value || undefined,
+                          })
+                        }
+                        className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        required
+                      >
+                        <option value="" disabled>
+                          Select Brand
+                        </option>
+                        {brandChoices.map((brand) => (
+                          <option key={brand} value={brand}>
+                            {brand}
                           </option>
-                          {brandChoices.map((brand) => (
-                            <option key={brand} value={brand}>
-                              {brand}
-                            </option>
-                          ))}
+                        ))}
                       </select>
                     </div>
-  
+
                     {/* Amount input field */}
                     <div className="w-32">
-                    
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                          ₱
-                        </span>
-                        <Input
-                          type="number"
-                          placeholder="0.00"
-                          value={jobAmounts.selectedCoupon || ""}
-                          onChange={(e) =>
-                            handleJobAmountChange("selectedCoupon", Number(e.target.value))
-                          }
-                          step="0.01"
-                          className="pl-8 pr-3 text-right w-full"
-                          required
-                        />
-              
+                      {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                        ₱
+                      </span> */}
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={jobAmounts.selectedCoupon || ""}
+                        onChange={(e) =>
+                          handleJobAmountChange(
+                            "selectedCoupon",
+                            Number(e.target.value),
+                          )
+                        }
+                        step="0.01"
+                        className="pl-8 pr-3 text-right w-full"
+                        required
+                      />
                     </div>
                   </>
                 )}
@@ -313,34 +331,43 @@ export default function TrimotorsJobRequest({
               </div>
             ) : (
               othersItems.map((item, index) => (
-                <div key={item.id} className="flex items-center gap-3 p-3 rounded-md">
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 p-3 rounded-md"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500 w-8">#{index + 1}</span>
+                      <span className="text-sm text-gray-500 w-8">
+                        #{index + 1}
+                      </span>
                       <Input
                         type="text"
                         value={item.description}
-                        onChange={(e) => updateOthersDescription(item.id, e.target.value)}
+                        onChange={(e) =>
+                          updateOthersDescription(item.id, e.target.value)
+                        }
                         placeholder="Enter job description"
                         className="flex-1 text-sm"
-                         required
+                        required
                       />
-                      
+
                       {/* Amount Field */}
-                      <div className="w-32">                     
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
-                            ₱
-                          </span>
-                          <Input
-                            type="number"
-                            placeholder="0.00"
-                            value={item.amount || ""}
-                            onChange={(e) => updateOthersAmount(item.id, Number(e.target.value))}
-                            step="0.01"
-                            className="pl-8 pr-3 text-right text-sm"
-                             required
-                          />
-                        </div>                      
+                      <div className="w-32">
+                        {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                          ₱
+                        </span> */}
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          value={item.amount || ""}
+                          onChange={(e) =>
+                            updateOthersAmount(item.id, Number(e.target.value))
+                          }
+                          step="0.01"
+                          className="pl-8 pr-3 text-right text-sm"
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
                   <Button
