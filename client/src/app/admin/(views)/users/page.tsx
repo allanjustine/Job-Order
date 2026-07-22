@@ -4,15 +4,22 @@ import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
+import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { Search, SearchSlash } from "lucide-react";
+import {
+  LockKeyhole,
+  LockKeyholeOpen,
+  Search,
+  SearchSlash,
+} from "lucide-react";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
   FaMagnifyingGlass,
   FaRotateRight,
 } from "react-icons/fa6";
+import Swal from "sweetalert2";
 
 const Users = () => {
   const {
@@ -29,6 +36,7 @@ const Users = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
+    fetchData,
   } = useFetch("/users");
 
   const columns = [
@@ -54,7 +62,9 @@ const Users = () => {
     {
       name: "LAST EXPORT",
       cell: (row: any) => (
-        <span className="font-bold text-gray-600">{row.user_export_log ?? "N/A"}</span>
+        <span className="font-bold text-gray-600">
+          {row.user_export_log ?? "N/A"}
+        </span>
       ),
     },
     {
@@ -110,7 +120,48 @@ const Users = () => {
       sortable: true,
       sortField: "created_at",
     },
+    {
+      name: "LOCK DATE RANGE",
+      cell: (row: any) => (
+        <Button type="button" variant="link" onClick={handleLockDate(row.id)}>
+          {row.is_locked_date ? <LockKeyhole /> : <LockKeyholeOpen />}
+        </Button>
+      ),
+      sortable: false,
+    },
   ];
+
+  const handleLockDate = (userId: string | number) => () => {
+    Swal.fire({
+      icon: "info",
+      title: "Lock Date Picker",
+      text: "Are you sure you want to lock date picker?",
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#3085d6",
+      showCancelButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await api.patch(`/users/${userId}/update`);
+
+          if (response.status === 200) {
+            fetchData();
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
+          }
+        } catch (error: any) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.response.data.message,
+          });
+        }
+      }
+    });
+  };
   return (
     <>
       <div className="p-6">
