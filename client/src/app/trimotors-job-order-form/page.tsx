@@ -44,6 +44,7 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
+import { Spinner } from "@/components/ui/spinner";
 
 const QUANTITY_DATA = {
   bajajOil: 1,
@@ -279,6 +280,7 @@ const TrimotorsJobOrderForm = () => {
   const [transactionCode, setTransactionCode] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [otherRemarks, setOtherRemarks] = useState("");
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -529,7 +531,6 @@ const TrimotorsJobOrderForm = () => {
     if (!isPrint) return;
 
     window.onafterprint = () => {
-      handlePrint();
       handleSavePrint();
       fetchJobOrderNumber();
     };
@@ -641,7 +642,8 @@ const TrimotorsJobOrderForm = () => {
             padding: "15px",
           },
         });
-        handlePreviewPrint();
+        setIsOpen(false);
+        setIsPrint(false);
         handleReset();
       }
     } catch (error) {
@@ -672,14 +674,35 @@ const TrimotorsJobOrderForm = () => {
     }
   };
 
-  const handlePreviewPrint = () => {
-    fetchJobOrderNumber();
-    setIsOpen(!isOpen);
+  const handlePreviewPrint = async () => {
+    setIsVerifying(true);
+    try {
+      const response = await api.post("/verifying-job-order", {
+        job_order_date: itemToStore.job_order.date,
+      });
+
+      if (response.status === 204) {
+        fetchJobOrderNumber();
+        setIsOpen(!isOpen);
+      }
+    } catch (error: any) {
+      console.error(error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          icon: "error",
+          title: "Ops! Something went wrong.",
+          text: error.response.data.message,
+        });
+      }
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleReset = () => {
     setCustomerName("");
     setContact("");
+    setDate(user.is_locked_date ? new Date().toISOString().split("T")[0] : "");
     setModel("");
     setEngineFrameNo("");
     setMileage("");
@@ -1071,8 +1094,17 @@ const TrimotorsJobOrderForm = () => {
                       ref={modalButtonRef}
                       type="submit"
                       className="bg-blue-600 hover:bg-blue-700 text-white py-5"
+                      disabled={isVerifying}
                     >
-                      <FaEye /> Preview
+                      {isVerifying ? (
+                        <>
+                          <Spinner /> Verifying
+                        </>
+                      ) : (
+                        <>
+                          <FaEye /> Preview
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
