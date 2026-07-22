@@ -47,6 +47,15 @@ export default function NextServiceScheduleView({ data }: { data: any }) {
           <p className="text-xxs">Customer</p>
         </div>
       </div>
+
+       <div className="flex mt-5">
+        <span className="font-bold mr-2">Receipt #:</span>
+        <span className="w-30 border-b border-black mt-2 "></span>
+      </div>
+      <div className="flex mt-3">
+        <span className="font-bold mr-2">Cashier's Signature:</span>
+        <span className="w-30 border-b border-black mt-2 "></span>
+      </div>
     </>
   );
 }

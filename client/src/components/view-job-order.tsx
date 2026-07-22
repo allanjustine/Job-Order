@@ -258,7 +258,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                           className="border border-black p-0.5 h-3"
                           style={{ padding: "2px 4px" }}
                         >
-                          <span>[✓] {job.category}</span>
+                          <span>[✓] {job.category} {job.part_brand?.toLowerCase() !== "n/a" ? ` - ${job.part_brand}` : ""}</span>
                         </td>
                         <td
                           className="border border-black p-0.5 text-left h-3"
