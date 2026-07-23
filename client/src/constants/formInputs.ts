@@ -11,3 +11,11 @@ export const LOGIN_INPUTS = {
   branchCodeOrEmail: "",
   password: "",
 };
+
+export const ERROR_INPUTS = {
+  branch: "",
+  branchName: "",
+  branchCode: "",
+  email: "",
+  password: "",
+};

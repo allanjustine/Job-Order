@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         $authService->store($request);
 
-        return response()->json("Successfully registered. You can login your account now.", 201);
+        return response()->json("Successfully registered a user.", 201);
     }
 
     /**
