@@ -122,4 +122,13 @@ class JobOrderService
 
         return $customer;
     }
+
+    public function delete(string $id)
+    {
+        $job_order = JobOrder::findOrFail($id);
+
+        $job_order->delete();
+
+        return $job_order;
+    }
 }
