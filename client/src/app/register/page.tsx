@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/ui/select";
-import { FORM_INPUTS } from "@/constants/formInputs";
+import { ERROR_INPUTS, FORM_INPUTS } from "@/constants/formInputs";
 import { FormInputType } from "@/types/formInputType";
 import Link from "next/link";
 import { api } from "@/lib/api";
@@ -19,13 +19,7 @@ const RegisterPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [errors, setErrors] = useState({
-    branch: "",
-    branchName: "",
-    branchCode: "",
-    email: "",
-    password: "",
-  });
+  const [errors, setErrors] = useState(ERROR_INPUTS);
   const [formInputs, setFormInputs] = useState<FormInputType>(FORM_INPUTS);
   const [showPassword, setShowPassword] = useState(false);
   const [branches, setBranches] = useState<any[]>([]);
@@ -46,6 +40,15 @@ const RegisterPage = () => {
     fetchBranches();
   }, []);
 
+  useMemo(() => {
+    if (!formInputs.branchName) return;
+
+    setFormInputs((prev) => ({
+      ...prev,
+      email: `${formInputs.branchName?.toLowerCase().replace(/ /g, "_")}@smctgroup.com`,
+    }));
+  }, [formInputs.branchName]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -53,15 +56,19 @@ const RegisterPage = () => {
       const response = await api.post("/register", formInputs);
       if (response.status === 201) {
         setFormInputs(FORM_INPUTS);
+        setErrors(ERROR_INPUTS);
+        setError("");
         Swal.fire({
           icon: "success",
           title: "Success",
           text: response.data,
-          confirmButtonText: "Go to Login",
+          confirmButtonText: "Back to users",
+          showCancelButton: true,
+          cancelButtonText: "Stay here",
           confirmButtonColor: "#3085d6",
         }).then((result) => {
           if (result.isConfirmed) {
-            router.push("/login");
+            router.replace("/admin/users");
           }
         });
       }
@@ -227,10 +234,7 @@ const RegisterPage = () => {
                   type="email"
                   placeholder="Enter your branch email"
                   error={errors?.email}
-                  value={
-                    formInputs.email ||
-                    `${formInputs.branchName?.toLowerCase().replace(/ /g, "_")}@smctgroup.com`
-                  }
+                  value={formInputs.email}
                   onChange={handleChange("email")}
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -310,7 +314,7 @@ const RegisterPage = () => {
               aria-busy={isLoading}
               className={`
                 w-full py-3 px-4 rounded-lg font-medium text-white transition-colors duration-200 ease-in-out
-              bg-blue-600 hover:bg-blue-700 
+              bg-blue-600 hover:bg-blue-700
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                 disabled:opacity-70 disabled:cursor-not-allowed
                 flex items-center justify-center gap-2
