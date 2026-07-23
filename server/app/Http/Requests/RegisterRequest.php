@@ -27,7 +27,7 @@ class RegisterRequest extends FormRequest
             "branchName"        => ["required"],
             "branch"            => ["required", Rule::exists('branches', 'id')],
             "email"             => ["required", "email", Rule::unique('users', 'email')],
-            "password"          => ["required", "min:4", "max:16", "confirmed"],
+            // "password"          => ["required", "min:4", "max:16", "confirmed"],
         ];
     }
 }
