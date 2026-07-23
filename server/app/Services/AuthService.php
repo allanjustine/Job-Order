@@ -48,7 +48,7 @@ class AuthService
                     "code"                  => Str::upper($request->branchCode),
                     "branch_id"             => $request->branch,
                     "email"                 => Str::of($request->email)->lower()->trim(),
-                    "password"              => $request->password,
+                    "password"              => "Smct123456",
                 ]);
 
             $employeeRole = Role::query()

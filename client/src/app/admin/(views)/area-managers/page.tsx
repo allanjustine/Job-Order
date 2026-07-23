@@ -58,7 +58,7 @@ const Reports = () => {
     {
       name: "BRANCHES UNDER AREA MANAGERS",
       cell: (row: any) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 py-2">
           {row.users.map((user: { code: string }, index: number) => (
             <span
               className="p-2 rounded-xl bg-blue-400 hover:bg-blue-500 text-white"

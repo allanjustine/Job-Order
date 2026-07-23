@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('reports', [ReportController::class, 'index']);
         Route::get('export-reports', [ReportController::class, 'exportData']);
         Route::delete('delete-job-order/{id}', [JobOrderController::class, 'destroy']);
+        Route::post('lock-all-user-date-pickers', [UsersController::class, 'lockAllUserDatePickers']);
     });
 
     // EMPLOYEE ROLE ROUTES

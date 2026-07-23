@@ -4,14 +4,14 @@ export default function PreviewData({ data }: any) {
   const calculateLaborTotal = () => {
     return data?.job_requests.reduce(
       (sum: any, item: any) => sum + (item.cost || 0),
-      0
+      0,
     );
   };
 
   const calculatePartsTotal = () => {
     return data?.parts_requests.reduce(
       (sum: any, item: any) => sum + (item.sub_total_price || 0),
-      0
+      0,
     );
   };
 
@@ -175,7 +175,7 @@ export default function PreviewData({ data }: any) {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-start">
             <span
-              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
+              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 shrink-0 ${
                 data?.visual_check.dent ? "bg-blue-500 text-white" : "bg-white"
               }`}
             >
@@ -194,7 +194,7 @@ export default function PreviewData({ data }: any) {
           </div>
           <div className="flex items-start">
             <span
-              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
+              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 shrink-0 ${
                 data?.visual_check.scratch
                   ? "bg-blue-500 text-white"
                   : "bg-white"
@@ -217,7 +217,7 @@ export default function PreviewData({ data }: any) {
           </div>
           <div className="flex items-start">
             <span
-              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
+              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 shrink-0 ${
                 data?.visual_check.broken
                   ? "bg-blue-500 text-white"
                   : "bg-white"
@@ -240,7 +240,7 @@ export default function PreviewData({ data }: any) {
           </div>
           <div className="flex items-start">
             <span
-              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 flex-shrink-0 ${
+              className={`inline-block w-5 h-5 border text-center border-gray-400 mr-2 mt-1 shrink-0 ${
                 data?.visual_check.missing
                   ? "bg-blue-500 text-white"
                   : "bg-white"

@@ -35,13 +35,13 @@ export default function Forbidden() {
           </div>
           <div className="space-y-4">
             {isLoading ? (
-              <div className="block w-full px-4 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200">
+              <div className="block w-full px-4 py-3 bg-linear-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200">
                 <Loader2 className="animate-spin mx-auto" />
               </div>
             ) : (
               <Link
                 href={user?.redirect_url}
-                className="block w-full px-4 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200"
+                className="block w-full px-4 py-3 bg-linear-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-medium rounded-lg text-center transition duration-200"
               >
                 Back to dashboard
               </Link>

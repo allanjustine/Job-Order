@@ -672,17 +672,23 @@ const Reports = () => {
             setViewData(null);
           }}
         >
-          Viewing {viewData?.customer.name}&apos;s Job Order
-          {viewData?.job_order_type && (
-            <span
-              className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
-                viewData.job_order_type === "trimotors"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "bg-blue-100 text-blue-700"
-              }`}
-            >
-              {viewData.job_order_type.toUpperCase()}
-            </span>
+          {isBrowsing ? (
+            <Skeleton className="w-1/2 h-10" />
+          ) : (
+            <>
+              Viewing {viewData?.customer.name}&apos;s Job Order
+              {viewData?.job_order_type && (
+                <span
+                  className={`ml-2 text-xs font-bold px-2 py-1 rounded ${
+                    viewData.job_order_type === "trimotors"
+                      ? "bg-indigo-100 text-indigo-700"
+                      : "bg-blue-100 text-blue-700"
+                  }`}
+                >
+                  {viewData.job_order_type.toUpperCase()}
+                </span>
+              )}
+            </>
           )}
         </ModalHeader>
         <ModalBody>

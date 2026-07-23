@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -158,5 +159,21 @@ class UsersController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function lockAllUserDatePickers()
+    {
+        $users = User::query()
+            ->where('is_locked_date', false);
+
+        $to_message = $users->count() . ' ' . Str::plural('user', $users->count());
+
+        $users->update([
+            'is_locked_date' => true
+        ]);
+
+        return response()->json([
+            'message' => "Successfully locked date pickers to {$to_message}"
+        ], 200);
     }
 }
