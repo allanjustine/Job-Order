@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
+import { CONFIG } from "@/config/app";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
@@ -13,6 +14,7 @@ import {
   Search,
   SearchSlash,
 } from "lucide-react";
+import Link from "next/link";
 import DataTable from "react-data-table-component";
 import {
   FaCircleNotch,
@@ -121,7 +123,18 @@ const Users = () => {
       sortField: "created_at",
     },
     {
-      name: "LOCK DATE RANGE",
+      name: (
+        <>
+          <Button
+            type="button"
+            variant="link"
+            onClick={() => handleLockDateToAllUsers()}
+          >
+            <LockKeyhole />
+          </Button>
+          LOCK DATE RANGE
+        </>
+      ),
       cell: (row: any) => (
         <Button
           type="button"
@@ -135,6 +148,39 @@ const Users = () => {
       sortable: false,
     },
   ];
+
+  const handleLockDateToAllUsers = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Lock Date Picker",
+      text: `Are you sure you want to lock date picker to all users?`,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#3085d6",
+      showCancelButton: true,
+      cancelButtonText: "No",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await api.post("/lock-all-user-date-pickers");
+
+          if (response.status === 200) {
+            fetchData();
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
+          }
+        } catch (error: any) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.response.data.message,
+          });
+        }
+      }
+    });
+  };
 
   const handleLockDate = (userId: string | number, isLocked: boolean) => () => {
     Swal.fire({
@@ -175,24 +221,31 @@ const Users = () => {
         <div className="bg-white rounded-md border border-gray-300 shadow">
           <div className="p-6">
             <div className="mb-2 flex justify-end">
-              <Button
-                type="button"
-                disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                  isRefresh && "bg-blue-400! cursor-not-allowed!"
-                }`}
-                onClick={handleRefresh}
-              >
-                {isRefresh ? (
-                  <>
-                    <FaCircleNotch className="animate-spin" /> Refreshing...
-                  </>
-                ) : (
-                  <>
-                    <FaRotateRight /> Refresh
-                  </>
-                )}
-              </Button>
+              <div className="flex">
+                <Button
+                  type="button"
+                  disabled={isRefresh}
+                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                    isRefresh && "bg-blue-400! cursor-not-allowed!"
+                  }`}
+                  onClick={handleRefresh}
+                >
+                  {isRefresh ? (
+                    <>
+                      <FaCircleNotch className="animate-spin" /> Refreshing...
+                    </>
+                  ) : (
+                    <>
+                      <FaRotateRight /> Refresh
+                    </>
+                  )}
+                </Button>
+                <Button type="button" className="py-5" asChild>
+                  <Link href={`/register?magic_word=${CONFIG.MAGIC_WORD}`}>
+                    Add User
+                  </Link>
+                </Button>
+              </div>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
               <h2 className="text-xl font-semibold text-gray-600">Users</h2>
