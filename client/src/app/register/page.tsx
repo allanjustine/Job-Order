@@ -10,9 +10,8 @@ import { FormInputType } from "@/types/formInputType";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import Swal from "sweetalert2";
-import withoutAuthPage from "@/lib/hoc/without-auth-page";
+import withAuthPage from "@/lib/hoc/without-auth-page";
 import ValidationText from "@/components/ui/ValidationText";
-import { Lock } from "lucide-react";
 import { CONFIG } from "@/config/app";
 import NotFound from "../not-found";
 
@@ -228,7 +227,10 @@ const RegisterPage = () => {
                   type="email"
                   placeholder="Enter your branch email"
                   error={errors?.email}
-                  value={formInputs.email}
+                  value={
+                    formInputs.email ||
+                    `${formInputs.branchName?.toLowerCase().replace(/ /g, "_")}@smctgroup.com`
+                  }
                   onChange={handleChange("email")}
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -250,7 +252,7 @@ const RegisterPage = () => {
               <ValidationText>{errors?.email?.[0]}</ValidationText>
             </div>
 
-            <div>
+            {/* <div>
               <Label>Password</Label>
 
               <div className="relative">
@@ -299,7 +301,7 @@ const RegisterPage = () => {
                 />
                 <span>{showPassword ? "Hide" : "Show"} passwords</span>
               </Label>
-            </div>
+            </div> */}
 
             <button
               type="submit"
@@ -329,9 +331,9 @@ const RegisterPage = () => {
           </form>
 
           <p className="mt-2 text-sm text-gray-500 text-center">
-            Already have an account?{" "}
-            <Link href="/login" className="text-blue-500 font-bold">
-              Sign In
+            Back to users{" "}
+            <Link href="/admin/users" className="text-blue-500 font-bold">
+              Back
             </Link>
           </p>
         </div>
@@ -345,4 +347,4 @@ const RegisterPage = () => {
   );
 };
 
-export default withoutAuthPage(RegisterPage);
+export default withAuthPage(RegisterPage);
