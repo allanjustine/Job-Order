@@ -9,7 +9,7 @@ import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { CircleX, Eye, Search, SearchSlash, User } from "lucide-react";
+import { CircleX, Eye, Search, SearchSlash, Trash2, User } from "lucide-react";
 import { Activity, useEffect, useState, useRef } from "react";
 import DataTable from "react-data-table-component";
 import {
@@ -113,7 +113,7 @@ const Reports = () => {
     };
   }, []);
 
-  function handleDeleteJobOrder(id: number) {
+  function handleCancelJobOrder(id: number) {
     return function () {
       Swal.fire({
         title: "Are you sure?",
@@ -137,6 +137,65 @@ const Reports = () => {
           Swal.fire({
             icon: "info",
             title: "Cancelling...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await api.delete(`/cancel-job-order/${id}`, {
+              data: {
+                reason,
+              },
+            });
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
+
+  function handleDeleteJobOrder(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to undo this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const reason = result.value;
+
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
             text: "Please wait...",
             allowOutsideClick: false,
             didOpen: () => {
@@ -303,6 +362,7 @@ const Reports = () => {
     },
     {
       name: "ACTIONS",
+      width: "320px",
       cell: (row: any) => (
         <div className="flex items-center gap-2">
           <Button
@@ -317,15 +377,34 @@ const Reports = () => {
             <HoverCardTrigger>
               <Button
                 type="button"
-                onClick={handleDeleteJobOrder(row?.id)}
+                onClick={handleCancelJobOrder(row?.id)}
                 disabled={row.status}
                 className={`p-2 ${
                   row.status
-                    ? "bg-gray-200 cursor-not-allowed text-red-600"
-                    : "bg-red-500 text-white"
+                    ? "bg-gray-200 cursor-not-allowed text-yellow-600"
+                    : "bg-yellow-500 text-white"
                 }`}
               >
                 <CircleX /> {row.status ? "Canceled" : "Cancel"}
+              </Button>
+            </HoverCardTrigger>
+            {row.status && (
+              <HoverCardContent side={"left"}>
+                <div className="flex flex-col gap-1">
+                  <h4 className="font-medium">Reason</h4>
+                  <p>{row.reason_for_cancellation || "N/A"}</p>
+                </div>
+              </HoverCardContent>
+            )}
+          </HoverCard>
+          <HoverCard>
+            <HoverCardTrigger>
+              <Button
+                type="button"
+                onClick={handleDeleteJobOrder(row?.id)}
+                className="bg-red-500 text-white"
+              >
+                <Trash2 /> Delete
               </Button>
             </HoverCardTrigger>
             {row.status && (
