@@ -55,7 +55,16 @@ class JobOrderController extends Controller
         ], 200);
     }
 
-    public function destroy($id)
+    public function destroy(JobOrderService $jobOrderService, string $id)
+    {
+        $jobOrder = $jobOrderService->delete($id);
+
+        return response()->json([
+            'message' => "Job Order with transaction code of \"{$jobOrder->transaction_code}\" deleted successfully."
+        ], 200);
+    }
+
+    public function cancel(string $id)
     {
         $jobOrder = JobOrder::find($id);
 
