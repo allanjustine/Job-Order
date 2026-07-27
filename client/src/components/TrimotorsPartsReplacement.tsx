@@ -480,6 +480,9 @@ export default function TrimotorsPartsReplacementSection({
                               handleQuantityChange(quantityKey, 1);
                             }
                           }
+                          if (item.label.startsWith("Misc")) {
+                            handleBrandChange(brandKey, "None");
+                          }
                         }}
                       />
                       {item.label}
@@ -492,6 +495,7 @@ export default function TrimotorsPartsReplacementSection({
                         {/* Brand Dropdown */}
                         <select
                           value={partsBrand[brandKey] || ""}
+                          disabled={item.label.startsWith("Misc")}
                           onChange={(e) =>
                             handleBrandChange(brandKey, e.target.value)
                           }
@@ -523,6 +527,7 @@ export default function TrimotorsPartsReplacementSection({
                               }
                               className="w-28 text-center"
                               required
+                              readOnly={item.label.startsWith("Misc")}
                             />
 
                             {/* Quantity Field */}
