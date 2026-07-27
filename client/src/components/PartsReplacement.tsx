@@ -314,6 +314,9 @@ export default function PartsReplacementSection({
                             handleQuantityChange(quantityKey, 1);
                           }
                         }
+                        if (item.label.startsWith("Misc")) {
+                          handleBrandChange(brandKey, "None");
+                        }
                       }}
                     />
                     {item.label}
@@ -331,6 +334,7 @@ export default function PartsReplacementSection({
                         }
                         className="w-32 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
+                        disabled={item.label.startsWith("Misc")}
                       >
                         <option value="" disabled>
                           Select Brand
@@ -349,6 +353,7 @@ export default function PartsReplacementSection({
                             type="text"
                             placeholder="Part No."
                             value={partsNumber[partNumberKey] || ""}
+                            readOnly={item.label.startsWith("Misc")}
                             onChange={(e) =>
                               handlePartNumberChange(
                                 partNumberKey,
