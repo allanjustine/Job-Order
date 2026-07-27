@@ -206,7 +206,7 @@ export default function CustomerGrid({
           </option>
           <option value="Repo Recon">Repo Recon</option>
           <option value="MC Service">MC Service</option>
-          <option value="Under Warranty">Under Warranty</option>
+          <option value="Warranty Claim">Warranty Claim</option>
           <option value="Regular Customer">Regular Customer</option>
           <option value="E-Bike">E-Bike</option>
           <option value="others">Others</option>
