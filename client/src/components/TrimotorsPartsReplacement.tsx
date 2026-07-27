@@ -496,6 +496,7 @@ export default function TrimotorsPartsReplacementSection({
                         <select
                           value={partsBrand[brandKey] || ""}
                           disabled={item.label.startsWith("Misc")}
+                          hidden={item.label.startsWith("Misc")}
                           onChange={(e) =>
                             handleBrandChange(brandKey, e.target.value)
                           }
@@ -528,6 +529,7 @@ export default function TrimotorsPartsReplacementSection({
                               className="w-28 text-center"
                               required
                               readOnly={item.label.startsWith("Misc")}
+                              hidden={item.label.startsWith("Misc")}
                             />
 
                             {/* Quantity Field */}
