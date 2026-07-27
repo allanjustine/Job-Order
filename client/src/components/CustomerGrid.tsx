@@ -39,6 +39,8 @@ export default function CustomerGrid({
   setMechanic,
   mechanics,
   setEstimatedRepairTime,
+  dealersName,
+  setDealersName,
 }: any) {
   const { user } = useAuth();
 
@@ -198,7 +200,7 @@ export default function CustomerGrid({
           <p className="text-red-500 text-xs mt-1">{errors.repairEnd}</p>
         )}
       </div>
-      <div className="mt-2">
+      <div>
         <Label>Category</Label>
         <Select value={remarks} onChange={(e) => setRemarks(e.target.value)}>
           <option value="" disabled>
@@ -233,6 +235,17 @@ export default function CustomerGrid({
           mechanic={mechanic}
           inputError={errors.mechanic}
         />
+      </div>
+      <div className="col-span-1">
+        <Label>Dealers Name</Label>
+        <Input
+          type="text"
+          value={dealersName}
+          onChange={(e) => setDealersName(e.target.value)}
+        />
+        {errors.dealersName && (
+          <p className="text-red-500 text-xs mt-1">{errors.dealersName}</p>
+        )}
       </div>
     </div>
   );
