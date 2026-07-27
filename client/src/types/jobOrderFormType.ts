@@ -84,6 +84,8 @@ export type PartsReplacement = {
   coolant: boolean;
   gearOil: boolean;
   oilFilter: boolean;
+  rag: boolean;
+  grease: boolean;
   partsOthers: boolean;
   partsOthersText: string;
   partsOthersItems?: PartsOthersItem[]; // New array for multiple others
@@ -189,6 +191,8 @@ export type PartsBrand = {
   coolant?: string;
   gearOil?: string;
   oilFilter?: string;
+  rag?: string;
+  grease?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -214,6 +218,8 @@ export type PartsNumber = {
   coolant?: string;
   gearOil?: string;
   oilFilter?: string;
+  rag?: string;
+  grease?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -239,6 +245,8 @@ export type PartsQuantity = {
   coolant?: number;
   gearOil?: number;
   oilFilter?: number;
+  rag?: number;
+  grease?: number;
   partsOthers?: number;
   [key: string]: number | undefined;
 };
@@ -264,6 +272,8 @@ export type PartsAmountsType = {
   coolant?: number;
   gearOil?: number;
   oilFilter?: number;
+  rag?: number;
+  grease?: number;
   total?: any;
   partsOthers?: number;
   [key: string]: number | undefined;
@@ -410,6 +420,8 @@ export type TrimotorsDiagnosisKeys =
   sparkplug: boolean;
   sparkplugCapRh: boolean;
   headlightRelay: boolean;
+  rag: boolean;
+  grease: boolean;
   partsOthers: boolean;
   partsOthersText: string;
   partsOthersItems?: PartsOthersItem[]; // New array for multiple others
@@ -442,6 +454,8 @@ export type TrimotorsPartsBrand = {
   sparkplug?: string;
   sparkplugCapRh?: string;
   headlightRelay?: string;
+  rag?: string;
+  grease?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -472,6 +486,8 @@ export type TrimotorsPartsNumber = {
   sparkplug?: string;
   sparkplugCapRh?: string;
   headlightRelay?: string;
+  rag?: string;
+  grease?: string;
   partsOthers?: string;
   [key: string]: string | undefined;
 };
@@ -502,6 +518,8 @@ export type TrimotorsPartsQuantity = {
   sparkplug?: number;
   sparkplugCapRh?: number;
   headlightRelay?: number;
+  rag?: number;
+  grease?: number;
   partsOthers?: number;
   [key: string]: number | undefined;
 };
@@ -532,6 +550,8 @@ export type TrimotorsPartsAmountsType = {
   sparkplug?: number;
   sparkplugCapRh?: number;
   headlightRelay?: number;
+  rag?: number;
+  grease?: number;
   total?: any;
   partsOthers?: number;
   [key: string]: number | undefined;

@@ -189,6 +189,8 @@ const JobOrderForm = () => {
     coolant: false,
     gearOil: false,
     oilFilter: false,
+    rag: false,
+    grease: false,
     partsOthers: false,
     partsOthersText: "",
   });
@@ -711,6 +713,8 @@ const JobOrderForm = () => {
       coolant: false,
       gearOil: false,
       oilFilter: false,
+      rag: false,
+      grease: false,
       partsOthers: false,
       partsOthersText: "",
       partsOthersItems: [],

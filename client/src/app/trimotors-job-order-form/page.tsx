@@ -261,6 +261,8 @@ const TrimotorsJobOrderForm = () => {
       sparkplug: false,
       sparkplugCapRh: false,
       headlightRelay: false,
+      rag: false,
+      grease: false,
       partsOthers: false,
       partsOthersText: "",
     });
@@ -850,6 +852,8 @@ const TrimotorsJobOrderForm = () => {
       sparkplug: false,
       sparkplugCapRh: false,
       headlightRelay: false,
+      rag: false,
+      grease: false,
       partsOthers: false,
       partsOthersText: "",
       partsOthersItems: [],

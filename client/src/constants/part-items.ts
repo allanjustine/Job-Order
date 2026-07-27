@@ -24,5 +24,7 @@ export const partsItems: PartsItem[] = [
   { key: "coolant", label: "Coolant" },
   { key: "gearOil", label: "Gear Oil" },
   { key: "oilFilter", label: "Oil Filter" },
+  { key: "rag", label: "Misc: Rag" },
+  { key: "grease", label: "Misc: Grease" },
   { key: "partsOthers", label: "PartsOthers" },
 ];
