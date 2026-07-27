@@ -29,8 +29,8 @@ export const trimotorsPartsItems: TrimotorsPartsItem[] = [
   { key: "sparkplug", label: "Sparkplug" },
   { key: "sparkplugCapRh", label: "Sparkplug cap rh" },
   { key: "headlightRelay", label: "Headlight relay" },
-  { key: "rag", label: "Misc: Rag" },
-  { key: "grease", label: "Misc: Grease" },
+  { key: "rag", label: "Miscellaneous - Rag" },
+  { key: "grease", label: "Miscellaneous - Grease" },
   { key: "partsOthers", label: "PartsOthers" },
 ];
 
