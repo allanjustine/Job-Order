@@ -39,6 +39,7 @@ const brandChoices = [
   "Bajaj",
   "Hatatsu",
   "BG Powerstroke",
+  "None",
 ];
 
 export default function PartsReplacementSection({
