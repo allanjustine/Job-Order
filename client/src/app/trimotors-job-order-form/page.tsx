@@ -96,6 +96,7 @@ const formSchema = z.object({
   generalRemarks: z.string().min(1, "General remarks is required"),
   serviceAdvisor: z.string().min(1, "Service Advisor is required"),
   branchManager: z.string().min(1, "Branch Manager is required"),
+  dealersName: z.string().min(1, "Dealers name is required"),
 });
 
 const TrimotorsJobOrderForm = () => {
@@ -280,6 +281,7 @@ const TrimotorsJobOrderForm = () => {
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
   const [transactionCode, setTransactionCode] = useState("");
+  const [dealersName, setDealersName] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [otherRemarks, setOtherRemarks] = useState("");
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -415,6 +417,7 @@ const TrimotorsJobOrderForm = () => {
         serviceAdvisor: signatures.serviceAdvisor,
         branchManager: signatures.branchManager,
         remarks,
+        dealersName,
       });
       setErrors({});
       return true;
@@ -508,6 +511,7 @@ const TrimotorsJobOrderForm = () => {
     assignedMechanics: mechanics.filter((mech: any) =>
       mechanic.includes(mech.id),
     ),
+    dealersName,
   };
 
   useEffect(() => {
@@ -623,6 +627,7 @@ const TrimotorsJobOrderForm = () => {
       purchase_date: purchaseDate,
       next_schedule_kms: nextScheduleKms,
       next_schedule_date: nextScheduleDate,
+      dealers_name: dealersName,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -722,6 +727,7 @@ const TrimotorsJobOrderForm = () => {
     setNextScheduleDate("");
     setNextScheduleKms("");
     setGeneralRemarks("");
+    setDealersName("");
     setMechanic([]);
 
     // Reset amounts
@@ -1032,6 +1038,8 @@ const TrimotorsJobOrderForm = () => {
                   setRemarks={setRemarks}
                   setOtherRemarks={setOtherRemarks}
                   otherRemarks={otherRemarks}
+                  dealersName={dealersName}
+                  setDealersName={setDealersName}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">

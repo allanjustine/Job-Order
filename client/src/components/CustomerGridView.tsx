@@ -81,6 +81,12 @@ export default function CustomerGridView({ data }: { data: any }) {
               ?.join(", ")}
           </span>
         </div>
+        <div className="flex">
+          <span className="font-bold w-32">Dealers Name:</span>
+          <span className="border-b border-black flex-1">
+            {data.dealersName}
+          </span>
+        </div>
       </div>
     </>
   );

@@ -164,6 +164,12 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                 ""}
             </span>
           </div>
+          <div className="flex">
+            <span className="font-bold w-32">Dealers Name:</span>
+            <span className="border-b border-black flex-1">
+              {data.dealers_name || "N/A"}
+            </span>
+          </div>
         </div>
 
         {data?.job_order_type === "motors" ? (
@@ -258,7 +264,12 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                           className="border border-black p-0.5 h-3"
                           style={{ padding: "2px 4px" }}
                         >
-                          <span>[✓] {job.category} {job.part_brand?.toLowerCase() !== "n/a" ? ` - ${job.part_brand}` : ""}</span>
+                          <span>
+                            [✓] {job.category}{" "}
+                            {job.part_brand?.toLowerCase() !== "n/a"
+                              ? ` - ${job.part_brand}`
+                              : ""}
+                          </span>
                         </td>
                         <td
                           className="border border-black p-0.5 text-left h-3"
@@ -361,7 +372,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
               Your Next Service Schedule is:
             </span>
             <span className="underline inline-block">
-              {formatDate(data.nextScheduleDate || data.next_schedule_date ) || "N/A"}
+              {formatDate(data.nextScheduleDate || data.next_schedule_date) ||
+                "N/A"}
             </span>
             <span> or </span>
             <span className="underline inline-block">
@@ -411,17 +423,15 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             <p className="text-xxs">Customer</p>
           </div>
         </div>
-        
-        {/* Footer Note */}
-              <p className="mt-10 text-center text-red-600 font-bold text-xl">
-                {data.status === "cancelled" ? "CANCELLED" : ""}
-              </p>
 
-               <p className="mt-1 text-center text-black text-s">
-                {data.reason_for_cancellation ? data.reason_for_cancellation : ""}
-              </p>
-              
-            
+        {/* Footer Note */}
+        <p className="mt-10 text-center text-red-600 font-bold text-xl">
+          {data.status === "cancelled" ? "CANCELLED" : ""}
+        </p>
+
+        <p className="mt-1 text-center text-black text-s">
+          {data.reason_for_cancellation ? data.reason_for_cancellation : ""}
+        </p>
       </div>
     </div>
   );

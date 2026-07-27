@@ -92,6 +92,7 @@ const formSchema = z.object({
   estimatedRepairTime: z.string().min(1, "Estimated repair time is required"),
   serviceAdvisor: z.string().min(1, "Service Advisor is required"),
   branchManager: z.string().min(1, "Branch Manager is required"),
+  dealersName: z.string().min(1, "Dealers name is required"),
 });
 
 const JobOrderForm = () => {
@@ -229,6 +230,7 @@ const JobOrderForm = () => {
   const modalButtonRef = useRef<HTMLButtonElement>(null);
   const [jobOrderNumber, setJobOrderNumber] = useState("");
   const [transactionCode, setTransactionCode] = useState("");
+  const [dealersName, setDealersName] = useState("");
   const [otherRemarks, setOtherRemarks] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -358,6 +360,7 @@ const JobOrderForm = () => {
         generalRemarks,
         serviceAdvisor: signatures.serviceAdvisor,
         branchManager: signatures.branchManager,
+        dealersName,
       });
       setErrors({});
       return true;
@@ -483,6 +486,7 @@ const JobOrderForm = () => {
     assignedMechanics: mechanics.filter((mech: any) =>
       mechanic.includes(mech.id),
     ),
+    dealersName,
   };
 
   useEffect(() => {
@@ -551,6 +555,7 @@ const JobOrderForm = () => {
       purchase_date: purchaseDate,
       next_schedule_kms: nextScheduleKms,
       next_schedule_date: nextScheduleDate,
+      dealers_name: dealersName,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -651,6 +656,7 @@ const JobOrderForm = () => {
     setGeneralRemarks("");
     setEstimatedRepairTime("");
     setMechanic([]);
+    setDealersName("");
 
     // Reset amounts
     setJobAmounts({});
@@ -919,6 +925,8 @@ const JobOrderForm = () => {
                   setRemarks={setRemarks}
                   setOtherRemarks={setOtherRemarks}
                   setEstimatedRepairTime={setEstimatedRepairTime}
+                  dealersName={dealersName}
+                  setDealersName={setDealersName}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
