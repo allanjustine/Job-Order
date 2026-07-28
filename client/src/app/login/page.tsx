@@ -70,14 +70,16 @@ const LoginPage = () => {
       <div className="relative w-full max-w-md">
         <div className="bg-white p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-white/20">
           <div className="flex justify-center mb-6">
-            <img
-              src="/logo.png"
-              alt="Company Logo"
-              className="h-16 w-auto"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/default-logo.png";
-              }}
-            />
+            <Link href="/">
+              <img
+                src="/logo.png"
+                alt="Company Logo"
+                className="h-16 w-auto"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/default-logo.png";
+                }}
+              />
+            </Link>
           </div>
 
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
