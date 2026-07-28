@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner";
 import ViewJobOrder from "@/components/view-job-order";
 import { api } from "@/lib/api";
 import { AlertCircleIcon, Search } from "lucide-react";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
 export default function Page() {
@@ -114,7 +115,7 @@ export default function Page() {
               <Button
                 type="button"
                 onClick={handleFindData}
-                className="text-lg px-8 py-6 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-700"
+                className="text-lg px-8 py-6 w-54 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-700"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -125,6 +126,13 @@ export default function Page() {
                   "Search Transaction"
                 )}
               </Button>
+
+              <Link
+                className="text-lg px-8 py-2 w-54 bg-gray-500 text-white rounded-lg cursor-pointer hover:bg-gray-700"
+                href="/"
+              >
+                Cancel
+              </Link>
             </div>
           </div>
         </div>
