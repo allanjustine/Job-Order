@@ -27,7 +27,7 @@ import {
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaFileExcel, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { FaFileExcel, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Link from "next/link";
@@ -48,6 +48,7 @@ import { Spinner } from "@/components/ui/spinner";
 import formatDate from "@/utils/format-date";
 import ViewJobOrder from "@/components/view-job-order";
 import { Skeleton } from "@/components/ui/skeleton";
+import TableLoader from "@/components/table-loader";
 
 const Dashboard = () => {
   const {
@@ -592,19 +593,10 @@ const Dashboard = () => {
                     highlightOnHover
                     progressPending={isLoading || isRefresh || isSearching}
                     progressComponent={
-                      <div className="py-8 text-gray-500 text-sm font-medium flex items-center gap-2">
-                        {isSearching ? (
-                          <>
-                            <FaMagnifyingGlass className="animate-ping" />{" "}
-                            Searching {searchTerm && `"${searchTerm}"`}...
-                          </>
-                        ) : (
-                          <>
-                            <FaCircleNotch className="animate-spin text-blue-500 text-lg" />{" "}
-                            Loading...
-                          </>
-                        )}
-                      </div>
+                      <TableLoader
+                        isSearching={isSearching}
+                        searchTerm={searchTerm}
+                      />
                     }
                     persistTableHead
                     paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
