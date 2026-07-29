@@ -38,18 +38,52 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
 
   return (
     <div>
-      <div
-        className={`p-1 font-sans bg-white text-black leading-tight border-2 border-black ${isReprint ? "h-screen" : ""}`}
-        style={{
-          fontSize: "8pt",
-          maxWidth: "210mm",
-          minHeight: "158mm",
-          margin: "0",
-          lineHeight: "1.2",
-        }}
-      >
-        {/* Header */}
-        <div className="flex flex-col justify-center items-center mb-1">
+      {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
+          so it prints upright on a normal Letter-size (8.5in x 11in) portrait
+          short bond sheet -- no custom/landscape paper size needed on the
+          printer. On screen, it displays normally (not rotated). After
+          printing, the sheet is cut crosswise in half (5.5in each half),
+          so content height must stay under ~5.3in (5.5in - 0.2in margin). */}
+      <style>{`
+        @page {
+          size: 8.5in 11in;
+          margin: 0;
+        }
+        @media print {
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+          .jo-rotate-wrapper {
+            position: relative;
+            width: 7.9in;
+            height: 5.3in;
+            margin: 0.2in 0 0 0;
+          }
+          .jo-rotate-content {
+            position: absolute;
+            top: 0;
+            left: 7.9in;
+            transform: rotate(90deg);
+            transform-origin: top left;
+          }
+        }
+      `}</style>
+      <div className="jo-rotate-wrapper">
+        <div
+          className={`jo-rotate-content p-1 font-sans bg-white border border-black text-black leading-tight box-border ${isReprint ? "h-screen" : ""}`}
+          style={{
+            fontSize: "7.5pt",
+            width: "5.1in",
+            height: "7.7in",
+            maxWidth: "5.3in",
+            minHeight: "7.7in",
+            lineHeight: "1.15",
+            overflow: "hidden",
+          }}
+        >
+          {/* Header */}
+        <div className="flex flex-col justify-center items-center mb-0.5">
           <div className="flex justify-between items-center w-full">
             <div className="flex-1 font-bold">{data.transaction_code}</div>
             <img
@@ -64,8 +98,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </div>
           </div>
           <h2
-            className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
-            style={{ fontSize: "8pt", lineHeight: "0.8" }}
+            className="font-bold border-t border-b border-black py-0.5 my-0.5 text-center w-full"
+            style={{ fontSize: "8pt", lineHeight: "1" }}
           >
             VEHICLE CHECKLIST
           </h2>
@@ -73,41 +107,41 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
 
         {/* Vehicle Information */}
         <div
-          className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          className="mb-1 grid grid-cols-2 gap-x-2 gap-y-0.5"
+          style={{ fontSize: "7.5pt", lineHeight: "1" }}
         >
           <div className="flex">
-            <span className="font-bold w-32">Date:</span>
+            <span className="font-bold w-16">Date:</span>
             <span className="border-b border-black flex-1">
               {data.date ? formatDate(new Date(data.date)) : "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Engine/Frame No.:</span>
+            <span className="font-bold w-24">Engine/Frame No.:</span>
             <span className="border-b border-black flex-1">
               {data.engine_number || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Branch Name:</span>
+            <span className="font-bold w-16">Branch Name:</span>
             <span className="border-b border-black flex-1">
               {data.customer.user.name || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Mileage:</span>
+            <span className="font-bold w-24">Mileage:</span>
             <span className="border-b border-black flex-1">
               {data.mileage || 0} km
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Customer Name:</span>
+            <span className="font-bold w-16">Customer Name:</span>
             <span className="border-b border-black flex-1">
               {data.customer?.name || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Purchased Date:</span>
+            <span className="font-bold w-24">Purchased Date:</span>
             <span className="border-b border-black flex-1">
               {data.purchase_date
                 ? formatDate(new Date(data.purchase_date))
@@ -115,49 +149,49 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Contact Number:</span>
+            <span className="font-bold w-16">Contact Number:</span>
             <span className="border-b border-black flex-1">
               {data.customer.contact_number || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Estimated Repair Time:</span>
+            <span className="font-bold w-24">Estimated Repair Time:</span>
             <span className="border-b border-black flex-1">
               {data.estimated_repair_time || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Model:</span>
+            <span className="font-bold w-16">Model:</span>
             <span className="border-b border-black flex-1">
               {data.model || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Repair Start Time:</span>
+            <span className="font-bold w-24">Repair Start Time:</span>
             <span className="border-b border-black flex-1">
               {data.repair_start || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Address:</span>
+            <span className="font-bold w-16">Address:</span>
             <span className="border-b border-black flex-1">
               {data.customer?.address || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Repair End Time:</span>
+            <span className="font-bold w-24">Repair End Time:</span>
             <span className="border-b border-black flex-1">
               {data.repair_end || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Category:</span>
+            <span className="font-bold w-16">Category:</span>
             <span className="border-b border-black flex-1">
               {data.category || "N/A"}
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-40">Mechanic Name:</span>
+            <span className="font-bold w-24">Mechanic Name:</span>
             <span className="border-b border-black flex-1">
               {data.assignedMechanics?.map((m: any) => m.name).join(", ") ||
                 data.mechanics?.map((m: any) => m.name).join(", ") ||
@@ -165,39 +199,39 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </span>
           </div>
           <div className="flex">
-            <span className="font-bold w-32">Dealers Name:</span>
+            <span className="font-bold w-16">Dealers Name:</span>
             <span className="border-b border-black flex-1">
               {data.dealers_name || "N/A"}
             </span>
           </div>
         </div>
 
-        {data?.job_order_type === "motors" ? (
+        {/* {data?.job_order_type === "motors" ? (
           <MotorsImage data={data} />
         ) : (
           <TriMotorsImage data={data} />
-        )}
+        )} */}
 
         {/* here */}
-        <div className="mb-2 text-xs">
-          <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+        <div className="mb-1 text-xs">
+          <h3 className="font-bold text-center border-[0.1px] border-black py-0.5 bg-gray-100 text-[7.5pt]">
             MOTORCYCLE'S DIAGNOSIS
           </h3>
 
           {data?.job_order_diagnosis?.length > 0 ? (
             <table
-              className="w-full border-collapse border border-black my-0"
-              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+              className="w-full border-collapse border-[0.1px] border-black my-0"
+              style={{ fontSize: "7pt", lineHeight: "1" }}
             >
               <thead>
                 <tr className="bg-gray-40">
-                  <th className="border border-black p-0.5 text-left">
+                  <th className="border-[0.1px] border-black p-0.5 text-left">
                     Diagnosis Item
                   </th>
-                  <th className="border border-black p-0.5 text-center">
+                  <th className="border-[0.1px] border-black p-0.5 text-center">
                     Status
                   </th>
-                  <th className="border border-black p-0.5 text-left">
+                  <th className="border-[0.1px] border-black p-0.5 text-left">
                     Remarks
                   </th>
                 </tr>
@@ -211,16 +245,16 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                     remarks: string;
                   }) => (
                     <tr key={item.id}>
-                      <td className="border border-black p-0.5 w-1/3">
+                      <td className="border-[0.1px] border-black p-px w-1/3">
                         {[
                           ...trimotorsdiagnosisItems,
                           ...motorsdiagnosisItems,
                         ].find((it) => it.key === item.title)?.label || "N/A"}
                       </td>
-                      <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                      <td className="border-[0.1px] border-black p-px text-center font-bold text-red-600 w-1/3">
                         {item?.status?.toUpperCase() || "N/A"}
                       </td>
-                      <td className="border border-black p-0.5 w-1/3">
+                      <td className="border-[0.1px] border-black p-px w-1/3">
                         {item.remarks || "N/A"}
                       </td>
                     </tr>
@@ -229,7 +263,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
               </tbody>
             </table>
           ) : (
-            <div className="border border-black p-2 text-center">
+            <div className="border-[0.1px] border-black p-1 text-center">
               <p className="font-semibold">All diagnosis are OK</p>
             </div>
           )}
@@ -237,20 +271,23 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
 
         {/* JOB ORDER */}
         <div
-          className="mb-1 text-xs"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          className="mb-0.5 text-xs"
+          style={{ fontSize: "8pt", lineHeight: "1" }}
         >
-          <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
+          <h3 className="font-bold text-center border-[0.1px] border-black py-0.5 bg-gray-100 text-[7.5pt]">
             JOB ORDER
           </h3>
           <div className="flex gap-1">
-            <table className="w-full border-collapse border border-black">
+            <table
+              className="w-full border-collapse border-[0.1px] border-black"
+              style={{ fontSize: "7pt", lineHeight: "1" }}
+            >
               <thead>
                 <tr>
-                  <th className="border border-black p-0.5 text-left">
+                  <th className="border-[0.1px] border-black p-px text-left">
                     Specific Job(s) Request
                   </th>
-                  <th className="border border-black p-0.5 text-center w-16">
+                  <th className="border-[0.1px] border-black p-px text-center w-8">
                     Amount
                   </th>
                 </tr>
@@ -261,8 +298,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                     {job.type === "job_request" && (
                       <>
                         <td
-                          className="border border-black p-0.5 h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           <span>
                             [✓] {job.category}{" "}
@@ -272,8 +309,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                           </span>
                         </td>
                         <td
-                          className="border border-black p-0.5 text-left h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black text-left h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           {formatCurrency(job.amount)}
                         </td>
@@ -285,25 +322,28 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                   <td className="border-b border-black p-0.5 font-semibold">
                     Total Labor Cost:
                   </td>
-                  <td className="border-b border-black p-1 font-semibold">
+                  <td className="border-b border-black p-0.5 font-semibold">
                     {phpCurrency(jobTotal)}
                   </td>
                 </tr>
               </tbody>
             </table>
-            <table className="w-full border-collapse border border-black">
+            <table
+              className="w-full border-collapse border-[0.1px] border-black"
+              style={{ fontSize: "7pt", lineHeight: "1" }}
+            >
               <thead>
                 <tr>
-                  <th className="border border-black p-0.5 text-left">
+                  <th className="border-[0.1px] border-black p-px text-left">
                     Parts Used
                   </th>
-                  <th className="border border-black p-0.5 text-center w-10">
+                  <th className="border-[0.1px] border-black p-px text-center w-6">
                     Qty
                   </th>
-                  <th className="border border-black p-0.5 text-left w-28">
+                  <th className="border-[0.1px] border-black p-px text-left w-14">
                     Brand / Part No.
                   </th>
-                  <th className="border border-black p-0.5 text-center w-16">
+                  <th className="border-[0.1px] border-black p-px text-center w-8">
                     Amount
                   </th>
                 </tr>
@@ -314,20 +354,20 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                     {job.type === "parts_replacement" && (
                       <>
                         <td
-                          className="border border-black p-0.5 h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           <span>[✓] {job.category}</span>
                         </td>
                         <td
-                          className="border border-black p-0.5 text-center h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black text-center h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           {job?.quantity || "N/A"}
                         </td>
                         <td
-                          className="border border-black p-0.5 text-left text-[7pt] h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black text-left text-[7.5pt] h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           {job?.part_brand && job?.part_number
                             ? `${job.part_brand}-${job.part_number}`
@@ -337,8 +377,8 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                                 : "N/A")}
                         </td>
                         <td
-                          className="border border-black p-0.5 text-left h-3"
-                          style={{ padding: "2px 4px" }}
+                          className="border-[0.1px] border-black text-left h-3"
+                          style={{ padding: "1px 3px" }}
                         >
                           {formatCurrency(job?.amount)}
                         </td>
@@ -353,7 +393,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
                   >
                     Total Parts Cost:
                   </td>
-                  <td className="border-b border-black p-1 font-semibold">
+                  <td className="border-b border-black p-0.5 font-semibold">
                     {phpCurrency(partsTotal)}
                   </td>
                 </tr>
@@ -361,13 +401,13 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             </table>
           </div>
 
-          <div className="flex justify-between items-center border border-black border-t-0 py-1">
+          <div className="flex justify-between items-center border-[0.1px] border-black border-t-0 py-0.5">
             <div className="font-bold ml-1">
               Grand Total: {phpCurrency(grandTotal)}
             </div>
           </div>
 
-          <div className="py-2">
+          <div className="py-1">
             <span className="font-bold mr-2">
               Your Next Service Schedule is:
             </span>
@@ -382,7 +422,7 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
             <span> kms (whichever comes first)</span>
           </div>
 
-          <div className="flex mt-2">
+          <div className="flex mt-1">
             <span className="font-bold mr-2">General Remarks:</span>
             <span className="underline flex-1">
               {data.general_remarks || "N/A"}
@@ -392,46 +432,62 @@ const ViewJobOrder = ({ data, isReprint }: PreviewJobOrderProps) => {
 
         {/* Signatures */}
         <div
-          className="mt-1 grid grid-cols-3 gap-2 text-xs"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          className="mt-0.5 grid grid-cols-3 gap-2 text-xs"
+          style={{ fontSize: "7.5pt", lineHeight: "1" }}
         >
           <div className="text-center p-0.5">
-            <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs text-left mb-5">Prepared by:</p>
+            <div className="mb-0.5 pb-0.5 h-4"></div>
+            <p className="text-left mb-2" style={{ fontSize: "7.5pt" }}>
+              Prepared by:
+            </p>
             <p className="underline">{data.service_advisor || "N/A"}</p>
-            <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
+            <p className="text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
             </p>
-            <p className="text-xxs">Salesrep/Service Advisor</p>
+            <p style={{ fontSize: "7pt" }}>Salesrep/Service Advisor</p>
           </div>
           <div className="text-center p-0.5">
-            <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs text-left mb-5">Checked by:</p>
+            <div className="mb-0.5 pb-0.5 h-4"></div>
+            <p className="text-left mb-2" style={{ fontSize: "7.5pt" }}>
+              Checked by:
+            </p>
             <p className="underline">{data.branch_manager || "N/A"}</p>
-            <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
+            <p className="text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
             </p>
-            <p className="text-xxs">BM/BS</p>
+            <p style={{ fontSize: "7pt" }}>BM/BS</p>
           </div>
           <div className="text-center p-0.5">
-            <div className="mb-1 pb-1 h-6"></div>
-            <p className="text-xs text-left mb-5">Conformed by:</p>
+            <div className="mb-0.5 pb-0.5 h-4"></div>
+            <p className="text-left mb-2" style={{ fontSize: "7.5pt" }}>
+              Conformed by:
+            </p>
             <p className="underline">{data.customer?.name || "N/A"}</p>
-            <p className="text-xs text-gray-600" style={{ fontSize: "7pt" }}>
+            <p className="text-gray-600" style={{ fontSize: "7pt" }}>
               (Signature Over Printed Name)
             </p>
-            <p className="text-xxs">Customer</p>
+            <p style={{ fontSize: "7pt" }}>Customer</p>
           </div>
         </div>
 
+        <div className="flex mt-2" style={{ fontSize: "8pt" }}>
+          <span className="font-bold mr-2">Receipt #:</span>
+          <span className="w-30 border-b border-black mt-1"></span>
+        </div>
+        <div className="flex mt-1" style={{ fontSize: "8pt" }}>
+          <span className="font-bold mr-2">Cashier's Signature:</span>
+          <span className="w-30 border-b border-black mt-1"></span>
+        </div>
+
         {/* Footer Note */}
-        <p className="mt-10 text-center text-red-600 font-bold text-xl">
+        <p className="mt-3 text-center text-red-600 font-bold text-lg">
           {data.status === "cancelled" ? "CANCELLED" : ""}
         </p>
 
-        <p className="mt-1 text-center text-black text-s">
+        <p className="mt-0.5 text-center text-black" style={{ fontSize: "8pt" }}>
           {data.reason_for_cancellation ? data.reason_for_cancellation : ""}
         </p>
+        </div>
       </div>
     </div>
   );

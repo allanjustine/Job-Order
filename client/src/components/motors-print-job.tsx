@@ -301,16 +301,51 @@ const allDiagnosisOK = () => {
 };
 
   return (
-    <div
-      className="p-1 font-sans bg-white text-black leading-tight border-2 border-black"
-      style={{
-        fontSize: "8pt",
-        maxWidth: "210mm",
-        minHeight: "258mm",
-        margin: "0",
-        lineHeight: "1.2",
-      }}
-    >
+    <div>
+      {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
+          so it prints upright on a normal Letter-size (8.5in x 11in) portrait
+          short bond sheet -- no custom/landscape paper size needed on the
+          printer. On screen, it displays normally (not rotated). After
+          printing, the sheet is cut crosswise in half (5.5in each half),
+          so content height must stay under ~5.3in (5.5in - 0.2in margin). */}
+      <style>{`
+        @page {
+          size: 8.5in 11in;
+          margin: 0;
+        }
+        @media print {
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+          .jo-rotate-wrapper {
+            position: relative;
+            width: 7.9in;
+            height: 5.3in;
+            margin: 0.2in 0 0 0;
+          }
+          .jo-rotate-content {
+            position: absolute;
+            top: 0;
+            left: 7.9in;
+            transform: rotate(90deg);
+            transform-origin: top left;
+          }
+        }
+      `}</style>
+      <div className="jo-rotate-wrapper">
+        <div
+          className="jo-rotate-content p-1 font-sans bg-white text-black leading-tight border-2 border-black box-border"
+          style={{
+            fontSize: "7.5pt",
+            width: "5.1in",
+            height: "7.7in",
+            maxWidth: "5.3in",
+            minHeight: "7.7in",
+            lineHeight: "1.15",
+            overflow: "hidden",
+          }}
+        >
       {/* Honda Header */}
       <div className="flex flex-col justify-center items-center mb-1">
         <div className="flex justify-between items-center w-full">
@@ -339,7 +374,7 @@ const allDiagnosisOK = () => {
        <CustomerGridView data={data} />
 
       {/* Motorcycle Unit & Engine Unit */}
-      <div
+      {/* <div
         className="mb-2 grid grid-cols-2 gap-2"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -388,12 +423,12 @@ const allDiagnosisOK = () => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="flex mt-1 mb-2">
+      {/* <div className="flex mt-1 mb-2">
         <span className="font-bold w-40">Contents inside U-Box:</span>
         <span className="underline">{data.contentUbox}</span>
-      </div>
+      </div> */}
 
       {/* Motorcycle Diagnosis Section - keep existing */}
       <div className="mb-2 text-xs">
@@ -666,6 +701,8 @@ const allDiagnosisOK = () => {
       <p className="mt-2 text-center float-left" style={{ fontSize: "6pt" }}>
         Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
       </p>
+        </div>
+      </div>
     </div>
   );
 };

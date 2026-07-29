@@ -340,7 +340,7 @@ const allDiagnosisOK = () => {
        <CustomerGridView data={data} />
 
       {/* Motorcycle Unit & Engine Unit */}
-      <div
+      {/* <div
         className="mb-2 grid grid-cols-2 gap-2"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -389,12 +389,12 @@ const allDiagnosisOK = () => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="flex mt-1 mb-2">
+      {/* <div className="flex mt-1 mb-2">
         <span className="font-bold w-40">Contents inside U-Box:</span>
         <span className="underline">{data.contentUbox}</span>
-      </div>
+      </div> */}
 
       {/* Motorcycle Diagnosis Section - keep existing */}
       <div className="mb-2 text-xs">
