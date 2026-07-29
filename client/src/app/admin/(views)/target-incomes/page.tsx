@@ -14,11 +14,7 @@ import {
 } from "lucide-react";
 import { Activity, ChangeEvent, useState } from "react";
 import DataTable from "react-data-table-component";
-import {
-  FaCircleNotch,
-  FaMagnifyingGlass,
-  FaRotateRight,
-} from "react-icons/fa6";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import AddTargetIncome from "../../components/target-income/add-target-income";
 import EditTargetIncome from "../../components/target-income/edit-target-income";
 import phpCurrency from "@/utils/phpCurrency";
@@ -29,6 +25,7 @@ import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import { format } from "date-fns";
 import Select from "@/components/ui/select";
+import TableLoader from "@/components/table-loader";
 
 const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -248,14 +245,52 @@ const Reports = () => {
   return (
     <>
       <div className="p-6">
-        <div className="bg-white rounded-md border border-gray-300 shadow">
-          <div className="p-6">
-            <div className="mb-2 flex justify-between items-center">
+        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Target Incomes
+              </h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Job Order Printing System — Target Incomes Overview
+              </p>
+            </div>
+            <div className="flex gap-1 items-center">
+              <div>
+                <Select
+                  value={filters?.month}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                    setFilters({
+                      month: e.target.value,
+                    });
+                  }}
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
+                >
+                  <option value="" selected disabled>
+                    Select Month
+                  </option>
+                  <option value="">This Month</option>
+                  {DATES?.map(({ label, value }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="relative w-full">
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                  isRefresh && "bg-blue-400! cursor-not-allowed!"
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
+                  isRefresh && "bg-yellow-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
               >
@@ -278,90 +313,46 @@ const Reports = () => {
                 <CircleFadingPlus /> Add Target Income
               </Button>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">
-                Target Incomes
-              </h2>
-              <div className="flex gap-1 items-center">
-                <div>
-                  <Select
-                    value={filters?.month}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                      setFilters({
-                        month: e.target.value,
-                      });
-                    }}
-                    className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
-                  >
-                    <option value="" selected disabled>
-                      Select Month
-                    </option>
-                    <option value="">This Month</option>
-                    {DATES?.map(({ label, value }) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </Select>
+          </div>
+          <div className="overflow-x-auto border-t">
+            <DataTable
+              columns={columns}
+              data={targetIncomes}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
+                />
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-5 font-bold text-gray-600 text-xl">
+                  {searchTerm ? (
+                    <div>
+                      <span className="flex gap-1 items-center">
+                        <SearchSlash /> No results for "{searchTerm}"
+                      </span>
+                    </div>
+                  ) : (
+                    "No target incomes yet."
+                  )}
                 </div>
-                <div className="relative w-full">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    onChange={handleSearch}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                </div>
-              </div>
-            </div>
-            <div className="overflow-x-auot">
-              <DataTable
-                columns={columns}
-                data={targetIncomes}
-                pagination
-                paginationServer
-                sortServer
-                onSort={handleSort}
-                paginationTotalRows={pagination.total}
-                onChangeRowsPerPage={handleRowsPerPageChange}
-                onChangePage={handlePageChange}
-                paginationPerPage={pagination.perPage}
-                striped
-                highlightOnHover
-                progressPending={isLoading || isRefresh || isSearching}
-                progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
-                    ) : (
-                      "Loading..."
-                    )}
-                  </div>
-                }
-                persistTableHead
-                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                defaultSortAsc={sort.sortBy}
-                defaultSortFieldId={sort.column}
-                noDataComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {searchTerm ? (
-                      <>
-                        <span className="flex gap-1 items-center">
-                          <SearchSlash /> No results for "{searchTerm}"
-                        </span>
-                      </>
-                    ) : (
-                      "No target incomes yet."
-                    )}
-                  </div>
-                }
-              />
-            </div>
+              }
+            />
           </div>
         </div>
       </div>

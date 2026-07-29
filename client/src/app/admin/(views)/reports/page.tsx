@@ -12,12 +12,7 @@ import { format, formatDistanceToNowStrict } from "date-fns";
 import { CircleX, Eye, Search, SearchSlash, Trash2, User } from "lucide-react";
 import { Activity, useEffect, useState, useRef } from "react";
 import DataTable from "react-data-table-component";
-import {
-  FaCircleNotch,
-  FaFileExcel,
-  FaMagnifyingGlass,
-  FaRotateRight,
-} from "react-icons/fa6";
+import { FaCircleNotch, FaFileExcel, FaRotateRight } from "react-icons/fa6";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { DatePickerWithRange } from "@/components/date-picker.with-range";
@@ -37,6 +32,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import TableLoader from "@/components/table-loader";
 
 export const FILTER_DATA = {
   branch: "",
@@ -45,7 +41,7 @@ export const FILTER_DATA = {
   job_order_type: "",
 };
 
-export type filterDataType = {
+export type FilterDataType = {
   branch: string;
   area_manager: string;
   date_range: string;
@@ -53,7 +49,7 @@ export type filterDataType = {
 };
 
 const Reports = () => {
-  const [filterItems, setFilterItems] = useState<filterDataType>(FILTER_DATA);
+  const [filterItems, setFilterItems] = useState<FilterDataType>(FILTER_DATA);
   const {
     data: reports,
     isLoading,
@@ -646,7 +642,7 @@ const Reports = () => {
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
                   isRefresh && "opacity-60 cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
@@ -707,19 +703,10 @@ const Reports = () => {
               highlightOnHover
               progressPending={isLoading || isRefresh || isSearching}
               progressComponent={
-                <div className="py-8 text-sm text-gray-500 flex items-center justify-center gap-2">
-                  {isSearching ? (
-                    <>
-                      <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                      {searchTerm && `"${searchTerm}"`}...
-                    </>
-                  ) : (
-                    <>
-                      <FaCircleNotch className="animate-spin text-blue-500 text-lg" />{" "}
-                      Loading...
-                    </>
-                  )}
-                </div>
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
+                />
               }
               persistTableHead
               paginationRowsPerPageOptions={PER_PAGE_OPTIONS}

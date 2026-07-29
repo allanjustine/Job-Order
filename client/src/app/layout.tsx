@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { AuthContextProvider } from "@/context/authContext";
 import BaseContent from "@/components/layouts/BaseContent";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [bg-size:16px_16px] scroll-smooth font-sans`}
       >
         <AuthContextProvider>
-          <Toaster />
-          <BaseContent children={children} />
+          <TooltipProvider>
+            <Toaster />
+            <BaseContent children={children} />
+          </TooltipProvider>
         </AuthContextProvider>
       </body>
     </html>

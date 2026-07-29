@@ -1,5 +1,6 @@
 "use client";
 
+import TableLoader from "@/components/table-loader";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
@@ -8,11 +9,7 @@ import withAuthPage from "@/lib/hoc/with-auth-page";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { Search, SearchSlash } from "lucide-react";
 import DataTable from "react-data-table-component";
-import {
-  FaCircleNotch,
-  FaMagnifyingGlass,
-  FaRotateRight,
-} from "react-icons/fa6";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 
 const Customers = () => {
   const {
@@ -88,14 +85,30 @@ const Customers = () => {
   return (
     <>
       <div className="p-6">
-        <div className="bg-white rounded-md border border-gray-300 shadow">
-          <div className="p-6">
-            <div className="mb-2 flex justify-end">
+        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Customers</h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Job Order Printing System — Customers Overview
+              </p>
+            </div>
+
+            <div className="mb-2 flex gap-1 items-center">
+              <div className="relative">
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
               <Button
                 type="button"
                 disabled={isRefresh}
-                className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                  isRefresh && "bg-blue-400! cursor-not-allowed!"
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
+                  isRefresh && "bg-yellow-400! cursor-not-allowed!"
                 }`}
                 onClick={handleRefresh}
               >
@@ -110,65 +123,46 @@ const Customers = () => {
                 )}
               </Button>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Customers</h2>
-              <div className="relative w-full md:w-1/3">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  onChange={handleSearch}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          </div>
+          <div className="overflow-x-auto border-t">
+            <DataTable
+              columns={columns}
+              data={customers}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-            <div className="overflow-x-auot">
-              <DataTable
-                columns={columns}
-                data={customers}
-                pagination
-                paginationServer
-                sortServer
-                onSort={handleSort}
-                paginationTotalRows={pagination.total}
-                onChangeRowsPerPage={handleRowsPerPageChange}
-                onChangePage={handlePageChange}
-                paginationPerPage={pagination.perPage}
-                striped
-                highlightOnHover
-                progressPending={isLoading || isRefresh || isSearching}
-                progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
-                    ) : (
-                      "Loading..."
-                    )}
-                  </div>
-                }
-                persistTableHead
-                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                defaultSortAsc={sort.sortBy}
-                defaultSortFieldId={sort.column}
-                noDataComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {searchTerm ? (
-                      <>
-                        <span className="flex gap-1 items-center">
-                          <SearchSlash /> No results for "{searchTerm}"
-                        </span>
-                      </>
-                    ) : (
-                      "No customers yet."
-                    )}
-                  </div>
-                }
-              />
-            </div>
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-5 font-bold text-gray-600 text-xl">
+                  {searchTerm ? (
+                    <>
+                      <span className="flex gap-1 items-center">
+                        <SearchSlash /> No results for "{searchTerm}"
+                      </span>
+                    </>
+                  ) : (
+                    "No customers yet."
+                  )}
+                </div>
+              }
+            />
           </div>
         </div>
       </div>

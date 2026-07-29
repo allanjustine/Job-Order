@@ -6,11 +6,7 @@ import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
 import { PenIcon, Search, SearchSlash, Trash, UserPlus } from "lucide-react";
 import DataTable from "react-data-table-component";
-import {
-  FaCircleNotch,
-  FaMagnifyingGlass,
-  FaRotateRight,
-} from "react-icons/fa6";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import { Activity, Dispatch, SetStateAction, useState } from "react";
 import Swal from "sweetalert2";
 import { api } from "@/lib/api";
@@ -18,6 +14,7 @@ import toast from "react-hot-toast";
 import AddMechanic from "@/components/mechanics/add-mechanic";
 import EditMechanic from "@/components/mechanics/edit-mechanic";
 import { useAuth } from "@/context/authContext";
+import TableLoader from "../table-loader";
 
 const Mechanics = ({
   setMechanicAdded,
@@ -215,17 +212,10 @@ const Mechanics = ({
                 highlightOnHover
                 progressPending={isLoading || isRefresh || isSearching}
                 progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
-                    ) : (
-                      "Loading..."
-                    )}
-                  </div>
+                  <TableLoader
+                    isSearching={isSearching}
+                    searchTerm={searchTerm}
+                  />
                 }
                 persistTableHead
                 paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
