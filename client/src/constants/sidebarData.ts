@@ -30,9 +30,9 @@ export const sidebarData = [
     name: "Mechanics",
   },
   {
-    href: "/admin/target-income",
+    href: "/admin/target-incomes",
     icon: HandCoinsIcon,
-    name: "Target Income",
+    name: "Target Incomes",
   },
   {
     href: "/admin/area-managers",
