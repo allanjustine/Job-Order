@@ -1,0 +1,378 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
+import useFetch from "@/hooks/useFetch";
+import withAuthPage from "@/lib/hoc/with-auth-page";
+import {
+  CircleFadingPlus,
+  PenIcon,
+  Search,
+  SearchSlash,
+  Trash,
+} from "lucide-react";
+import { Activity, ChangeEvent, useState } from "react";
+import DataTable from "react-data-table-component";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
+import AddTargetIncome from "../../components/target-income/add-target-income";
+import EditTargetIncome from "../../components/target-income/edit-target-income";
+import phpCurrency from "@/utils/phpCurrency";
+import { formatDateAndTime } from "@/utils/format-date-and-time";
+import { diffForHumans } from "@/utils/diff-for-humans";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import { api } from "@/lib/api";
+import { format } from "date-fns";
+import Select from "@/components/ui/select";
+import TableLoader from "@/components/table-loader";
+
+const Reports = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
+  const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
+  const [filters, setFilters] = useState<{ month: string }>({
+    month: "",
+  });
+  const {
+    data: targetIncomes,
+    isLoading,
+    error,
+    pagination,
+    sort,
+    isRefresh,
+    isSearching,
+    searchTerm,
+    handleSort,
+    handleRowsPerPageChange,
+    handlePageChange,
+    handleSearch,
+    handleRefresh,
+    fetchData,
+  } = useFetch("/target-incomes", { filterItems: filters });
+
+  const DATES = [
+    {
+      label: "January",
+      value: 1,
+    },
+    {
+      label: "February",
+      value: 2,
+    },
+    {
+      label: "March",
+      value: 3,
+    },
+    {
+      label: "April",
+      value: 4,
+    },
+    {
+      label: "May",
+      value: 5,
+    },
+    {
+      label: "June",
+      value: 6,
+    },
+    {
+      label: "July",
+      value: 7,
+    },
+    {
+      label: "August",
+      value: 8,
+    },
+    {
+      label: "September",
+      value: 9,
+    },
+    {
+      label: "October",
+      value: 10,
+    },
+    {
+      label: "November",
+      value: 11,
+    },
+    {
+      label: "December",
+      value: 12,
+    },
+  ];
+
+  const columns = [
+    {
+      name: "ID",
+      selector: (row: any) => row.id,
+
+      sortable: true,
+      sortField: "id",
+      width: "80px",
+    },
+    {
+      name: "BRANCH",
+      cell: (row: any) => (
+        <div>
+          <span className="font-bold text-gray-600">
+            ({row.user.code}) - {row.user.name}
+          </span>
+        </div>
+      ),
+    },
+    {
+      name: "MONTH OF",
+      cell: (row: any) => (
+        <div>
+          <span className="font-extrabold text-gray-800 capitalize">
+            {format(row.month_of, "MMMM yyyy")}
+          </span>
+        </div>
+      ),
+    },
+    {
+      name: "TARGET INCOME",
+      cell: (row: any) => (
+        <span className="font-semibold">{phpCurrency(row.target_income)}</span>
+      ),
+      sortable: true,
+      sortField: "target_income",
+    },
+    {
+      name: "SHOP INCOME",
+      cell: (row: any) => (
+        <span className="font-semibold">{phpCurrency(row.shop_income)}</span>
+      ),
+    },
+    {
+      name: "CREATED AT",
+      cell: (row: any) => (
+        <>
+          <div className="flex flex-col">
+            <span className="text-sm">{formatDateAndTime(row.created_at)}</span>
+            <span className="text-gray-500 text-xs font-bold">
+              {diffForHumans(row.created_at)}
+            </span>
+          </div>
+        </>
+      ),
+      sortable: true,
+      sortField: "created_at",
+    },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            className="text-blue-500 hover:text-blue-600"
+            variant={"link"}
+            size={"icon"}
+            onClick={() => {
+              setIsOpenEdit(true);
+              setSelectedTargetIncome(row);
+            }}
+          >
+            <PenIcon className="size-5" />
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDeleteTargetIncomes(row?.id)}
+            className="text-red-500 hover:text-red-600"
+            variant={"link"}
+            size={"icon"}
+          >
+            <Trash className="size-5" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  function handleDeleteTargetIncomes(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to recover this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.delete(`/target-incomes/${id}`);
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
+
+  return (
+    <>
+      <div className="p-6">
+        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Target Incomes
+              </h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Job Order Printing System — Target Incomes Overview
+              </p>
+            </div>
+            <div className="flex gap-1 items-center">
+              <div>
+                <Select
+                  value={filters?.month}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                    setFilters({
+                      month: e.target.value,
+                    });
+                  }}
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
+                >
+                  <option value="" selected disabled>
+                    Select Month
+                  </option>
+                  <option value="">This Month</option>
+                  {DATES?.map(({ label, value }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="relative w-full">
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
+              <Button
+                type="button"
+                disabled={isRefresh}
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
+                  isRefresh && "bg-yellow-400! cursor-not-allowed!"
+                }`}
+                onClick={handleRefresh}
+              >
+                {isRefresh ? (
+                  <>
+                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <FaRotateRight /> Refresh
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+              >
+                <CircleFadingPlus /> Add Target Income
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-x-auto border-t">
+            <DataTable
+              columns={columns}
+              data={targetIncomes}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
+                />
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-5 font-bold text-gray-600 text-xl">
+                  {searchTerm ? (
+                    <div>
+                      <span className="flex gap-1 items-center">
+                        <SearchSlash /> No results for "{searchTerm}"
+                      </span>
+                    </div>
+                  ) : (
+                    "No target incomes yet."
+                  )}
+                </div>
+              }
+            />
+          </div>
+        </div>
+      </div>
+      <Activity mode={isOpen ? "visible" : "hidden"}>
+        <AddTargetIncome
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          fetchData={fetchData}
+        />
+      </Activity>
+      <Activity mode={isOpenEdit ? "visible" : "hidden"}>
+        <EditTargetIncome
+          isOpen={isOpenEdit}
+          setIsOpen={setIsOpenEdit}
+          fetchData={fetchData}
+          selectedTargetIncome={selectedTargetIncome}
+        />
+      </Activity>
+    </>
+  );
+};
+
+export default withAuthPage(Reports);
