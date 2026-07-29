@@ -24,16 +24,17 @@ import {
   ModalHeader,
 } from "@/components/ui/modal";
 import PreviewData from "@/components/PreviewData";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Swal from "sweetalert2";
 import { api } from "@/lib/api";
 import { formatDateAndTime } from "@/utils/format-date-and-time";
 import { diffForHumans } from "@/utils/diff-for-humans";
+import TableLoader from "@/components/table-loader";
 
 interface StatItem {
   total_job_prints: {
@@ -335,7 +336,9 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Job Order Printing System — Admin Overview</p>
+            <p className="text-sm text-gray-400 mt-0.5">
+              Job Order Printing System — Admin Overview
+            </p>
           </div>
         </div>
 
@@ -345,24 +348,32 @@ const Dashboard = () => {
           <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Total Job Prints</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                  Total Job Prints
+                </p>
                 <p className="text-3xl font-bold text-gray-800">
                   {isLoadingStats ? spinner() : data.totalReceiptPrints}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Hover to see breakdown</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Hover to see breakdown
+                </p>
               </div>
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-400 shadow-md">
+              <div className="p-3 rounded-xl bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
                 <Printer className="w-5 h-5 text-white" />
               </div>
             </div>
             <div className="absolute z-10 top-full left-0 mt-2 w-52 p-3 bg-white border border-gray-200 rounded-xl shadow-lg text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="flex justify-between py-1 border-b border-gray-100">
                 <span className="text-gray-500">Motorcycle</span>
-                <span className="font-semibold">{isLoadingStats ? spinner() : data.total_job_motor_print}</span>
+                <span className="font-semibold">
+                  {isLoadingStats ? spinner() : data.total_job_motor_print}
+                </span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-gray-500">Trimotors</span>
-                <span className="font-semibold">{isLoadingStats ? spinner() : data.total_job_trimotor_print}</span>
+                <span className="font-semibold">
+                  {isLoadingStats ? spinner() : data.total_job_trimotor_print}
+                </span>
               </div>
             </div>
           </div>
@@ -376,11 +387,17 @@ const Dashboard = () => {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{item.label}</p>
-                    <p className="text-3xl font-bold text-gray-800">{item.value}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                      {item.label}
+                    </p>
+                    <p className="text-3xl font-bold text-gray-800">
+                      {item.value}
+                    </p>
                     <p className="text-xs text-gray-400 mt-1">{item.sub}</p>
                   </div>
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${item.color} shadow-md`}>
+                  <div
+                    className={`p-3 rounded-xl bg-linear-to-br ${item.color} shadow-md`}
+                  >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -392,12 +409,14 @@ const Dashboard = () => {
           <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-1">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Total Amount</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                  Total Amount
+                </p>
                 <p className="text-3xl font-bold text-gray-800">
                   {isLoadingStats ? spinner() : data.totalOverAllAmount}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-amber-400 shadow-md">
+              <div className="p-3 rounded-xl bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
                 <PhilippinePeso className="w-5 h-5 text-white" />
               </div>
             </div>
@@ -410,8 +429,12 @@ const Dashboard = () => {
           <div className="xl:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 h-fit">
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-gray-800">Recent Print Job Orders</h2>
-                <p className="text-xs text-gray-400">Latest submitted job orders</p>
+                <h2 className="text-base font-semibold text-gray-800">
+                  Recent Print Job Orders
+                </h2>
+                <p className="text-xs text-gray-400">
+                  Latest submitted job orders
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="relative">
@@ -432,9 +455,13 @@ const Dashboard = () => {
                   onClick={handleRefresh}
                 >
                   {isRefresh ? (
-                    <><FaCircleNotch className="animate-spin" /> Refreshing...</>
+                    <>
+                      <FaCircleNotch className="animate-spin" /> Refreshing...
+                    </>
                   ) : (
-                    <><FaRotateRight /> Refresh</>
+                    <>
+                      <FaRotateRight /> Refresh
+                    </>
                   )}
                 </Button>
               </div>
@@ -455,13 +482,10 @@ const Dashboard = () => {
                 highlightOnHover
                 progressPending={isLoading || isRefresh || isSearching}
                 progressComponent={
-                  <div className="py-8 font-semibold text-gray-500 text-sm flex items-center justify-center gap-2">
-                    {isSearching ? (
-                      <><FaMagnifyingGlass className="animate-ping" /> Searching {searchTerm && `"${searchTerm}"`}...</>
-                    ) : (
-                      <><CgSpinner className="animate-spin text-blue-500 text-lg" /> Loading...</>
-                    )}
-                  </div>
+                  <TableLoader
+                    isSearching={isSearching}
+                    searchTerm={searchTerm}
+                  />
                 }
                 persistTableHead
                 paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
@@ -470,9 +494,15 @@ const Dashboard = () => {
                 noDataComponent={
                   <div className="py-10 text-gray-400 text-sm flex flex-col items-center gap-2">
                     {searchTerm ? (
-                      <><SearchSlash className="w-8 h-8" /><span>No results for "{searchTerm}"</span></>
+                      <>
+                        <SearchSlash className="w-8 h-8" />
+                        <span>No results for "{searchTerm}"</span>
+                      </>
                     ) : (
-                      <><Printer className="w-8 h-8" /><span>No job orders yet.</span></>
+                      <>
+                        <Printer className="w-8 h-8" />
+                        <span>No job orders yet.</span>
+                      </>
                     )}
                   </div>
                 }
@@ -489,7 +519,9 @@ const Dashboard = () => {
                 Top 10 Overall Job Orders
               </h3>
               <div className="flex flex-col gap-2">
-                {isLoadingStats ? skeletonRows(5) : adminStats.top_over_all_job_orders.length > 0 ? (
+                {isLoadingStats ? (
+                  skeletonRows(5)
+                ) : adminStats.top_over_all_job_orders.length > 0 ? (
                   adminStats.top_over_all_job_orders.map((item, index) => (
                     <div
                       key={index}
@@ -497,12 +529,18 @@ const Dashboard = () => {
                       title={item.category}
                     >
                       {rankBadge(index)}
-                      <span className="flex-1 text-xs font-medium text-gray-600 line-clamp-1">{item.category}</span>
-                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                      <span className="flex-1 text-xs font-medium text-gray-600 line-clamp-1">
+                        {item.category}
+                      </span>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">
+                        {phpCurrency(item.amount)}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
+                  <p className="text-center text-sm text-gray-400 py-4">
+                    No data yet.
+                  </p>
                 )}
               </div>
             </div>
@@ -514,7 +552,9 @@ const Dashboard = () => {
                 Top 10 Branch Job Orders
               </h3>
               <div className="flex flex-col gap-2">
-                {isLoadingStats ? skeletonRows(5) : adminStats.top_branch_job_orders.length > 0 ? (
+                {isLoadingStats ? (
+                  skeletonRows(5)
+                ) : adminStats.top_branch_job_orders.length > 0 ? (
                   adminStats.top_branch_job_orders.map((item, index) => (
                     <div
                       key={index}
@@ -524,13 +564,19 @@ const Dashboard = () => {
                       {rankBadge(index)}
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-gray-700 line-clamp-1">{`(${item.branch.code}) ${item.branch.name}`}</p>
-                        <p className="text-xs text-gray-400 line-clamp-1">{item.category}</p>
+                        <p className="text-xs text-gray-400 line-clamp-1">
+                          {item.category}
+                        </p>
                       </div>
-                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">
+                        {phpCurrency(item.amount)}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
+                  <p className="text-center text-sm text-gray-400 py-4">
+                    No data yet.
+                  </p>
                 )}
               </div>
             </div>
@@ -542,7 +588,9 @@ const Dashboard = () => {
                 Top 10 Area Manager Job Orders
               </h3>
               <div className="flex flex-col gap-2">
-                {isLoadingStats ? skeletonRows(5, "h-14") : adminStats.top_area_manager_job_orders.length > 0 ? (
+                {isLoadingStats ? (
+                  skeletonRows(5, "h-14")
+                ) : adminStats.top_area_manager_job_orders.length > 0 ? (
                   adminStats.top_area_manager_job_orders.map((item, index) => (
                     <div
                       key={index}
@@ -551,15 +599,23 @@ const Dashboard = () => {
                     >
                       {rankBadge(index)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-700 line-clamp-1">{item.area_manager_name}</p>
+                        <p className="text-xs font-bold text-gray-700 line-clamp-1">
+                          {item.area_manager_name}
+                        </p>
                         <p className="text-xs font-medium text-gray-500 line-clamp-1">{`(${item.branch.code}) ${item.branch.name}`}</p>
-                        <p className="text-xs text-gray-400 line-clamp-1">{item.category}</p>
+                        <p className="text-xs text-gray-400 line-clamp-1">
+                          {item.category}
+                        </p>
                       </div>
-                      <span className="text-xs font-bold text-gray-800 shrink-0">{phpCurrency(item.amount)}</span>
+                      <span className="text-xs font-bold text-gray-800 shrink-0">
+                        {phpCurrency(item.amount)}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-sm text-gray-400 py-4">No data yet.</p>
+                  <p className="text-center text-sm text-gray-400 py-4">
+                    No data yet.
+                  </p>
                 )}
               </div>
             </div>
