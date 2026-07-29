@@ -3,12 +3,13 @@ import acronymName from "@/utils/acronymName";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Activity, useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import { Button } from "../ui/button";
 import { sidebarData } from "@/constants/sidebarData";
 import Swal from "sweetalert2";
 import { FaSignOutAlt } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export default function Sidebar({
   isSidebarOpen,
@@ -77,27 +78,40 @@ export default function Sidebar({
       }`}
     >
       <div className="p-4 flex items-center justify-center border-b border-gray-300 h-18">
-        <Image src="/logo.png" alt="Logo" width={150} height={150} />
+        <div className="flex gap-1 items-center">
+          <Image src="/logo.png" alt="Logo" width={60} height={60} />
+          {isSidebarOpen && (
+            <p className="font-bold text-gray-700">Job Order System</p>
+          )}
+        </div>
       </div>
       <nav className="p-1">
         <ul className="space-y-2">
           {sidebarData.map((item, index) => (
-            <li className="flex items-center w-full" key={index}>
-              <Link
-                title={!isSidebarOpen ? item.name : ""}
-                className={`flex items-center gap-4 hover:bg-blue-100 transition-all w-full ${
-                  !isSidebarOpen && "justify-center"
-                } p-3 rounded-lg text-blue-700 ${
-                  isActive(item.href) && "bg-blue-100"
-                }`}
-                href={item.href}
-              >
-                <item.icon className="w-6 h-6 text-center" />
-                {isSidebarOpen && (
-                  <span className="whitespace-nowrap">{item.name}</span>
-                )}
-              </Link>
-            </li>
+            <Tooltip key={index}>
+              <TooltipTrigger className="w-full">
+                <li className="flex items-center w-full">
+                  <Link
+                    className={`flex items-center gap-4 hover:bg-blue-100 transition-all w-full ${
+                      !isSidebarOpen && "justify-center"
+                    } p-3 rounded-lg text-blue-700 ${
+                      isActive(item.href) && "bg-blue-100"
+                    }`}
+                    href={item.href}
+                  >
+                    <item.icon className="w-6 h-6 text-center" />
+                    {isSidebarOpen && (
+                      <span className="whitespace-nowrap">{item.name}</span>
+                    )}
+                  </Link>
+                </li>
+              </TooltipTrigger>
+              <Activity mode={isSidebarOpen ? "hidden" : "visible"}>
+                <TooltipContent side={"right"}>
+                  <p>{item.name}</p>
+                </TooltipContent>
+              </Activity>
+            </Tooltip>
           ))}
         </ul>
       </nav>
