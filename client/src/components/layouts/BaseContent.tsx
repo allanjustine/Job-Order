@@ -9,7 +9,7 @@ import Sidebar from "./Sidebar";
 export default function BaseContent({ children }: { children: ReactNode }) {
   const { isAuthenticated, isAdmin } = useAuth();
   const pathname = usePathname();
-  const [isSidebarOpen, setIsOpenSidebar] = useState<boolean>(false);
+  const [isSidebarOpen, setIsOpenSidebar] = useState<boolean>(true);
   const isSidebarActive = adminPaths.some((item) => pathname.startsWith(item));
 
   const handleToggleSidebar = () => {
