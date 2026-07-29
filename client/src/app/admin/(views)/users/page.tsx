@@ -1,5 +1,6 @@
 "use client";
 
+import TableLoader from "@/components/table-loader";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { CONFIG } from "@/config/app";
@@ -11,16 +12,13 @@ import { format, formatDistanceToNowStrict } from "date-fns";
 import {
   LockKeyhole,
   LockKeyholeOpen,
+  Plus,
   Search,
   SearchSlash,
 } from "lucide-react";
 import Link from "next/link";
 import DataTable from "react-data-table-component";
-import {
-  FaCircleNotch,
-  FaMagnifyingGlass,
-  FaRotateRight,
-} from "react-icons/fa6";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import Swal from "sweetalert2";
 
 const Users = () => {
@@ -218,38 +216,16 @@ const Users = () => {
   return (
     <>
       <div className="p-6">
-        <div className="bg-white rounded-md border border-gray-300 shadow">
-          <div className="p-6">
-            <div className="mb-2 flex justify-end">
-              <div className="flex">
-                <Button
-                  type="button"
-                  disabled={isRefresh}
-                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                    isRefresh && "bg-blue-400! cursor-not-allowed!"
-                  }`}
-                  onClick={handleRefresh}
-                >
-                  {isRefresh ? (
-                    <>
-                      <FaCircleNotch className="animate-spin" /> Refreshing...
-                    </>
-                  ) : (
-                    <>
-                      <FaRotateRight /> Refresh
-                    </>
-                  )}
-                </Button>
-                <Button type="button" className="py-5" asChild>
-                  <Link href={`/register?magic_word=${CONFIG.MAGIC_WORD}`}>
-                    Add User
-                  </Link>
-                </Button>
-              </div>
+        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Users</h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Job Order Printing System — Users Overview
+              </p>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-600">Users</h2>
-              <div className="relative w-full md:w-1/3">
+            <div className="flex items-center gap-1">
+              <div className="relative">
                 <Input
                   type="search"
                   placeholder="Search..."
@@ -258,54 +234,74 @@ const Users = () => {
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               </div>
+              <Button
+                type="button"
+                disabled={isRefresh}
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
+                  isRefresh && "bg-yellow-400! cursor-not-allowed!"
+                }`}
+                onClick={handleRefresh}
+              >
+                {isRefresh ? (
+                  <>
+                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <FaRotateRight /> Refresh
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                className="bg-blue-500 py-5 hover:bg-blue-600"
+                asChild
+              >
+                <Link href={`/register?magic_word=${CONFIG.MAGIC_WORD}`}>
+                  <Plus /> Add User
+                </Link>
+              </Button>
             </div>
-            <div className="overflow-x-auot">
-              <DataTable
-                columns={columns}
-                data={users}
-                pagination
-                paginationServer
-                sortServer
-                onSort={handleSort}
-                paginationTotalRows={pagination.total}
-                onChangeRowsPerPage={handleRowsPerPageChange}
-                onChangePage={handlePageChange}
-                paginationPerPage={pagination.perPage}
-                striped
-                highlightOnHover
-                progressPending={isLoading || isRefresh || isSearching}
-                progressComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {isSearching ? (
-                      <div className="flex items-center gap-1">
-                        <FaMagnifyingGlass className="animate-ping" /> Searching{" "}
-                        {searchTerm !== "" && <span>"{searchTerm}"</span>}
-                        ...
-                      </div>
-                    ) : (
-                      "Loading..."
-                    )}
-                  </div>
-                }
-                persistTableHead
-                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                defaultSortAsc={sort.sortBy}
-                defaultSortFieldId={sort.column}
-                noDataComponent={
-                  <div className="py-5 font-bold text-gray-600 text-xl">
-                    {searchTerm ? (
-                      <>
-                        <span className="flex gap-1 items-center">
-                          <SearchSlash /> No results for "{searchTerm}"
-                        </span>
-                      </>
-                    ) : (
-                      "No users yet."
-                    )}
-                  </div>
-                }
-              />
-            </div>
+          </div>
+          <div className="overflow-x-auto border-t">
+            <DataTable
+              columns={columns}
+              data={users}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
+                />
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-5 font-bold text-gray-600 text-xl">
+                  {searchTerm ? (
+                    <>
+                      <span className="flex gap-1 items-center">
+                        <SearchSlash /> No results for "{searchTerm}"
+                      </span>
+                    </>
+                  ) : (
+                    "No users yet."
+                  )}
+                </div>
+              }
+            />
           </div>
         </div>
       </div>
