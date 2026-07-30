@@ -1,7 +1,6 @@
 "use client";
 
 import useFetch from "@/hooks/useFetch";
-import { useRouter } from "next/navigation";
 import {
   Search,
   SearchSlash,
@@ -98,20 +97,74 @@ const Dashboard = () => {
   const [hasMechanic, setHasMechanic] = useState<boolean>(false);
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isReprint, setIsReprint] = useState<boolean>(false);
+  const [isPrintRestItems, setIsPrintRestItems] = useState<boolean>(false);
+  const [viewRemainingData, setViewRemainingData] = useState<any>(null);
 
   useEffect(() => {
     if (!isReprint) return;
 
+    const jobRequestCount =
+      viewData?.job_order_details.filter(
+        (item: any) => item.type === "job_request",
+      ).length ?? 0;
+    const partsReplacementCount =
+      viewData?.job_order_details.filter(
+        (item: any) => item.type === "parts_replacement",
+      ).length ?? 0;
+
     window.onafterprint = () => {
-      setIsReprint(false);
+      if (
+        (!isPrintRestItems && jobRequestCount > 10) ||
+        partsReplacementCount > 10
+      ) {
+        setIsReprint(false);
+        Swal.fire({
+          icon: "info",
+          title: "Print Rest Items",
+          text: `Are you sure you want to print rest items?`,
+          confirmButtonText: "Yes",
+          confirmButtonColor: "#3085d6",
+          showCancelButton: true,
+          cancelButtonText: "No",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setIsReprint(true);
+            setIsOpen(false);
+            setIsPrintRestItems(true);
+          }
+          if (result.isDismissed) {
+            setIsPrintRestItems(false);
+            setViewRemainingData(null);
+            setIsReprint(false);
+          }
+        });
+      } else {
+        setIsPrintRestItems(false);
+        setIsReprint(false);
+      }
     };
 
-    window.print();
+    Swal.fire({
+      icon: "success",
+      title: "Please wait...",
+      text: "Processing data to print...",
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    setTimeout(() => {
+      Swal.close();
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }, 2500);
 
     return () => {
       window.onafterprint = null;
     };
-  }, [isReprint]);
+  }, [isReprint, viewData, isPrintRestItems]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -193,6 +246,7 @@ const Dashboard = () => {
       const response = await api.get(`/job-orders/${id}/browse`);
       if (response.status === 200) {
         setViewData(response?.data?.data);
+        setViewRemainingData(response?.data?.data);
       }
     } catch (error: any) {
       console.error(error);
@@ -345,8 +399,6 @@ const Dashboard = () => {
     });
   };
 
-  const router = useRouter();
-
   const handleExport = async () => {
     setIsExporting(true);
     try {
@@ -440,7 +492,13 @@ const Dashboard = () => {
   };
 
   if (isReprint) {
-    return <ViewJobOrder data={viewData} isReprint={isReprint} />;
+    return (
+      <ViewJobOrder
+        data={isPrintRestItems ? viewRemainingData : viewData}
+        isReprint={isReprint}
+        isPrintRestItems={isPrintRestItems}
+      />
+    );
   }
 
   return (
@@ -840,7 +898,11 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <ViewJobOrder data={viewData} isReprint={isReprint} />
+            <ViewJobOrder
+              data={isPrintRestItems ? viewRemainingData : viewData}
+              isReprint={isReprint}
+              isPrintRestItems={isPrintRestItems}
+            />
           )}
         </ModalBody>
         <ModalFooter>
