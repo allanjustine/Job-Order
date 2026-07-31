@@ -60,9 +60,10 @@ interface PreviewJobOrderProps {
     transactionCode: string;
     assignedMechanics: string[];
   };
+  hasRestData?: boolean;
 }
 
-const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
+const PreviewPrint = ({ data, hasRestData }: PreviewJobOrderProps) => {
   // Safely calculate totals with fallbacks
   const jobTotal = Object.values(data.jobAmounts || {}).reduce(
     (s: number, v) => s + (Number(v) || 0),
@@ -277,29 +278,29 @@ const PreviewPrint = ({ data }: PreviewJobOrderProps) => {
   };
 
   // Get NG diagnosis items// Get NG diagnosis items
-const getNGDiagnosisItems = () => {
-  // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
-  const diagnosisItems = motorsdiagnosisItems; // This should be the correct list of diagnosis items
+  const getNGDiagnosisItems = () => {
+    // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
+    const diagnosisItems = motorsdiagnosisItems; // This should be the correct list of diagnosis items
 
-  return diagnosisItems.filter(
-    (item) => data.diagnosis?.[item.key as DiagnosisKeys]?.status === "ng"
-  );
-};
+    return diagnosisItems.filter(
+      (item) => data.diagnosis?.[item.key as DiagnosisKeys]?.status === "ng",
+    );
+  };
 
-// Check if any diagnosis is NG
-const hasNGDiagnosis = () => {
-  return getNGDiagnosisItems().length > 0;
-};
+  // Check if any diagnosis is NG
+  const hasNGDiagnosis = () => {
+    return getNGDiagnosisItems().length > 0;
+  };
 
-// Check if all diagnosis are OK (no NG and at least one diagnosis exists)
-const allDiagnosisOK = () => {
-  if (!data.diagnosis) return false;
-  const diagnosisValues = Object.values(data.diagnosis);
-  if (diagnosisValues.length === 0) return false;
-  return diagnosisValues.every(
-    (item) => item.status === "ok" || item.status === "na"
-  );
-};
+  // Check if all diagnosis are OK (no NG and at least one diagnosis exists)
+  const allDiagnosisOK = () => {
+    if (!data.diagnosis) return false;
+    const diagnosisValues = Object.values(data.diagnosis);
+    if (diagnosisValues.length === 0) return false;
+    return diagnosisValues.every(
+      (item) => item.status === "ok" || item.status === "na",
+    );
+  };
 
   return (
     <div
@@ -337,7 +338,7 @@ const allDiagnosisOK = () => {
       </div>
 
       {/* Vehicle Information */}
-       <CustomerGridView data={data} />
+      <CustomerGridView data={data} />
 
       {/* Motorcycle Unit & Engine Unit */}
       {/* <div
@@ -401,13 +402,13 @@ const allDiagnosisOK = () => {
         <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
           MOTORCYCLE'S DIAGNOSIS
         </h3>
-        
+
         {allDiagnosisOK() && (
           <div className="border border-black p-2 text-center">
             <p className="font-semibold">All diagnosis are OK</p>
           </div>
         )}
-        
+
         {hasNGDiagnosis() && (
           <table
             className="w-full border-collapse border border-black my-0"
@@ -415,8 +416,12 @@ const allDiagnosisOK = () => {
           >
             <thead>
               <tr className="bg-gray-40">
-                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
-                <th className="border border-black p-0.5 text-center">Status</th>
+                <th className="border border-black p-0.5 text-left">
+                  Diagnosis Item
+                </th>
+                <th className="border border-black p-0.5 text-center">
+                  Status
+                </th>
                 <th className="border border-black p-0.5 text-left">Remarks</th>
               </tr>
             </thead>
@@ -473,15 +478,24 @@ const allDiagnosisOK = () => {
           </thead>
           <tbody>
             {(() => {
-              const allSelectedJobs = getAllSelectedJobs();
-              const allSelectedParts = getAllSelectedParts();
+              const allSelectedJobs = getAllSelectedJobs().slice(
+                hasRestData ? 10 : 0,
+                hasRestData ? 20 : 10,
+              );
+              const allSelectedParts = getAllSelectedParts().slice(
+                hasRestData ? 10 : 0,
+                hasRestData ? 20 : 10,
+              );
 
               // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
-              const FIXED_DATA_ROWS = 16;
 
               const rows = [];
 
-              for (let i = 0; i < FIXED_DATA_ROWS; i++) {
+              for (
+                let i = 0;
+                i < Math.max(allSelectedJobs.length, allSelectedParts.length);
+                i++
+              ) {
                 const job = allSelectedJobs[i];
                 const part = allSelectedParts[i];
 
@@ -525,7 +539,7 @@ const allDiagnosisOK = () => {
                       jobLabel = jobLabelText;
                     }
                     jobAmount = phpCurrency(jobAmountValue);
-                      
+
                     jobCheckbox = "[✓] ";
                   }
                 }
@@ -559,7 +573,7 @@ const allDiagnosisOK = () => {
                             (partsOthersItem.partNumber
                               ? `#${partsOthersItem.partNumber}`
                               : "");
-                      partAmount = formatCurrency(partsOthersItem.amount)
+                      partAmount = formatCurrency(partsOthersItem.amount);
                       partCheckbox = "[✓] ";
                     }
                   } else if (typeof part === "string") {
@@ -662,7 +676,7 @@ const allDiagnosisOK = () => {
         </div>
       </div>
 
-       <NextServiceScheduleView data={data} />
+      <NextServiceScheduleView data={data} />
 
       {/* Footer Note */}
       <p className="mt-2 text-center" style={{ fontSize: "6pt" }}>
