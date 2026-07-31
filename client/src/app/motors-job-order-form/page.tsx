@@ -234,6 +234,7 @@ const JobOrderForm = () => {
   const [otherRemarks, setOtherRemarks] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [hasRestData, setHasRestData] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -512,16 +513,59 @@ const JobOrderForm = () => {
     if (!isPrint) return;
 
     window.onafterprint = () => {
-      handleSavePrint();
-      fetchJobOrderNumber();
+      const jobRequestCount = Object.entries(jobOrderData.jobAmounts).length;
+      const partsCount = Object.entries(jobOrderData.partsAmounts).length;
+      if (!hasRestData && Math.max(jobRequestCount, partsCount) > 10) {
+        setIsPrint(false);
+        Swal.fire({
+          icon: "info",
+          title: "Print Rest Items",
+          text: `Are you sure you want to print rest items?`,
+          confirmButtonText: "Yes",
+          confirmButtonColor: "#3085d6",
+          showCancelButton: true,
+          cancelButtonText: "No",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setIsPrint(true);
+            setHasRestData(true);
+          }
+          if (result.isDismissed) {
+            setIsPrint(false);
+            setHasRestData(false);
+            handleSavePrint();
+            fetchJobOrderNumber();
+          }
+        });
+      } else {
+        setHasRestData(false);
+        handleSavePrint();
+        fetchJobOrderNumber();
+        setIsPrint(false);
+      }
     };
 
-    window.print();
+    Swal.fire({
+      icon: "success",
+      title: "Please wait...",
+      text: "Processing data to print...",
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    setTimeout(() => {
+      Swal.close();
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }, 2500);
 
     return () => {
       window.onafterprint = null;
     };
-  }, [isPrint]);
+  }, [isPrint, hasRestData, jobOrderData]);
 
   const mergedDiagnosis = Object.entries(diagnosis)
     .map(([key, value]) => {
@@ -577,6 +621,7 @@ const JobOrderForm = () => {
             padding: "15px",
           },
         });
+
         setIsOpen(false);
         setIsPrint(false);
         handleReset();
@@ -799,7 +844,7 @@ const JobOrderForm = () => {
     <>
       {/* Print View (hidden until printing) */}
       {isPrint ? (
-        <MotorsPrintJobOrder data={jobOrderData} />
+        <MotorsPrintJobOrder data={jobOrderData} hasRestData={hasRestData} />
       ) : (
         <>
           <div className="flex items-center p-5 bg-white">
@@ -1031,7 +1076,7 @@ const JobOrderForm = () => {
               Previewing Job Order Data before print...
             </ModalHeader>
             <ModalBody>
-              <PreviewPrint data={jobOrderData} />
+              <PreviewPrint data={jobOrderData} hasRestData={hasRestData} />
             </ModalBody>
             <ModalFooter>
               <Button
