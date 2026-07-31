@@ -59,9 +59,10 @@ interface PrintJobOrderProps {
     transactionCode: string;
     assignedMechanics: string[];
   };
+  hasRestData?: boolean;
 }
 
-const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
+const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
   // Safely calculate totals with fallbacks
   const jobTotal = Object.values(data.jobAmounts || {}).reduce(
     (s: number, v) => s + (Number(v) || 0),
@@ -276,32 +277,32 @@ const MotorsPrintJobOrder = ({ data }: PrintJobOrderProps) => {
   };
 
   // Get NG diagnosis items// Get NG diagnosis items
-const getNGDiagnosisItems = () => {
-  // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
-  const diagnosisItems = motorsdiagnosisItems; // This should be the correct list of diagnosis items
+  const getNGDiagnosisItems = () => {
+    // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
+    const diagnosisItems = motorsdiagnosisItems; // This should be the correct list of diagnosis items
 
-  return diagnosisItems.filter(
-    (item) => data.diagnosis?.[item.key as DiagnosisKeys]?.status === "ng"
-  );
-};
+    return diagnosisItems.filter(
+      (item) => data.diagnosis?.[item.key as DiagnosisKeys]?.status === "ng",
+    );
+  };
 
-// Check if any diagnosis is NG
-const hasNGDiagnosis = () => {
-  return getNGDiagnosisItems().length > 0;
-};
+  // Check if any diagnosis is NG
+  const hasNGDiagnosis = () => {
+    return getNGDiagnosisItems().length > 0;
+  };
 
-// Check if all diagnosis are OK (no NG and at least one diagnosis exists)
-const allDiagnosisOK = () => {
-  if (!data.diagnosis) return false;
-  const diagnosisValues = Object.values(data.diagnosis);
-  if (diagnosisValues.length === 0) return false;
-  return diagnosisValues.every(
-    (item) => item.status === "ok" || item.status === "na"
-  );
-};
+  // Check if all diagnosis are OK (no NG and at least one diagnosis exists)
+  const allDiagnosisOK = () => {
+    if (!data.diagnosis) return false;
+    const diagnosisValues = Object.values(data.diagnosis);
+    if (diagnosisValues.length === 0) return false;
+    return diagnosisValues.every(
+      (item) => item.status === "ok" || item.status === "na",
+    );
+  };
 
   return (
-    <div>
+    <div className="print-page">
       {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
           so it prints upright on a normal Letter-size (8.5in x 11in) portrait
           short bond sheet -- no custom/landscape paper size needed on the
@@ -310,20 +311,45 @@ const allDiagnosisOK = () => {
           so content height must stay under ~5.3in (5.5in - 0.2in margin). */}
       <style>{`
         @page {
-          size: 8.5in 11in;
+          size: Letter portrait;
           margin: 0;
         }
+
         @media print {
-          html, body {
+          html,
+          body {
+            width: 8.5in;
+            height: 11in;
             margin: 0;
             padding: 0;
+            overflow: hidden;
           }
-          .jo-rotate-wrapper {
+
+          .print-page {
             position: relative;
+            width: 8.5in;
+            height: 11in;
+            overflow: hidden;
+          }
+
+          .jo-rotate-wrapper {
+            position: absolute;
             width: 7.9in;
             height: 5.3in;
-            margin: 0.2in 0 0 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
+
+          .jo-rotate-wrapper:nth-child(1) {
+            top: .2in;
+            left: 0;
+          }
+
+          .jo-rotate-wrapper:nth-child(2) {
+            top: 5.55in;
+            left: 0;
+          }
+
           .jo-rotate-content {
             position: absolute;
             top: 0;
@@ -333,48 +359,56 @@ const allDiagnosisOK = () => {
           }
         }
       `}</style>
-      <div className="jo-rotate-wrapper">
+      {Array.from({ length: 2 }).map((_, index) => (
         <div
-          className="jo-rotate-content p-1 font-sans bg-white text-black leading-tight border-2 border-black box-border"
-          style={{
-            fontSize: "7.5pt",
-            width: "5.1in",
-            height: "7.7in",
-            maxWidth: "5.3in",
-            minHeight: "7.7in",
-            lineHeight: "1.15",
-            overflow: "hidden",
-          }}
+          className={`jo-rotate-wrapper mt-3 ml-3 ${index === 1 ? "border-b border-black border-dashed" : ""}`}
         >
-      {/* Honda Header */}
-      <div className="flex flex-col justify-center items-center mb-1">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex-1 font-bold">{data.transactionCode}</div>
-          <img
-            src="/smct-header.jpg"
-            alt="Company Logo"
-            className="h-10 w-auto"
-          />
-          <div className="flex-1 flex justify-end items-center">
-            <h3 className="text-right font-bold">
-              {data.branch.replace("(", "").replace(")", "").split(" ")[0]}-
-              {data.jobOrderNumber}
-            </h3>
-          </div>
-        </div>
-        <h2
-          className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
-        >
-          VEHICLE CHECKLIST
-        </h2>
-      </div>
+          <div
+            className="jo-rotate-content p-1 font-sans bg-white text-black leading-tight border-2 border-black box-border"
+            style={{
+              fontSize: "7.5pt",
+              width: "5.1in",
+              height: "7.45in",
+              maxWidth: "5.3in",
+              minHeight: "7.45in",
+              lineHeight: "1.15",
+              overflow: "hidden",
+            }}
+          >
+            {/* Honda Header */}
+            <div className="flex flex-col justify-center items-center mb-1">
+              <div className="flex justify-between items-center w-full">
+                <div className="flex-1 font-bold">{data.transactionCode}</div>
+                <img
+                  src="/smct-header.jpg"
+                  alt="Company Logo"
+                  className="h-10 w-auto"
+                />
+                <div className="flex-1 flex justify-end items-center">
+                  <h3 className="text-right font-bold">
+                    {
+                      data.branch
+                        .replace("(", "")
+                        .replace(")", "")
+                        .split(" ")[0]
+                    }
+                    -{data.jobOrderNumber}
+                  </h3>
+                </div>
+              </div>
+              <h2
+                className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
+                style={{ fontSize: "8pt", lineHeight: "0.8" }}
+              >
+                VEHICLE CHECKLIST
+              </h2>
+            </div>
 
-      {/* Vehicle Information */}
-       <CustomerGridView data={data} />
+            {/* Vehicle Information */}
+            <CustomerGridView data={data} />
 
-      {/* Motorcycle Unit & Engine Unit */}
-      {/* <div
+            {/* Motorcycle Unit & Engine Unit */}
+            {/* <div
         className="mb-2 grid grid-cols-2 gap-2"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -425,284 +459,317 @@ const allDiagnosisOK = () => {
         </div>
       </div> */}
 
-      {/* <div className="flex mt-1 mb-2">
+            {/* <div className="flex mt-1 mb-2">
         <span className="font-bold w-40">Contents inside U-Box:</span>
         <span className="underline">{data.contentUbox}</span>
       </div> */}
 
-      {/* Motorcycle Diagnosis Section - keep existing */}
-      <div className="mb-2 text-xs">
-        <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-          MOTORCYCLE'S DIAGNOSIS
-        </h3>
-        
-        {allDiagnosisOK() && (
-          <div className="border border-black p-2 text-center">
-            <p className="font-semibold">All diagnosis are OK</p>
-          </div>
-        )}
-        
-        {hasNGDiagnosis() && (
-          <table
-            className="w-full border-collapse border border-black my-0"
-            style={{ fontSize: "8pt", lineHeight: "0.8" }}
-          >
-            <thead>
-              <tr className="bg-gray-40">
-                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
-                <th className="border border-black p-0.5 text-center">Status</th>
-                <th className="border border-black p-0.5 text-left">Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {getNGDiagnosisItems().map((item) => (
-                <tr key={item.key}>
-                  <td className="border border-black p-0.5 w-1/3">
-                    {item.label}
-                  </td>
-                  <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                    NG
-                  </td>
-                  <td className="border border-black p-0.5 w-1/3">
-                    {data.diagnosis?.[item.key as DiagnosisKeys]?.remarks || ""}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+            {/* Motorcycle Diagnosis Section - keep existing */}
+            <div className="mb-2 text-xs">
+              <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                MOTORCYCLE'S DIAGNOSIS
+              </h3>
 
-      {/* JOB ORDER - Fixed 17 rows (16 data rows + 1 totals row) */}
-      <div
-        className="mb-1 text-xs"
-        style={{ fontSize: "8pt", lineHeight: "0.8" }}
-      >
-        <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
-          JOB ORDER
-        </h3>
+              {allDiagnosisOK() && (
+                <div className="border border-black p-2 text-center">
+                  <p className="font-semibold">All diagnosis are OK</p>
+                </div>
+              )}
 
-        <table className="w-full border-collapse border border-black">
-          <thead>
-            <tr className="bg-gray-40">
-              <th className="border border-black p-0.5 text-left">
-                Specific Job(s) Request
-              </th>
-              <th className="border border-black p-0.5 text-center w-16">
-                Amount
-              </th>
-              <th className="border border-black p-0.5 text-left">
-                Parts Used
-              </th>
-              <th className="border border-black p-0.5 text-center w-10">
-                Qty
-              </th>
-              <th className="border border-black p-0.5 text-left w-28">
-                Brand / Part No.
-              </th>
-              <th className="border border-black p-0.5 text-center w-16">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              const allSelectedJobs = getAllSelectedJobs();
-              const allSelectedParts = getAllSelectedParts();
+              {hasNGDiagnosis() && (
+                <table
+                  className="w-full border-collapse border border-black my-0"
+                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                >
+                  <thead>
+                    <tr className="bg-gray-40">
+                      <th className="border border-black p-0.5 text-left">
+                        Diagnosis Item
+                      </th>
+                      <th className="border border-black p-0.5 text-center">
+                        Status
+                      </th>
+                      <th className="border border-black p-0.5 text-left">
+                        Remarks
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getNGDiagnosisItems().map((item) => (
+                      <tr key={item.key}>
+                        <td className="border border-black p-0.5 w-1/3">
+                          {item.label}
+                        </td>
+                        <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                          NG
+                        </td>
+                        <td className="border border-black p-0.5 w-1/3">
+                          {data.diagnosis?.[item.key as DiagnosisKeys]
+                            ?.remarks || ""}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
 
-              // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
-              const FIXED_DATA_ROWS = 16;
+            {/* JOB ORDER - Fixed 17 rows (16 data rows + 1 totals row) */}
+            <div
+              className="mb-1 text-xs"
+              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+            >
+              <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
+                JOB ORDER
+              </h3>
 
-              const rows = [];
+              <table className="w-full border-collapse border border-black">
+                <thead>
+                  <tr className="bg-gray-40">
+                    <th className="border border-black p-0.5 text-left">
+                      Specific Job(s) Request
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-16">
+                      Amount
+                    </th>
+                    <th className="border border-black p-0.5 text-left">
+                      Parts Used
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-10">
+                      Qty
+                    </th>
+                    <th className="border border-black p-0.5 text-left w-28">
+                      Brand / Part No.
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-16">
+                      Amount
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const allSelectedJobs = getAllSelectedJobs().slice(
+                      hasRestData ? 10 : 0,
+                      hasRestData ? 20 : 10,
+                    );
+                    const allSelectedParts = getAllSelectedParts().slice(
+                      hasRestData ? 10 : 0,
+                      hasRestData ? 20 : 10,
+                    );
 
-              for (let i = 0; i < FIXED_DATA_ROWS; i++) {
-                const job = allSelectedJobs[i];
-                const part = allSelectedParts[i];
+                    // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
 
-                // Job data
-                let jobLabel = "";
-                let jobAmount = "";
-                let jobCheckbox = "";
+                    const rows = [];
 
-                if (job) {
-                  // Check if this is a job others item
-                  if (
-                    typeof job === "string" &&
-                    job.startsWith("job_others_")
-                  ) {
-                    const othersIndex = parseInt(job.split("_")[2]);
-                    const othersItem = getJobOthersItemByIndex(othersIndex);
-                    if (othersItem) {
-                      jobLabel = `${othersItem.description}`;
-                      jobAmount = phpCurrency(othersItem.amount);
-                      jobCheckbox = "[✓] ";
-                    }
-                  } else if (typeof job === "string") {
-                    const jobKey = job;
-                    const jobLabelText = getJobItemLabel(jobKey);
-                    const amountKey =
-                      jobKey === "coupon" ? "selectedCoupon" : jobKey;
-                    const jobAmountValue = getJobAmount(amountKey);
+                    for (
+                      let i = 0;
+                      i <
+                      Math.max(allSelectedJobs.length, allSelectedParts.length);
+                      i++
+                    ) {
+                      const job = allSelectedJobs[i];
+                      const part = allSelectedParts[i];
 
-                    if (jobKey === "coupon") {
-                      // Display coupon with brand if available
-                      const couponName = getCouponName(
-                        data.jobRequest.selectedCoupon,
-                      );
-                      const couponBrand = data.jobRequest.couponBrand;
-                      if (couponBrand) {
-                        jobLabel = `Coupon - ${couponName} - ${couponBrand}`;
-                      } else {
-                        jobLabel = `Coupon - ${couponName}`;
+                      // Job data
+                      let jobLabel = "";
+                      let jobAmount = "";
+                      let jobCheckbox = "";
+
+                      if (job) {
+                        // Check if this is a job others item
+                        if (
+                          typeof job === "string" &&
+                          job.startsWith("job_others_")
+                        ) {
+                          const othersIndex = parseInt(job.split("_")[2]);
+                          const othersItem =
+                            getJobOthersItemByIndex(othersIndex);
+                          if (othersItem) {
+                            jobLabel = `${othersItem.description}`;
+                            jobAmount = phpCurrency(othersItem.amount);
+                            jobCheckbox = "[✓] ";
+                          }
+                        } else if (typeof job === "string") {
+                          const jobKey = job;
+                          const jobLabelText = getJobItemLabel(jobKey);
+                          const amountKey =
+                            jobKey === "coupon" ? "selectedCoupon" : jobKey;
+                          const jobAmountValue = getJobAmount(amountKey);
+
+                          if (jobKey === "coupon") {
+                            // Display coupon with brand if available
+                            const couponName = getCouponName(
+                              data.jobRequest.selectedCoupon,
+                            );
+                            const couponBrand = data.jobRequest.couponBrand;
+                            if (couponBrand) {
+                              jobLabel = `Coupon - ${couponName} - ${couponBrand}`;
+                            } else {
+                              jobLabel = `Coupon - ${couponName}`;
+                            }
+                          } else {
+                            jobLabel = jobLabelText;
+                          }
+                          jobAmount = phpCurrency(jobAmountValue);
+                          jobCheckbox = "[✓] ";
+                        }
                       }
-                    } else {
-                      jobLabel = jobLabelText;
+
+                      // Part data
+                      let partLabel = "";
+                      let partQty: string = "";
+                      let partDetail = "";
+                      let partAmount = "";
+                      let partCheckbox = "";
+
+                      if (part) {
+                        // Check if this is a parts others item
+                        if (
+                          typeof part === "string" &&
+                          part.startsWith("parts_others_")
+                        ) {
+                          const othersIndex = parseInt(part.split("_")[2]);
+                          const partsOthersItem =
+                            getPartsOthersItemByIndex(othersIndex);
+                          if (partsOthersItem) {
+                            partLabel = `${partsOthersItem.description}`;
+                            partQty =
+                              partsOthersItem.quantity > 0
+                                ? partsOthersItem.quantity.toString()
+                                : "";
+                            partDetail =
+                              partsOthersItem.brand &&
+                              partsOthersItem.partNumber
+                                ? `${partsOthersItem.brand}-${partsOthersItem.partNumber}`
+                                : partsOthersItem.brand ||
+                                  (partsOthersItem.partNumber
+                                    ? `#${partsOthersItem.partNumber}`
+                                    : "");
+                            partAmount = phpCurrency(partsOthersItem.amount);
+                            partCheckbox = "[✓] ";
+                          }
+                        } else if (typeof part === "string") {
+                          const partKey = part;
+                          const partLabelText = getPartLabel(partKey);
+                          const partQtyValue = getPartsQuantity(partKey);
+                          const partAmountValue = getPartsAmount(partKey);
+                          const partDetailText = formatPartDetail(partKey);
+
+                          partLabel = partLabelText;
+                          partQty =
+                            partQtyValue > 0 ? partQtyValue.toString() : "";
+                          partDetail = partDetailText;
+                          partAmount = phpCurrency(partAmountValue);
+                          partCheckbox = "[✓] ";
+                        }
+                      }
+
+                      rows.push(
+                        <tr key={i}>
+                          <td
+                            className="border border-black p-0.5 h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {job && (
+                              <span>
+                                {jobCheckbox}
+                                {jobLabel}
+                              </span>
+                            )}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 text-left h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {jobAmount}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {part && (
+                              <span>
+                                {partCheckbox}
+                                {partLabel}
+                              </span>
+                            )}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 text-center h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {partQty}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 text-left text-[7pt] h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {partDetail}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 text-left h-3"
+                            style={{ padding: "2px 4px" }}
+                          >
+                            {partAmount}
+                          </td>
+                        </tr>,
+                      );
                     }
-                    jobAmount = phpCurrency(jobAmountValue);
-                    jobCheckbox = "[✓] ";
-                  }
-                }
 
-                // Part data
-                let partLabel = "";
-                let partQty: string = "";
-                let partDetail = "";
-                let partAmount = "";
-                let partCheckbox = "";
+                    // Add totals row (row 17)
+                    rows.push(
+                      <tr key="totals">
+                        <td
+                          className="border border-black p-0.5 font-semibold"
+                          style={{ padding: "2px 4px" }}
+                          colSpan={2}
+                        >
+                          Total Labor Cost: {phpCurrency(jobTotal)}
+                        </td>
+                        <td
+                          className="border border-black p-0.5 font-semibold"
+                          style={{ padding: "2px 4px" }}
+                          colSpan={4}
+                        >
+                          Total Parts Cost: {phpCurrency(partsTotal)}
+                        </td>
+                      </tr>,
+                    );
 
-                if (part) {
-                  // Check if this is a parts others item
-                  if (
-                    typeof part === "string" &&
-                    part.startsWith("parts_others_")
-                  ) {
-                    const othersIndex = parseInt(part.split("_")[2]);
-                    const partsOthersItem =
-                      getPartsOthersItemByIndex(othersIndex);
-                    if (partsOthersItem) {
-                      partLabel = `${partsOthersItem.description}`;
-                      partQty =
-                        partsOthersItem.quantity > 0
-                          ? partsOthersItem.quantity.toString()
-                          : "";
-                      partDetail =
-                        partsOthersItem.brand && partsOthersItem.partNumber
-                          ? `${partsOthersItem.brand}-${partsOthersItem.partNumber}`
-                          : partsOthersItem.brand ||
-                            (partsOthersItem.partNumber
-                              ? `#${partsOthersItem.partNumber}`
-                              : "");
-                      partAmount = phpCurrency(partsOthersItem.amount);
-                      partCheckbox = "[✓] ";
-                    }
-                  } else if (typeof part === "string") {
-                    const partKey = part;
-                    const partLabelText = getPartLabel(partKey);
-                    const partQtyValue = getPartsQuantity(partKey);
-                    const partAmountValue = getPartsAmount(partKey);
-                    const partDetailText = formatPartDetail(partKey);
+                    return rows;
+                  })()}
+                </tbody>
+              </table>
 
-                    partLabel = partLabelText;
-                    partQty = partQtyValue > 0 ? partQtyValue.toString() : "";
-                    partDetail = partDetailText;
-                    partAmount = phpCurrency(partAmountValue);
-                    partCheckbox = "[✓] ";
-                  }
-                }
+              {/* Grand Total */}
+              <div className="flex justify-between items-center border border-black border-t-0 py-1">
+                <div className="font-bold ml-1">
+                  Grand Total: {phpCurrency(grandTotal)}
+                </div>
+              </div>
+            </div>
 
-                rows.push(
-                  <tr key={i}>
-                    <td
-                      className="border border-black p-0.5 h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {job && (
-                        <span>
-                          {jobCheckbox}
-                          {jobLabel}
-                        </span>
-                      )}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 text-left h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {jobAmount}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {part && (
-                        <span>
-                          {partCheckbox}
-                          {partLabel}
-                        </span>
-                      )}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 text-center h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {partQty}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 text-left text-[7pt] h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {partDetail}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 text-left h-3"
-                      style={{ padding: "2px 4px" }}
-                    >
-                      {partAmount}
-                    </td>
-                  </tr>,
-                );
-              }
+            <NextServiceScheduleView data={data} />
 
-              // Add totals row (row 17)
-              rows.push(
-                <tr key="totals">
-                  <td
-                    className="border border-black p-0.5 font-semibold"
-                    style={{ padding: "2px 4px" }}
-                    colSpan={2}
-                  >
-                    Total Labor Cost: {phpCurrency(jobTotal)}
-                  </td>
-                  <td
-                    className="border border-black p-0.5 font-semibold"
-                    style={{ padding: "2px 4px" }}
-                    colSpan={4}
-                  >
-                    Total Parts Cost: {phpCurrency(partsTotal)}
-                  </td>
-                </tr>,
-              );
+            {/* Footer Note */}
+            <p
+              className="mt-2 text-center float-left"
+              style={{ fontSize: "6pt" }}
+            >
+              Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
+            </p>
 
-              return rows;
-            })()}
-          </tbody>
-        </table>
-
-        {/* Grand Total */}
-        <div className="flex justify-between items-center border border-black border-t-0 py-1">
-          <div className="font-bold ml-1">
-            Grand Total: {phpCurrency(grandTotal)}
+            {index === 1 && (
+              <span
+                className="absolute bottom-1 right-1 text-xs"
+                style={{ fontSize: "8pt" }}
+              >
+                Customer's Copy
+              </span>
+            )}
           </div>
         </div>
-      </div>
-
-      <NextServiceScheduleView data={data} />
-
-      {/* Footer Note */}
-      <p className="mt-2 text-center float-left" style={{ fontSize: "6pt" }}>
-        Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
-      </p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
