@@ -114,8 +114,8 @@ const Dashboard = () => {
 
     window.onafterprint = () => {
       if (
-        (!isPrintRestItems && jobRequestCount > 10) ||
-        partsReplacementCount > 10
+        !isPrintRestItems &&
+        (jobRequestCount > 10 || partsReplacementCount > 10)
       ) {
         setIsReprint(false);
         Swal.fire({
