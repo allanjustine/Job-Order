@@ -10,7 +10,10 @@ export default function ServiceAndManager({
     <>
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div>
-          <Label> Salesrep/Service Advisor</Label>
+          <Label>
+            {" "}
+            Salesrep/Service Advisor<span className="text-red-500">*</span>
+          </Label>
           <Input
             type="text"
             error={errors.serviceAdvisor}
@@ -27,15 +30,19 @@ export default function ServiceAndManager({
           )}
         </div>
         <div>
-          <Label>BM/BS</Label>
+          <Label>
+            BM/BS<span className="text-red-500">*</span>
+          </Label>
           <Input
             type="text"
             error={errors.branchManager}
             value={signatures.branchManager}
-            onChange={(e) => setSignatures((prev: any) => ({
+            onChange={(e) =>
+              setSignatures((prev: any) => ({
                 ...prev,
                 branchManager: e.target.value,
-              }))}
+              }))
+            }
           />
           {errors.branchManager && (
             <p className="text-red-500 text-xs mt-1">{errors.branchManager}</p>

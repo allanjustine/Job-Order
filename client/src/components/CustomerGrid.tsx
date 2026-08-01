@@ -75,7 +75,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Customer Name</Label>
+        <Label>
+          Customer Name<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.customerName}
@@ -87,7 +89,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Contact Number</Label>
+        <Label>
+          Contact Number<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.contact}
@@ -99,7 +103,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Model</Label>
+        <Label>
+          Model<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.model}
@@ -111,7 +117,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Engine/Frame No.</Label>
+        <Label>
+          Engine/Frame No.<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.engineFrameNo}
@@ -123,7 +131,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Mileage</Label>
+        <Label>
+          Mileage<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.mileage}
@@ -147,7 +157,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Address</Label>
+        <Label>
+          Address<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.address}
@@ -159,7 +171,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Estimated Repair Time</Label>
+        <Label>
+          Estimated Repair Time<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           error={errors.estimatedRepairTime}
@@ -173,7 +187,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Repair Start Time</Label>
+        <Label>
+          Repair Start Time<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="time"
           error={errors.repairStart}
@@ -187,7 +203,9 @@ export default function CustomerGrid({
         )}
       </div>
       <div className="col-span-1">
-        <Label>Repair End Time</Label>
+        <Label>
+          Repair End Time<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="time"
           error={errors.repairEnd}
@@ -201,8 +219,14 @@ export default function CustomerGrid({
         )}
       </div>
       <div>
-        <Label>Category</Label>
-        <Select value={remarks} onChange={(e) => setRemarks(e.target.value)}>
+        <Label>
+          Category<span className="text-red-500">*</span>
+        </Label>
+        <Select
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
+          className={errors.remarks && "border-red-500"}
+        >
           <option value="" disabled>
             Select Category
           </option>
@@ -228,7 +252,9 @@ export default function CustomerGrid({
       </div>
 
       <div className="col-span-1">
-        <Label>Select Mechanic</Label>
+        <Label>
+          Select Mechanic<span className="text-red-500">*</span>
+        </Label>
         <MultiMechanic
           mechanics={mechanics}
           setMechanic={setMechanic}
@@ -237,11 +263,14 @@ export default function CustomerGrid({
         />
       </div>
       <div className="col-span-1">
-        <Label>Dealers Name</Label>
+        <Label>
+          Dealers Name<span className="text-red-500">*</span>
+        </Label>
         <Input
           type="text"
           value={dealersName}
           onChange={(e) => setDealersName(e.target.value)}
+          className={errors.dealersName && "border-red-500"}
         />
         {errors.dealersName && (
           <p className="text-red-500 text-xs mt-1">{errors.dealersName}</p>
