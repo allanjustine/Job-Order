@@ -57,9 +57,13 @@ interface TrimotorsPreviewJobOrderProps {
     transactionCode: string;
     assignedMechanics: string[];
   };
+  hasRestData?: boolean;
 }
 
-const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
+const TrimotorsPreviewJobOrder = ({
+  data,
+  hasRestData,
+}: TrimotorsPreviewJobOrderProps) => {
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
 
   // Safely calculate totals with fallbacks including coupon
@@ -272,24 +276,25 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
   const getNGDiagnosisItems = () => {
     // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
     const diagnosisItems = trimotorsdiagnosisItems; // This should be the correct list of diagnosis items
-  
+
     return diagnosisItems.filter(
-      (item) => data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.status === "ng"
+      (item) =>
+        data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.status === "ng",
     );
   };
-  
+
   // Check if any diagnosis is NG
   const hasNGDiagnosis = () => {
     return getNGDiagnosisItems().length > 0;
   };
-  
+
   // Check if all diagnosis are OK (no NG and at least one diagnosis exists)
   const allDiagnosisOK = () => {
     if (!data.diagnosis) return false;
     const diagnosisValues = Object.values(data.diagnosis);
     if (diagnosisValues.length === 0) return false;
     return diagnosisValues.every(
-      (item) => item.status === "ok" || item.status === "na"
+      (item) => item.status === "ok" || item.status === "na",
     );
   };
 
@@ -338,7 +343,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
       <CustomerGridView data={data} />
 
       {/* Motorcycle Unit & Engine Unit */}
-      <div
+      {/* <div
         className="mb-2 grid grid-cols-1 gap-2"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -363,11 +368,11 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* <span className="font-bold mr-1">Category:</span>
-            <span className="border-b border-black flex-1">{data.remarks}</span> */}
+            <span className="font-bold mr-1">Category:</span>
+            <span className="border-b border-black flex-1">{data.remarks}</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Motorcycle Diagnosis Section */}
       <div className="mb-2 text-xs">
@@ -380,7 +385,7 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
             <p className="font-semibold">All diagnosis are OK</p>
           </div>
         )}
-        
+
         {hasNGDiagnosis() && (
           <table
             className="w-full border-collapse border border-black my-0"
@@ -388,8 +393,12 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
           >
             <thead>
               <tr className="bg-gray-40">
-                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
-                <th className="border border-black p-0.5 text-center">Status</th>
+                <th className="border border-black p-0.5 text-left">
+                  Diagnosis Item
+                </th>
+                <th className="border border-black p-0.5 text-center">
+                  Status
+                </th>
                 <th className="border border-black p-0.5 text-left">Remarks</th>
               </tr>
             </thead>
@@ -403,7 +412,8 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
                     NG
                   </td>
                   <td className="border border-black p-0.5 w-1/3">
-                    {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.remarks || ""}
+                    {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]
+                      ?.remarks || ""}
                   </td>
                 </tr>
               ))}
@@ -446,8 +456,14 @@ const TrimotorsPreviewJobOrder = ({ data }: TrimotorsPreviewJobOrderProps) => {
           </thead>
           <tbody>
             {(() => {
-              const selectedJobs = getSelectedJobs();
-              const selectedParts = getSelectedParts();
+              const selectedJobs = getSelectedJobs().slice(
+                hasRestData ? 10 : 0,
+                hasRestData ? 20 : 10,
+              );
+              const selectedParts = getSelectedParts().slice(
+                hasRestData ? 10 : 0,
+                hasRestData ? 20 : 10,
+              );
 
               // Get the maximum number of rows needed
               const totalRows = Math.max(
