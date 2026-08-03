@@ -285,6 +285,7 @@ const TrimotorsJobOrderForm = () => {
   const [mechanics, setMechanics] = useState<any>([]);
   const [otherRemarks, setOtherRemarks] = useState("");
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [hasRestData, setHasRestData] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -537,16 +538,63 @@ const TrimotorsJobOrderForm = () => {
     if (!isPrint) return;
 
     window.onafterprint = () => {
-      handleSavePrint();
-      fetchJobOrderNumber();
+      const jobRequestCount = Object.entries(
+        TrimotorsjobOrderData.jobAmounts,
+      ).length;
+      const partsCount = Object.entries(
+        TrimotorsjobOrderData.partsAmounts,
+      ).length;
+      if (!hasRestData && Math.max(jobRequestCount, partsCount) > 10) {
+        setIsPrint(false);
+        Swal.fire({
+          icon: "info",
+          title: "Print Rest Items",
+          text: `Are you sure you want to print rest items?`,
+          confirmButtonText: "Yes",
+          confirmButtonColor: "#3085d6",
+          showCancelButton: true,
+          cancelButtonText: "No",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setIsPrint(true);
+            setHasRestData(true);
+          }
+          if (result.isDismissed) {
+            setIsPrint(false);
+            setHasRestData(false);
+            handleSavePrint();
+            fetchJobOrderNumber();
+          }
+        });
+      } else {
+        setHasRestData(false);
+        handleSavePrint();
+        fetchJobOrderNumber();
+        setIsPrint(false);
+      }
     };
 
-    window.print();
+    Swal.fire({
+      icon: "success",
+      title: "Please wait...",
+      text: "Processing data to print...",
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    setTimeout(() => {
+      Swal.close();
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }, 2500);
 
     return () => {
       window.onafterprint = null;
     };
-  }, [isPrint]);
+  }, [isPrint, hasRestData, TrimotorsjobOrderData]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -912,7 +960,10 @@ const TrimotorsJobOrderForm = () => {
     <>
       {/* Print View (hidden until printing) */}
       {isPrint ? (
-        <TrimotorsPrintJobOrder data={TrimotorsjobOrderData} />
+        <TrimotorsPrintJobOrder
+          data={TrimotorsjobOrderData}
+          hasRestData={hasRestData}
+        />
       ) : (
         <>
           <div className="flex items-center p-5 bg-white">
@@ -1128,7 +1179,10 @@ const TrimotorsJobOrderForm = () => {
               Previewing Job Order Data before print...
             </ModalHeader>
             <ModalBody>
-              <TrimotorsPreviewPrint data={TrimotorsjobOrderData} />
+              <TrimotorsPreviewPrint
+                data={TrimotorsjobOrderData}
+                hasRestData={hasRestData}
+              />
             </ModalBody>
             <ModalFooter>
               <Button

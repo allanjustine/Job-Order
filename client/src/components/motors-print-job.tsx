@@ -362,6 +362,7 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
       {Array.from({ length: 2 }).map((_, index) => (
         <div
           className={`jo-rotate-wrapper mt-3 ml-3 ${index === 1 ? "border-b border-black border-dashed" : ""}`}
+          key={index}
         >
           <div
             className="jo-rotate-content p-1 font-sans bg-white text-black leading-tight border-2 border-black box-border"

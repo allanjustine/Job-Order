@@ -57,16 +57,20 @@ interface TrimotorsPrintJobOrderProps {
     transactionCode: string;
     assignedMechanics: string[];
   };
+  hasRestData?: boolean;
 }
 
-const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
+const TrimotorsPrintJobOrder = ({
+  data,
+  hasRestData,
+}: TrimotorsPrintJobOrderProps) => {
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
 
   // Safely calculate totals with fallbacks
   const jobTotal = (() => {
     let total = 0;
     Object.entries(data.jobAmounts || {}).forEach(([key, value]) => {
-      if (key !== 'selectedCoupon') {
+      if (key !== "selectedCoupon") {
         total += Number(value) || 0;
       }
     });
@@ -146,11 +150,14 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   };
 
   const getCouponData = () => {
-    if ((data.jobRequest as any).coupon && (data.jobRequest as any).selectedCoupon) {
+    if (
+      (data.jobRequest as any).coupon &&
+      (data.jobRequest as any).selectedCoupon
+    ) {
       return {
         selectedCoupon: (data.jobRequest as any).selectedCoupon,
         couponBrand: (data.jobRequest as any).couponBrand,
-        amount: (data.jobAmounts as any).selectedCoupon || 0
+        amount: (data.jobAmounts as any).selectedCoupon || 0,
       };
     }
     return null;
@@ -167,12 +174,12 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
       description?: string;
     }> = [];
 
-       // Add coupon as a job item if selected
-  const couponData = getCouponData();
+    // Add coupon as a job item if selected
+    const couponData = getCouponData();
     if (couponData) {
       selectedJobs.push({
-        key: 'coupon',
-        label: `${couponData.selectedCoupon}${couponData.couponBrand ? ` - ${couponData.couponBrand}` : ''}`,
+        key: "coupon",
+        label: `${couponData.selectedCoupon}${couponData.couponBrand ? ` - ${couponData.couponBrand}` : ""}`,
         amount: couponData.amount,
         isCoupon: true,
       });
@@ -180,10 +187,9 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
 
     // Add regular selected jobs
     trimotorsJobItems.forEach((item) => {
-      if(item.key === "selectedCoupon"){
+      if (item.key === "selectedCoupon") {
         return;
-      }
-      else if (item.key !== "others" && isJobSelected(item.key)) {
+      } else if (item.key !== "others" && isJobSelected(item.key)) {
         selectedJobs.push({
           key: item.key,
           label: item.label,
@@ -269,24 +275,25 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   const getNGDiagnosisItems = () => {
     // FIX: Use trimotorsPartsItems instead of MotorsDiagnosisItem
     const diagnosisItems = trimotorsdiagnosisItems; // This should be the correct list of diagnosis items
-  
+
     return diagnosisItems.filter(
-      (item) => data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.status === "ng"
+      (item) =>
+        data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.status === "ng",
     );
   };
-  
+
   // Check if any diagnosis is NG
   const hasNGDiagnosis = () => {
     return getNGDiagnosisItems().length > 0;
   };
-  
+
   // Check if all diagnosis are OK (no NG and at least one diagnosis exists)
   const allDiagnosisOK = () => {
     if (!data.diagnosis) return false;
     const diagnosisValues = Object.values(data.diagnosis);
     if (diagnosisValues.length === 0) return false;
     return diagnosisValues.every(
-      (item) => item.status === "ok" || item.status === "na"
+      (item) => item.status === "ok" || item.status === "na",
     );
   };
 
@@ -297,310 +304,411 @@ const TrimotorsPrintJobOrder = ({ data }: TrimotorsPrintJobOrderProps) => {
   };
 
   return (
-    <div
-      className="p-1 font-sans bg-white text-black leading-tight border-2 border-black"
-      style={{
-        fontSize: "8pt",
-        maxWidth: "210mm",
-        minHeight: "258mm",
-        margin: "0",
-        lineHeight: "0.10",
-      }}
-    >
-      {/* Honda Header */}
-      <div className="flex flex-col justify-center items-center mb-1">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex-1 font-bold">{data.transactionCode}</div>
-          <img
-            src="/smct-header.jpg"
-            alt="Company Logo"
-            className="h-10 w-auto"
-          />
-          <div className="flex-1 flex justify-end items-center">
-            <h3 className="text-right font-bold">
-              {data.branch.replace("(", "").replace(")", "").split(" ")[0]}-
-              {data.jobOrderNumber}
-            </h3>
-          </div>
-        </div>
-        <h2
-          className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
-          style={{ fontSize: "8pt", lineHeight: "0.8" }}
+    <div className="print-page">
+      {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
+          so it prints upright on a normal Letter-size (8.5in x 11in) portrait
+          short bond sheet -- no custom/landscape paper size needed on the
+          printer. On screen, it displays normally (not rotated). After
+          printing, the sheet is cut crosswise in half (5.5in each half),
+          so content height must stay under ~5.3in (5.5in - 0.2in margin). */}
+      <style>{`
+        @page {
+          size: Letter portrait;
+          margin: 0;
+        }
+
+        @media print {
+          html,
+          body {
+            width: 8.5in;
+            height: 11in;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+          }
+
+          .print-page {
+            position: relative;
+            width: 8.5in;
+            height: 11in;
+            overflow: hidden;
+          }
+
+          .jo-rotate-wrapper {
+            position: absolute;
+            width: 7.9in;
+            height: 5.3in;
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .jo-rotate-wrapper:nth-child(1) {
+            top: .2in;
+            left: 0;
+          }
+
+          .jo-rotate-wrapper:nth-child(2) {
+            top: 5.55in;
+            left: 0;
+          }
+
+          .jo-rotate-content {
+            position: absolute;
+            top: 0;
+            left: 7.9in;
+            transform: rotate(90deg);
+            transform-origin: top left;
+          }
+        }
+      `}</style>
+      {Array.from({ length: 2 }).map((_, index) => (
+        <div
+          className={`jo-rotate-wrapper mt-3 ml-3 ${index === 1 ? "border-b border-black border-dashed" : ""}`}
+          key={index}
         >
-          VEHICLE CHECKLIST
-        </h2>
-      </div>
-
-      {/* Vehicle Information - Compact Grid */}
-       <CustomerGridView data={data} />
-
-      {/* Motorcycle Unit & Engine Unit */}
-      <div
-        className="mb-2 grid grid-cols-1 gap-2"
-        style={{ fontSize: "8pt", lineHeight: "0.8" }}
-      >
-        <div className="border border-black p-0.5">
-          <div className="font-bold mb-1">TRIMOTOR UNIT:</div>
-          <div className="mb-1" style={{ fontSize: "6pt", lineHeight: "0.6" }}>
-            <span className="font-bold mr-2">LEGEND:</span>
-            <span className="mr-2">X-SCRATCH</span>
-            <span className="mr-2">●-DENT</span>
-            <span className="mr-2">■-CRACK</span>
-            <span>□-NOT AVAILABLE</span>
-          </div>
-
-          <div className="mb-1">
-            <div
-              className="flex items-center justify-center overflow-hidden"
-              style={{ height: "145px" }}
-            >
-              <img
-                src="/trimotors.png"
-                alt="Trimotors Unit Diagram"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Motorcycle Diagnosis Section */}
-      <div className="mb-2 text-xs">
-        <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-          TRIMOTORS' DIAGNOSIS
-        </h3>
-        
-        {allDiagnosisOK() && (
-          <div className="border border-black p-2 text-center">
-            <p className="font-semibold">All diagnosis are OK</p>
-          </div>
-        )}
-        
-        {hasNGDiagnosis() && (
-          <table
-            className="w-full border-collapse border border-black my-0"
-            style={{ fontSize: "8pt", lineHeight: "0.8" }}
+          <div
+            className="jo-rotate-content p-1 font-sans bg-white text-black leading-tight border-2 border-black box-border"
+            style={{
+              fontSize: "7.5pt",
+              width: "5.1in",
+              height: "7.45in",
+              maxWidth: "5.3in",
+              minHeight: "7.45in",
+              lineHeight: "1.15",
+              overflow: "hidden",
+            }}
           >
-            <thead>
-              <tr className="bg-gray-40">
-                <th className="border border-black p-0.5 text-left">Diagnosis Item</th>
-                <th className="border border-black p-0.5 text-center">Status</th>
-                <th className="border border-black p-0.5 text-left">Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {getNGDiagnosisItems().map((item) => (
-                <tr key={item.key}>
-                  <td className="border border-black p-0.5 w-1/3">
-                    {item.label}
-                  </td>
-                  <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                    NG
-                  </td>
-                  <td className="border border-black p-0.5 w-1/3">
-                    {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]?.remarks || ""}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
-      <div
-        className="mb-1 text-xs"
-        style={{ fontSize: "8pt", lineHeight: "0.8" }}
-      >
-        <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
-          JOB ORDER
-        </h3>
-
-        <table className="w-full border-collapse border border-black">
-          <thead>
-            <tr className="bg-gray-40">
-              <th className="border border-black p-0.5 text-left">
-                Specific Job(s) Request
-              </th>
-              <th className="border border-black p-0.5 text-center w-16">
-                Amount
-              </th>
-              <th className="border border-black p-0.5 text-left">
-                Parts Used
-              </th>
-              <th className="border border-black p-0.5 text-center w-10">
-                Qty
-              </th>
-              <th className="border border-black p-0.5 text-left w-28">
-                Brand / Part No.
-              </th>
-              <th className="border border-black p-0.5 text-center w-16">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              const selectedJobs = getSelectedJobs();
-              const selectedParts = getSelectedParts();
-
-              // Get the maximum number of rows needed
-              const totalRows = Math.max(
-                selectedJobs.length,
-                selectedParts.length,
-              );
-
-              const rows = [];
-
-              // If nothing is selected, show empty state
-              if (totalRows === 0) {
-                rows.push(
-                  <tr key="empty">
-                    <td
-                      className="border border-black p-0.5 text-center text-gray-500"
-                      style={{ padding: "2px 4px" }}
-                      colSpan={6}
-                    >
-                      No job requests or parts selected
-                    </td>
-                  </tr>,
-                );
-              } else {
-                // Loop through based on the maximum length
-                for (let i = 0; i < totalRows; i++) {
-                  const job = selectedJobs[i];
-                  const part = selectedParts[i];
-
-                  // Job data
-                  let jobLabel = "";
-                  let jobAmount = "";
-                  let jobCheckbox = "";
-
-                  if (job) {
-                    if (job.isCoupon) {
-                      jobLabel = `${job.label}`;
-                    } else if (job.isOthers) {
-                      jobLabel = `${job.label}`;
-                    } else {
-                      jobLabel = job.label;
+            {/* Honda Header */}
+            <div className="flex flex-col justify-center items-center mb-1">
+              <div className="flex justify-between items-center w-full">
+                <div className="flex-1 font-bold">{data.transactionCode}</div>
+                <img
+                  src="/smct-header.jpg"
+                  alt="Company Logo"
+                  className="h-10 w-auto"
+                />
+                <div className="flex-1 flex justify-end items-center">
+                  <h3 className="text-right font-bold">
+                    {
+                      data.branch
+                        .replace("(", "")
+                        .replace(")", "")
+                        .split(" ")[0]
                     }
-                    jobAmount =  phpCurrency(job.amount);
-                    jobCheckbox = "[✓] ";
-                  }
+                    -{data.jobOrderNumber}
+                  </h3>
+                </div>
+              </div>
+              <h2
+                className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
+                style={{ fontSize: "8pt", lineHeight: "0.8" }}
+              >
+                VEHICLE CHECKLIST
+              </h2>
+            </div>
 
-                  // Part data
-                  let partLabel = "";
-                  let partQty: string = "";
-                  let partDetail = "";
-                  let partAmount = "";
-                  let partCheckbox = "";
+            {/* Vehicle Information - Compact Grid */}
+            <CustomerGridView data={data} />
 
-                  if (part) {
-                    if (part.isOthers) {
-                      partLabel = `${part.label}`;
+            {/* Motorcycle Unit & Engine Unit */}
+            {/* <div
+              className="mb-2 grid grid-cols-1 gap-2"
+              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+            >
+              <div className="border border-black p-0.5">
+                <div className="font-bold mb-1">TRIMOTOR UNIT:</div>
+                <div
+                  className="mb-1"
+                  style={{ fontSize: "6pt", lineHeight: "0.6" }}
+                >
+                  <span className="font-bold mr-2">LEGEND:</span>
+                  <span className="mr-2">X-SCRATCH</span>
+                  <span className="mr-2">●-DENT</span>
+                  <span className="mr-2">■-CRACK</span>
+                  <span>□-NOT AVAILABLE</span>
+                </div>
+
+                <div className="mb-1">
+                  <div
+                    className="flex items-center justify-center overflow-hidden"
+                    style={{ height: "145px" }}
+                  >
+                    <img
+                      src="/trimotors.png"
+                      alt="Trimotors Unit Diagram"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div> */}
+
+            {/* Motorcycle Diagnosis Section */}
+            <div className="mb-2 text-xs">
+              <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                TRIMOTORS' DIAGNOSIS
+              </h3>
+
+              {allDiagnosisOK() && (
+                <div className="border border-black p-2 text-center">
+                  <p className="font-semibold">All diagnosis are OK</p>
+                </div>
+              )}
+
+              {hasNGDiagnosis() && (
+                <table
+                  className="w-full border-collapse border border-black my-0"
+                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                >
+                  <thead>
+                    <tr className="bg-gray-40">
+                      <th className="border border-black p-0.5 text-left">
+                        Diagnosis Item
+                      </th>
+                      <th className="border border-black p-0.5 text-center">
+                        Status
+                      </th>
+                      <th className="border border-black p-0.5 text-left">
+                        Remarks
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getNGDiagnosisItems().map((item) => (
+                      <tr key={item.key}>
+                        <td className="border border-black p-0.5 w-1/3">
+                          {item.label}
+                        </td>
+                        <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                          NG
+                        </td>
+                        <td className="border border-black p-0.5 w-1/3">
+                          {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]
+                            ?.remarks || ""}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
+            <div
+              className="mb-1 text-xs"
+              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+            >
+              <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
+                JOB ORDER
+              </h3>
+
+              <table className="w-full border-collapse border border-black">
+                <thead>
+                  <tr className="bg-gray-40">
+                    <th className="border border-black p-0.5 text-left">
+                      Specific Job(s) Request
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-16">
+                      Amount
+                    </th>
+                    <th className="border border-black p-0.5 text-left">
+                      Parts Used
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-10">
+                      Qty
+                    </th>
+                    <th className="border border-black p-0.5 text-left w-28">
+                      Brand / Part No.
+                    </th>
+                    <th className="border border-black p-0.5 text-center w-16">
+                      Amount
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const selectedJobs = getSelectedJobs().slice(
+                      hasRestData ? 10 : 0,
+                      hasRestData ? 20 : 10,
+                    );
+                    const selectedParts = getSelectedParts().slice(
+                      hasRestData ? 10 : 0,
+                      hasRestData ? 20 : 10,
+                    );
+
+                    // Get the maximum number of rows needed
+                    const totalRows = Math.max(
+                      selectedJobs.length,
+                      selectedParts.length,
+                    );
+
+                    const rows = [];
+
+                    // If nothing is selected, show empty state
+                    if (totalRows === 0) {
+                      rows.push(
+                        <tr key="empty">
+                          <td
+                            className="border border-black p-0.5 text-center text-gray-500"
+                            style={{ padding: "2px 4px" }}
+                            colSpan={6}
+                          >
+                            No job requests or parts selected
+                          </td>
+                        </tr>,
+                      );
                     } else {
-                      partLabel = part.label;
+                      // Loop through based on the maximum length
+                      for (let i = 0; i < totalRows; i++) {
+                        const job = selectedJobs[i];
+                        const part = selectedParts[i];
+
+                        // Job data
+                        let jobLabel = "";
+                        let jobAmount = "";
+                        let jobCheckbox = "";
+
+                        if (job) {
+                          if (job.isCoupon) {
+                            jobLabel = `${job.label}`;
+                          } else if (job.isOthers) {
+                            jobLabel = `${job.label}`;
+                          } else {
+                            jobLabel = job.label;
+                          }
+                          jobAmount = phpCurrency(job.amount);
+                          jobCheckbox = "[✓] ";
+                        }
+
+                        // Part data
+                        let partLabel = "";
+                        let partQty: string = "";
+                        let partDetail = "";
+                        let partAmount = "";
+                        let partCheckbox = "";
+
+                        if (part) {
+                          if (part.isOthers) {
+                            partLabel = `${part.label}`;
+                          } else {
+                            partLabel = part.label;
+                          }
+                          partQty =
+                            part.quantity > 0 ? part.quantity.toString() : "";
+                          partDetail = part.detail;
+                          partAmount = formatCurrency(part.amount);
+                          partCheckbox = "[✓] ";
+                        }
+
+                        rows.push(
+                          <tr key={i}>
+                            <td
+                              className="border border-black p-0.5 h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {job && (
+                                <span>
+                                  {jobCheckbox}
+                                  {jobLabel}
+                                </span>
+                              )}
+                            </td>
+                            <td
+                              className="border border-black p-0.5 text-left h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {jobAmount}
+                            </td>
+                            <td
+                              className="border border-black p-0.5 h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {part && (
+                                <span>
+                                  {partCheckbox}
+                                  {partLabel}
+                                </span>
+                              )}
+                            </td>
+                            <td
+                              className="border border-black p-0.5 text-center h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {partQty}
+                            </td>
+                            <td
+                              className="border border-black p-0.5 text-left text-[7pt] h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {partDetail}
+                            </td>
+                            <td
+                              className="border border-black p-0.5 text-left h-3"
+                              style={{ padding: "2px 4px" }}
+                            >
+                              {partAmount}
+                            </td>
+                          </tr>,
+                        );
+                      }
                     }
-                    partQty = part.quantity > 0 ? part.quantity.toString() : "";
-                    partDetail = part.detail;
-                    partAmount = formatCurrency(part.amount)
-                    partCheckbox = "[✓] ";
-                  }
 
-                  rows.push(
-                    <tr key={i}>
-                      <td
-                        className="border border-black p-0.5 h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {job && (
-                          <span>
-                            {jobCheckbox}
-                            {jobLabel}
-                          </span>
-                        )}
-                      </td>
-                      <td
-                        className="border border-black p-0.5 text-left h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {jobAmount}
-                      </td>
-                      <td
-                        className="border border-black p-0.5 h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {part && (
-                          <span>
-                            {partCheckbox}
-                            {partLabel}
-                          </span>
-                        )}
-                      </td>
-                      <td
-                        className="border border-black p-0.5 text-center h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {partQty}
-                      </td>
-                      <td
-                        className="border border-black p-0.5 text-left text-[7pt] h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {partDetail}
-                      </td>
-                      <td
-                        className="border border-black p-0.5 text-left h-3"
-                        style={{ padding: "2px 4px" }}
-                      >
-                        {partAmount}
-                      </td>
-                    </tr>,
-                  );
-                }
-              }
+                    // Add totals row (only if there are selections)
+                    if (totalRows > 0) {
+                      rows.push(
+                        <tr key="totals">
+                          <td
+                            className="border border-black p-0.5 font-semibold"
+                            style={{ padding: "2px 4px" }}
+                            colSpan={2}
+                          >
+                            Total Labor Cost: {phpCurrency(jobTotal)}
+                          </td>
+                          <td
+                            className="border border-black p-0.5 font-semibold"
+                            style={{ padding: "2px 4px" }}
+                            colSpan={4}
+                          >
+                            Total Parts Cost: {phpCurrency(partsTotal)}
+                          </td>
+                        </tr>,
+                      );
+                    }
 
-              // Add totals row (only if there are selections)
-              if (totalRows > 0) {
-                rows.push(
-                  <tr key="totals">
-                    <td
-                      className="border border-black p-0.5 font-semibold"
-                      style={{ padding: "2px 4px" }}
-                      colSpan={2}
-                    >
-                      Total Labor Cost: {phpCurrency(jobTotal)}
-                    </td>
-                    <td
-                      className="border border-black p-0.5 font-semibold"
-                      style={{ padding: "2px 4px" }}
-                      colSpan={4}
-                    >
-                      Total Parts Cost: {phpCurrency(partsTotal)}
-                    </td>
-                  </tr>,
-                );
-              }
+                    return rows;
+                  })()}
+                </tbody>
+              </table>
 
-              return rows;
-            })()}
-          </tbody>
-        </table>
+              {/* Grand Total */}
+              <div className="flex justify-between items-center border border-black border-t-0 py-1">
+                <div className="font-bold ml-1">
+                  Grand Total: {phpCurrency(grandTotal)}
+                </div>
+              </div>
+            </div>
 
-        {/* Grand Total */}
-        <div className="flex justify-between items-center border border-black border-t-0 py-1">
-          <div className="font-bold ml-1 text-xxs">
-            Grand Total: {phpCurrency(grandTotal)}
+            <NextServiceScheduleView data={data} />
+
+            {/* Footer Note */}
+            <p
+              className="mt-2 text-center float-left"
+              style={{ fontSize: "6pt" }}
+            >
+              Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
+            </p>
+
+            {index === 1 && (
+              <span
+                className="absolute bottom-1 right-1 text-xs"
+                style={{ fontSize: "8pt" }}
+              >
+                Customer's Copy
+              </span>
+            )}
           </div>
         </div>
-      </div>
-
-         <NextServiceScheduleView data={data} />
-
-      {/* Footer Note */}
-      <p className="mt-2 text-center float-left" style={{ fontSize: "6pt" }}>
-        Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
-      </p>
+      ))}
     </div>
   );
 };
