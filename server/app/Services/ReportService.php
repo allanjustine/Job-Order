@@ -52,7 +52,8 @@ class ReportService
                     $item->whereAny(
                         [
                             'job_order_number',
-                            'job_order_type'
+                            'job_order_type',
+                            'transaction_code'
                         ],
                         'like',
                         "%{$search}%"
