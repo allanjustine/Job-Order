@@ -232,7 +232,7 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation,dealers_name',
                 'jobOrder.customer:id,name,address',
                 'jobOrder.mechanics:id,name',
             ])
@@ -280,9 +280,10 @@ class ReportService
             return [
                 'Date'              => $showHeader ? $item->jobOrder?->date->format('m-d-Y') : '',
                 'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
-                'Branch Code'       => Auth::user()->code,
+                'Branch Code'       => $showHeader ? Auth::user()->code : '',
                 'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
                 'Address'           => $showHeader ? $item->jobOrder?->customer?->address : '',
+                'Dealer Name'       => $showHeader ? $item->jobOrder?->dealers_name : '',
                 'Mechanics'         => $showHeader ? $item->jobOrder?->mechanics->pluck('name')->join(', ') : '',
                 'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                 'Coupon Brand'      => $item->type === 'job_request' && strtolower(trim($item->part_brand)) !== 'n/a' ? $item->part_brand : '',
