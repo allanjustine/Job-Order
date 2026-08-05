@@ -274,11 +274,12 @@ const Reports = () => {
   }, []);
 
   useEffect(() => {
-    if (!date?.from || !date?.to) return;
-
     setFilterItems((prev) => ({
       ...prev,
-      date_range: `${format(date?.from || new Date(), "yyyy-MM-dd")}, ${format(date?.to || new Date(), "yyyy-MM-dd")}`,
+      date_range:
+        date?.from || date?.to
+          ? `${format(date?.from || new Date(), "yyyy-MM-dd")}, ${format(date?.to || new Date(), "yyyy-MM-dd")}`
+          : "",
     }));
   }, [date?.from, date?.to]);
 
