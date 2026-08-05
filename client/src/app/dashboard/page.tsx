@@ -26,7 +26,7 @@ import {
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaFileExcel, FaRotateRight } from "react-icons/fa6";
+import { FaCheckDouble, FaFileExcel, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Link from "next/link";
@@ -86,7 +86,7 @@ const Dashboard = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const { user, handleLogout: handleLogoutUser } = useAuth();
-  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isExport, setIsExport] = useState<boolean>(false);
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
@@ -99,6 +99,7 @@ const Dashboard = () => {
   const [isReprint, setIsReprint] = useState<boolean>(false);
   const [isPrintRestItems, setIsPrintRestItems] = useState<boolean>(false);
   const [viewRemainingData, setViewRemainingData] = useState<any>(null);
+  const [dataToExport, setDataToExport] = useState<any>(null);
 
   useEffect(() => {
     if (!isReprint) return;
@@ -399,85 +400,97 @@ const Dashboard = () => {
     });
   };
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      const response = await api.get("/export-branch-reports", {
-        params: {
-          search: searchTerm,
-          from: formatDate(date?.from),
-          to: formatDate(date?.to),
+  useEffect(() => {
+    if (!isExport) return;
+
+    const handleExportChecking = async () => {
+      setIsChecking(true);
+      try {
+        const response = await api.get("/export-branch-reports", {
+          params: {
+            search: searchTerm,
+            from: formatDate(date?.from),
+            to: formatDate(date?.to),
+          },
+        });
+
+        if (response.status === 200) {
+          setDataToExport(response.data.data);
+        }
+
+        if (response.data.data.length === 0) {
+          return toast.error(
+            "Export failed! No data to export in selected date range.",
+            {
+              position: "bottom-right",
+              duration: 5000,
+              icon: "😒",
+              style: {
+                borderRadius: "15px",
+                background: "red",
+                color: "#fff",
+                padding: "15px",
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    handleExportChecking();
+  }, [date, searchTerm, isExport]);
+
+  const handleExport = () => {
+    if (dataToExport.length === 0 || !dataToExport || isChecking) return;
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    const dateFromTo =
+      date?.from &&
+      date?.to &&
+      `${format(date?.from, "LLL dd, y")} to ${format(date?.to, "LLL dd, y")}`;
+
+    const saveFileName = searchTerm
+      ? `(Searched: ${searchTerm}) ${dateFromTo}.xlsx`
+      : `${dateFromTo} Reports.xlsx`;
+
+    saveAs(blob, saveFileName);
+
+    setIsExport(false);
+
+    setDate({
+      from: new Date(),
+      to: new Date(),
+    });
+
+    toast.error(
+      "Export Ready! After saving the file, Please check your downloads folder.",
+      {
+        position: "bottom-center",
+        duration: 5000,
+        icon: "✅",
+        style: {
+          borderRadius: "15px",
+          background: "green",
+          color: "#fff",
+          padding: "15px",
         },
-      });
-
-      if (response.data.data.length === 0) {
-        return toast.error(
-          "Export failed! No data to export in selected date range.",
-          {
-            position: "bottom-center",
-            duration: 5000,
-            icon: "😒",
-            style: {
-              borderRadius: "15px",
-              background: "red",
-              color: "#fff",
-              padding: "15px",
-            },
-          },
-        );
-      }
-
-      if (response.status === 200) {
-        const worksheet = XLSX.utils.json_to_sheet(response.data.data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
-
-        const excelBuffer = XLSX.write(workbook, {
-          bookType: "xlsx",
-          type: "array",
-        });
-        const blob = new Blob([excelBuffer], {
-          type: "application/octet-stream",
-        });
-
-        const dateFromTo =
-          date?.from &&
-          date?.to &&
-          `${format(date?.from, "LLL dd, y")} to ${format(date?.to, "LLL dd, y")}`;
-
-        const saveFileName = searchTerm
-          ? `(Searched: ${searchTerm}) ${dateFromTo}.xlsx`
-          : `${dateFromTo} Reports.xlsx`;
-
-        saveAs(blob, saveFileName);
-
-        setIsExport(false);
-
-        setDate({
-          from: new Date(),
-          to: new Date(),
-        });
-
-        toast.error(
-          "Export Ready! After saving the file, Please check your downloads folder.",
-          {
-            position: "bottom-center",
-            duration: 5000,
-            icon: "✅",
-            style: {
-              borderRadius: "15px",
-              background: "green",
-              color: "#fff",
-              padding: "15px",
-            },
-          },
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsExporting(false);
-    }
+      },
+    );
   };
 
   const handleViewExport = () => {
@@ -939,24 +952,41 @@ const Dashboard = () => {
               setDate={setDate}
               setIsRefresh={() => {}}
             />
+            <div className="flex items-center justify-center">
+              {isChecking ? (
+                <div className="mt-0.5 flex items-center gap-1">
+                  <Spinner />{" "}
+                  <span className="text-xl font-bold text-gray-500 ">
+                    Fetching...
+                  </span>
+                </div>
+              ) : dataToExport?.length > 0 ? (
+                <p className="text-green-500 text-xl font-bold">
+                  {`There are ${dataToExport?.length} job orders to be exported. Please click proceed to export.`}
+                </p>
+              ) : (
+                <p className="text-red-500 text-xl font-bold">
+                  There are no job orders to be exported. Please change the
+                  date.
+                </p>
+              )}
+            </div>
           </div>
         </ModalBody>
         <ModalFooter>
           <Button
             type="button"
-            className={`bg-green-500 py-5 hover:bg-green-600 text-white ${isExporting || !date?.from || !date?.to ? "cursor-not-allowed!" : ""}`}
+            className={`bg-green-500 py-5 hover:bg-green-600 text-white ${isChecking || !date?.from || !date?.to ? "cursor-not-allowed!" : ""}`}
             onClick={handleExport}
-            disabled={isExporting || !date?.from || !date?.to}
+            disabled={
+              isChecking ||
+              !date?.from ||
+              !date?.to ||
+              dataToExport?.length === 0 ||
+              !dataToExport
+            }
           >
-            {isExporting ? (
-              <>
-                <FaCircleNotch className="animate-spin" /> Exporting...
-              </>
-            ) : (
-              <>
-                <FaCheckCircle /> Proceed
-              </>
-            )}
+            <FaCheckCircle /> Proceed
           </Button>
         </ModalFooter>
       </Modal>
