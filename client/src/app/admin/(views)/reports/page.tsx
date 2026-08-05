@@ -33,6 +33,14 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import TableLoader from "@/components/table-loader";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 
 export const FILTER_DATA = {
   branch: "",
@@ -46,6 +54,12 @@ export type FilterDataType = {
   area_manager: string;
   date_range: string;
   job_order_type: string;
+};
+
+type BranchProps = {
+  id: number;
+  code: string;
+  name: string;
 };
 
 const Reports = () => {
@@ -72,8 +86,13 @@ const Reports = () => {
   } = useFetch(`/reports`, {
     filterItems,
   });
-  const [branches, setBranches] = useState([]);
-  const [areaManagers, setAreaManagers] = useState([]);
+  const [branches, setBranches] = useState<BranchProps[]>([]);
+  const [areaManagers, setAreaManagers] = useState<
+    {
+      id: number;
+      name: string;
+    }[]
+  >([]);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [date, setDate] = useState<DateRange | undefined>({
@@ -88,6 +107,10 @@ const Reports = () => {
   const HAS_FILTER_APPLIED =
     Object.values(filterItems)?.some((value) => value !== "") ||
     searchTerm !== "";
+  const [searchTermAutoCompleteBranch, setSearchTermAutoCompleteBranch] =
+    useState<string>("");
+  const [searchTermAutoCompleteArea, setSearchTermAutoCompleteArea] =
+    useState<string>("");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -490,6 +513,15 @@ const Reports = () => {
     }
   };
 
+  const selectedBranch = branches.find(
+    (branch: { id: number }) => branch.id === Number(filterItems.branch),
+  );
+
+  const selectedAreaManager = areaManagers.find(
+    (areaManager: { id: number }) =>
+      areaManager.id === Number(filterItems.area_manager),
+  );
+
   return (
     <>
       <div className="p-6 space-y-5">
@@ -514,7 +546,7 @@ const Reports = () => {
                   type="search"
                   placeholder="Search..."
                   onChange={handleSearch}
-                  className="h-10 rounded-lg border-gray-200 pl-9 text-sm"
+                  className="h-12 rounded-lg border-gray-200 pl-9 text-sm"
                 />
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               </div>
@@ -527,23 +559,42 @@ const Reports = () => {
                 Branch
               </Label>
               {isDataLoading ? (
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-12 w-full" />
               ) : (
-                <Select
+                <Combobox
                   value={filterItems.branch}
-                  onChange={handleFilterItems("branch")}
-                  className="h-10 rounded-lg border-gray-200 text-sm"
+                  onValueChange={(item) => {
+                    setFilterItems((prev) => ({
+                      ...prev,
+                      branch: String(item ?? ""),
+                    }));
+                    setSearchTermAutoCompleteBranch("");
+                  }}
+                  items={branches}
                 >
-                  <option value="" disabled>
-                    Select branch
-                  </option>
-                  {branches.map((branch: any) => (
-                    <option
-                      key={branch.id}
-                      value={branch.id}
-                    >{`(${branch.code}) - ${branch.name}`}</option>
-                  ))}
-                </Select>
+                  <ComboboxInput
+                    className="h-12"
+                    placeholder="Select a branch"
+                    value={
+                      !searchTermAutoCompleteBranch && selectedBranch
+                        ? `(${selectedBranch.code}) - ${selectedBranch.name}`
+                        : searchTermAutoCompleteBranch
+                    }
+                    onChange={(e) =>
+                      setSearchTermAutoCompleteBranch(e.target.value)
+                    }
+                  />
+                  <ComboboxContent>
+                    <ComboboxList>
+                      {(item: BranchProps) => (
+                        <ComboboxItem key={item.id} value={item.id}>
+                          {`(${item.code}) - ${item.name}`}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                    <ComboboxEmpty>No branches found.</ComboboxEmpty>
+                  </ComboboxContent>
+                </Combobox>
               )}
             </div>
             <div className="w-full">
@@ -554,22 +605,42 @@ const Reports = () => {
                 Area Manager
               </Label>
               {isDataLoading ? (
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-12 w-full" />
               ) : (
-                <Select
+                <Combobox
                   value={filterItems.area_manager}
-                  onChange={handleFilterItems("area_manager")}
-                  className="h-10 rounded-lg border-gray-200 text-sm"
+                  onValueChange={(item) => {
+                    setFilterItems((prev) => ({
+                      ...prev,
+                      area_manager: String(item ?? ""),
+                    }));
+                    setSearchTermAutoCompleteArea("");
+                  }}
+                  items={areaManagers}
                 >
-                  <option value="" disabled>
-                    Select area manager
-                  </option>
-                  {areaManagers.map((areaManager: any) => (
-                    <option key={areaManager.id} value={areaManager.id}>
-                      {areaManager.name}
-                    </option>
-                  ))}
-                </Select>
+                  <ComboboxInput
+                    className="h-12"
+                    placeholder="Select a area manager"
+                    value={
+                      !searchTermAutoCompleteArea && selectedAreaManager
+                        ? selectedAreaManager.name
+                        : searchTermAutoCompleteArea
+                    }
+                    onChange={(e) =>
+                      setSearchTermAutoCompleteArea(e.target.value)
+                    }
+                  />
+                  <ComboboxContent>
+                    <ComboboxList>
+                      {(item: BranchProps) => (
+                        <ComboboxItem key={item.id} value={item.id}>
+                          {item.name}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                    <ComboboxEmpty>No branches found.</ComboboxEmpty>
+                  </ComboboxContent>
+                </Combobox>
               )}
             </div>
             <div className="w-full">
@@ -592,7 +663,7 @@ const Reports = () => {
               <Select
                 value={filterItems.job_order_type}
                 onChange={handleFilterItems("job_order_type")}
-                className="h-10 rounded-lg border-gray-200 text-sm"
+                className="h-12 rounded-lg border-gray-200 text-sm"
               >
                 <option value="" disabled>
                   Select order type
@@ -618,7 +689,7 @@ const Reports = () => {
                   setIsRefresh(true);
                 }}
                 disabled={!HAS_FILTER_APPLIED}
-                className="h-10 rounded-lg border-gray-200 text-sm w-full bg-gray-600 hover:bg-gray-500 text-white"
+                className="h-12 rounded-lg border-gray-200 text-sm w-full bg-gray-600 hover:bg-gray-500 text-white"
               >
                 Reset Filters
               </Button>
@@ -740,7 +811,7 @@ const Reports = () => {
           }}
         >
           {isBrowsing ? (
-            <Skeleton className="w-1/2 h-10" />
+            <Skeleton className="w-1/2 h-12" />
           ) : (
             <>
               Viewing {viewData?.customer.name}&apos;s Job Order
