@@ -24,7 +24,7 @@ export default function TrimotorsCategory({
                   Select Category
                 </option>
                 <option value="Repo Recon">Repo Recon</option>
-                <option value="MC Service">MC Service</option>
+                <option value="Branch MC/CCR Service">Branch MC/CCR Service</option>
                 <option value="Warranty Claim">Warranty Claim</option>
                 <option value="Regular Customer">Regular Customer</option>
                 <option value="E-Bike">E-Bike</option>
