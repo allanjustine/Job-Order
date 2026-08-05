@@ -40,6 +40,22 @@ export default function RootLayout({
             <BaseContent children={children} />
           </TooltipProvider>
         </AuthContextProvider>
+        <script>
+          console.info("%c 𝒮𝑀𝒞𝒯", "font-family:monospace; font-weight: 900;
+          font-size: 120px;color: red; text-shadow: 3px 3px 0 rgb(217,324, 422)
+          , 6px 6px 0 rgb(333,91,14) , 9px 9px 0 rgb(122,221,8) , 12px 12px 0
+          rgb(5,45,68) , 15px 15px 0 rgb(2,22,206) , 18px 18px 0 rgb(4,77,155) ,
+          21px 21px 0 rgb(42,21,155)"), console.info("%c 𝓙𝓸𝓫 𝓞𝓻𝓭𝓮𝓻",
+          "font-family:monospace; font-weight: 900; font-size: 120px;color: red;
+          text-shadow: 3px 3px 0 rgb(217,324, 422) , 6px 6px 0 rgb(333,91,14) ,
+          9px 9px 0 rgb(122,221,8) , 12px 12px 0 rgb(5,45,68) , 15px 15px 0
+          rgb(2,22,206) , 18px 18px 0 rgb(4,77,155) , 21px 21px 0
+          rgb(42,21,155)"), console.info("%c 𝓢𝔂𝓼𝓽𝓮𝓶", "font-family:monospace;
+          font-weight: 900; font-size: 120px;color: red; text-shadow: 3px 3px 0
+          rgb(217,324, 422) , 6px 6px 0 rgb(333,91,14) , 9px 9px 0
+          rgb(122,221,8) , 12px 12px 0 rgb(5,45,68) , 15px 15px 0 rgb(2,22,206)
+          , 18px 18px 0 rgb(4,77,155) , 21px 21px 0 rgb(42,21,155)")
+        </script>
       </body>
     </html>
   );
