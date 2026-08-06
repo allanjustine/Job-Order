@@ -478,14 +478,8 @@ const PreviewPrint = ({ data, hasRestData }: PreviewJobOrderProps) => {
           </thead>
           <tbody>
             {(() => {
-              const allSelectedJobs = getAllSelectedJobs().slice(
-                hasRestData ? 10 : 0,
-                hasRestData ? 20 : 10,
-              );
-              const allSelectedParts = getAllSelectedParts().slice(
-                hasRestData ? 10 : 0,
-                hasRestData ? 20 : 10,
-              );
+              const allSelectedJobs = getAllSelectedJobs();
+              const allSelectedParts = getAllSelectedParts();
 
               // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
 
