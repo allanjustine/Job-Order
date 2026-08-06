@@ -111,6 +111,8 @@ const Reports = () => {
     useState<string>("");
   const [searchTermAutoCompleteArea, setSearchTermAutoCompleteArea] =
     useState<string>("");
+  const [underDevelopmentViewData, setunderDevelopmentViewData] =
+    useState<any>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -264,6 +266,7 @@ const Reports = () => {
       const response = await api.get(`/job-orders/${id}/browse`);
       if (response.status === 200) {
         setViewData(response?.data?.data);
+        setunderDevelopmentViewData(response?.data?.data);
       }
     } catch (error: any) {
       console.error(error);
@@ -851,7 +854,7 @@ const Reports = () => {
         </ModalBody>
         <ModalFooter>
           <Button
-            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
+            className="bg-gray-400 hover:bg-gray-500 text-white py-5 px-3"
             type="button"
             onClick={() => {
               setIsOpen(false);
@@ -859,6 +862,22 @@ const Reports = () => {
             }}
           >
             Close
+          </Button>
+          <Button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 py-5 px-5"
+            onClick={() =>
+              Swal.fire({ icon: "info", title: "Under Development" }).then(
+                (result) => {
+                  if (result.isConfirmed) {
+                    setIsOpen(true);
+                    setViewData(underDevelopmentViewData);
+                  }
+                },
+              )
+            }
+          >
+            Edit
           </Button>
         </ModalFooter>
       </Modal>
