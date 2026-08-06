@@ -9,6 +9,7 @@ import { Wrench } from "lucide-react";
 import formatDate from "@/utils/format-date";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
+import { useMemo } from "react";
 
 interface PreviewJobOrderProps {
   data?: Record<string, any>;
@@ -39,6 +40,17 @@ const ViewJobOrder = ({
       />
     );
   }
+
+  const filteredData = useMemo(() => {
+    const item = !isReprint
+      ? data.job_order_details
+      : data.job_order_details?.slice(
+          isPrintRestItems ? 10 : 0,
+          isPrintRestItems ? 20 : 10,
+        );
+
+    return item;
+  }, [isPrintRestItems, data.job_order_details, isReprint]);
 
   return (
     <>
@@ -348,12 +360,8 @@ const ViewJobOrder = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {data.job_order_details
+                      {filteredData
                         ?.filter((job: any) => job.type === "job_request")
-                        ?.slice(
-                          isPrintRestItems ? 10 : 0,
-                          isPrintRestItems ? 20 : 10,
-                        )
                         ?.map((job: any, i: number) => (
                           <tr key={i}>
                             {job.type === "job_request" && (
@@ -413,13 +421,9 @@ const ViewJobOrder = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {data.job_order_details
+                      {filteredData
                         ?.filter(
                           (item: any) => item.type === "parts_replacement",
-                        )
-                        ?.slice(
-                          isPrintRestItems ? 10 : 0,
-                          isPrintRestItems ? 20 : 10,
                         )
                         ?.map((job: any, i: number) => (
                           <tr key={i}>
