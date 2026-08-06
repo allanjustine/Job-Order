@@ -456,14 +456,8 @@ const TrimotorsPreviewJobOrder = ({
           </thead>
           <tbody>
             {(() => {
-              const selectedJobs = getSelectedJobs().slice(
-                hasRestData ? 10 : 0,
-                hasRestData ? 20 : 10,
-              );
-              const selectedParts = getSelectedParts().slice(
-                hasRestData ? 10 : 0,
-                hasRestData ? 20 : 10,
-              );
+              const selectedJobs = getSelectedJobs();
+              const selectedParts = getSelectedParts();
 
               // Get the maximum number of rows needed
               const totalRows = Math.max(
