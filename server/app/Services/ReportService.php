@@ -125,8 +125,8 @@ class ReportService
         return JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation',
-                'jobOrder.customer:id,name',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation,dealers_name,model,engine_number,next_schedule_date,mileage',
+                'jobOrder.customer:id,name,address,contact_number',
                 'jobOrder.mechanics:id,name,user_id',
                 'jobOrder.mechanics.user',
             ])
@@ -203,6 +203,13 @@ class ReportService
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
+                    'Contact Number'    => $item->jobOrder?->customer?->contact_number ,
+                    'Address'           => $item->jobOrder?->customer?->address ,
+                    'Model'             => $item->jobOrder?->model ,
+                    'Engine/Frame No.'  => $item->jobOrder?->engine_number ,
+                    'Dealer Name'       => $item->jobOrder?->dealers_name ,
+                    'Next Service Date' => $item->jobOrder?->next_schedule_date ,
+                    'Mileage'           => $item->jobOrder?->mileage ,
                     'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                     'Coupon Brand'      => $item->type === 'job_request' && strtolower(trim($item->part_brand)) !== 'n/a' ? $item->part_brand : '',
                     'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
@@ -232,8 +239,8 @@ class ReportService
         $jobOrders = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
-                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation,dealers_name',
-                'jobOrder.customer:id,name,address',
+                'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation,dealers_name,model,engine_number,next_schedule_date,mileage',
+                'jobOrder.customer:id,name,address,contact_number',
                 'jobOrder.mechanics:id,name',
             ])
             ->when(
@@ -282,8 +289,13 @@ class ReportService
                 'JO Number'         => $showHeader ? $item->jobOrder?->job_order_number : '',
                 'Branch Code'       => $showHeader ? Auth::user()->code : '',
                 'Customer Name'     => $showHeader ? $item->jobOrder?->customer?->name : '',
+                'Contact Number'    => $showHeader ? $item->jobOrder?->customer?->contact_number : '',
                 'Address'           => $showHeader ? $item->jobOrder?->customer?->address : '',
+                'Model'             => $showHeader ? $item->jobOrder?->model : '',
+                'Engine/Frame No.'  => $showHeader ? $item->jobOrder?->engine_number : '',
                 'Dealer Name'       => $showHeader ? $item->jobOrder?->dealers_name : '',
+                'Next Service Date' => $showHeader ? $item->jobOrder?->next_schedule_date : '',
+                'Mileage'           => $showHeader ? $item->jobOrder?->mileage : '',
                 'Mechanics'         => $showHeader ? $item->jobOrder?->mechanics->pluck('name')->join(', ') : '',
                 'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                 'Coupon Brand'      => $item->type === 'job_request' && strtolower(trim($item->part_brand)) !== 'n/a' ? $item->part_brand : '',
