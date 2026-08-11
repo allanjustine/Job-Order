@@ -126,7 +126,14 @@ const Users = () => {
           <Button
             type="button"
             variant="link"
-            onClick={() => handleLockDateToAllUsers()}
+            onClick={() => handleLockDateToAllUsers(true)}
+          >
+            <LockKeyholeOpen />
+          </Button>
+          <Button
+            type="button"
+            variant="link"
+            onClick={() => handleLockDateToAllUsers(false)}
           >
             <LockKeyhole />
           </Button>
@@ -147,7 +154,7 @@ const Users = () => {
     },
   ];
 
-  const handleLockDateToAllUsers = () => {
+  const handleLockDateToAllUsers = (status: boolean) => {
     Swal.fire({
       icon: "info",
       title: "Lock Date Picker",
@@ -159,7 +166,9 @@ const Users = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await api.post("/lock-all-user-date-pickers");
+          const response = await api.post("/lock-all-user-date-pickers", {
+            lock_status: status,
+          });
 
           if (response.status === 200) {
             fetchData();
