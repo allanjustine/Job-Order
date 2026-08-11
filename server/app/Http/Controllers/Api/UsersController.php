@@ -163,17 +163,21 @@ class UsersController extends Controller
 
     public function lockAllUserDatePickers()
     {
+        $lock_status = request('lock_status', false);
+
         $users = User::query()
-            ->where('is_locked_date', false);
+            ->where('is_locked_date', $lock_status);
 
         $to_message = $users->count() . ' ' . Str::plural('user', $users->count());
 
         $users->update([
-            'is_locked_date' => true
+            'is_locked_date' => !$lock_status
         ]);
 
+        $message = $lock_status ? 'locked' : 'unlocked';
+
         return response()->json([
-            'message' => "Successfully locked date pickers to {$to_message}"
+            'message' => "Successfully {$message} date pickers to {$to_message}"
         ], 200);
     }
 }
