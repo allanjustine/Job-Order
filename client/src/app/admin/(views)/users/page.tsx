@@ -122,24 +122,27 @@ const Users = () => {
     },
     {
       name: (
-        <>
+        <div className="flex items-center gap-1">
           <Button
             type="button"
             variant="link"
+            className="text-blue-500"
             onClick={() => handleLockDateToAllUsers(true)}
           >
             <LockKeyholeOpen />
           </Button>
+          <span>LOCK DATE RANGE</span>
           <Button
             type="button"
             variant="link"
+            className="text-green-500"
             onClick={() => handleLockDateToAllUsers(false)}
           >
             <LockKeyhole />
           </Button>
-          LOCK DATE RANGE
-        </>
+        </div>
       ),
+      width: "220px",
       cell: (row: any) => (
         <Button
           type="button"
@@ -150,6 +153,7 @@ const Users = () => {
           {row.is_locked_date ? <LockKeyhole /> : <LockKeyholeOpen />}
         </Button>
       ),
+      center: true,
       sortable: false,
     },
   ];
