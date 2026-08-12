@@ -199,6 +199,35 @@ export default function EditJoContent({
                       )}
                     />
                   </div>
+                  {formInputs.job_order_details
+                    .find((item) => item.id === detail.id)
+                    ?.category?.startsWith("Coupon") && (
+                    <div className="w-full space-y-2">
+                      <Label>Parts Brand</Label>
+                      <select
+                        className="py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                        required
+                        value={
+                          formInputs.job_order_details.find(
+                            (item) => item.id === detail.id,
+                          )?.part_brand
+                        }
+                        onChange={handleJobOrderDetailChange(
+                          detail.id,
+                          "part_brand",
+                        )}
+                      >
+                        <option value="" disabled>
+                          Select Brand
+                        </option>
+                        {brandChoices.map((brand) => (
+                          <option key={brand} value={brand}>
+                            {brand}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div className="w-full space-y-2">
                     <Label>Amount</Label>
                     <Input
