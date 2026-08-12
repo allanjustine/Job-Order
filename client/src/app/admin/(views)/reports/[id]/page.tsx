@@ -4,6 +4,7 @@ import EditJoContent from "@/components/edit-jo-content";
 import EditJoLoader from "@/components/edit-jo-loader";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
+import { formatDate } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -101,7 +102,7 @@ function EditJo() {
       if (response.status === 200) {
         setFormInputs({
           job_order_number: data.job_order_number,
-          date: data.date,
+          date: formatDate(data.date, "yyyy-MM-dd"),
           purchase_date: data.purchase_date,
           next_schedule_date: data.next_schedule_date,
           next_schedule_kms: data.next_schedule_kms,
