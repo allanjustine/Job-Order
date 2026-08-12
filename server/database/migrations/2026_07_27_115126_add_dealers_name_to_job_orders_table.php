@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::table('job_orders', function (Blueprint $table) {
             $table->string('dealers_name');
+            $table->string('motorcycle_unit')->nullable();
+            $table->string('engine_condition')->nullable();
+            $table->string('content_inside_ubox')->nullable();
         });
     }
 

@@ -24,19 +24,21 @@ export default function MotorEngineGrid({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
-            <Label>Motorcyle Unit</Label>
+            <Label>Motorcyle and Engine Unit</Label>
             <Select
               value={motorcycleUnit}
               onChange={(e) => setMotorcycleUnit(e.target.value)}
             >
               <option value="" disabled>
-                Select Motocycle Unit
+                Select Motocycle and Engine Unit
               </option>
               <option value="business">Business</option>
               <option value="automatic">Automatic</option>
               <option value="cub">Cub</option>
               <option value="sports">Sports</option>
+              <option value="sports">Moped</option>
             </Select>
+
 
             <div className="mt-2">
               <Label>Contents inside U-Box</Label>
@@ -52,19 +54,6 @@ export default function MotorEngineGrid({
 
         <div className="bg-gray-50 p-4 rounded-md">
           <div>
-            <Label>Engine Unit</Label>
-            <Select
-              value={engineUnit}
-              onChange={(e) => setEngineUnit(e.target.value)}
-            >
-              <option value="" disabled>
-                Select Engine Unit
-              </option>
-              <option value="business_sports">Business/Sports</option>
-              <option value="automatic">Automatic</option>
-              <option value="cub">Cub</option>
-            </Select>
-
             <div className="mt-2">
               <Label>Engine Condition</Label>
               <Input
