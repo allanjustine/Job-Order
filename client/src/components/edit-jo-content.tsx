@@ -210,14 +210,14 @@ export default function EditJoContent({
                         value={
                           formInputs.job_order_details.find(
                             (item) => item.id === detail.id,
-                          )?.part_brand
+                          )?.part_brand || ""
                         }
                         onChange={handleJobOrderDetailChange(
                           detail.id,
                           "part_brand",
                         )}
                       >
-                        <option value="" disabled>
+                        <option value="n/a" disabled>
                           Select Brand
                         </option>
                         {brandChoices.map((brand) => (
