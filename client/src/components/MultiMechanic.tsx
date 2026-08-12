@@ -23,8 +23,8 @@ export function MultiMechanic({
 }: {
   mechanics: any;
   setMechanic: React.Dispatch<SetStateAction<any>>;
-  mechanic: any;
-  inputError: string;
+  mechanic?: any;
+  inputError?: string;
 }) {
   const anchor = useComboboxAnchor();
 

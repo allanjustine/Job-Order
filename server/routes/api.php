@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
         Route::get('reports', [ReportController::class, 'index']);
         Route::get('export-reports', [ReportController::class, 'exportData']);
+        Route::get('show-jo/{job_order}/browse', [ReportController::class, 'show']);
+        Route::patch('update-job-order/{job_order}/update', [JobOrderController::class, 'update']);
         Route::delete('cancel-job-order/{id}', [JobOrderController::class, 'cancel']);
         Route::delete('delete-job-order/{id}', [JobOrderController::class, 'destroy']);
         Route::post('lock-all-user-date-pickers', [UsersController::class, 'lockAllUserDatePickers']);

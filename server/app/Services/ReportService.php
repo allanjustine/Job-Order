@@ -203,13 +203,13 @@ class ReportService
                     'JO Number'         => $item->jobOrder?->job_order_number,
                     'Branch Code'       => $item->jobOrder?->mechanics->first()?->user?->code,
                     'Customer Name'     => $item->jobOrder?->customer?->name,
-                    'Contact Number'    => $item->jobOrder?->customer?->contact_number ,
-                    'Address'           => $item->jobOrder?->customer?->address ,
-                    'Model'             => $item->jobOrder?->model ,
-                    'Engine/Frame No.'  => $item->jobOrder?->engine_number ,
-                    'Dealer Name'       => $item->jobOrder?->dealers_name ,
-                    'Next Service Date' => $item->jobOrder?->next_schedule_date ,
-                    'Mileage'           => $item->jobOrder?->mileage ,
+                    'Contact Number'    => $item->jobOrder?->customer?->contact_number,
+                    'Address'           => $item->jobOrder?->customer?->address,
+                    'Model'             => $item->jobOrder?->model,
+                    'Engine/Frame No.'  => $item->jobOrder?->engine_number,
+                    'Dealer Name'       => $item->jobOrder?->dealers_name,
+                    'Next Service Date' => $item->jobOrder?->next_schedule_date,
+                    'Mileage'           => $item->jobOrder?->mileage,
                     'Job Requests'      => $item->type === 'job_request' ? $item->category : '',
                     'Coupon Brand'      => $item->type === 'job_request' && strtolower(trim($item->part_brand)) !== 'n/a' ? $item->part_brand : '',
                     'Job Amount'        => $item->type === 'job_request' ? $item->amount : "",
@@ -313,5 +313,15 @@ class ReportService
         });
 
         return $jobOrders;
+    }
+
+    public function showJo($job_order)
+    {
+        return $job_order->load([
+            'customer',
+            'mechanics:id',
+            'jobOrderDetails',
+            'customer.user.mechanics'
+        ]);
     }
 }

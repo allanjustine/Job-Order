@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\JobOrder;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
 
@@ -42,9 +43,14 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ReportService $reportService, JobOrder $job_order)
     {
-        //
+        $data = $reportService->showJo($job_order);
+
+        return response()->json([
+            'message' => 'Job Order retrieved successfully.',
+            'data'    => $data
+        ], 200);
     }
 
     /**

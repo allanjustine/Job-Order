@@ -123,6 +123,38 @@ class JobOrderService
         return $customer;
     }
 
+    public function update($job_order, $request)
+    {
+        return DB::transaction(function () use ($job_order, $request) {
+
+            $formed_job_order_details = collect($request->job_order_details)->map(function ($job_order_detail) {
+                return [
+                    ...$job_order_detail,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+            })->toArray();
+
+            $job_order->customer()->update([
+                'name'           => $request->customer['name'],
+                'address'        => $request->customer['address'],
+                'contact_number' => $request->customer['contact_number'],
+            ]);
+
+            $job_order->mechanics()->sync($request->mechanic_ids);
+
+            $job_order->jobOrderDetails()->upsert(
+                $formed_job_order_details,
+                ['id'],
+                ['category', 'part_brand', 'part_number', 'quantity', 'amount']
+            );
+
+            $job_order->update($request->job_order);
+
+            return $job_order;
+        });
+    }
+
     public function delete(string $id)
     {
         $job_order = JobOrder::findOrFail($id);

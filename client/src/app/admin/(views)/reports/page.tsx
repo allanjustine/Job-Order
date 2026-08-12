@@ -41,6 +41,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/components/ui/combobox";
+import { useRouter } from "next/navigation";
 
 export const FILTER_DATA = {
   branch: "",
@@ -113,6 +114,7 @@ const Reports = () => {
     useState<string>("");
   const [underDevelopmentViewData, setunderDevelopmentViewData] =
     useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -866,16 +868,7 @@ const Reports = () => {
           <Button
             type="button"
             className="bg-blue-500 hover:bg-blue-600 py-5 px-5"
-            onClick={() =>
-              Swal.fire({ icon: "info", title: "Under Development" }).then(
-                (result) => {
-                  if (result.isConfirmed) {
-                    setIsOpen(true);
-                    setViewData(underDevelopmentViewData);
-                  }
-                },
-              )
-            }
+            onClick={() => router.push(`/admin/reports/${viewData?.id}`)}
           >
             Edit
           </Button>
