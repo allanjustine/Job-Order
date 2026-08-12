@@ -31,7 +31,7 @@ interface PartsReplacementSectionProps {
 }
 
 // Brand options
-const brandChoices = [
+export const brandChoices = [
   "Honda",
   "Yamaha",
   "Kawasaki",
