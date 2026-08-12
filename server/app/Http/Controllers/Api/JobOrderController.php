@@ -55,6 +55,15 @@ class JobOrderController extends Controller
         ], 200);
     }
 
+    public function update(JobOrderService $jobOrderService, JobOrder $jobOrder, Request $request)
+    {
+        $data = $jobOrderService->update($jobOrder, $request);
+
+        return response()->json([
+            'message' => "Job Order with transaction code of \"{$data->transaction_code}\" updated successfully."
+        ], 200);
+    }
+
     public function destroy(JobOrderService $jobOrderService, string $id)
     {
         $jobOrder = $jobOrderService->delete($id);
