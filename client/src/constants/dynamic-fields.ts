@@ -1,6 +1,6 @@
 export const CUSTOMER_DETAILS_FIELDS = [
   {
-    label: "date",
+    label: "Date",
     value: "date",
     type: "date",
     is_customer_details: false,

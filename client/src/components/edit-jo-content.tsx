@@ -394,7 +394,7 @@ export default function EditJoContent({
                 }
               })
             }
-            className="bg-gray-700 hover:bg-gray-600 hover:-translate-y-1"
+            className="bg-gray-700 hover:bg-gray-600 hover:-translate-y-1 py-5"
             size="lg"
           >
             Cancel
@@ -402,7 +402,7 @@ export default function EditJoContent({
           <Button
             type="button"
             onClick={handleSave}
-            className="bg-blue-500 hover:bg-blue-600 hover:-translate-y-1"
+            className="bg-blue-500 hover:bg-blue-600 hover:-translate-y-1 py-5"
             size="lg"
           >
             Save
