@@ -162,7 +162,7 @@ const Users = () => {
     Swal.fire({
       icon: "info",
       title: "Lock Date Picker",
-      text: `Are you sure you want to lock date picker to all users?`,
+      text: `Are you sure you want to ${status ? "unlock" : "lock"} date picker to all users?`,
       confirmButtonText: "Yes",
       confirmButtonColor: "#3085d6",
       showCancelButton: true,
