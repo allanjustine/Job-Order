@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\AreaManagerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\Admin\CustomersController;
+use App\Http\Controllers\Api\Admin\ManageJobOrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\JobOrderController;
@@ -47,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('cancel-job-order/{id}', [JobOrderController::class, 'cancel']);
         Route::delete('delete-job-order/{id}', [JobOrderController::class, 'destroy']);
         Route::post('lock-all-user-date-pickers', [UsersController::class, 'lockAllUserDatePickers']);
+        Route::post('manage-job-order-detail/store', [ManageJobOrderDetail::class, 'store']);
+        Route::delete('manage-job-order-detail/{job_order_detail}/delete', [ManageJobOrderDetail::class, 'destroy']);
     });
 
     // EMPLOYEE ROLE ROUTES

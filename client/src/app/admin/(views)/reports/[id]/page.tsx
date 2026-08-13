@@ -147,6 +147,7 @@ function EditJo() {
           formInputs={formInputs}
           setFormInputs={setFormInputs}
           id={id as number | string | undefined}
+          fetchData={fetchData}
         />
       )}
     </div>

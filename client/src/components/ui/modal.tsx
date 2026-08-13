@@ -39,7 +39,7 @@ function ModalBody({ children }: any) {
 function Modal({ isOpen, className, ref, children }: any) {
   if (!isOpen) return;
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 h-screen">
       <div
         ref={ref}
         className={cn("bg-white min-w-sm w-2/6 rounded-md relative", className)}
