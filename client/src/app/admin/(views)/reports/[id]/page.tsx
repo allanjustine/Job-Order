@@ -58,6 +58,7 @@ export type FormInputType = {
   customer: Customer;
   mechanics: Mechanic[];
   job_order_details: JobOrderDetail[];
+  transaction_code?: string;
 };
 
 const FORM_INPUTS = {
@@ -122,6 +123,7 @@ function EditJo() {
           customer: data.customer,
           mechanics: data.mechanics.map((mechanic: Mechanic) => mechanic.id),
           job_order_details: data.job_order_details,
+          transaction_code: data.transaction_code,
         });
       }
     } catch (error) {
