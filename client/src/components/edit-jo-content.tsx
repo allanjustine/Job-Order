@@ -94,10 +94,14 @@ export default function EditJoContent({
 
   return (
     <div className="space-y-3 relative">
-      <div className="border-b border-gray-500 py-2">
+      <div className="border-b border-gray-500 py-2 flex justify-between items-center">
         <div className="text-2xl font-extrabold text-gray-700">
           {" "}
           Editing JO: {formInputs.job_order_number}
+        </div>
+        <div className="text-2xl font-extrabold text-gray-700">
+          {" "}
+          Transaction Code: {formInputs.transaction_code}
         </div>
       </div>
       <div className="border rounded-xl p-5 space-y-2">
