@@ -36,7 +36,7 @@ export default function MotorEngineGrid({
               <option value="automatic">Automatic</option>
               <option value="cub">Cub</option>
               <option value="sports">Sports</option>
-              <option value="sports">Moped</option>
+              <option value="moped">Moped</option>
             </Select>
 
 
