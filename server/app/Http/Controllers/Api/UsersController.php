@@ -148,6 +148,11 @@ class UsersController extends Controller
 
         $status = $user->is_locked_date ? "locked" : "unlocked";
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($user)
+            ->log("Updated date picker status to {$status}");
+
         return response()->json([
             'message' => "User date picker is now {$status} successfully."
         ], 200);
@@ -175,6 +180,10 @@ class UsersController extends Controller
         ]);
 
         $message = $lock_status ? 'locked' : 'unlocked';
+
+        activity()
+            ->causedBy(Auth::user())
+            ->log("Successfully {$message} to {$to_message} date pickers.");
 
         return response()->json([
             'message' => "Successfully {$message} date pickers to {$to_message}"
