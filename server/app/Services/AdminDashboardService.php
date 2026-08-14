@@ -26,7 +26,6 @@ class AdminDashboardService
             ->where('job_order_type', JobOrderType::TRIMOTORS?->value)
             ->count();
 
-
         return [
             'total'           => $total,
             'total_motors'    => $totalMotors,
