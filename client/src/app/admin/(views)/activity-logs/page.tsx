@@ -38,7 +38,7 @@ const ActivityLogs = () => {
     },
     {
       name: "CAUSER",
-      selector: (row: any) => (
+      cell: (row: any) => (
         <div>
           <span className="font-bold text-gray-700">
             {row.causer ? row.causer.name : "N/A"}
