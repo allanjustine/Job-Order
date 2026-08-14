@@ -16,9 +16,11 @@ use App\Http\Controllers\Api\Admin\TargetIncomeController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\UserDashboardController;
 use App\Models\JobOrder;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', function (Request $request) {
@@ -50,6 +52,41 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('lock-all-user-date-pickers', [UsersController::class, 'lockAllUserDatePickers']);
         Route::post('manage-job-order-detail/store', [ManageJobOrderDetail::class, 'store']);
         Route::delete('manage-job-order-detail/{job_order_detail}/delete', [ManageJobOrderDetail::class, 'destroy']);
+        Route::get('activity-logs', function () {
+            $per_page = request('perPage') ?: 10;
+
+            $sort = request('sort') ?: ["column" => "id", "direction" => "desc"];
+
+            $search = request('search') ?: '';
+
+            $column = match ($sort['column']) {
+                'causer.name' => User::query()->select('name')->whereColumn('users.id', 'activity_log.causer_id'),
+                default => $sort['column']
+            };
+
+            $activities = Activity::query()
+                ->with(['causer:id,name'])
+                ->when($search, function ($query) use ($search) {
+                    $query->whereHas('causer', function ($q) use ($search) {
+                        $q->whereAny(
+                            [
+                                'name',
+                                'code',
+                                'email'
+                            ],
+                            "like",
+                            "%{$search}%"
+                        );
+                    })->orWhereLike('description', "%{$search}%");
+                })
+                ->orderBy($column, $sort["direction"])
+                ->paginate($per_page, ['id', 'description', 'causer_id', 'causer_type', 'subject_type', 'created_at']);
+
+            return response()->json([
+                'message' => 'Activity logs fetched successfully.',
+                'data'    => $activities,
+            ]);
+        });
     });
 
     // EMPLOYEE ROLE ROUTES

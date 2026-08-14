@@ -2,10 +2,12 @@
 
 import EditJoContent from "@/components/edit-jo-content";
 import EditJoLoader from "@/components/edit-jo-loader";
+import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { formatDate } from "date-fns";
-import { useParams } from "next/navigation";
+import { BookX } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export type Customer = {
@@ -93,6 +95,8 @@ function EditJo() {
   const id = useParams()?.id;
   const [formInputs, setFormInputs] = useState<FormInputType>(FORM_INPUTS);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isCanceled, setIsCanceled] = useState<boolean>(false);
+  const router = useRouter();
 
   const fetchData = async () => {
     try {
@@ -101,6 +105,7 @@ function EditJo() {
       const data = response.data.data;
 
       if (response.status === 200) {
+        setIsCanceled(data.status === "cancelled");
         setFormInputs({
           job_order_number: data.job_order_number,
           date: formatDate(data.date, "yyyy-MM-dd"),
@@ -137,6 +142,26 @@ function EditJo() {
     if (!id) return;
     fetchData();
   }, [id]);
+
+  if (isCanceled)
+    return (
+      <div className="grid justify-center items-center h-screen">
+        <div className="flex flex-col items-center space-y-3">
+          <BookX className="w-32 h-32 text-gray-700" />
+          <h1 className="text-4xl font-bold text-gray-700">
+            Sorry you cannot edit this job order as it has been cancelled
+          </h1>
+          <Button
+            type="button"
+            size="lg"
+            className="px-7 py-6 bg-blue-500 hover:bg-blue-600 hover:-translate-y-1"
+            onClick={() => router.replace("/admin/reports")}
+          >
+            Back
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="p-6">

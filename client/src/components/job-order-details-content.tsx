@@ -172,6 +172,16 @@ export default function JobOrderDetailsContent({
       });
     };
 
+  const jobRequest =
+    formInputs.job_order_details.filter(
+      (item) => item.type === "job_request",
+    ) || [];
+
+  const partsRequest =
+    formInputs.job_order_details.filter(
+      (item) => item.type === "parts_replacement",
+    ) || [];
+
   return (
     <>
       <div className="border rounded-xl p-5">
@@ -189,9 +199,8 @@ export default function JobOrderDetailsContent({
             >
               <Plus /> Add Job Request
             </Button>
-            {formInputs.job_order_details
-              .filter((item) => item.type === "job_request")
-              .map((detail, index) => (
+            {jobRequest.length > 0 ? (
+              jobRequest.map((detail, index) => (
                 <div key={index} className="flex gap-3 space-y-2">
                   <div className="w-full space-y-2">
                     <Label>Category Name</Label>
@@ -263,7 +272,14 @@ export default function JobOrderDetailsContent({
                     <Trash />
                   </Button>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full mt-5">
+                <h4 className="text-lg font-bold text-gray-600 text-center mb-5">
+                  No data added
+                </h4>
+              </div>
+            )}
           </div>
           <div className="border rounded-lg p-3 h-fit relative">
             <h4 className="text-lg font-bold text-gray-600 text-center mb-5">
@@ -277,9 +293,8 @@ export default function JobOrderDetailsContent({
             >
               <Plus /> Add Parts Used
             </Button>
-            {formInputs.job_order_details
-              .filter((item) => item.type === "parts_replacement")
-              .map((detail, index) => (
+            {partsRequest.length > 0 ? (
+              partsRequest.map((detail, index) => (
                 <div key={index} className="flex gap-3 space-y-2">
                   <div className="w-full space-y-2">
                     <Label>Parts Name</Label>
@@ -379,7 +394,14 @@ export default function JobOrderDetailsContent({
                     <Trash />
                   </Button>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full mt-5">
+                <h4 className="text-lg font-bold text-gray-600 text-center mb-5">
+                  No data added
+                </h4>
+              </div>
+            )}
           </div>
         </div>
       </div>

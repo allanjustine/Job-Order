@@ -88,6 +88,11 @@ class JobOrderController extends Controller
             'reason_for_cancellation' => request('reason')
         ]);
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($jobOrder)
+            ->log("Canceled job order data with transaction code of \"{$jobOrder->transaction_code}\" and the reason is \"{$jobOrder->reason_for_cancellation}\".");
+
         return response()->json([
             'message' => 'Job Order cancelled successfully.'
         ], 200);

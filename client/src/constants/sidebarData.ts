@@ -6,6 +6,7 @@ import {
   HandCoinsIcon,
   UserCheck,
   ShieldUser,
+  Activity,
 } from "lucide-react";
 
 export const sidebarData = [
@@ -38,6 +39,11 @@ export const sidebarData = [
     href: "/admin/area-managers",
     icon: ShieldUser,
     name: "Area Managers",
+  },
+  {
+    href: "/admin/activity-logs",
+    icon: Activity,
+    name: "Activity Logs",
   },
   {
     href: "/admin/reports",

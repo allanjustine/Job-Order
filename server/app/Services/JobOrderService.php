@@ -151,6 +151,11 @@ class JobOrderService
 
             $job_order->update($request->job_order);
 
+            activity()
+                ->causedBy(Auth::user())
+                ->performedOn($job_order)
+                ->log("Updated job order data with transaction code of \"{$job_order->transaction_code}\".");
+
             return $job_order;
         });
     }
@@ -158,6 +163,11 @@ class JobOrderService
     public function delete(string $id)
     {
         $job_order = JobOrder::findOrFail($id);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($job_order)
+            ->log("Deleted job order data with transaction code of \"{$job_order->transaction_code}\".");
 
         $job_order->delete();
 
