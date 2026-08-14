@@ -92,11 +92,22 @@ class TargetIncomeService
         TargetIncome::query()
             ->insert($toInsert);
 
-        return count($toInsert);
+        $count = count($toInsert);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->log("Created {$count} target incomes");
+
+        return $count;
     }
 
     public function update($request, $targetIncome)
     {
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($targetIncome)
+            ->log("Updated target income to {$targetIncome->user->name} from {$targetIncome->target_income} to {$request->target_income}");
+
         return $targetIncome->update([
             "target_income" => $request->target_income
         ]);
@@ -104,6 +115,11 @@ class TargetIncomeService
 
     public function delete($targetIncome)
     {
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($targetIncome)
+            ->log("Deleted target income to {$targetIncome->user->name}.");
+
         return $targetIncome->delete();
     }
 
@@ -134,6 +150,10 @@ class TargetIncomeService
 
         TargetIncome::query()
             ->insert($toInsert->toArray());
+
+        activity()
+            ->causedBy(Auth::user())
+            ->log("Synced target incomes for last month.");
 
         return $targetIncomes;
     }
