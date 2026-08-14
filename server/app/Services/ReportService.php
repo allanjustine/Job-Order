@@ -122,7 +122,7 @@ class ReportService
 
         $search = request('search', '');
 
-        return JobOrderDetail::query()
+        $job_order_details = JobOrderDetail::query()
             ->select('id', 'job_order_id', 'type', 'amount', 'quantity', 'category', 'part_brand', 'part_number')
             ->with([
                 'jobOrder:id,job_order_number,customer_id,job_order_type,general_remarks,category,status,date,reason_for_cancellation,dealers_name,model,engine_number,next_schedule_date,mileage',
@@ -224,6 +224,12 @@ class ReportService
                     'Reason for Cancellation' => $item->jobOrder?->reason_for_cancellation,
                 ];
             });
+
+        activity()
+            ->causedBy(Auth::user())
+            ->log("Exported {$job_order_details->count()} job order details in reports.");
+
+        return $job_order_details;
     }
 
     public function exportBranch()
@@ -311,6 +317,10 @@ class ReportService
                 'Reason for Cancellation' => $item->jobOrder?->reason_for_cancellation,
             ];
         });
+
+        activity()
+            ->causedBy(Auth::user())
+            ->log("Exported {$jobOrders->count()} job order details.");
 
         return $jobOrders;
     }
