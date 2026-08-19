@@ -243,8 +243,12 @@ const Dashboard = () => {
     weeklyPrints: adminStats.weekly_prints,
     monthlyPrints: adminStats.monthly_prints,
     totalMechanics: adminStats.total_mechanics,
-    totalMotorcycleJobs: phpCurrency(adminStats.total_motorcycle_jobs || 0),
-    totalTrimotorsJobs: phpCurrency(adminStats.total_trimotors_job || 0),
+    totalMotorcycleJobs: phpCurrency(
+      Number(adminStats.total_motorcycle_jobs) || 0,
+    ),
+    totalTrimotorsJobs: phpCurrency(
+      Number(adminStats.total_trimotors_job) || 0,
+    ),
     totalOverAllAmount: phpCurrency(Number(adminStats.total_amount) || 0),
     total_job_motor_print: adminStats.total_job_prints.total_motors,
     total_job_trimotor_print: adminStats.total_job_prints.total_trimotors,
