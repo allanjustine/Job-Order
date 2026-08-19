@@ -20,6 +20,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy your Laravel project into the container
 COPY . /var/www
 
+COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+
 EXPOSE 1004
 
 CMD ["php-fpm"]
