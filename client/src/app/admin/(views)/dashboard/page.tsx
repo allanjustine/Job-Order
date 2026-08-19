@@ -305,6 +305,13 @@ const Dashboard = () => {
       color: "from-rose-500 to-rose-400",
       sub: "Total revenue",
     },
+    {
+      label: "Total Amount",
+      value: isLoadingStats ? spinner() : data.totalOverAllAmount,
+      icon: PhilippinePeso,
+      color: "from-yellow-500 to-orange-400",
+      sub: "Overall revenue",
+    },
   ];
 
   const rankBadge = (index: number) => {
@@ -347,7 +354,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {/* Total Job Prints — with hover breakdown */}
           <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
             <div className="flex items-start justify-between">
@@ -355,18 +362,18 @@ const Dashboard = () => {
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
                   Total Job Prints
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="xl:text-3xl text-xl font-bold text-gray-800 mt-5">
                   {isLoadingStats ? spinner() : data.totalReceiptPrints}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   Hover to see breakdown
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
+              <div className="p-3 rounded-xl bg-linear-to-br from-blue-500 to-blue-400 shadow-md absolute right-3">
                 <Printer className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="absolute z-10 top-full left-0 mt-2 w-52 p-3 bg-white border border-gray-200 rounded-xl shadow-lg text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="absolute z-60 top-full left-0 mt-2 w-52 p-3 bg-white border border-gray-200 rounded-xl shadow-lg text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="flex justify-between py-1 border-b border-gray-100">
                 <span className="text-gray-500">Motorcycle</span>
                 <span className="font-semibold">
@@ -387,20 +394,20 @@ const Dashboard = () => {
             return (
               <div
                 key={index}
-                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 relative"
               >
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="z-50">
                     <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
                       {item.label}
                     </p>
-                    <p className="text-3xl font-bold text-gray-800">
+                    <p className="xl:text-3xl text-xl font-bold text-gray-800 mt-5">
                       {item.value}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">{item.sub}</p>
                   </div>
                   <div
-                    className={`p-3 rounded-xl bg-linear-to-br ${item.color} shadow-md`}
+                    className={`p-3 rounded-xl bg-linear-to-br ${item.color} shadow-md absolute right-3`}
                   >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
@@ -408,23 +415,6 @@ const Dashboard = () => {
               </div>
             );
           })}
-
-          {/* Total Amount */}
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-1">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                  Total Amount
-                </p>
-                <p className="text-3xl font-bold text-gray-800">
-                  {isLoadingStats ? spinner() : data.totalOverAllAmount}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
-                <PhilippinePeso className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Main Content */}
