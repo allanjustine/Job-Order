@@ -62,20 +62,16 @@ class AdminDashboardService
 
     private function totalMotorcycleJobs()
     {
-        return JobOrder::query()
-            ->where('job_order_type', JobOrderType::MOTORS?->value)
-            ->withSum('jobOrderDetails', 'amount')
-            ->get()
-            ->sum('job_order_details_sum_amount');
+        return JobOrderDetail::query()
+            ->whereRelation('jobOrder', 'job_order_type', JobOrderType::MOTORS?->value)
+            ->sum('amount');
     }
 
     private function totalTrimotorcycleJobs()
     {
-        return JobOrder::query()
-            ->where('job_order_type', JobOrderType::TRIMOTORS?->value)
-            ->withSum('jobOrderDetails', 'amount')
-            ->get()
-            ->sum('job_order_details_sum_amount');
+        return JobOrderDetail::query()
+            ->whereRelation('jobOrder', 'job_order_type', JobOrderType::TRIMOTORS?->value)
+            ->sum('amount');
     }
 
     private function totalAmount()
@@ -87,7 +83,7 @@ class AdminDashboardService
     private function topTenOverAllJobOrders()
     {
         $jobOrderDetails = JobOrderDetail::query()
-            ->get()
+            ->get(['id', 'category', 'amount', 'job_order_id'])
             ->groupBy('category');
 
         return $jobOrderDetails->map(fn($items, $category) => [
@@ -103,7 +99,7 @@ class AdminDashboardService
     private function topTenBranchJobOrders()
     {
         $customers = Customer::query()
-            ->get()
+            ->get(['id', 'user_id'])
             ->groupBy('user_id');
 
         return $customers->map(function ($items) {
@@ -114,8 +110,9 @@ class AdminDashboardService
                 ->pluck('id');
 
             $jobOrderDetails = JobOrderDetail::query()
+                ->with('jobOrder.customer.user')
                 ->whereIn('job_order_id', $jobOrderIds)
-                ->get()
+                ->get(['id', 'category', 'amount', 'job_order_id'])
                 ->groupBy('category');
 
             return $jobOrderDetails->map(fn($items, $category) => [
@@ -153,8 +150,9 @@ class AdminDashboardService
                 ->pluck('id');
 
             $jobOrderDetails = JobOrderDetail::query()
+                ->with('jobOrder.customer.user')
                 ->whereIn('job_order_id', $jobOrderIds)
-                ->get()
+                ->get(['id', 'category', 'amount', 'job_order_id'])
                 ->groupBy('category');
 
             return $jobOrderDetails->map(fn($items, $category) => [
