@@ -20,11 +20,17 @@ export default function EditJoContent({
   setFormInputs,
   id,
   fetchData,
+  setErrors,
+  errors,
+  prevNextStats,
 }: {
   formInputs: FormInputType;
   setFormInputs: Dispatch<SetStateAction<FormInputType>>;
   id?: string | number;
   fetchData: () => void;
+  setErrors: Dispatch<SetStateAction<{ [key: string]: string }>>;
+  errors: { [key: string]: string };
+  prevNextStats: { prev: number | null; next: number | null };
 }) {
   const router = useRouter();
 
@@ -68,13 +74,29 @@ export default function EditJoContent({
               router.push("/admin/reports");
             });
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
-          Swal.close();
+          if (error.response.status === 422) {
+            setErrors(error.response.data.errors);
+          } else {
+            setErrors({});
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: error.response.data.message || "An error occurred.",
+            });
+          }
         }
       }
     });
   };
+
+  const prevNext = Object.entries(prevNextStats).map(([key, value]) => {
+    return {
+      key,
+      value,
+    };
+  });
 
   return (
     <div className="space-y-3 relative">
@@ -87,6 +109,19 @@ export default function EditJoContent({
           {" "}
           Transaction Code: {formInputs.transaction_code}
         </div>
+      </div>
+      <div className="flex items-center justify-between">
+        {prevNext.map((item) => (
+          <Button
+            key={item.key}
+            className="uppercase bg-cyan-500"
+            size="lg"
+            onClick={() => router.push(`/admin/reports/${item.value}`)}
+            disabled={item.value === null}
+          >
+            {item.key}
+          </Button>
+        ))}
       </div>
       <div className="border rounded-xl p-5 space-y-2">
         <h3 className="text-xl text-gray-700 font-bold">CUSTOMER DETAILS</h3>
@@ -126,7 +161,9 @@ export default function EditJoContent({
                   <option value="Branch MC/CCR Service">
                     Branch MC/CCR Service
                   </option>
-                  <option value="Branch Delivery/Towing">Branch Delivery/Towing</option>
+                  <option value="Branch Delivery/Towing">
+                    Branch Delivery/Towing
+                  </option>
                   <option value="Warranty Claim">Warranty Claim</option>
                   <option value="Regular Customer">Regular Customer</option>
                   <option value="Walk In">Walk In</option>
@@ -158,6 +195,7 @@ export default function EditJoContent({
                   }
                 />
               )}
+              <small className="text-red-500">{errors[field.value]}</small>
             </div>
           ))}
         </div>
