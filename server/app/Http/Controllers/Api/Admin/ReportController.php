@@ -68,4 +68,29 @@ class ReportController extends Controller
     {
         //
     }
+
+    public function prevNextJobOrderStats(JobOrder $jobOrder)
+    {
+        $jobOrderItem = JobOrder::query()
+            ->select('id', 'status')
+            ->whereNull('status');
+
+        $prevJobOrder = (clone $jobOrderItem)
+            ->where('id', '<', $jobOrder->id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $nextJobOrder = (clone $jobOrderItem)
+            ->where('id', '>', $jobOrder->id)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        return response()->json([
+            'message'      => 'Previous and next job order stats retrieved successfully.',
+            'data'         => [
+                'previous' => $prevJobOrder?->id,
+                'next'     => $nextJobOrder?->id,
+            ]
+        ], 200);
+    }
 }
