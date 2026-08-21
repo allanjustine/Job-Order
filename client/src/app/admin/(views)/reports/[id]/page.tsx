@@ -96,15 +96,23 @@ function EditJo() {
   const [formInputs, setFormInputs] = useState<FormInputType>(FORM_INPUTS);
   const [loading, setLoading] = useState<boolean>(true);
   const [isCanceled, setIsCanceled] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [prevNextStats, setPrevNextStats] = useState<{
+    prev: number | null;
+    next: number | null;
+  }>({ prev: null, next: null });
   const router = useRouter();
 
   const fetchData = async () => {
     try {
-      const response = await api.get(`/show-jo/${id}/browse`);
+      const [browse, prevNext] = await Promise.all([
+        api.get(`/show-jo/${id}/browse`),
+        api.get(`/prev-next/${id}/stats`),
+      ]);
 
-      const data = response.data.data;
+      const data = browse.data.data;
 
-      if (response.status === 200) {
+      if (browse.status === 200) {
         setIsCanceled(data.status === "cancelled");
         setFormInputs({
           job_order_number: data.job_order_number,
@@ -131,6 +139,10 @@ function EditJo() {
           transaction_code: data.transaction_code,
         });
       }
+
+      if (prevNext.status === 200) {
+        setPrevNextStats(prevNext.data.data);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -142,6 +154,8 @@ function EditJo() {
     if (!id) return;
     fetchData();
   }, [id]);
+
+  console.log(prevNextStats);
 
   if (isCanceled)
     return (
@@ -173,6 +187,9 @@ function EditJo() {
           setFormInputs={setFormInputs}
           id={id as number | string | undefined}
           fetchData={fetchData}
+          setErrors={setErrors}
+          errors={errors}
+          prevNextStats={prevNextStats}
         />
       )}
     </div>
