@@ -155,8 +155,6 @@ function EditJo() {
     fetchData();
   }, [id]);
 
-  console.log(prevNextStats);
-
   if (isCanceled)
     return (
       <div className="grid justify-center items-center h-screen">
