@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import adminPaths from "@/data/admin-paths.json";
@@ -11,6 +11,20 @@ export default function BaseContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsOpenSidebar] = useState<boolean>(true);
   const isSidebarActive = adminPaths.some((item) => pathname.startsWith(item));
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setIsOpenSidebar(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const handleToggleSidebar = () => {
     setIsOpenSidebar(!isSidebarOpen);
