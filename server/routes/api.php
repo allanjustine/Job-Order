@@ -70,21 +70,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get-job-order-number', function () {
             $user = Auth::user();
 
-            $lastJobOrderNumber = $user->jobOrders()->max('job_order_number') ?? 0;
+            $last_job_order_number = $user->jobOrders()->max('job_order_number') ?? 0;
 
-            Cache::forget('jo_transaction_code');
-
-            $jobOrderNumber = sprintf('%07d', $lastJobOrderNumber + 1);
+            $job_order_number = sprintf('%07d', $last_job_order_number + 1);
 
             do {
                 $generated_code = "JO-" . Str::upper(Str::random(15));
             } while (JobOrder::query()->where('transaction_code', "{$generated_code}")->exists());
 
-            Cache::put('jo_transaction_code', $generated_code, now()->addMinutes(30));
-
             return response()->json([
-                'job_order_number' => $jobOrderNumber,
-                'transaction_code' => $generated_code
+                'job_order_number' => $job_order_number,
+                'transaction_code' => $generated_code,
             ], 200);
         });
         Route::get('mechanic-checking', function (Request $request) {
