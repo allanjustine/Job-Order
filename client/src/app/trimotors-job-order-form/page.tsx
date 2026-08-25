@@ -676,6 +676,7 @@ const TrimotorsJobOrderForm = () => {
       next_schedule_kms: nextScheduleKms,
       next_schedule_date: nextScheduleDate,
       dealers_name: dealersName,
+      transaction_code: transactionCode,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
