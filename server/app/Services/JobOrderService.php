@@ -61,11 +61,11 @@ class JobOrderService
     {
         $user = Auth::user();
 
-        $lastJobOrderNumber = $user
+        $last_job_order_number = $user
             ->jobOrders()
             ->max('job_order_number') ?? 0;
 
-        $job_order_number = \sprintf('%07d', $lastJobOrderNumber + 1);
+        $job_order_number = \sprintf('%07d', $last_job_order_number + 1);
 
         $customer = DB::transaction(function () use ($request, $user, $job_order_number) {
 
@@ -78,7 +78,6 @@ class JobOrderService
                 ->create([
                     ...$request->job_order,
                     'job_order_number' => $job_order_number,
-                    'transaction_code' => Cache::get('jo_transaction_code')
                 ]);
 
             $data = [];
@@ -117,8 +116,6 @@ class JobOrderService
 
             return $customer;
         });
-
-        Cache::forget('jo_transaction_code');
 
         return $customer;
     }
