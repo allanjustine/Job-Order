@@ -603,6 +603,7 @@ const JobOrderForm = () => {
       motorcycle_unit: motorcycleUnit,
       engine_condition: engineCondition,
       content_inside_ubox: contentUbox,
+      transaction_code: transactionCode,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
