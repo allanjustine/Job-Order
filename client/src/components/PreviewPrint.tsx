@@ -191,6 +191,8 @@ const PreviewPrint = ({ data, hasRestData }: PreviewJobOrderProps) => {
       "adjustBallRace",
       "replaceBallRace",
       "replaceForkOilAndOilSeal",
+      "upholstery",
+      "contractor",
     ];
     return jobKeys.filter((key) => isRegularJobSelected(key));
   };

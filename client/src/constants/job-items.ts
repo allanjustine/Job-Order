@@ -32,5 +32,7 @@ export const jobItems: JobItem[] = [
   { key: "adjustBallRace", label: "Adjust Ball Race" },
   { key: "replaceBallRace", label: "Replace Ball Race" },
   { key: "replaceForkOilAndOilSeal", label: "Replace Fork Oil & Oil Seal" },
+  { key: "upholstery", label: "Upholstery" },
+  { key: "contractor", label: "Contractor" },
   { key: "others", label: "Others" },
 ];

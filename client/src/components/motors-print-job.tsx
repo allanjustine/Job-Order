@@ -190,6 +190,8 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
       "adjustBallRace",
       "replaceBallRace",
       "replaceForkOilAndOilSeal",
+      "upholstery",
+      "contractor",
     ];
     return jobKeys.filter((key) => isRegularJobSelected(key));
   };

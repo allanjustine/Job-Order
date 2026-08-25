@@ -58,6 +58,8 @@ export type JobRequest = {
   adjustBallRace: boolean;
   replaceBallRace: boolean;
   replaceForkOilAndOilSeal: boolean;
+  upholstery: boolean;
+  contractor: boolean;
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[]; // Array of custom job items
   othersText: string;
@@ -129,6 +131,8 @@ export type TrimotorsJobRequestType = {
   replaceHeadlightRelay: boolean
   replaceIsolatorRubber: boolean
   replaceStatorMagnetoRotorAssy: boolean
+  upholstery: boolean;
+  contractor: boolean;
   others: boolean; // To check if Others section is enabled
   othersItems: JobOthersItem[];
   othersText: string;
@@ -164,6 +168,8 @@ export type JobAmountsType = {
   adjustBallRace?: number;
   replaceBallRace?: number;
   replaceForkOilAndOilSeal?: number;
+  upholstery?: number;
+  contractor?: number;
   others?: number;
   selectedCoupon?: number;
   total?: any;
@@ -315,6 +321,8 @@ export type TrimotorsJobAmountType = {
   replaceHeadlightRelay?: number;
   replaceIsolatorRubber?: number;
   replaceStatorMagnetoRotorAssy?: number;
+  upholstery?: number;
+  contractor?: number;
   others?: number;
   othersText?: number;
 };

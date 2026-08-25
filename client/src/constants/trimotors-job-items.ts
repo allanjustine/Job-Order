@@ -39,5 +39,7 @@ export const trimotorsJobItems: TrimotorsJobItem[] = [
   { key: "replaceHeadlightRelay", label: "Replace Headlight Relay" },
   { key: "replaceIsolatorRubber", label: "Replace Isolator Rubber" },
   { key: "replaceStatorMagnetoRotorAssy", label: "Replace Stator/Magneto/Rotor Assy." },
+  { key: "upholstery", label: "Upholstery" },
+  { key: "contractor", label: "Contractor" },
   { key: "others", label: "Others" },
 ];
