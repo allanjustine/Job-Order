@@ -141,22 +141,22 @@ const Dashboard = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    async function fetchAdminStats() {
-      try {
-        const response = await api.get("/admin-stats");
-
-        if (response.status === 200) {
-          setAdminStats(response.data.data);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoadingStats(false);
-      }
-    }
-
     fetchAdminStats();
   }, []);
+
+  async function fetchAdminStats() {
+    try {
+      const response = await api.get("/admin-stats");
+
+      if (response.status === 200) {
+        setAdminStats(response.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -446,7 +446,11 @@ const Dashboard = () => {
                   className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                     isRefresh && "opacity-60 cursor-not-allowed!"
                   }`}
-                  onClick={handleRefresh}
+                  onClick={() => {
+                    handleRefresh();
+                    setIsLoadingStats(true);
+                    fetchAdminStats();
+                  }}
                 >
                   {isRefresh ? (
                     <>
