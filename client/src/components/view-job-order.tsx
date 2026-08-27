@@ -574,7 +574,7 @@ const ViewJobOrder = ({
 
               <div className="flex mt-2" style={{ fontSize: "8pt" }}>
                 <span className="font-bold mr-2">Receipt #:</span>
-                <span className="w-30 border-b border-black mt-1"></span>
+                <span className="w-30 border-b border-black mt-1">{data.receipt_number || ""}</span>
               </div>
               <div className="flex mt-1" style={{ fontSize: "8pt" }}>
                 <span className="font-bold mr-2">Cashier's Signature:</span>
