@@ -56,6 +56,7 @@ interface TrimotorsPreviewJobOrderProps {
     jobOrderNumber: string;
     transactionCode: string;
     assignedMechanics: string[];
+    receiptNumber: string;
   };
   hasRestData?: boolean;
 }

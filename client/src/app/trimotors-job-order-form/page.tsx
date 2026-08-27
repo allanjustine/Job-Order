@@ -124,6 +124,7 @@ const TrimotorsJobOrderForm = () => {
   const [nextScheduleDate, setNextScheduleDate] = useState("");
   const [nextScheduleKms, setNextScheduleKms] = useState("");
   const [generalRemarks, setGeneralRemarks] = useState("");
+  const [receiptNumber, setReceiptNumber] = useState("");
 
   // Amounts state
   // Amounts state
@@ -515,6 +516,7 @@ const TrimotorsJobOrderForm = () => {
       mechanic.includes(mech.id),
     ),
     dealersName,
+    receiptNumber,
   };
 
   useEffect(() => {
@@ -679,6 +681,7 @@ const TrimotorsJobOrderForm = () => {
       next_schedule_date: nextScheduleDate,
       dealers_name: dealersName,
       transaction_code: transactionCode,
+      receipt_number: receiptNumber,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -779,6 +782,7 @@ const TrimotorsJobOrderForm = () => {
     setNextScheduleKms("");
     setGeneralRemarks("");
     setDealersName("");
+    setReceiptNumber("");
     setMechanic([]);
 
     // Reset amounts
@@ -1146,6 +1150,8 @@ const TrimotorsJobOrderForm = () => {
                   errors={errors}
                   signatures={signatures}
                   setSignatures={setSignatures}
+                  receiptNumber={receiptNumber}
+                  setReceiptNumber={setReceiptNumber}
                 />
                 {/* Submit Button */}
                 <div className="flex justify-end">
