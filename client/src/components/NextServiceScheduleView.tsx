@@ -50,7 +50,7 @@ export default function NextServiceScheduleView({ data }: { data: any }) {
 
        <div className="flex mt-5">
         <span className="font-bold mr-2">Receipt #:</span>
-        <span className="w-30 border-b border-black mt-2 "></span>
+        <span className="w-30 underline mt-2 "> {data.receiptNumber}</span>
       </div>
       <div className="flex mt-3">
         <span className="font-bold mr-2">Cashier's Signature:</span>

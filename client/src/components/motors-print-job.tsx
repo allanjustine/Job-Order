@@ -58,6 +58,7 @@ interface PrintJobOrderProps {
     jobOrderNumber: string;
     transactionCode: string;
     assignedMechanics: string[];
+    receiptNumber: string;
   };
   hasRestData?: boolean;
 }
@@ -89,7 +90,7 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
   };
 
   const formatCurrency = (amount: number | undefined): string => {
-    if (!amount || amount === 0) return "";
+    if (amount === undefined || amount === null) return "";
     return phpCurrency(amount);
   };
 
@@ -648,7 +649,7 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
                                   (partsOthersItem.partNumber
                                     ? `#${partsOthersItem.partNumber}`
                                     : "");
-                            partAmount = phpCurrency(partsOthersItem.amount);
+                            partAmount = phpCurrency(Number(partsOthersItem.amount));
                             partCheckbox = "[✓] ";
                           }
                         } else if (typeof part === "string") {

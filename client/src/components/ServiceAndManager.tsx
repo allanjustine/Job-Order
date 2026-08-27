@@ -5,6 +5,8 @@ export default function ServiceAndManager({
   errors,
   signatures,
   setSignatures,
+  receiptNumber,
+  setReceiptNumber,
 }: any) {
   return (
     <>
@@ -49,6 +51,21 @@ export default function ServiceAndManager({
           )}
         </div>
       </div>
+      <div className="mt-4">
+              <Label>
+                Receipt Number:
+              </Label>
+              <Input
+                error={errors.receiptNumber}
+                placeholder=""
+                className="w-50 mt-1"
+                value={receiptNumber}
+                onChange={(e) => setReceiptNumber(e.target.value)}
+              />
+              {errors.receiptNumber && (
+                <p className="text-red-500 text-xs mt-1">{errors.receiptNumber}</p>
+              )}
+            </div>
     </>
   );
 }

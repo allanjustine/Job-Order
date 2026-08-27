@@ -59,6 +59,7 @@ interface PreviewJobOrderProps {
     jobOrderNumber: string;
     transactionCode: string;
     assignedMechanics: string[];
+    receiptNumber: string;
   };
   hasRestData?: boolean;
 }
@@ -90,7 +91,7 @@ const PreviewPrint = ({ data, hasRestData }: PreviewJobOrderProps) => {
   };
 
   const formatCurrency = (amount: number | undefined): string => {
-    if (!amount || amount === 0) return "";
+    if (amount === undefined || amount === null) return "";
     return phpCurrency(amount);
   };
 
@@ -569,7 +570,7 @@ const PreviewPrint = ({ data, hasRestData }: PreviewJobOrderProps) => {
                             (partsOthersItem.partNumber
                               ? `#${partsOthersItem.partNumber}`
                               : "");
-                      partAmount = formatCurrency(partsOthersItem.amount);
+                      partAmount = formatCurrency(Number(partsOthersItem.amount));
                       partCheckbox = "[✓] ";
                     }
                   } else if (typeof part === "string") {

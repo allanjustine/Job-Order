@@ -234,6 +234,7 @@ const JobOrderForm = () => {
   const [transactionCode, setTransactionCode] = useState("");
   const [dealersName, setDealersName] = useState("");
   const [otherRemarks, setOtherRemarks] = useState("");
+  const [receiptNumber, setReceiptNumber] = useState("");
   const [mechanics, setMechanics] = useState<any>([]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [hasRestData, setHasRestData] = useState<boolean>(false);
@@ -490,6 +491,7 @@ const JobOrderForm = () => {
       mechanic.includes(mech.id),
     ),
     dealersName,
+    receiptNumber,
   };
 
   useEffect(() => {
@@ -606,6 +608,7 @@ const JobOrderForm = () => {
       engine_condition: engineCondition,
       content_inside_ubox: contentUbox,
       transaction_code: transactionCode,
+      receipt_number: receiptNumber,
     },
     job_order_details: itemsData,
     mechanic_ids: mechanic,
@@ -708,6 +711,7 @@ const JobOrderForm = () => {
     setEstimatedRepairTime("");
     setMechanic([]);
     setDealersName("");
+    setReceiptNumber("");
 
     // Reset amounts
     setJobAmounts({});
@@ -1046,6 +1050,8 @@ const JobOrderForm = () => {
                   errors={errors}
                   signatures={signatures}
                   setSignatures={setSignatures}
+                  receiptNumber={receiptNumber}
+                  setReceiptNumber={setReceiptNumber}
                 />
                 {/* Submit Button */}
                 <div className="flex justify-end">
