@@ -136,4 +136,13 @@ class JobOrderController extends Controller
 
         return response()->noContent();
     }
+
+    public function addReceipt(JobOrderService $jobOrderService, JobOrder $jobOrder, Request $request)
+    {
+        $jobOrderService->addReceipt($jobOrder, $request);
+
+        return response()->json([
+            'message' => 'Receipt added successfully.'
+        ], 200);
+    }
 }

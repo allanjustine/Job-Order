@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 200);
         });
         Route::post('verifying-job-order', [JobOrderController::class, 'verifyingJobOrder']);
+        Route::post('add-receipt/{job_order}', [JobOrderController::class, 'addReceipt']);
     });
 
     // GLOBAL AUTHENTICATED ROUTES

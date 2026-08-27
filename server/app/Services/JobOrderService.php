@@ -25,7 +25,7 @@ class JobOrderService
         };
 
         $jobOrders = JobOrder::query()
-            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'status', 'next_schedule_date', 'next_schedule_kms', 'created_at')
+            ->select('id', 'job_order_number', 'job_order_type', 'customer_id', 'status', 'next_schedule_date', 'next_schedule_kms', 'created_at','receipt_number')
             ->with([
                 'customer:id,name',
                 'mechanics:id,name',
@@ -169,5 +169,16 @@ class JobOrderService
         $job_order->delete();
 
         return $job_order;
+    }
+
+    public function addReceipt($job_order, $request)
+    {
+        return DB::transaction(function () use ($job_order, $request) {
+
+            $job_order->update([
+                'receipt_number' => $request->receipt_number,
+            ]);
+            return $job_order;
+        });
     }
 }
