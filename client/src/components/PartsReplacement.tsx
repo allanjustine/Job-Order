@@ -152,7 +152,7 @@ export default function PartsReplacementSection({
       brand: "",
       partNumber: "",
       quantity: 1,
-      amount: 0,
+      amount: "",
     };
     const updatedItems = [...partsOthersItems, newItem];
     setPartsReplacement({
@@ -218,7 +218,7 @@ export default function PartsReplacementSection({
     // Total will be recalculated by useEffect
   };
 
-  const updatePartsOthersAmount = (id: string, amount: number) => {
+  const updatePartsOthersAmount = (id: string, amount: number | "") => {
     const updatedItems = partsOthersItems.map((item) =>
       item.id === id ? { ...item, amount } : item,
     );
@@ -229,7 +229,7 @@ export default function PartsReplacementSection({
 
     // Total ay sum ng amount lang, hindi na quantity * amount
     const totalOthersAmount = updatedItems.reduce(
-      (sum, item) => sum + item.amount,
+      (sum, item) => sum + Number(item.amount),
       0,
     );
     handlePartsAmountChange("partsOthers", totalOthersAmount);
@@ -245,7 +245,7 @@ export default function PartsReplacementSection({
           brand: "",
           partNumber: "",
           quantity: 1,
-          amount: 0,
+          amount: "",
         };
         setPartsReplacement({
           ...partsReplacement,
@@ -395,7 +395,7 @@ export default function PartsReplacementSection({
                               value={
                                 partsAmounts[
                                   item.key as keyof PartsAmountsType
-                                ] || ""
+                                ] ?? ""
                               }
                               onChange={(e) =>
                                 handleAmountChangeWithTotal(
@@ -527,11 +527,11 @@ export default function PartsReplacementSection({
                           <Input
                             type="number"
                             placeholder="0.00"
-                            value={item.amount || ""}
+                            value={item.amount ?? ""}
                             onChange={(e) =>
                               updatePartsOthersAmount(
                                 item.id,
-                                Number(e.target.value),
+                                e.target.value === "" ? "" : Number(e.target.value)
                               )
                             }
                             step="0.01"

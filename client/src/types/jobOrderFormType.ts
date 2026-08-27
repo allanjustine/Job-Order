@@ -15,7 +15,7 @@ export interface PartsOthersItem {
   brand: string;
   partNumber: string;
   quantity: number;
-  amount: number;
+  amount: number | "";
 }
 
 export interface TrimotorsPartsOthersItem {
@@ -24,7 +24,7 @@ export interface TrimotorsPartsOthersItem {
   brand: string;
   partNumber: string;
   quantity: number;
-  amount: number;
+  amount: number | "";
 }
 
 export type JobRequest = {

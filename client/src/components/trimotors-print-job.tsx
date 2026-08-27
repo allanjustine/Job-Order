@@ -56,6 +56,7 @@ interface TrimotorsPrintJobOrderProps {
     jobOrderNumber: string;
     transactionCode: string;
     assignedMechanics: string[];
+    receiptNumber: string;
   };
   hasRestData?: boolean;
 }
@@ -102,7 +103,7 @@ const TrimotorsPrintJobOrder = ({
   };
 
   const formatCurrency = (amount: number | undefined): string => {
-    if (!amount || amount === 0) return "";
+    if (amount === undefined || amount === null) return "";
     return phpCurrency(amount);
   };
 
