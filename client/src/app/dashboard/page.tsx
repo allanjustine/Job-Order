@@ -12,6 +12,7 @@ import {
   User,
   Eye,
   Printer,
+  Newspaper,
 } from "lucide-react";
 import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -100,6 +101,10 @@ const Dashboard = () => {
   const [isPrintRestItems, setIsPrintRestItems] = useState<boolean>(false);
   const [viewRemainingData, setViewRemainingData] = useState<any>(null);
   const [dataToExport, setDataToExport] = useState<any>(null);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
+  const [receiptJobOrderId, setReceiptJobOrderId] = useState<number | null>(null);
+  const [receiptNumber, setReceiptNumber] = useState<string>("");
+  const [isSubmittingReceipt, setIsSubmittingReceipt] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isReprint) return;
@@ -256,6 +261,50 @@ const Dashboard = () => {
     }
   };
 
+  const handleOpenReceiptModal = (id: number) => () => {
+    setReceiptJobOrderId(id);
+    setReceiptNumber("");
+    setIsReceiptModalOpen(true);
+  };
+
+  const handleCloseReceiptModal = () => {
+    setIsReceiptModalOpen(false);
+    setReceiptJobOrderId(null);
+    setReceiptNumber("");
+  };
+
+  const handleAddReceipt = async () => {
+    if (!receiptJobOrderId || !receiptNumber.trim()) return;
+
+    setIsSubmittingReceipt(true);
+    try {
+      const response = await api.post(`/add-receipt/${receiptJobOrderId}`, {
+        receipt_number: receiptNumber.trim(),
+      });
+      if (response.status === 200) {
+        toast.success(response.data.message, {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "👍",
+        });
+        handleCloseReceiptModal();
+        handleRefresh();
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to add receipt number.",
+        {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "⚠️",
+        },
+      );
+    } finally {
+      setIsSubmittingReceipt(false);
+    }
+  };
+
   const columns = [
     {
       name: "JO NUMBER",
@@ -329,13 +378,26 @@ const Dashboard = () => {
     {
       name: "ACTION",
       cell: (row: any) => (
-        <div>
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             onClick={handleView(row.id)}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             ref={buttonRef}
           >
-            <Eye /> View
+            <Eye />
+          </Button>
+          <Button
+            onClick={handleOpenReceiptModal(row.id)}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            ref={buttonRef}
+            disabled={!!row.receipt_number}
+            title={
+              row.receipt_number
+                ? `Receipt already added: ${row.receipt_number}`
+                : "Add Receipt Number"
+            }
+          >
+            <Newspaper />
           </Button>
         </div>
       ),
@@ -987,6 +1049,65 @@ const Dashboard = () => {
             }
           >
             <FaCheckCircle /> Proceed
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={isReceiptModalOpen} className="w-md">
+        <ModalHeader onClose={handleCloseReceiptModal}>
+          Add Receipt Number
+        </ModalHeader>
+        <ModalBody>
+          <div className="space-y-2">
+            <label
+              htmlFor="receipt-number"
+              className="text-sm font-medium text-gray-600"
+            >
+              Receipt Number
+            </label>
+            <Input
+              id="receipt-number"
+              type="text"
+              autoFocus
+              placeholder="Enter receipt number..."
+              value={receiptNumber}
+              onChange={(e: any) => setReceiptNumber(e.target.value)}
+              onKeyDown={(e: any) => {
+                if (e.key === "Enter" && !isSubmittingReceipt) {
+                  handleAddReceipt();
+                }
+              }}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            type="button"
+            className={`bg-green-500 py-5 hover:bg-green-600 text-white ${
+              isSubmittingReceipt || !receiptNumber.trim()
+                ? "cursor-not-allowed!"
+                : ""
+            }`}
+            onClick={handleAddReceipt}
+            disabled={isSubmittingReceipt || !receiptNumber.trim()}
+          >
+            {isSubmittingReceipt ? (
+              <>
+                <Spinner /> Submitting...
+              </>
+            ) : (
+              <>
+                <FaCheckCircle /> Submit
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            className="bg-gray-400 hover:bg-gray-500 text-white py-5"
+            onClick={handleCloseReceiptModal}
+          >
+            Cancel
           </Button>
         </ModalFooter>
       </Modal>
