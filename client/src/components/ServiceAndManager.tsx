@@ -52,20 +52,20 @@ export default function ServiceAndManager({
         </div>
       </div>
       <div className="mt-4">
-              <Label>
-                Receipt Number:
-              </Label>
-              <Input
-                error={errors.receiptNumber}
-                placeholder=""
-                className="w-50 mt-1"
-                value={receiptNumber}
-                onChange={(e) => setReceiptNumber(e.target.value)}
-              />
-              {errors.receiptNumber && (
-                <p className="text-red-500 text-xs mt-1">{errors.receiptNumber}</p>
-              )}
-            </div>
+        <Label>
+          Receipt Number: <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          error={errors.receiptNumber}
+          placeholder=""
+          className="w-80 mt-1"
+          value={receiptNumber}
+          onChange={(e) => setReceiptNumber(e.target.value)}
+        />
+        {errors.receiptNumber && (
+          <p className="text-red-500 text-xs mt-1">{errors.receiptNumber}</p>
+        )}
+      </div>
     </>
   );
 }
