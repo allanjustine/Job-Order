@@ -111,4 +111,9 @@ export const BOTTOM_FIELDS = [
     value: "branch_manager",
     type: "text",
   },
+  {
+    label: "Receipt Number",
+    value: "receipt_number",
+    type: "text",
+  },
 ];

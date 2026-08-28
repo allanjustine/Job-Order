@@ -61,6 +61,7 @@ export type FormInputType = {
   mechanics: Mechanic[];
   job_order_details: JobOrderDetail[];
   transaction_code?: string;
+  receipt_number?: string;
 };
 
 const FORM_INPUTS = {
@@ -89,6 +90,7 @@ const FORM_INPUTS = {
   },
   mechanics: [],
   job_order_details: [],
+  receipt_number: "",
 };
 
 function EditJo() {
@@ -137,6 +139,7 @@ function EditJo() {
           mechanics: data.mechanics.map((mechanic: Mechanic) => mechanic.id),
           job_order_details: data.job_order_details,
           transaction_code: data.transaction_code,
+          receipt_number: data.receipt_number,
         });
       }
 
