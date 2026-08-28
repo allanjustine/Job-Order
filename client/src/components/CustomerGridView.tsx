@@ -14,7 +14,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           </span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Engine/Frame No.:</span>
+          <span className="font-bold w-32">Engine/Frame No.:</span>
           <span className="border-b border-black flex-1">
             {data.engineFrameNo}
           </span>
@@ -24,7 +24,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           <span className="border-b border-black flex-1">{data.branch}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Mileage:</span>
+          <span className="font-bold w-32">Mileage:</span>
           <span className="border-b border-black flex-1">
             {data.mileage} km
           </span>
@@ -36,7 +36,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           </span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Purchased Date:</span>
+          <span className="font-bold w-32">Purchased Date:</span>
           <span className="border-b border-black flex-1">
             {data.purchaseDate}
           </span>
@@ -46,7 +46,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           <span className="border-b border-black flex-1">{data.contact}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Estimated Repair Time:</span>
+          <span className="font-bold w-32">Estimated Repair Time:</span>
           <span className="border-b border-black flex-1">
             {data.estimatedRepairTime}
           </span>
@@ -56,7 +56,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           <span className="border-b border-black flex-1">{data.model}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Repair Start Time:</span>
+          <span className="font-bold w-32">Repair Start Time:</span>
           <span className="border-b border-black flex-1">
             {data.repairStart}
           </span>
@@ -66,7 +66,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           <span className="border-b border-black flex-1">{data.address}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Repair End Time:</span>
+          <span className="font-bold w-32">Repair End Time:</span>
           <span className="border-b border-black flex-1">{data.repairEnd}</span>
         </div>
         <div className="flex">
@@ -74,7 +74,7 @@ export default function CustomerGridView({ data }: { data: any }) {
           <span className="border-b border-black flex-1">{data.remarks}</span>
         </div>
         <div className="flex">
-          <span className="font-bold w-40">Mechanic Name:</span>
+          <span className="font-bold w-32">Mechanic Name:</span>
           <span className="border-b border-black flex-1">
             {data.assignedMechanics
               ?.map((mechanic: any) => mechanic.name)
