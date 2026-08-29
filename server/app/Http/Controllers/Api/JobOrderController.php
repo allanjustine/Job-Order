@@ -130,9 +130,9 @@ class JobOrderController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->is_locked_date && !now()->isSameDay($request->job_order_date)) {
-            abort(400, 'Submissions of job orders are only allowed on today\'s date. Please make sure the date is correct.');
-        }
+        abort_if($user->is_locked_date && !now()->isSameDay($request->job_order_date), 400, 'Submissions of job orders are only allowed on today\'s date. Please make sure the date is correct.');
+
+        abort_unless(now()->isSameYear($request->job_order_date), 400, 'Submissions of job orders are only allowed on the current year. Please make sure the date is correct.');
 
         return response()->noContent();
     }

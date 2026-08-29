@@ -225,9 +225,11 @@ class ReportService
                 ];
             });
 
-        activity()
-            ->causedBy(Auth::user())
-            ->log("Exported {$job_order_details->count()} job order details in reports.");
+        if ($job_order_details->isNotEmpty()) {
+            activity()
+                ->causedBy(Auth::user())
+                ->log("Exported {$job_order_details->count()} job order details in reports.");
+        }
 
         return $job_order_details;
     }
@@ -318,9 +320,11 @@ class ReportService
             ];
         });
 
-        activity()
-            ->causedBy(Auth::user())
-            ->log("Exported {$jobOrders->count()} job order details.");
+        if ($jobOrders->isNotEmpty()) {
+            activity()
+                ->causedBy(Auth::user())
+                ->log("Exported {$jobOrders->count()} job order details in reports.");
+        }
 
         return $jobOrders;
     }

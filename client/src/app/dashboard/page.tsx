@@ -66,6 +66,7 @@ const Dashboard = () => {
     handlePageChange,
     handleSearch,
     handleRefresh,
+    fetchData,
   } = useFetch("/job-orders");
   const [viewData, setViewData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -102,9 +103,12 @@ const Dashboard = () => {
   const [viewRemainingData, setViewRemainingData] = useState<any>(null);
   const [dataToExport, setDataToExport] = useState<any>(null);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
-  const [receiptJobOrderId, setReceiptJobOrderId] = useState<number | null>(null);
+  const [receiptJobOrderId, setReceiptJobOrderId] = useState<number | null>(
+    null,
+  );
   const [receiptNumber, setReceiptNumber] = useState<string>("");
-  const [isSubmittingReceipt, setIsSubmittingReceipt] = useState<boolean>(false);
+  const [isSubmittingReceipt, setIsSubmittingReceipt] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (!isReprint) return;
@@ -288,7 +292,7 @@ const Dashboard = () => {
           icon: "👍",
         });
         handleCloseReceiptModal();
-        handleRefresh();
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
