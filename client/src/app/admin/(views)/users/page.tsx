@@ -66,6 +66,8 @@ const Users = () => {
           {row.user_export_log ?? "N/A"}
         </span>
       ),
+      sortable: true,
+      sortField: "user_export_log.created_at",
     },
     {
       name: "ASSIGNED BRANCH",
@@ -77,6 +79,8 @@ const Users = () => {
           </span>
         </div>
       ),
+      sortable: true,
+      sortField: "branch.branch_name",
     },
     {
       name: "ROLES",
@@ -96,6 +100,8 @@ const Users = () => {
           ))}
         </div>
       ),
+      sortable: true,
+      sortField: "user.role",
     },
     {
       name: "EMAIL",
