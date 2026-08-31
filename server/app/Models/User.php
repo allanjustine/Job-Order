@@ -99,6 +99,7 @@ class User extends Authenticatable
 
     public function userExportLog()
     {
-        return $this->hasOne(UserExportLog::class);
+        return $this->hasOne(UserExportLog::class)
+            ->latestOfMany();
     }
 }
