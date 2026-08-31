@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\RoleName;
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\User;
+use App\Models\UserExportLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
@@ -21,6 +24,13 @@ class UsersController extends Controller
         $sort = request('sort') ?: ["column" => "id", "direction" => "desc"];
 
         $search = request('search') ?: '';
+
+        $sort['column'] = match ($sort['column']) {
+            'user_export_log.created_at' => UserExportLog::query()->select('created_at')->whereColumn('user_export_logs.user_id', 'users.id')->latest()->limit(1),
+            'branch.branch_name'         => Branch::query()->select('branch_name')->whereColumn('branches.id', 'users.branch_id'),
+            'user.role'                  => Role::query()->select('roles.name')->join('model_has_roles', 'model_has_roles.role_id', '=', 'roles.id')->whereColumn('model_has_roles.model_id', 'users.id'),
+            default                      => $sort['column']
+        };
 
         $customers = User::with(['branch:id,branch_name,branch_code', 'roles:id,name', 'userExportLog'])
             ->whereNotIn('id', [Auth::id()])
@@ -59,7 +69,7 @@ class UsersController extends Controller
                 "user_export_log" => $user->userExportLog?->created_at?->diffForHumans(),
                 "is_locked_date"  => $user->is_locked_date,
                 "roles"           => $user->roles,
-                "created_at"      => $user->created_at,
+                "created_at"      => $user->created_at
             ])
         ]);
 
