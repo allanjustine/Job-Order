@@ -44,6 +44,7 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
+import { getMotorsPrintPageCount } from "@/utils/job-order-pagination";
 import { Spinner } from "@/components/ui/spinner";
 
 const QUANTITY_DATA = {
@@ -289,6 +290,11 @@ const TrimotorsJobOrderForm = () => {
   const [otherRemarks, setOtherRemarks] = useState("");
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [hasRestData, setHasRestData] = useState<boolean>(false);
+  // 0-indexed page currently being printed. Drives TrimotorsPrintJobOrder
+  // directly so ANY number of pages can be printed, not just a
+  // hard-capped 20 items / 2 pages. hasRestData is kept only for
+  // backward compat with the TrimotorsPreviewPrint modal component.
+  const [printPage, setPrintPage] = useState<number>(0);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -541,19 +547,25 @@ const TrimotorsJobOrderForm = () => {
   useEffect(() => {
     if (!isPrint) return;
 
+    const jobRequestCount = Object.entries(
+      TrimotorsjobOrderData.jobAmounts,
+    ).length;
+    const partsCount = Object.entries(
+      TrimotorsjobOrderData.partsAmounts,
+    ).length;
+    const totalPages = getMotorsPrintPageCount(jobRequestCount, partsCount);
+
     window.onafterprint = () => {
-      const jobRequestCount = Object.entries(
-        TrimotorsjobOrderData.jobAmounts,
-      ).length;
-      const partsCount = Object.entries(
-        TrimotorsjobOrderData.partsAmounts,
-      ).length;
-      if (!hasRestData && Math.max(jobRequestCount, partsCount) > 10) {
-        setIsPrint(false);
+      const nextPage = printPage + 1;
+
+      if (nextPage < totalPages) {
+        // Stay in "print mode" (isPrint stays true) while the confirm
+        // dialog is up, so the background print target never
+        // unmounts/remounts mid-flow.
         Swal.fire({
           icon: "info",
           title: "Print Rest Items",
-          text: `Are you sure you want to print rest items?`,
+          text: `Are you sure you want to print the rest of the items? (Page ${nextPage + 1} of ${totalPages})`,
           confirmButtonText: "Yes",
           confirmButtonColor: "#3085d6",
           showCancelButton: true,
@@ -561,21 +573,19 @@ const TrimotorsJobOrderForm = () => {
           allowOutsideClick: false,
         }).then((result) => {
           if (result.isConfirmed) {
-            setIsPrint(true);
-            setHasRestData(true);
-          }
-          if (result.isDismissed) {
+            setPrintPage(nextPage);
+          } else {
+            setPrintPage(0);
             setIsPrint(false);
-            setHasRestData(false);
             handleSavePrint();
             fetchJobOrderNumber();
           }
         });
       } else {
-        setHasRestData(false);
+        setPrintPage(0);
+        setIsPrint(false);
         handleSavePrint();
         fetchJobOrderNumber();
-        setIsPrint(false);
       }
     };
 
@@ -598,7 +608,7 @@ const TrimotorsJobOrderForm = () => {
     return () => {
       window.onafterprint = null;
     };
-  }, [isPrint, hasRestData, TrimotorsjobOrderData]);
+  }, [isPrint, printPage, TrimotorsjobOrderData]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -713,6 +723,7 @@ const TrimotorsJobOrderForm = () => {
   };
 
   const handlePrint = () => {
+    setPrintPage(0);
     setIsPrint(!isPrint);
   };
 
@@ -971,7 +982,7 @@ const TrimotorsJobOrderForm = () => {
       {isPrint ? (
         <TrimotorsPrintJobOrder
           data={TrimotorsjobOrderData}
-          hasRestData={hasRestData}
+          printPage={printPage}
         />
       ) : (
         <>

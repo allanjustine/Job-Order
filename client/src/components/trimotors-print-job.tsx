@@ -19,6 +19,7 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
+import { getJobOrderPageRange, getMotorsPrintPageCount,} from "@/utils/job-order-pagination";
 
 interface TrimotorsPrintJobOrderProps {
   data: {
@@ -59,12 +60,16 @@ interface TrimotorsPrintJobOrderProps {
     receiptNumber: string;
   };
   hasRestData?: boolean;
+  printPage?: number;
 }
 
 const TrimotorsPrintJobOrder = ({
   data,
   hasRestData,
+  printPage,
 }: TrimotorsPrintJobOrderProps) => {
+
+  const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
 
   // Safely calculate totals with fallbacks
@@ -304,6 +309,20 @@ const TrimotorsPrintJobOrder = ({
     return item?.status === statusType ? "✓" : "";
   };
 
+  // Total pages needed to fit ALL selected jobs/parts (dynamic, not
+  // capped to 20 items / 2 pages anymore).
+  const totalPages = getMotorsPrintPageCount(
+    getSelectedJobs().length,
+    getSelectedParts().length,
+  );
+  // Footer content (Grand Total, next service schedule, "Printed on")
+  // only makes sense once, so only show it on the LAST printed page.
+  const isLastPage = resolvedPage >= totalPages - 1;
+  // On continuation pages (page 2, 3, ...) don't repeat the header,
+  // vehicle info, or diagnosis section — only the JOB ORDER table
+  // continues, so printed sheets look clean.
+  const isFirstPage = resolvedPage === 0;
+
   return (
     <div className="print-page">
       {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
@@ -400,16 +419,20 @@ const TrimotorsPrintJobOrder = ({
                   </h3>
                 </div>
               </div>
-              <h2
-                className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
-                style={{ fontSize: "8pt", lineHeight: "0.8" }}
-              >
-                VEHICLE CHECKLIST
-              </h2>
+              {isFirstPage && (
+                <h2
+                  className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
+                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                >
+                  VEHICLE CHECKLIST
+                </h2>
+              )}
             </div>
 
-            {/* Vehicle Information - Compact Grid */}
-            <CustomerGridView data={data} />
+            {isFirstPage && (
+              <>
+                {/* Vehicle Information - Compact Grid */}
+                <CustomerGridView data={data} />
 
             {/* Motorcycle Unit & Engine Unit */}
             {/* <div
@@ -493,11 +516,22 @@ const TrimotorsPrintJobOrder = ({
                 </table>
               )}
             </div>
+              </>
+            )}
+
+            {!isFirstPage && (
+              <div
+                className="mb-1 text-center font-bold border border-black py-0.5 bg-gray-100"
+                style={{ fontSize: "7.5pt" }}
+              >
+                JOB ORDER (continued)
+              </div>
+            )}
 
             {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
             <div
               className="mb-1 text-xs"
-              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+              style={{ fontSize: "6.5pt", lineHeight: "0.8" }}
             >
               <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
                 JOB ORDER
@@ -528,13 +562,11 @@ const TrimotorsPrintJobOrder = ({
                 </thead>
                 <tbody>
                   {(() => {
-                    const selectedJobs = getSelectedJobs().slice(
-                      hasRestData ? 10 : 0,
-                      hasRestData ? 20 : 10,
-                    );
+                    const { start, end } = getJobOrderPageRange(resolvedPage);
+                    const selectedJobs = getSelectedJobs().slice(start, end);
                     const selectedParts = getSelectedParts().slice(
-                      hasRestData ? 10 : 0,
-                      hasRestData ? 20 : 10,
+                      start,
+                      end,
                     );
 
                     // Get the maximum number of rows needed
@@ -681,23 +713,31 @@ const TrimotorsPrintJobOrder = ({
                 </tbody>
               </table>
 
-              {/* Grand Total */}
-              <div className="flex justify-between items-center border border-black border-t-0 py-1">
-                <div className="font-bold ml-1">
-                  Grand Total: {phpCurrency(grandTotal)}
-                </div>
-              </div>
+              {isLastPage && (
+                <>
+                  {/* Grand Total */}
+                  <div className="flex justify-between items-center border border-black border-t-0 py-1">
+                    <div className="font-bold ml-1">
+                      Grand Total: {phpCurrency(grandTotal)}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
-            <NextServiceScheduleView data={data} />
+            {isLastPage && (
+              <>
+                <NextServiceScheduleView data={data} />
 
-            {/* Footer Note */}
-            <p
-              className="mt-2 text-center float-left"
-              style={{ fontSize: "6pt" }}
-            >
-              Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
-            </p>
+                {/* Footer Note */}
+                <p
+                  className="mt-2 text-center float-left"
+                  style={{ fontSize: "6pt" }}
+                >
+                  Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
+                </p>
+              </>
+            )}
 
             {index === 1 && (
               <span
