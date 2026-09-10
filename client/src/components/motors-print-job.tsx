@@ -21,6 +21,7 @@ import { partsItems } from "@/constants/part-items";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
+import { getJobOrderPageRange, getMotorsPrintPageCount,} from "@/utils/job-order-pagination";
 
 interface PrintJobOrderProps {
   data: {
@@ -61,9 +62,11 @@ interface PrintJobOrderProps {
     receiptNumber: string;
   };
   hasRestData?: boolean;
+  printPage?: number;
 }
 
-const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
+const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProps) => {
+  const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
   // Safely calculate totals with fallbacks
   const jobTotal = Object.values(data.jobAmounts || {}).reduce(
     (s: number, v) => s + (Number(v) || 0),
@@ -304,6 +307,18 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
     );
   };
 
+  const totalPages = getMotorsPrintPageCount(
+    getAllSelectedJobs().length,
+    getAllSelectedParts().length,
+  );
+  // Footer content (Grand Total, next service schedule, "Printed on")
+  // only makes sense once, so only show it on the LAST printed page.
+  const isLastPage = resolvedPage >= totalPages - 1;
+  // On continuation pages (page 2, 3, ...) don't repeat the header,
+  // vehicle info, or diagnosis section — only the JOB ORDER table
+  // continues, so printed sheets look clean.
+  const isFirstPage = resolvedPage === 0;
+
   return (
     <div className="print-page">
       {/* Print sizing: content is 5in x 7.7in, rotated 90deg ONLY WHEN PRINTING
@@ -400,16 +415,20 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
                   </h3>
                 </div>
               </div>
-              <h2
-                className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
-                style={{ fontSize: "8pt", lineHeight: "0.8" }}
-              >
-                VEHICLE CHECKLIST
-              </h2>
+              {isFirstPage && (
+                <h2
+                  className="font-bold border-t border-b border-black py-1 my-1 text-center w-full"
+                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                >
+                  VEHICLE CHECKLIST
+                </h2>
+              )}
             </div>
 
-            {/* Vehicle Information */}
-            <CustomerGridView data={data} />
+            {isFirstPage && (
+              <>
+                {/* Vehicle Information */}
+                <CustomerGridView data={data} />
 
             {/* Motorcycle Unit & Engine Unit */}
             {/* <div
@@ -517,11 +536,22 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
                 </table>
               )}
             </div>
+              </>
+            )}
+
+            {!isFirstPage && (
+              <div
+                className="mb-1 text-center font-bold border border-black py-0.5 bg-gray-100"
+                style={{ fontSize: "7.5pt" }}
+              >
+                JOB ORDER (continued)
+              </div>
+            )}
 
             {/* JOB ORDER - Fixed 17 rows (16 data rows + 1 totals row) */}
             <div
               className="mb-1 text-xs"
-              style={{ fontSize: "8pt", lineHeight: "0.8" }}
+              style={{ fontSize: "6.5pt", lineHeight: "0.8" }}
             >
               <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
                 JOB ORDER
@@ -552,13 +582,14 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
                 </thead>
                 <tbody>
                   {(() => {
+                    const { start, end } = getJobOrderPageRange(resolvedPage);
                     const allSelectedJobs = getAllSelectedJobs().slice(
-                      hasRestData ? 10 : 0,
-                      hasRestData ? 20 : 10,
+                      start,
+                      end,
                     );
                     const allSelectedParts = getAllSelectedParts().slice(
-                      hasRestData ? 10 : 0,
-                      hasRestData ? 20 : 10,
+                      start,
+                      end,
                     );
 
                     // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
@@ -745,23 +776,31 @@ const MotorsPrintJobOrder = ({ data, hasRestData }: PrintJobOrderProps) => {
                 </tbody>
               </table>
 
-              {/* Grand Total */}
-              <div className="flex justify-between items-center border border-black border-t-0 py-1">
-                <div className="font-bold ml-1">
-                  Grand Total: {phpCurrency(grandTotal)}
-                </div>
-              </div>
+              {isLastPage && (
+                <>
+                  {/* Grand Total */}
+                  <div className="flex justify-between items-center border border-black border-t-0 py-1">
+                    <div className="font-bold ml-1">
+                      Grand Total: {phpCurrency(grandTotal)}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
-            <NextServiceScheduleView data={data} />
+            {isLastPage && (
+              <>
+                <NextServiceScheduleView data={data} />
 
-            {/* Footer Note */}
-            <p
-              className="mt-2 text-center float-left"
-              style={{ fontSize: "6pt" }}
-            >
-              Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
-            </p>
+                {/* Footer Note */}
+                <p
+                  className="mt-2 text-center float-left"
+                  style={{ fontSize: "6pt" }}
+                >
+                  Printed on: {format(new Date(), "MMMM dd, yyyy hh:mm a")}
+                </p>
+              </>
+            )}
 
             {index === 1 && (
               <span

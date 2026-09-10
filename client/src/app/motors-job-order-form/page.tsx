@@ -43,6 +43,7 @@ import PreviewPrint from "@/components/PreviewPrint";
 import FormHeader from "@/components/form-header";
 import { jobItems } from "@/constants/job-items";
 import { partsItems } from "@/constants/part-items";
+import { getMotorsPrintPageCount } from "@/utils/job-order-pagination";
 import { Spinner } from "@/components/ui/spinner";
 
 const QUANTITY_DATA = {
@@ -238,6 +239,7 @@ const JobOrderForm = () => {
   const [mechanics, setMechanics] = useState<any>([]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [hasRestData, setHasRestData] = useState<boolean>(false);
+  const [printPage, setPrintPage] = useState<number>(0);
 
   useEffect(() => {
     async function fetchMechanics() {
@@ -516,15 +518,18 @@ const JobOrderForm = () => {
   useEffect(() => {
     if (!isPrint) return;
 
+    const jobRequestCount = Object.entries(jobOrderData.jobAmounts).length;
+    const partsCount = Object.entries(jobOrderData.partsAmounts).length;
+    const totalPages = getMotorsPrintPageCount(jobRequestCount, partsCount);
+
     window.onafterprint = () => {
-      const jobRequestCount = Object.entries(jobOrderData.jobAmounts).length;
-      const partsCount = Object.entries(jobOrderData.partsAmounts).length;
-      if (!hasRestData && Math.max(jobRequestCount, partsCount) > 10) {
-        setIsPrint(false);
+      const nextPage = printPage + 1;
+
+      if (nextPage < totalPages) {
         Swal.fire({
           icon: "info",
           title: "Print Rest Items",
-          text: `Are you sure you want to print rest items?`,
+          text: `Are you sure you want to print the rest of the items? (Page ${nextPage + 1} of ${totalPages})`,
           confirmButtonText: "Yes",
           confirmButtonColor: "#3085d6",
           showCancelButton: true,
@@ -532,21 +537,19 @@ const JobOrderForm = () => {
           allowOutsideClick: false,
         }).then((result) => {
           if (result.isConfirmed) {
-            setIsPrint(true);
-            setHasRestData(true);
-          }
-          if (result.isDismissed) {
+            setPrintPage(nextPage);
+          } else {
+            setPrintPage(0);
             setIsPrint(false);
-            setHasRestData(false);
             handleSavePrint();
             fetchJobOrderNumber();
           }
         });
       } else {
-        setHasRestData(false);
+        setPrintPage(0);
+        setIsPrint(false);
         handleSavePrint();
         fetchJobOrderNumber();
-        setIsPrint(false);
       }
     };
 
@@ -569,7 +572,7 @@ const JobOrderForm = () => {
     return () => {
       window.onafterprint = null;
     };
-  }, [isPrint, hasRestData, jobOrderData]);
+  }, [isPrint, printPage, jobOrderData]);
 
   const mergedDiagnosis = Object.entries(diagnosis)
     .map(([key, value]) => {
@@ -641,6 +644,7 @@ const JobOrderForm = () => {
   };
 
   const handlePrint = () => {
+    setPrintPage(0);
     setIsPrint(!isPrint);
   };
 
@@ -856,7 +860,7 @@ const JobOrderForm = () => {
     <>
       {/* Print View (hidden until printing) */}
       {isPrint ? (
-        <MotorsPrintJobOrder data={jobOrderData} hasRestData={hasRestData} />
+        <MotorsPrintJobOrder data={jobOrderData} printPage={printPage} />
       ) : (
         <>
           <div className="flex items-center p-5 bg-white">
