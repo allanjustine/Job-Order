@@ -35,7 +35,7 @@ const ViewJobOrder = ({
   const grandTotal = Number(data?.job_order_details_sum_amount) || 0;
 
   const formatCurrency = (amount: number | undefined): string => {
-    if (!amount || amount === 0) return "";
+    if (amount ===undefined) return "";
     return phpCurrency(amount);
   };
 
