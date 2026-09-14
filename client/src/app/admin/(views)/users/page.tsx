@@ -3,7 +3,6 @@
 import TableLoader from "@/components/table-loader";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
-import { CONFIG } from "@/config/app";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
 import { api } from "@/lib/api";
@@ -12,16 +11,24 @@ import { format, formatDistanceToNowStrict } from "date-fns";
 import {
   LockKeyhole,
   LockKeyholeOpen,
+  Pen,
   Plus,
   Search,
   SearchSlash,
+  Trash,
 } from "lucide-react";
-import Link from "next/link";
 import DataTable from "react-data-table-component";
 import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import CreateUser from "../../components/users/create";
+import { useState } from "react";
+import EditUser, { UserType } from "../../components/users/edit";
+import toast from "react-hot-toast";
 
 const Users = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const {
     data: users,
     isLoading,
@@ -92,7 +99,9 @@ const Users = () => {
               className={`px-1.5 text-xs py-1 rounded-2xl font-bold ${
                 role.name === "admin"
                   ? "bg-blue-200 text-blue-700"
-                  : "bg-cyan-200 text-cyan-700"
+                  : role.name === "approver"
+                    ? "bg-violet-200 text-violet-700"
+                    : "bg-cyan-200 text-cyan-700"
               }`}
             >
               {role.name}
@@ -134,6 +143,7 @@ const Users = () => {
             variant="link"
             className="text-blue-500"
             onClick={() => handleLockDateToAllUsers(true)}
+            title="Unlock Date Picker to All Users"
           >
             <LockKeyholeOpen />
           </Button>
@@ -143,6 +153,7 @@ const Users = () => {
             variant="link"
             className="text-green-500"
             onClick={() => handleLockDateToAllUsers(false)}
+            title="Lock Date Picker to All Users"
           >
             <LockKeyhole />
           </Button>
@@ -155,6 +166,7 @@ const Users = () => {
           variant="link"
           className={row.is_locked_date ? "text-green-500" : "text-blue-500"}
           onClick={handleLockDate(row.id, row.is_locked_date)}
+          title={row.is_locked_date ? "Unlock Date Picker" : "Lock Date Picker"}
         >
           {row.is_locked_date ? <LockKeyhole /> : <LockKeyholeOpen />}
         </Button>
@@ -162,7 +174,83 @@ const Users = () => {
       center: true,
       sortable: false,
     },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex gap-1">
+          <Button
+            type="button"
+            variant="link"
+            className="text-blue-500 hover:text-blue-600 hover:scale-105"
+            onClick={() => {
+              setSelectedUser(row);
+              setIsEditOpen(true);
+            }}
+          >
+            <Pen />
+          </Button>
+          <Button
+            type="button"
+            variant="link"
+            className="text-red-500 hover:text-red-600 hover:scale-105"
+            onClick={handleDeleteUser(row.id)}
+          >
+            <Trash />
+          </Button>
+        </div>
+      ),
+    },
   ];
+
+  const handleDeleteUser = (userId: string | number) => async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "After deleting, you will not be able to recover this data!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          icon: "info",
+          title: "Deleting...",
+          text: "Please wait...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        try {
+          const response = await api.delete(`/users/${userId}/delete`);
+
+          if (response.status === 200) {
+            toast.success(response.data.message, {
+              position: "bottom-center",
+              duration: 5000,
+              icon: "👍",
+              style: {
+                borderRadius: "15px",
+                background: "#333",
+                color: "#fff",
+                padding: "15px",
+              },
+            });
+            Swal.close();
+            fetchData();
+          }
+        } catch (error) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong. Please try again!",
+          });
+        }
+      }
+    });
+  };
 
   const handleLockDateToAllUsers = (status: boolean) => {
     Swal.fire({
@@ -274,11 +362,9 @@ const Users = () => {
               <Button
                 type="button"
                 className="bg-blue-500 py-5 hover:bg-blue-600"
-                asChild
+                onClick={() => setIsOpen(true)}
               >
-                <Link href={`/register?magic_word=${CONFIG.MAGIC_WORD}`}>
-                  <Plus /> Add User
-                </Link>
+                <Plus /> Add User
               </Button>
             </div>
           </div>
@@ -324,6 +410,14 @@ const Users = () => {
           </div>
         </div>
       </div>
+
+      <CreateUser isOpen={isOpen} setIsOpen={setIsOpen} fetchData={fetchData} />
+      <EditUser
+        isOpen={isEditOpen}
+        setIsOpen={setIsEditOpen}
+        fetchData={fetchData}
+        selectedUser={selectedUser}
+      />
     </>
   );
 };
