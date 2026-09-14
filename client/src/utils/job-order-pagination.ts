@@ -2,10 +2,10 @@
 
 // Rows that fit on the FIRST printed page/copy (it also carries the
 // vehicle info + diagnosis section, so less room for the tables).
-export const JOB_ORDER_FIRST_PAGE_ITEMS = 12;
+export const JOB_ORDER_FIRST_PAGE_ITEMS = 10;
 // Rows that fit on each SUBSEQUENT page/copy (continuation pages skip
 // the vehicle info + diagnosis section, so more room for the tables).
-export const JOB_ORDER_SUBSEQUENT_PAGE_ITEMS = 20;
+export const JOB_ORDER_SUBSEQUENT_PAGE_ITEMS = 15;
 /** @deprecated use JOB_ORDER_FIRST_PAGE_ITEMS / JOB_ORDER_SUBSEQUENT_PAGE_ITEMS instead. */
 export const JOB_ORDER_ITEMS_PER_PAGE = JOB_ORDER_FIRST_PAGE_ITEMS;
 

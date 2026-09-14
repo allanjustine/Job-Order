@@ -437,7 +437,7 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black align-top"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt] leading-[1.2] block break-words">
+                                  <span className="text-[7.5pt] leading-[1.2] block">
                                     ✓ {jobLabel}{jobBrand}
                                   </span>
                                 </td>
@@ -445,7 +445,7 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black text-left align-top whitespace-nowrap"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt]">
+                                  <span className="text-[7.5pt]">
                                     {formatCurrency(job.amount)}
                                   </span>
                                 </td>
@@ -469,10 +469,10 @@ const ViewJobOrder = ({
                         return rows;
                       })()}
                       <tr key="totals">
-                        <td className="border-b border-black p-0.5 font-semibold text-[6.5pt]">
+                        <td className="border-b border-black p-0.5 font-semibold text-[7.5pt]">
                           Total Labor Cost:
                         </td>
-                        <td className="border-b border-black p-0.5 font-semibold text-[6.5pt] whitespace-nowrap">
+                        <td className="border-b border-black p-0.5 font-semibold text-[7.5pt] whitespace-nowrap">
                           {phpCurrency(jobTotal)}
                         </td>
                       </tr>
@@ -495,16 +495,16 @@ const ViewJobOrder = ({
                     </colgroup>
                     <thead>
                       <tr>
-                        <th className="border-[0.1px] border-black p-px text-left text-[6.5pt]">
+                        <th className="border-[0.1px] border-black p-px text-left text-[7.5pt]">
                           Parts Used
                         </th>
-                        <th className="border-[0.1px] border-black p-px text-center text-[6.5pt] whitespace-nowrap">
+                        <th className="border-[0.1px] border-black p-px text-center text-[7.5pt] whitespace-nowrap">
                           Qty
                         </th>
-                        <th className="border-[0.1px] border-black p-px text-left text-[6.5pt]">
+                        <th className="border-[0.1px] border-black p-px text-left text-[7.5pt]">
                           Brand / Part No.
                         </th>
-                        <th className="border-[0.1px] border-black p-px text-center text-[6.5pt] whitespace-nowrap">
+                        <th className="border-[0.1px] border-black p-px text-center text-[7.5pt] whitespace-nowrap">
                           Amount
                         </th>
                       </tr>
@@ -524,7 +524,7 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black align-top"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt] leading-[1.2] block break-words">
+                                  <span className="text-[7.5pt] leading-[1.2] block">
                                     ✓ {part.category}
                                   </span>
                                 </td>
@@ -532,13 +532,13 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black text-center align-top whitespace-nowrap"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt]">{part?.quantity || ""}</span>
+                                  <span className="text-[7.5pt]">{part?.quantity || ""}</span>
                                 </td>
                                 <td
                                   className="border-[0.1px] border-black text-left align-top overflow-hidden"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt] leading-[1.2] block whitespace-nowrap overflow-hidden text-ellipsis">
+                                  <span className="text-[7.5pt] leading-[1.2] block ">
                                     {partDetail || ""}
                                   </span>
                                 </td>
@@ -546,7 +546,7 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black text-left align-top whitespace-nowrap"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[6.5pt]">
+                                  <span className="text-[7.5pt]">
                                     {formatCurrency(part?.amount)}
                                   </span>
                                 </td>
@@ -580,12 +580,12 @@ const ViewJobOrder = ({
                       
                       <tr key="totals">
                         <td
-                          className="border-b border-black p-0.5 font-semibold text-[6.5pt] "
+                          className="border-b border-black p-0.5 font-semibold text-[7.5pt] "
                           colSpan={3}
                         >
                           Total Parts Cost:
                         </td>
-                        <td className="border-b border-black p-0.5 font-semibold text-[6.5pt] whitespace-nowrap">
+                        <td className="border-b border-black p-0.5 font-semibold text-[7.5pt] whitespace-nowrap">
                           {phpCurrency(partsTotal)}
                         </td>
                       </tr>
