@@ -2,112 +2,32 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\RoleName;
 use App\Http\Controllers\Controller;
-use App\Models\Branch;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use App\Models\UserExportLog;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
+    public function __construct(public UserService $userService) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $per_page = request('perPage') ?: 10;
+        $users = $this->userService->getAllUsers();
 
-        $sort = request('sort') ?: ["column" => "id", "direction" => "desc"];
-
-        $search = request('search') ?: '';
-
-        $sort['column'] = match ($sort['column']) {
-            'user_export_log.created_at' => UserExportLog::query()->select('created_at')->whereColumn('user_export_logs.user_id', 'users.id')->latest()->limit(1),
-            'branch.branch_name'         => Branch::query()->select('branch_name')->whereColumn('branches.id', 'users.branch_id'),
-            'user.role'                  => Role::query()->select('roles.name')->join('model_has_roles', 'model_has_roles.role_id', '=', 'roles.id')->whereColumn('model_has_roles.model_id', 'users.id'),
-            default                      => $sort['column']
-        };
-
-        $customers = User::with(['branch:id,branch_name,branch_code', 'roles:id,name', 'userExportLog'])
-            ->whereNotIn('id', [Auth::id()])
-            ->when(
-                $search,
-                fn($query) =>
-                $query->where(
-                    fn($subQuery) =>
-                    $subQuery->where("name", "like", "%{$search}%")
-                        ->orWhere("code", "like", "%{$search}%")
-                        ->orWhere("email", "like", "%{$search}%")
-                        ->orWhereHas(
-                            "roles",
-                            fn($roleQuery) =>
-                            $roleQuery->where("name", "like", "%{$search}%")
-                        )
-                        ->orWhereHas(
-                            "branch",
-                            fn($branchQuery) =>
-                            $branchQuery->where("branch_name", "like", "%{$search}%")
-                                ->orWhere('code', 'like', "%{$search}%")
-                        )
-                )
-            )
-            ->orderBy($sort["column"], $sort["direction"])
-            ->paginate($per_page);
-
-        $data = async(fn() => [
-            "data"                => $customers->through(fn($user) => [
-                "id"              => $user->id,
-                "name"            => $user->name,
-                "code"            => $user->code,
-                "branch_id"       => $user->branch_id,
-                "email"           => $user->email,
-                "branch"          => $user->branch,
-                "user_export_log" => $user->userExportLog?->created_at?->diffForHumans(),
-                "is_locked_date"  => $user->is_locked_date,
-                "roles"           => $user->roles,
-                "created_at"      => $user->created_at
-            ])
-        ]);
-
-        return response()->json(await($data), 200);
+        return response()->json($users, 200);
     }
 
     public function userSelectionOptions()
     {
-        $type = request('type', null);
-
-        $users = User::query()
-            ->has('customers')
-            ->where(
-                fn($query)
-                =>
-                $query->whereNot('id', Auth::id())
-                    ->whereDoesntHaveRelation('roles', 'name', RoleName::ADMIN?->value)
-            )
-            ->when(
-                $type === 'target-income',
-                fn($query)
-                =>
-                $query->whereDoesntHave(
-                    'targetIncomes',
-                    fn($user)
-                    =>
-                    $user->whereMonth('month_of', now()->month)
-                        ->whereYear('month_of', now()->year)
-                )
-            )
-            ->when(
-                $type === 'area-manager',
-                fn($query)
-                =>
-                $query->doesntHave('areaManagers')
-            )
-            ->orderBy('code')
-            ->get(['id', 'name', 'code']);
+        $users = $this->userService->getSelectionOptions();
 
         return response()->json([
             'message' => 'User selection options retrieved successfully.',
@@ -126,9 +46,16 @@ class UsersController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $storeUserRequest)
     {
-        //
+        $storeUserRequest->validated();
+
+        $user = $this->userService->storeUser($storeUserRequest);
+
+        return response()->json([
+            'message' => 'User created successfully.',
+            'data'    => $user,
+        ], 201);
     }
 
     /**
@@ -150,7 +77,20 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $updateUserRequest, User $user)
+    {
+        $data = $this->userService->updateUser($updateUserRequest, $user);
+
+        return response()->json([
+            'message' => "User from \"{$data['old_data']}\" to \"{$data['new_data']}\" updated successfully."
+        ], 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+
+    public function lockUpdate(User $user)
     {
         $user->update([
             "is_locked_date" => !$user->is_locked_date
@@ -168,12 +108,13 @@ class UsersController extends Controller
         ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $this->userService->deleteUser($user);
+
+        return response()->json([
+            'message' => "User {$user->name} deleted successfully."
+        ], 200);
     }
 
     public function lockAllUserDatePickers()
