@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enums\RoleName;
+use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -35,7 +36,9 @@ class User extends Authenticatable
 
     protected $appends = [
         "redirect_url",
-        'is_admin'
+        'is_admin',
+        'is_approver',
+        'is_employee'
     ];
 
     /**
@@ -67,6 +70,16 @@ class User extends Authenticatable
         return $this->hasRole(RoleName::ADMIN);
     }
 
+    public function isApprover()
+    {
+        return $this->hasRole(RoleName::APPROVER);
+    }
+
+    public function isEmployee()
+    {
+        return $this->hasRole(RoleName::EMPLOYEE);
+    }
+
     public function getRedirectUrlAttribute()
     {
         return $this->isAdmin() ? "/admin/dashboard" : "/dashboard";
@@ -75,6 +88,16 @@ class User extends Authenticatable
     public function getIsAdminAttribute()
     {
         return $this->isAdmin();
+    }
+
+    public function getIsApproverAttribute()
+    {
+        return $this->isApprover();
+    }
+
+    public function getIsEmployeeAttribute()
+    {
+        return $this->isEmployee();
     }
 
     public function jobOrders()
@@ -101,5 +124,21 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserExportLog::class)
             ->latestOfMany();
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function hasPendingTicket($jobOrderId)
+    {
+        return $this->tickets()
+            ->where(function ($query) use ($jobOrderId) {
+                $query->where('status', TicketStatus::PENDING?->value)
+                    ->where('job_order_id', $jobOrderId);
+            })
+            ->latest()
+            ->exists();
     }
 }
