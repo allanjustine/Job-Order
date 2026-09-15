@@ -735,6 +735,32 @@ const Dashboard = () => {
                     </>
                   )}
                 </Button>
+                <Button
+                  type="button"
+                  ref={createButtonRef}
+                  onClick={handleOpenCreate}
+                  onMouseDown={() => {
+                    if (!hasMechanic) setIsScale(true);
+                  }}
+                  onMouseUp={() => {
+                    if (!hasMechanic) setIsScale(false);
+                  }}
+                  onMouseLeave={() => {
+                    if (!hasMechanic) setIsScale(false);
+                  }}
+                  disabled={isLoadingMechanicChecking}
+                  className="bg-blue-600 hover:bg-blue-700 text-white py-5 px-4 text-sm font-semibold shadow-sm flex items-center gap-2"
+                >
+                  {isLoadingMechanicChecking ? (
+                    <>
+                      <Spinner /> Checking...
+                    </>
+                  ) : (
+                    <>
+                      <Wrench className="w-4 h-4" /> Create Job Order
+                    </>
+                  )}
+                </Button>
                 <HoverCard>
                   <HoverCardTrigger>
                     <Button
@@ -760,32 +786,6 @@ const Dashboard = () => {
                         <FaFileExcel /> Export
                       </Button>
                     </Activity>
-                    <Button
-                      type="button"
-                      ref={createButtonRef}
-                      onClick={handleOpenCreate}
-                      onMouseDown={() => {
-                        if (!hasMechanic) setIsScale(true);
-                      }}
-                      onMouseUp={() => {
-                        if (!hasMechanic) setIsScale(false);
-                      }}
-                      onMouseLeave={() => {
-                        if (!hasMechanic) setIsScale(false);
-                      }}
-                      disabled={isLoadingMechanicChecking}
-                      className="bg-blue-600 hover:bg-blue-700 text-white py-5 px-4 text-sm font-semibold shadow-sm flex items-center gap-2"
-                    >
-                      {isLoadingMechanicChecking ? (
-                        <>
-                          <Spinner /> Checking...
-                        </>
-                      ) : (
-                        <>
-                          <Wrench className="w-4 h-4" /> Create Job Order
-                        </>
-                      )}
-                    </Button>
                     <Button
                       type="button"
                       className="bg-violet-500 hover:bg-violet-600 text-white py-5 px-3 text-sm shadow-sm"
