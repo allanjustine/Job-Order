@@ -32,7 +32,7 @@ const Reports = () => {
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
   const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
   const [filters, setFilters] = useState<{ month: string }>({
-    month: "",
+    month: "Select Month",
   });
   const {
     data: targetIncomes,
@@ -266,10 +266,10 @@ const Reports = () => {
                   }}
                   className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
                 >
-                  <option value="" selected disabled>
+                  <option value="Select Month" disabled>
                     Select Month
                   </option>
-                  <option value="">This Month</option>
+                  <option value="This Month">This Month</option>
                   {DATES?.map(({ label, value }) => (
                     <option key={value} value={value}>
                       {label}
