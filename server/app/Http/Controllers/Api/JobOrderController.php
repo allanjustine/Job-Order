@@ -18,7 +18,7 @@ class JobOrderController extends Controller
         return response()->json([
             'message' => 'Job Orders fetched successfully.',
             'data'    => $jobOrders
-        ]);
+        ], 200);
     }
 
     public function store(Request $request, JobOrderService $jobOrderService)

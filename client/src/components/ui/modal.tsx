@@ -22,8 +22,10 @@ function ModalHeader({ onClose, className, centerText, children }: any) {
 
 function ModalFooter({ children }: any) {
   return (
-    <div className="py-2 px-3 flex justify-end">
-      <div className="flex gap-2">{children}</div>
+    <div className="py-2 px-3 flex md:justify-end">
+      <div className="flex gap-2 flex-col md:flex-row w-full md:w-auto">
+        {children}
+      </div>
     </div>
   );
 }

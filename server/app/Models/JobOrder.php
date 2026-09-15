@@ -3,11 +3,16 @@
 namespace App\Models;
 
 use App\Enums\JobOrderType;
+use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class JobOrder extends Model
 {
     protected $guarded = [];
+
+    protected $appends = [
+        'has_pending_ticket'
+    ];
 
     protected function casts(): array
     {
@@ -54,5 +59,18 @@ class JobOrder extends Model
     public function jobOrderDiagnosis()
     {
         return $this->hasMany(JobOrderDiagnosis::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function getHasPendingTicketAttribute()
+    {
+        return $this->tickets()
+            ->where('status', TicketStatus::PENDING)
+            ->latest()
+            ->exists();
     }
 }

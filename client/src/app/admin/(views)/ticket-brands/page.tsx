@@ -1,0 +1,253 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
+import useFetch from "@/hooks/useFetch";
+import withAuthPage from "@/lib/hoc/with-auth-page";
+import { PenIcon, Search, SearchSlash, Trash, UserPlus } from "lucide-react";
+import DataTable from "react-data-table-component";
+import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
+import { Activity, useState } from "react";
+import Swal from "sweetalert2";
+import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import TableLoader from "@/components/table-loader";
+import CreateTicketBrand from "../../components/ticket-brands/create";
+import EditTicketBrand from "../../components/ticket-brands/edit";
+
+const TicketBrands = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
+  const [selectedTicketBrand, setSelectedTicketBrand] = useState<any>(null);
+  const {
+    data: ticketBrands,
+    isLoading,
+    error,
+    pagination,
+    sort,
+    isRefresh,
+    isSearching,
+    searchTerm,
+    handleSort,
+    handleRowsPerPageChange,
+    handlePageChange,
+    handleSearch,
+    handleRefresh,
+    fetchData,
+  } = useFetch("/ticket-brands");
+
+  const columns = [
+    {
+      name: "ID",
+      selector: (row: any) => row.id,
+      sortable: true,
+      sortField: "id",
+      width: "80px",
+    },
+    {
+      name: "NAME",
+      selector: (row: any) => row.name,
+      sortable: true,
+      sortField: "name",
+    },
+    {
+      name: "NUMBER OF TICKETS",
+      selector: (row: any) => row.tickets_count,
+      sortable: true,
+      sortField: "tickets_count",
+    },
+    {
+      name: "ACTIONS",
+      cell: (row: any) => (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            className="text-blue-500 hover:text-blue-600"
+            size={"icon"}
+            variant={"link"}
+            onClick={() => {
+              setIsOpenEdit(true);
+              setSelectedTicketBrand(row);
+            }}
+          >
+            <PenIcon className="size-5" />
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDeleteTicketBrands(row?.id)}
+            className="text-red-500 hover:text-red-600"
+            size={"icon"}
+            variant={"link"}
+          >
+            <Trash className="size-5" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  function handleDeleteTicketBrands(id: number) {
+    return function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "After deleting, you will not be able to recover this data!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: "info",
+            title: "Deleting...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.delete(`/ticket-brands/${id}`);
+
+            if (response.status === 200) {
+              toast.success(response.data.message, {
+                position: "bottom-center",
+                duration: 5000,
+                icon: "👍",
+                style: {
+                  borderRadius: "15px",
+                  background: "#333",
+                  color: "#fff",
+                  padding: "15px",
+                },
+              });
+              Swal.close();
+              fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong. Please try again!",
+            });
+          }
+        }
+      });
+    };
+  }
+
+  return (
+    <>
+      <div className="p-6">
+        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Ticket Brands
+              </h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Job Order Printing System — Ticket Brands Overview
+              </p>
+            </div>
+            <div className="mb-2 flex justify-between items-center gap-1">
+              <div className="relative">
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  onChange={handleSearch}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
+              <Button
+                type="button"
+                disabled={isRefresh}
+                className={`bg-yellow-500 hover:bg-yellow-400 text-white py-5 ${
+                  isRefresh && "bg-yellow-400! cursor-not-allowed!"
+                }`}
+                onClick={handleRefresh}
+              >
+                {isRefresh ? (
+                  <>
+                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <FaRotateRight /> Refresh
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+              >
+                <UserPlus /> Add Ticket Brand
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-x-auto border-t">
+            <DataTable
+              columns={columns}
+              data={ticketBrands}
+              pagination
+              paginationServer
+              sortServer
+              onSort={handleSort}
+              paginationTotalRows={pagination.total}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={handlePageChange}
+              paginationPerPage={pagination.perPage}
+              striped
+              highlightOnHover
+              progressPending={isLoading || isRefresh || isSearching}
+              progressComponent={
+                <TableLoader
+                  isSearching={isSearching}
+                  searchTerm={searchTerm}
+                />
+              }
+              persistTableHead
+              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+              defaultSortAsc={sort.sortBy}
+              defaultSortFieldId={sort.column}
+              noDataComponent={
+                <div className="py-5 font-bold text-gray-600 text-xl">
+                  {searchTerm ? (
+                    <>
+                      <span className="flex gap-1 items-center">
+                        <SearchSlash /> No results for "{searchTerm}"
+                      </span>
+                    </>
+                  ) : (
+                    "No ticket brands yet."
+                  )}
+                </div>
+              }
+            />
+          </div>
+        </div>
+      </div>
+      <Activity mode={isOpen ? "visible" : "hidden"}>
+        <CreateTicketBrand
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          fetchData={fetchData}
+        />
+      </Activity>
+      <Activity mode={isOpenEdit ? "visible" : "hidden"}>
+        <EditTicketBrand
+          isOpen={isOpenEdit}
+          setIsOpen={setIsOpenEdit}
+          fetchData={fetchData}
+          selectedTicketBrand={selectedTicketBrand}
+        />
+      </Activity>
+    </>
+  );
+};
+
+export default withAuthPage(TicketBrands);

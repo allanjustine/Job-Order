@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
                 "guard_name"        => "web",
                 "created_at"        => now(),
                 "updated_at"        => now(),
-            ],
+            ]
         ];
 
         $permissions = [
