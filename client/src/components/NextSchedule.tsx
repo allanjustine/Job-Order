@@ -45,7 +45,7 @@ export default function NextSchedule({
           value={generalRemarks}
           onChange={(e) => setGeneralRemarks(e.target.value)}
         />
-        {errors.date && (
+        {errors.generalRemarks && (
           <p className="text-red-500 text-xs mt-1">{errors.generalRemarks}</p>
         )}
       </div>
