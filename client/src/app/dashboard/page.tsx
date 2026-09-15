@@ -13,6 +13,10 @@ import {
   Eye,
   Printer,
   Newspaper,
+  TicketPlus,
+  TableOfContents,
+  UserCog,
+  Tags,
 } from "lucide-react";
 import { FaCheckCircle, FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -27,7 +31,7 @@ import {
 import { Activity, useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/input";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FaCheckDouble, FaFileExcel, FaRotateRight } from "react-icons/fa6";
+import { FaFileExcel, FaRotateRight } from "react-icons/fa6";
 import phpCurrency from "@/utils/phpCurrency";
 import { CgSpinner } from "react-icons/cg";
 import Link from "next/link";
@@ -50,6 +54,18 @@ import ViewJobOrder from "@/components/view-job-order";
 import { getJobOrderPrintPageCount } from "@/utils/job-order-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import TableLoader from "@/components/table-loader";
+import CreateTicket from "@/components/tickets/create";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import TicketBaseContent from "@/components/tickets/base";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 const Dashboard = () => {
   const {
@@ -74,6 +90,8 @@ const Dashboard = () => {
   const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false);
   const [isBrowsing, setIsBrowsing] = useState<boolean>(false);
   const [isMechanicOpen, setIsMechanicOpen] = useState<boolean>(false);
+  const [isOpenTickets, setIsOpenTickets] = useState<boolean>(false);
+  const [isOpenCreateTicket, setIsOpenCreateTicket] = useState<boolean>(false);
   const [topJobOrders, setTopJobOrders] = useState<
     {
       category: string;
@@ -109,6 +127,16 @@ const Dashboard = () => {
   const [receiptNumber, setReceiptNumber] = useState<string>("");
   const [isSubmittingReceipt, setIsSubmittingReceipt] =
     useState<boolean>(false);
+  const [selectedData, setSelectedData] = useState<{
+    id: number | string;
+    transaction_code: string;
+  } | null>(null);
+  const [isLoadingStats, setIsLoading] = useState<boolean>(true);
+  const [dataStats, setData] = useState<any>([]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [isRefresh]);
 
   useEffect(() => {
     if (!isReprint) return;
@@ -249,6 +277,21 @@ const Dashboard = () => {
     };
   }, []);
 
+  async function fetchDashboardData() {
+    try {
+      const response = await api.get("/branch-stats");
+
+      if (response.status === 200) {
+        setData(response.data.data);
+        setTopJobOrders(response.data.data.top_job_orders);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const handleView = (id: number) => async () => {
     setIsOpen(true);
     setIsBrowsing(true);
@@ -382,30 +425,70 @@ const Dashboard = () => {
       name: "ACTION",
       cell: (row: any) => (
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button
-            onClick={handleView(row.id)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            ref={buttonRef}
-          >
-            <Eye />
-          </Button>
-          <Button
-            onClick={handleOpenReceiptModal(row.id)}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-            ref={buttonRef}
-            disabled={!!row.receipt_number}
-            title={
-              row.receipt_number
-                ? `Receipt already added: ${row.receipt_number}`
-                : "Add Receipt Number"
-            }
-          >
-            <Newspaper />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleView(row.id)}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                ref={buttonRef}
+              >
+                <Eye />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>View Job Order</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded"
+                disabled={row?.has_pending_ticket}
+                onClick={() => {
+                  Swal.fire({
+                    title: "Are you sure?",
+                    text: "After you create a ticket, you won’t be able to edit it anymore.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, create a ticket!",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      setIsOpenCreateTicket(true);
+                      setSelectedData({
+                        id: row.id,
+                        transaction_code: row.transaction_code,
+                      });
+                    }
+                  });
+                }}
+              >
+                <TicketPlus />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Create a Ticket</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleOpenReceiptModal(row.id)}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                ref={buttonRef}
+                disabled={!!row.receipt_number}
+                title={
+                  row.receipt_number
+                    ? `Receipt already added: ${row.receipt_number}`
+                    : "Add Receipt Number"
+                }
+              >
+                <Newspaper />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Add a Recipt Number</TooltipContent>
+          </Tooltip>
         </div>
       ),
-      sortField: "created_at",
-      sortable: true,
+      width: "200px",
     },
   ];
 
@@ -571,10 +654,11 @@ const Dashboard = () => {
 
   if (isReprint) {
     return (
-      <ViewJobOrder 
-      data={viewData} 
-      isReprint={isReprint} 
-      printPage={printPage} />
+      <ViewJobOrder
+        data={viewData}
+        isReprint={isReprint}
+        printPage={printPage}
+      />
     );
   }
 
@@ -616,10 +700,16 @@ const Dashboard = () => {
           setTopJobOrders={setTopJobOrders}
           isScale={isScale}
           isRefreshing={isRefresh}
+          setIsOpenTickets={setIsOpenTickets}
+          isOpenTickets={isOpenTickets}
+          data={dataStats}
+          isLoading={isLoadingStats}
         />
 
         {/* Data Table Section */}
-        <Activity mode={!isMechanicOpen ? "visible" : "hidden"}>
+        <Activity
+          mode={!isMechanicOpen && !isOpenTickets ? "visible" : "hidden"}
+        >
           <div className="space-y-4">
             {/* Action Bar */}
             <div className="flex items-center justify-between gap-3">
@@ -645,47 +735,79 @@ const Dashboard = () => {
                     </>
                   )}
                 </Button>
-                <Activity
-                  mode={
-                    !isRefresh && !isLoading && jobOrders.length > 0
-                      ? "visible"
-                      : "hidden"
-                  }
-                >
-                  <Button
-                    type="button"
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white py-5 px-3 text-sm shadow-sm"
-                    onClick={handleViewExport}
-                  >
-                    <FaFileExcel /> Export
-                  </Button>
-                </Activity>
-                <Button
-                  type="button"
-                  ref={createButtonRef}
-                  onClick={handleOpenCreate}
-                  onMouseDown={() => {
-                    if (!hasMechanic) setIsScale(true);
-                  }}
-                  onMouseUp={() => {
-                    if (!hasMechanic) setIsScale(false);
-                  }}
-                  onMouseLeave={() => {
-                    if (!hasMechanic) setIsScale(false);
-                  }}
-                  disabled={isLoadingMechanicChecking}
-                  className="bg-blue-600 hover:bg-blue-700 text-white py-5 px-4 text-sm font-semibold shadow-sm flex items-center gap-2"
-                >
-                  {isLoadingMechanicChecking ? (
-                    <>
-                      <Spinner /> Checking...
-                    </>
-                  ) : (
-                    <>
-                      <Wrench className="w-4 h-4" /> Create Job Order
-                    </>
-                  )}
-                </Button>
+                <HoverCard>
+                  <HoverCardTrigger>
+                    <Button
+                      type="button"
+                      className="bg-blue-500 hover:bg-blue-600 py-5 px-3"
+                    >
+                      <TableOfContents /> Actions
+                    </Button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="flex w-64 flex-col gap-0.5">
+                    <Activity
+                      mode={
+                        !isRefresh && !isLoading && jobOrders.length > 0
+                          ? "visible"
+                          : "hidden"
+                      }
+                    >
+                      <Button
+                        type="button"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white py-5 px-3 text-sm shadow-sm"
+                        onClick={handleViewExport}
+                      >
+                        <FaFileExcel /> Export
+                      </Button>
+                    </Activity>
+                    <Button
+                      type="button"
+                      ref={createButtonRef}
+                      onClick={handleOpenCreate}
+                      onMouseDown={() => {
+                        if (!hasMechanic) setIsScale(true);
+                      }}
+                      onMouseUp={() => {
+                        if (!hasMechanic) setIsScale(false);
+                      }}
+                      onMouseLeave={() => {
+                        if (!hasMechanic) setIsScale(false);
+                      }}
+                      disabled={isLoadingMechanicChecking}
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-5 px-4 text-sm font-semibold shadow-sm flex items-center gap-2"
+                    >
+                      {isLoadingMechanicChecking ? (
+                        <>
+                          <Spinner /> Checking...
+                        </>
+                      ) : (
+                        <>
+                          <Wrench className="w-4 h-4" /> Create Job Order
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      className="bg-violet-500 hover:bg-violet-600 text-white py-5 px-3 text-sm shadow-sm"
+                      onClick={() => {
+                        setIsMechanicOpen(true);
+                        setIsOpenTickets(false);
+                      }}
+                    >
+                      <UserCog /> Mechanics
+                    </Button>
+                    <Button
+                      type="button"
+                      className="bg-pink-500 hover:bg-pink-600 text-white py-5 px-3 text-sm shadow-sm"
+                      onClick={() => {
+                        setIsOpenTickets(true);
+                        setIsMechanicOpen(false);
+                      }}
+                    >
+                      <Tags /> Tickets
+                    </Button>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
             </div>
 
@@ -848,8 +970,7 @@ const Dashboard = () => {
         </Activity>
 
         <Activity mode={isMechanicOpen ? "visible" : "hidden"}>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-700">Mechanics</h2>
+          <div className="flex justify-end items-center mb-4">
             <Button
               onClick={() => setIsMechanicOpen(false)}
               type="button"
@@ -862,6 +983,18 @@ const Dashboard = () => {
             setMechanicAdded={setMechanicAdded}
             mechanicAdded={mechanicAdded}
           />
+        </Activity>
+        <Activity mode={isOpenTickets ? "visible" : "hidden"}>
+          <div className="flex justify-end items-center mb-4">
+            <Button
+              onClick={() => setIsOpenTickets(false)}
+              type="button"
+              className="bg-red-500 hover:bg-red-600 text-white font-medium py-5 px-4"
+            >
+              <X /> Close Tickets
+            </Button>
+          </div>
+          <TicketBaseContent />
         </Activity>
       </div>
 
@@ -1115,6 +1248,13 @@ const Dashboard = () => {
           </Button>
         </ModalFooter>
       </Modal>
+      <CreateTicket
+        isOpen={isOpenCreateTicket}
+        setIsOpen={setIsOpenCreateTicket}
+        fetchData={fetchData}
+        selectedData={selectedData}
+        fetchDashboardData={fetchDashboardData}
+      />
     </>
   );
 };
