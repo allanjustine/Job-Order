@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStatusTicketRequest;
 use App\Http\Requests\StoreTicketRequest;
 use App\Models\Ticket;
+use App\Models\TicketNote;
 use App\Services\TicketService;
 use Illuminate\Http\Request;
 
@@ -103,7 +104,27 @@ class TicketController extends Controller
         $data = $this->ticketService->updateTicketStatus($request, $ticket, $title);
 
         return response()->json([
-            'message' =>  "Ticket with ticket code of {$data->ticket_code} rejected successfully",
-        ]);
+            'message' => "Ticket with ticket code of {$data->ticket_code} rejected successfully",
+        ], 200);
+    }
+
+    public function addNoteToTicket(StoreStatusTicketRequest $request, Ticket $ticket)
+    {
+        $request->validated();
+
+        $data = $this->ticketService->addNoteToTicket($request, $ticket);
+
+        return response()->json([
+            'message' => "Note added to ticket with ticket code of {$data->ticket_code} successfully",
+        ], 200);
+    }
+
+    public function deleteNote(TicketNote $note)
+    {
+        $data = $this->ticketService->deleteNote($note);
+
+        return response()->json([
+            'message' => "Note \"{$data->content}\" deleted successfully",
+        ], 200);
     }
 }
