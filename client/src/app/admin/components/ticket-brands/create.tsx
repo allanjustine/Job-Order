@@ -1,0 +1,144 @@
+import { Button } from "@/components/ui/button";
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "@/components/ui/modal";
+import { Dispatch, SetStateAction } from "react";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "@/lib/api";
+import Input from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Plus } from "lucide-react";
+import toast from "react-hot-toast";
+import { Spinner } from "@/components/ui/spinner";
+
+const schema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters long")
+    .max(50, "Name must be at most 50 characters long")
+    .nonempty("Name is required"),
+});
+
+interface FormItem {
+  name: string;
+}
+
+export default function CreateTicketBrand({
+  isOpen,
+  setIsOpen,
+  fetchData,
+}: {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => void;
+}) {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<FormItem>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  async function onSubmit(data: any) {
+    try {
+      const response = await api.post("/ticket-brands", {
+        name: data.name,
+      });
+
+      if (response.status === 201) {
+        setIsOpen(false);
+        reset();
+        toast.success(response.data.message, {
+          position: "bottom-center",
+          duration: 5000,
+          icon: "👍",
+          style: {
+            borderRadius: "15px",
+            background: "#333",
+            color: "#fff",
+            padding: "15px",
+          },
+        });
+        fetchData();
+      }
+    } catch (error: any) {
+      console.error(error);
+      if (error.response.status === 422) {
+        Object.entries(error.response.data.errors).forEach(
+          ([field, messages]) => {
+            const msgs = messages as string[];
+
+            setError(field as keyof FormItem, {
+              type: "server",
+              message: msgs[0],
+            });
+          },
+        );
+      }
+    }
+  }
+
+  return (
+    <>
+      <Modal className="w-1/4" isOpen={isOpen}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <ModalHeader onClose={() => setIsOpen(false)}>
+            Add Ticket Brand
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-2">
+              <div>
+                <Label htmlFor="name">Ticket Brand Name</Label>
+                <Input
+                  className="py-3"
+                  placeholder="Enter ticket brand name"
+                  {...register("name", { required: true })}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+            >
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Adding...
+                </>
+              ) : (
+                <>
+                  <Plus /> Add
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => setIsOpen(false)}
+              type="button"
+              className="bg-gray-500 hover:bg-gray-600 text-white py-5"
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
+    </>
+  );
+}
