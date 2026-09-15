@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Enums\JobOrderType;
+use App\Enums\TicketStatus;
 use App\Models\Customer;
 use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
 use App\Models\Mechanic;
 use App\Models\TargetIncome;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserDashboardService
 {
@@ -134,6 +136,26 @@ class UserDashboardService
         ];
     }
 
+    public function ticketStats()
+    {
+        $tickets = Auth::user()
+            ->tickets();
+
+        $total_tickets = $tickets->count();
+
+        $tickets_by_status = $tickets->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        return [
+            'total_tickets'    => $total_tickets,
+            'pending_tickets'  => $tickets_by_status[TicketStatus::PENDING?->value] ?? 0,
+            'edited_tickets'   => $tickets_by_status[TicketStatus::EDITED?->value] ?? 0,
+            'rejected_tickets' => $tickets_by_status[TicketStatus::REJECTED?->value] ?? 0
+        ];
+    }
+
     public function getUserDashboard()
     {
         return [
@@ -144,7 +166,8 @@ class UserDashboardService
             'total_mechanics'       => $this->totalMechanics(),
             'target_data'           => $this->targetData(),
             'top_job_orders'        => $this->getTopJobOrders(),
-            'sum_by_types'          => $this->sumByTypes()
+            'sum_by_types'          => $this->sumByTypes(),
+            'ticket_stats'          => $this->ticketStats()
         ];
     }
 }
