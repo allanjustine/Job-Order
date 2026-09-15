@@ -8,10 +8,15 @@ import {
   PillBottleIcon,
   Plus,
   Printer,
+  Tags,
+  TicketCheck,
+  TicketIcon,
+  TicketMinus,
+  TicketX,
   UserCog,
   Wrench,
 } from "lucide-react";
-import { Activity, useEffect, useState } from "react";
+import { Activity, useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 
 export default function StatCards({
@@ -19,32 +24,13 @@ export default function StatCards({
   setIsMechanicOpen,
   isMechanicOpen,
   mechanicAdded,
-  setTopJobOrders,
   isScale,
   isRefreshing,
+  setIsOpenTickets,
+  isOpenTickets,
+  data,
+  isLoading,
 }: any) {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [data, setData] = useState<any>([]);
-
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        const response = await api.get("/branch-stats");
-
-        if (response.status === 200) {
-          setData(response.data.data);
-          setTopJobOrders(response.data.data.top_job_orders);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, [isRefreshing]);
-
   const stats = [
     {
       label: "Monthly Service Target Income",
@@ -90,8 +76,35 @@ export default function StatCards({
     }
   }
 
+  const TICKET_ICONS = {
+    total_tickets: TicketIcon,
+    pending_tickets: TicketMinus,
+    edited_tickets: TicketCheck,
+    rejected_tickets: TicketX,
+  };
+
+  const TICKET_STATS = useMemo(() => {
+    if (!data.ticket_stats) return [];
+
+    return Object.entries(data.ticket_stats).map(([title, value]) => {
+      return {
+        title: title.replaceAll("_", " "),
+        value,
+        is_button_open: title === "total_tickets",
+        icon: TICKET_ICONS[title as keyof typeof TICKET_ICONS],
+      };
+    });
+  }, [data.ticket_stats]);
+
+  const BG_COLORS = [
+    "from-pink-500 to-pink-400",
+    "from-yellow-500 to-yellow-400",
+    "from-blue-500 to-blue-400",
+    "from-red-500 to-red-400",
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8">
       <div className="relative bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
         <div className="flex items-start justify-between">
           <div>
@@ -226,7 +239,10 @@ export default function StatCards({
                 <Button
                   type="button"
                   variant={"link"}
-                  onClick={() => setIsMechanicOpen(!isMechanicOpen)}
+                  onClick={() => {
+                    setIsMechanicOpen(!isMechanicOpen);
+                    setIsOpenTickets(false);
+                  }}
                   className={`p-0 hover:text-blue-600 hover:no-underline ${isScale ? "scale-130 text-red-500" : "text-blue-500"}`}
                 >
                   <Plus size="20" /> Add more mechanic
@@ -239,6 +255,50 @@ export default function StatCards({
           </div>
         </div>
       </div>
+      {TICKET_STATS.length > 0 &&
+        TICKET_STATS.map((item: any, index: number) => (
+          <div
+            className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+            key={index}
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-2 capitalize">
+                  {item.title}
+                </p>
+                <div className="flex gap-2 items-center">
+                  <p className="text-2xl font-semibold text-gray-800">
+                    {isLoading || isRefreshing ? spinner() : item.value}
+                  </p>
+                  <Activity
+                    mode={
+                      item.is_button_open && !isOpenTickets
+                        ? "visible"
+                        : "hidden"
+                    }
+                  >
+                    <Button
+                      type="button"
+                      variant={"link"}
+                      onClick={() => {
+                        setIsMechanicOpen(false);
+                        setIsOpenTickets(!isOpenTickets);
+                      }}
+                      className="p-0 hover:text-blue-600 hover:no-underline text-blue-500"
+                    >
+                      <TicketIcon size="20" /> View Tickets
+                    </Button>
+                  </Activity>
+                </div>
+              </div>
+              <div
+                className={`p-3 rounded-lg bg-linear-to-br shadow-md ${BG_COLORS[index]}`}
+              >
+                <item.icon className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
+        ))}
     </div>
   );
 }
