@@ -531,7 +531,7 @@ const TrimotorsPrintJobOrder = ({
             {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
             <div
               className="mb-1 text-xs"
-              style={{ fontSize: "6.5pt", lineHeight: "0.8" }}
+              style={{ fontSize: "7.5pt", lineHeight: "0.8" }}
             >
               <h3 className="font-bold text-center border border-black py-1 bg-gray-100">
                 JOB ORDER
