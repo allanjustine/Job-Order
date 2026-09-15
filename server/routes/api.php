@@ -13,12 +13,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\JobOrderController;
 use App\Http\Controllers\Api\Admin\MechanicController;
 use App\Http\Controllers\Api\Admin\ReportController;
+use App\Http\Controllers\Api\Admin\RoleAndPermissionController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
+use App\Http\Controllers\Api\Admin\TicketBrandController;
+use App\Http\Controllers\Api\Admin\TicketCategoryController;
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\UserDashboardController;
 use App\Models\JobOrder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -34,7 +37,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::controller(UsersController::class)->group(function () {
             Route::get('users', 'index');
             Route::get('user-selection-options', 'userSelectionOptions');
-            Route::patch('users/{user}/update', 'update');
+            Route::patch('users/{user}/update', 'lockUpdate');
+            Route::patch('users/{user}/update-details', 'update');
+            Route::post('users', 'store');
+            Route::delete('users/{user}/delete', 'destroy');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
@@ -53,6 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('manage-job-order-detail/{job_order_detail}/delete', [ManageJobOrderDetail::class, 'destroy']);
         Route::get('prev-next/{job_order}/stats', [ReportController::class, 'prevNextJobOrderStats']);
         Route::get('activity-logs', [ActivityLogController::class, 'index']);
+        Route::get('get-all-roles', [RoleAndPermissionController::class, 'getAllRoles']);
+        Route::get('role-and-permissions', [RoleAndPermissionController::class, 'index']);
+        Route::post('role-and-permissions', [RoleAndPermissionController::class, 'store']);
+        Route::patch('role-and-permissions/{id}/update', [RoleAndPermissionController::class, 'update']);
+        Route::delete('role-and-permissions/{role}/roles', [RoleAndPermissionController::class, 'destroyRole']);
+        Route::delete('role-and-permissions/{permission}/permissions', [RoleAndPermissionController::class, 'destroyPermission']);
+        Route::apiResource('ticket-categories', TicketCategoryController::class);
+        Route::apiResource('ticket-brands', TicketBrandController::class);
     });
 
     // EMPLOYEE ROLE ROUTES
@@ -101,6 +115,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', 'destroy');
     });
     Route::resource('mechanics', MechanicController::class);
+    Route::resource('tickets', TicketController::class);
+    Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'rejectTicket']);
+    Route::get('ticket-categories-and-brands', [TicketController::class, 'getAllTicketCategoriesAndBrands']);
 });
 
 // PUBLIC ROUTES
