@@ -155,4 +155,31 @@ class TicketService
 
         return $ticket;
     }
+
+    public function addNoteToTicket($request, $ticket)
+    {
+        $ticket->notes()->create([
+            'content'  => $request->note,
+            'noted_by' => Auth::id()
+        ]);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($ticket)
+            ->log("Added a note to ticket \"{$ticket->ticket_code}\" and the note is: \"{$request->note}\".");
+
+        return $ticket;
+    }
+
+    public function deleteNote($note)
+    {
+        $note->delete();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($note)
+            ->log("Deleted a note to ticket \"{$note->ticket->ticket_code}\" and the note is: \"{$note->content}\".");
+
+        return $note;
+    }
 }

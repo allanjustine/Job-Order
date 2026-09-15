@@ -45,6 +45,7 @@ export type ChangeRequestsType = {
 };
 
 export type NotesType = {
+  id: string | null;
   noted_by: UserType;
   content: string;
 };
@@ -161,6 +162,70 @@ export default function ViewTicket({
       });
     };
 
+  const handleAddNote = async () => {
+    Swal.fire({
+      title: `Are you sure you want to add a note to this ticket?`,
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `Yes, add note!`,
+      input: "textarea",
+      inputPlaceholder: "Enter a note",
+      allowOutsideClick: false,
+      showCloseButton: true,
+      customClass: {
+        input: "resize-none h-46!",
+      },
+      inputAttributes: {
+        "aria-label": "Enter a note",
+      },
+      inputValidator: (value) => {
+        if (!value.trim()) {
+          return "Please enter a note!";
+        }
+
+        if (value.trim().length < 10) {
+          return "Note must be at least 10 characters.";
+        }
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Adding note...`,
+          text: "Please wait...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        try {
+          const response = await api.patch(`/tickets/${data!.id}/add-note`, {
+            note: result.value,
+          });
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
+            fetchData();
+          }
+        } catch (error: any) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text:
+              error.response.data.message ||
+              "Something went wrong. Please try again later.",
+          });
+        }
+      }
+    });
+  };
+
   return (
     <Modal isOpen={isOpen && id} className="w-xl">
       <ModalHeader onClose={() => setIsOpen(false)}>
@@ -193,7 +258,7 @@ export default function ViewTicket({
               />
               <CardItem
                 title="Transcation Code"
-                value={data?.job_order.transaction_code}
+                value={data?.job_order.transaction_code ?? "N/A"}
               />
             </Card>
             <Card title="Ticket Information">
@@ -216,11 +281,11 @@ export default function ViewTicket({
             <Card title="Other Details" cols="grid-cols-1">
               <CardItem title="Description" value={data?.description} />
               {data?.edited_by && (
-                <CardItem title="Description" value={data?.edited_by.name} />
+                <CardItem title="Edited By" value={data?.edited_by.name} />
               )}
               {data?.edited_at && (
                 <CardItem
-                  title="Description"
+                  title="Edited At"
                   value={formatDateAndTime(data?.edited_at)}
                 />
               )}
@@ -237,7 +302,13 @@ export default function ViewTicket({
             {data?.change_requests?.length! > 0 && (
               <TicketChangeRequests changeRequests={data!.change_requests} />
             )}
-            {data?.notes?.length! > 0 && <TicketNotes notes={data!.notes} />}
+            {data?.status === TICKET_STATUS.EDITED && (
+              <TicketNotes
+                notes={data!.notes}
+                handleAddNote={handleAddNote}
+                fetchData={fetchData}
+              />
+            )}
           </div>
         )}
       </ModalBody>
@@ -282,16 +353,21 @@ export default function ViewTicket({
 export const Card = ({
   title,
   cols,
+  button,
   children,
 }: {
   title: string;
   cols?: string;
+  button?: ReactNode;
   children: ReactNode;
 }) => {
   return (
     <div className="border px-4 py-2 rounded-xl shadow-lg hover:shadow-xl space-y-2">
-      <h2 className="font-bold text-gray-400 tracking-wide uppercase">
+      <h2
+        className={`font-bold text-gray-400 tracking-wide uppercase ${button && "flex items-center justify-between"}`}
+      >
         {title}
+        {button}
       </h2>
       <div className={`grid ${cols ?? "grid-cols-2"} space-y-2`}>
         {children}
