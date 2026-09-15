@@ -19,7 +19,7 @@ class ActivityLogController extends Controller
         return response()->json([
             'message' => 'Activity logs fetched successfully.',
             'data'    => $data,
-        ]);
+        ], 200);
     }
 
     /**
