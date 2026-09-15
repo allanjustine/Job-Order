@@ -154,93 +154,88 @@ const Mechanics = ({
 
   return (
     <>
-      <div className="p-6">
-        <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Mechanics</h1>
-              <p className="text-sm text-gray-400 mt-0.5">
-                Job Order Printing System — Mechanics Overview
-              </p>
-            </div>
+      <div className="bg-white rounded-2xl border border-gray-300 shadow-lg">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Mechanics</h1>
+            <p className="text-sm text-gray-400 mt-0.5">
+              Job Order Printing System — Mechanics Overview
+            </p>
+          </div>
 
-            <div className="mb-2 flex gap-1 justify-end items-center">
-              <div className="relative w-full">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  onChange={handleSearch}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-              <Button
-                type="button"
-                disabled={isRefresh}
-                className={`bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 py-5 px-3 text-sm shadow-sm ${
-                  isRefresh && "cursor-not-allowed! opacity-60"
-                }`}
-                onClick={handleRefresh}
-              >
-                {isRefresh ? (
+          <div className="mb-2 flex gap-1 justify-end items-center">
+            <div className="relative w-full">
+              <Input
+                type="search"
+                placeholder="Search..."
+                onChange={handleSearch}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            </div>
+            <Button
+              type="button"
+              disabled={isRefresh}
+              className={`bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 py-5 px-3 text-sm shadow-sm ${
+                isRefresh && "cursor-not-allowed! opacity-60"
+              }`}
+              onClick={handleRefresh}
+            >
+              {isRefresh ? (
+                <>
+                  <FaCircleNotch className="animate-spin" /> Refreshing...
+                </>
+              ) : (
+                <>
+                  <FaRotateRight /> Refresh
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsOpen(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-5"
+            >
+              <UserPlus /> Add Mechanic
+            </Button>
+          </div>
+        </div>
+        <div className="overflow-x-auto border-t">
+          <DataTable
+            columns={columns}
+            data={mechanics}
+            pagination
+            paginationServer
+            sortServer
+            onSort={handleSort}
+            paginationTotalRows={pagination.total}
+            onChangeRowsPerPage={handleRowsPerPageChange}
+            onChangePage={handlePageChange}
+            paginationPerPage={pagination.perPage}
+            striped
+            highlightOnHover
+            progressPending={isLoading || isRefresh || isSearching}
+            progressComponent={
+              <TableLoader isSearching={isSearching} searchTerm={searchTerm} />
+            }
+            persistTableHead
+            paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+            defaultSortAsc={sort.sortBy}
+            defaultSortFieldId={sort.column}
+            noDataComponent={
+              <div className="py-5 font-bold text-gray-600 text-xl">
+                {searchTerm ? (
                   <>
-                    <FaCircleNotch className="animate-spin" /> Refreshing...
+                    <span className="flex gap-1 items-center">
+                      <SearchSlash /> No results for "{searchTerm}"
+                    </span>
                   </>
                 ) : (
-                  <>
-                    <FaRotateRight /> Refresh
-                  </>
+                  "No mechanics yet."
                 )}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setIsOpen(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-5"
-              >
-                <UserPlus /> Add Mechanic
-              </Button>
-            </div>
-          </div>
-          <div className="overflow-x-auto border-t">
-            <DataTable
-              columns={columns}
-              data={mechanics}
-              pagination
-              paginationServer
-              sortServer
-              onSort={handleSort}
-              paginationTotalRows={pagination.total}
-              onChangeRowsPerPage={handleRowsPerPageChange}
-              onChangePage={handlePageChange}
-              paginationPerPage={pagination.perPage}
-              striped
-              highlightOnHover
-              progressPending={isLoading || isRefresh || isSearching}
-              progressComponent={
-                <TableLoader
-                  isSearching={isSearching}
-                  searchTerm={searchTerm}
-                />
-              }
-              persistTableHead
-              paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-              defaultSortAsc={sort.sortBy}
-              defaultSortFieldId={sort.column}
-              noDataComponent={
-                <div className="py-5 font-bold text-gray-600 text-xl">
-                  {searchTerm ? (
-                    <>
-                      <span className="flex gap-1 items-center">
-                        <SearchSlash /> No results for "{searchTerm}"
-                      </span>
-                    </>
-                  ) : (
-                    "No mechanics yet."
-                  )}
-                </div>
-              }
-            />
-          </div>
+              </div>
+            }
+          />
         </div>
       </div>
       <Activity mode={isOpen ? "visible" : "hidden"}>
