@@ -17,4 +17,8 @@ Route::get('generate-null-jo', function () {
             'transaction_code' => $generated_code
         ]);
     });
+
+    return response()->json([
+        'message' => "{$jobOrders->count()} job orders updated successfully.",
+    ], 200);
 });
