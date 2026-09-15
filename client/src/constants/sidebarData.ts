@@ -7,6 +7,10 @@ import {
   UserCheck,
   ShieldUser,
   Activity,
+  TicketIcon,
+  GitBranchPlus,
+  Tags,
+  Tickets,
 } from "lucide-react";
 
 export const sidebarData = [
@@ -44,6 +48,26 @@ export const sidebarData = [
     href: "/admin/activity-logs",
     icon: Activity,
     name: "Activity Logs",
+  },
+  {
+    href: "/tickets",
+    icon: TicketIcon,
+    name: "Tickets",
+  },
+  {
+    href: "/admin/ticket-categories",
+    icon: Tags,
+    name: "Ticket Categories",
+  },
+  {
+    href: "/admin/ticket-brands",
+    icon: Tickets,
+    name: "Ticket Brands",
+  },
+  {
+    href: "/admin/roles-and-permissions",
+    icon: ShieldUser,
+    name: "Roles and Permissions",
   },
   {
     href: "/admin/reports",
