@@ -85,7 +85,7 @@ export default function Sidebar({
           )}
         </div>
       </div>
-      <nav className="p-1">
+      <nav className="p-1 overflow-y-auto h-[calc(100vh-80px)]">
         <ul className="space-y-2">
           {sidebarData.map((item, index) => (
             <Tooltip key={index}>
