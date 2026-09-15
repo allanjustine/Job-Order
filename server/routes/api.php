@@ -67,6 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('role-and-permissions/{permission}/permissions', [RoleAndPermissionController::class, 'destroyPermission']);
         Route::apiResource('ticket-categories', TicketCategoryController::class);
         Route::apiResource('ticket-brands', TicketBrandController::class);
+        Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'updateTicketStatus']);
+        Route::patch('/tickets/{ticket}/add-note', [TicketController::class, 'addNoteToTicket']);
+        Route::delete('/notes/{note}/delete', [TicketController::class, 'deleteNote']);
     });
 
     // EMPLOYEE ROLE ROUTES
@@ -116,7 +119,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::resource('mechanics', MechanicController::class);
     Route::resource('tickets', TicketController::class);
-    Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'updateTicketStatus']);
     Route::get('ticket-categories-and-brands', [TicketController::class, 'getAllTicketCategoriesAndBrands']);
 });
 
