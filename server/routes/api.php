@@ -116,7 +116,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::resource('mechanics', MechanicController::class);
     Route::resource('tickets', TicketController::class);
-    Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'rejectTicket']);
+    Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'updateTicketStatus']);
     Route::get('ticket-categories-and-brands', [TicketController::class, 'getAllTicketCategoriesAndBrands']);
 });
 
