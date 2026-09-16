@@ -30,6 +30,7 @@ type ViewTicketProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   id: string | number | null;
   fetchDataProp: () => void;
+  setId: Dispatch<SetStateAction<string | number | null>>;
 };
 
 export type AttachmentsType = {
@@ -75,6 +76,7 @@ export default function ViewTicket({
   setIsOpen,
   id,
   fetchDataProp,
+  setId,
 }: ViewTicketProps) {
   const { isAdmin } = useAuth();
   const [data, setData] = useState<TicketType | null>(null);
@@ -154,6 +156,7 @@ export default function ViewTicket({
               });
               fetchDataProp();
               setIsOpen(false);
+              setId(null);
             }
           } catch (error: any) {
             console.error(error);
@@ -303,7 +306,12 @@ export default function ViewTicket({
 
   return (
     <Modal isOpen={isOpen && id} className="w-xl">
-      <ModalHeader onClose={() => setIsOpen(false)}>
+      <ModalHeader
+        onClose={() => {
+          setIsOpen(false);
+          setId(null);
+        }}
+      >
         {isLoading ? (
           <Skeleton className="w-78 h-10 bg-slate-200" />
         ) : (
@@ -407,7 +415,10 @@ export default function ViewTicket({
         <Button
           type="button"
           className="bg-gray-400 hover:bg-gray-500 text-white py-5"
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false);
+            setId(null);
+          }}
         >
           Close
         </Button>
