@@ -303,6 +303,7 @@ export default function TicketBaseContent() {
         setIsOpen={setIsView}
         id={selectedId}
         fetchDataProp={fetchData}
+        setId={setSelectedId}
       />
     </>
   );
