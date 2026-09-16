@@ -139,6 +139,8 @@ class TicketService
     public function updateTicketStatus($request, $ticket, $title)
     {
         $ticket = DB::transaction(function () use ($request, $ticket, $title) {
+            abort_unless($ticket->status === TicketStatus::PENDING, 400, "You can only edit/reject pending tickets.");
+
             if ($title === 'reject') {
                 $ticket->update([
                     'rejected_reason' => $request->note,
