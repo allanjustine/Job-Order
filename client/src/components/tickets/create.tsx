@@ -397,7 +397,7 @@ export default function CreateTicket({
               htmlFor="from_tos"
               className="text-sm font-medium text-gray-600"
             >
-              Change Requests (optional)
+              Change Requests
             </Label>
             {fields.map((field, index) => (
               <div

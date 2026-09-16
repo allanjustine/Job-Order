@@ -47,7 +47,7 @@ class TicketController extends Controller
         $data = $this->ticketService->storeTicket($request);
 
         return response()->json([
-            'message' => 'Ticket created successfully',
+            'message' => "Ticket with ticket code of {$data->ticket_code} created successfully",
             'data'    => $data
         ], 201);
     }
