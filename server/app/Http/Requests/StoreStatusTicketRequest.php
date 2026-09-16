@@ -23,7 +23,7 @@ class StoreStatusTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'note' => ['required', 'string', 'max:255']
+            'note' => ['required', 'string', 'min:10', 'max:5000']
         ];
     }
 }
