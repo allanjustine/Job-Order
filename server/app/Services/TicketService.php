@@ -122,6 +122,20 @@ class TicketService
         ];
     }
 
+    public function deleteTicket($ticket)
+    {
+        abort_if($ticket->status !== TicketStatus::PENDING, 400, "Only pending tickets can be deleted.");
+
+        $ticket->delete();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($ticket)
+            ->log("Ticket \"{$ticket->ticket_code}\" deleted.");
+
+        return $ticket;
+    }
+
     public function updateTicketStatus($request, $ticket, $title)
     {
         $ticket = DB::transaction(function () use ($request, $ticket, $title) {
@@ -181,5 +195,41 @@ class TicketService
             ->log("Deleted a note to ticket \"{$note->ticket->ticket_code}\" and the note is: \"{$note->content}\".");
 
         return $note;
+    }
+
+    public function updateTicketRejectedReason($ticket, $request)
+    {
+        $old_reason = $ticket->rejected_reason;
+
+        $ticket->update([
+            'rejected_reason' => $request->rejected_reason
+        ]);
+
+        $message = "Ticket with ticket code of {$ticket->ticket_code} updated rejected reason successfully from \"{$old_reason}\" to \"{$ticket->rejected_reason}\"";
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($ticket)
+            ->log($message);
+
+        return $message;
+    }
+
+    public function updateTicketNoteContent($note, $request)
+    {
+        $old_content = $note->content;
+
+        $note->update([
+            'content' => $request->content
+        ]);
+
+        $message = "Ticket note from ticket with ticket code of {$note->ticket->ticket_code} updated content successfully from \"{$old_content}\" to \"{$note->content}\"";
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($note)
+            ->log($message);
+
+        return $message;
     }
 }
