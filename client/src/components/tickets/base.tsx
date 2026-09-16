@@ -2,7 +2,6 @@ import TableLoader from "@/components/table-loader";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
-import { useAuth } from "@/context/authContext";
 import useFetch from "@/hooks/useFetch";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { Eye, Search, SearchSlash, Trash } from "lucide-react";
@@ -13,6 +12,7 @@ import ViewTicket from "./view";
 import Swal from "sweetalert2";
 import { api } from "@/lib/api";
 import { TICKET_STATUS } from "@/constants/ticket-status";
+import Select from "../ui/select";
 
 export type UserType = {
   name: string;
@@ -48,8 +48,10 @@ export const TICKET_STATUS_COLOR = {
 };
 
 export default function TicketBaseContent() {
-  const { isAdmin } = useAuth();
   const [isView, setIsView] = useState<boolean>(false);
+  const [filterItems, setFilterItems] = useState<{ status: string }>({
+    status: "ALL",
+  });
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
   const {
     data: tickets,
@@ -66,7 +68,8 @@ export default function TicketBaseContent() {
     handleSearch,
     handleRefresh,
     fetchData,
-  } = useFetch("/tickets");
+    setIsLoading,
+  } = useFetch("/tickets", { filterItems });
 
   const columns = [
     {
@@ -230,13 +233,31 @@ export default function TicketBaseContent() {
             </p>
           </div>
 
-          <div className="mb-2 flex gap-1 items-center">
+          <div className="mb-2 flex gap-1 items-center flex-col lg:flex-row">
+            <Select
+              value={filterItems.status}
+              onChange={(e) => {
+                setFilterItems({ status: e.target.value });
+                setIsLoading(true);
+              }}
+            >
+              <option value="" disabled>
+                Select status
+              </option>
+              {Object.entries({ ALL: "all", ...TICKET_STATUS }).map(
+                ([status, value]) => (
+                  <option value={status} key={value}>
+                    {status}
+                  </option>
+                ),
+              )}
+            </Select>
             <div className="relative">
               <Input
                 type="search"
                 placeholder="Search..."
                 onChange={handleSearch}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-50"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
@@ -303,6 +324,7 @@ export default function TicketBaseContent() {
         setIsOpen={setIsView}
         id={selectedId}
         fetchDataProp={fetchData}
+        setId={setSelectedId}
       />
     </>
   );

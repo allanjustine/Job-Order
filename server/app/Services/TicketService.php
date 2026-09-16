@@ -18,6 +18,8 @@ class TicketService
 
         $search = request('search', '');
 
+        $status = request('status', '');
+
         $sort = request('sort', ["column" => "created_at", "direction" => "desc"]);
 
         $tickets = Ticket::query()
@@ -36,6 +38,7 @@ class TicketService
                         ->orWhereRelation('jobOrder', 'transaction_code', 'like', "%{$search}%");
                 });
             })
+            ->when($status !== 'ALL', fn($query) => $query->where('status', $status))
             ->orderBy($sort['column'], $sort['direction'])
             ->paginate($per_page, [
                 'id',
