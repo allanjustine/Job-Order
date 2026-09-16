@@ -41,35 +41,47 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('users/{user}/update-details', 'update');
             Route::post('users', 'store');
             Route::delete('users/{user}/delete', 'destroy');
+            Route::post('lock-all-user-date-pickers', 'lockAllUserDatePickers');
+        });
+        Route::controller(ReportController::class)->group(function () {
+            Route::get('reports', [ReportController::class, 'index']);
+            Route::get('export-reports', 'exportData');
+            Route::get('show-jo/{job_order}/browse', 'show');
+            Route::get('prev-next/{job_order}/stats', 'prevNextJobOrderStats');
+        });
+        Route::controller(JobOrderController::class)->group(function () {
+            Route::patch('update-job-order/{job_order}/update', 'update');
+            Route::delete('cancel-job-order/{id}', 'cancel');
+            Route::delete('delete-job-order/{id}', 'destroy');
+        });
+        Route::controller(ManageJobOrderDetail::class)->group(function () {
+            Route::post('manage-job-order-detail/store', 'store');
+            Route::delete('manage-job-order-detail/{job_order_detail}/delete', 'destroy');
+        });
+        Route::controller(RoleAndPermissionController::class)->group(function () {
+            Route::get('get-all-roles', 'getAllRoles');
+            Route::get('role-and-permissions', 'index');
+            Route::post('role-and-permissions', 'store');
+            Route::patch('role-and-permissions/{id}/update', 'update');
+            Route::delete('role-and-permissions/{role}/roles', 'destroyRole');
+            Route::delete('role-and-permissions/{permission}/permissions', 'destroyPermission');
+        });
+        Route::controller(TicketController::class)->group(function () {
+            Route::patch('/tickets/{ticket}/{title}', 'updateTicketStatus');
+            Route::patch('/tickets/{ticket}/add-note', 'addNoteToTicket');
+            Route::delete('/notes/{note}/delete', 'deleteNote');
+            Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
+            Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
-        Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
         Route::resource('area-managers', AreaManagerController::class);
+        Route::apiResource('ticket-categories', TicketCategoryController::class);
+        Route::apiResource('ticket-brands', TicketBrandController::class);
+        Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
         Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
-        Route::get('reports', [ReportController::class, 'index']);
-        Route::get('export-reports', [ReportController::class, 'exportData']);
-        Route::get('show-jo/{job_order}/browse', [ReportController::class, 'show']);
-        Route::patch('update-job-order/{job_order}/update', [JobOrderController::class, 'update']);
-        Route::delete('cancel-job-order/{id}', [JobOrderController::class, 'cancel']);
-        Route::delete('delete-job-order/{id}', [JobOrderController::class, 'destroy']);
-        Route::post('lock-all-user-date-pickers', [UsersController::class, 'lockAllUserDatePickers']);
-        Route::post('manage-job-order-detail/store', [ManageJobOrderDetail::class, 'store']);
-        Route::delete('manage-job-order-detail/{job_order_detail}/delete', [ManageJobOrderDetail::class, 'destroy']);
-        Route::get('prev-next/{job_order}/stats', [ReportController::class, 'prevNextJobOrderStats']);
         Route::get('activity-logs', [ActivityLogController::class, 'index']);
-        Route::get('get-all-roles', [RoleAndPermissionController::class, 'getAllRoles']);
-        Route::get('role-and-permissions', [RoleAndPermissionController::class, 'index']);
-        Route::post('role-and-permissions', [RoleAndPermissionController::class, 'store']);
-        Route::patch('role-and-permissions/{id}/update', [RoleAndPermissionController::class, 'update']);
-        Route::delete('role-and-permissions/{role}/roles', [RoleAndPermissionController::class, 'destroyRole']);
-        Route::delete('role-and-permissions/{permission}/permissions', [RoleAndPermissionController::class, 'destroyPermission']);
-        Route::apiResource('ticket-categories', TicketCategoryController::class);
-        Route::apiResource('ticket-brands', TicketBrandController::class);
-        Route::patch('/tickets/{ticket}/{title}', [TicketController::class, 'updateTicketStatus']);
-        Route::patch('/tickets/{ticket}/add-note', [TicketController::class, 'addNoteToTicket']);
-        Route::delete('/notes/{note}/delete', [TicketController::class, 'deleteNote']);
     });
 
     // EMPLOYEE ROLE ROUTES
@@ -77,9 +89,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::controller(JobOrderController::class)->group(function () {
             Route::get('job-orders', 'index');
             Route::get('job-orders/{job_order}/browse', 'show')->withoutMiddleware('role:employee');
-            Route::get('export-branch-reports', [JobOrderController::class, 'exportBranchData']);
-        });
-        Route::controller(JobOrderController::class)->group(function () {
+            Route::get('export-branch-reports', 'exportBranchData');
+            Route::post('verifying-job-order', 'verifyingJobOrder');
+            Route::post('add-receipt/{job_order}', 'addReceipt');
             Route::post('create-job-order', 'store');
         });
         Route::get('branch-mechanics', [MechanicController::class, 'branchMechanic']);
@@ -109,17 +121,18 @@ Route::middleware('auth:sanctum')->group(function () {
                 "has_mechanic" => $has_mechanic->exists()
             ], 200);
         });
-        Route::post('verifying-job-order', [JobOrderController::class, 'verifyingJobOrder']);
-        Route::post('add-receipt/{job_order}', [JobOrderController::class, 'addReceipt']);
     });
 
     // GLOBAL AUTHENTICATED ROUTES
     Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'destroy');
     });
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('ticket-categories-and-brands', 'getAllTicketCategoriesAndBrands');
+        Route::delete('/tickets/{ticket}/delete', 'destroy');
+    });
     Route::resource('mechanics', MechanicController::class);
     Route::resource('tickets', TicketController::class);
-    Route::get('ticket-categories-and-brands', [TicketController::class, 'getAllTicketCategoriesAndBrands']);
 });
 
 // PUBLIC ROUTES
