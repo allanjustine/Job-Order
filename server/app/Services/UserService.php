@@ -101,7 +101,7 @@ class UserService
 
     public function updateUser($request, $user)
     {
-        $old_data = "name: {$user->name}, code: {$user->code}, branch: {$user->branch->branch_name}, email: {$user->email}, role: {$user->roles->first()->name}";
+        $old_data = "name: {$user->name}, code: {$user->code}, branch: {$user->branch->branch_name}, email: {$user->email}, role: {$user->roles->first()?->name}";
 
         DB::transaction(function () use ($request, $user) {
             $user->update([
