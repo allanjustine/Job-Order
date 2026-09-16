@@ -1,4 +1,4 @@
-import { Plus, Trash } from "lucide-react";
+import { Pen, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardItem, NotesType } from "./view";
 import { Fragment } from "react";
@@ -26,17 +26,104 @@ export default function TicketNotes({
       allowOutsideClick: false,
     }).then(async (result) => {
       if (result.isConfirmed) {
+        Swal.fire({
+          title: `Deleting note...`,
+          text: "Please wait...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         try {
           const response = await api.delete(`/notes/${noteId}/delete`);
           if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
             fetchData();
           }
-        } catch (eror: any) {
-          console.error(eror);
+        } catch (error: any) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text:
+              error.response.data.message ||
+              "Something went wrong. Please try again later.",
+          });
         }
       }
     });
   };
+
+  const handleEditNote =
+    (noteId: string | number | null, content: string) => () => {
+      Swal.fire({
+        title: `Are you sure you want to update the content of this note?`,
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: `Yes, update it!`,
+        input: "textarea",
+        inputPlaceholder: "Enter a new content",
+        allowOutsideClick: false,
+        showCloseButton: true,
+        inputValue: content,
+        customClass: {
+          input: "resize-none h-46!",
+        },
+        inputAttributes: {
+          "aria-label": "Enter a new content",
+        },
+        inputValidator: (value) => {
+          if (!value.trim()) {
+            return "Please enter a new content!";
+          }
+
+          if (value.trim().length < 10) {
+            return "Content must be at least 10 characters.";
+          }
+        },
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: `Updating content...`,
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const response = await api.patch(`/notes/${noteId}/update`, {
+              content: result.value,
+            });
+            if (response.status === 200) {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: response.data.message,
+              });
+              fetchData();
+            }
+          } catch (error: any) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text:
+                error.response.data.message ||
+                "Something went wrong. Please try again later.",
+            });
+          }
+        }
+      });
+    };
+
   return (
     <Card
       title="Ticket Notes"
@@ -44,26 +131,37 @@ export default function TicketNotes({
         <Button
           type="button"
           onClick={handleAddNote}
+          size="sm"
           className="bg-blue-500 hover:bg-blue-600 hover:scale-105 duration-300 ease-in-out hover:translate-x-1"
         >
           <Plus /> Add Note
         </Button>
       }
-      cols={notes?.length > 0 ? "grid-cols-[40%_50%_10%]" : "grid-cols-1"}
+      cols={notes?.length > 0 ? "grid-cols-[35%_50%_15%]" : "grid-cols-1"}
     >
       {notes?.length > 0 ? (
         notes?.map((item, index) => (
           <Fragment key={index}>
             <CardItem title="Noted By" value={item.noted_by.name} />
             <CardItem title="Content" value={item.content} />
-            <Button
-              type="button"
-              variant="link"
-              className="text-red-500 hover:text-red-600 hover:scale-105 duration-300 ease-in-out hover:translate-x-1"
-              onClick={handleDeleteNote(item.id)}
-            >
-              <Trash />
-            </Button>
+            <div className="flex gap-1 items-center">
+              <Button
+                type="button"
+                variant="link"
+                className="text-blue-500 hover:text-blue-600 hover:scale-105 duration-300 ease-in-out hover:translate-x-1"
+                onClick={handleEditNote(item.id, item.content)}
+              >
+                <Pen />
+              </Button>
+              <Button
+                type="button"
+                variant="link"
+                className="text-red-500 hover:text-red-600 hover:scale-105 duration-300 ease-in-out hover:translate-x-1"
+                onClick={handleDeleteNote(item.id)}
+              >
+                <Trash />
+              </Button>
+            </div>
           </Fragment>
         ))
       ) : (
