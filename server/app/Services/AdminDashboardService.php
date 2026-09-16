@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Enums\JobOrderType;
+use App\Enums\TicketStatus;
 use App\Enums\TypeOfJob;
 use App\Models\AreaManager;
 use App\Models\Customer;
 use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
 use App\Models\Mechanic;
+use App\Models\Ticket;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardService
 {
@@ -172,6 +175,25 @@ class AdminDashboardService
             ->values();
     }
 
+    public function ticketStats()
+    {
+        $tickets = Ticket::query();
+
+        $total_tickets = $tickets->count();
+
+        $total_tickets_by_status = $tickets->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        return [
+            'total_tickets'    => $total_tickets,
+            'pending_tickets'  => $total_tickets_by_status[TicketStatus::PENDING?->value] ?? 0,
+            'edited_tickets'   => $total_tickets_by_status[TicketStatus::EDITED?->value] ?? 0,
+            'rejected_tickets' => $total_tickets_by_status[TicketStatus::REJECTED?->value] ?? 0
+        ];
+    }
+
     public function getAllStats()
     {
         return [
@@ -185,7 +207,8 @@ class AdminDashboardService
             'total_amount'                => $this->totalAmount(),
             'top_over_all_job_orders'     => $this->topTenOverAllJobOrders(),
             'top_branch_job_orders'       => $this->topTenBranchJobOrders(),
-            'top_area_manager_job_orders' => $this->topTenAreaManagersJobOrders()
+            'top_area_manager_job_orders' => $this->topTenAreaManagersJobOrders(),
+            'ticket_stats'                => $this->ticketStats()
         ];
     }
 }
