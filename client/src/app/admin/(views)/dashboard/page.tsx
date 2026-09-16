@@ -12,6 +12,8 @@ import {
   CarFrontIcon,
   UserCog,
   User,
+  Ticket,
+  TicketMinus,
 } from "lucide-react";
 import { FaCircleNotch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
@@ -35,6 +37,56 @@ import { api } from "@/lib/api";
 import { formatDateAndTime } from "@/utils/format-date-and-time";
 import { diffForHumans } from "@/utils/diff-for-humans";
 import TableLoader from "@/components/table-loader";
+
+const ADMIN_STATS_INITIAL_VALUES = {
+  total_job_prints: {
+    total: 0,
+    total_motors: 0,
+    total_trimotors: 0,
+  },
+  today_prints: 0,
+  weekly_prints: 0,
+  monthly_prints: 0,
+  total_mechanics: 0,
+  total_motorcycle_jobs: 0,
+  total_trimotors_job: 0,
+  total_amount: 0,
+  total_job_motor_print: 0,
+  total_job_trimotor_print: 0,
+  top_over_all_job_orders: [
+    {
+      category: "",
+      amount: 0,
+    },
+  ],
+  top_area_manager_job_orders: [
+    {
+      category: "",
+      area_manager_name: "",
+      amount: 0,
+      branch: {
+        name: "",
+        code: "",
+      },
+    },
+  ],
+  top_branch_job_orders: [
+    {
+      category: "",
+      amount: 0,
+      branch: {
+        name: "",
+        code: "",
+      },
+    },
+  ],
+  ticket_stats: {
+    total_tickets: 0,
+    pending_tickets: 0,
+    edited_tickets: 0,
+    rejected_tickets: 0,
+  },
+};
 
 interface StatItem {
   total_job_prints: {
@@ -72,6 +124,12 @@ interface StatItem {
       code: string;
     };
   }[];
+  ticket_stats: {
+    total_tickets: number;
+    pending_tickets: number;
+    edited_tickets: number;
+    rejected_tickets: number;
+  };
 }
 
 const Dashboard = () => {
@@ -94,49 +152,9 @@ const Dashboard = () => {
   const [viewData, setViewData] = useState<any>(null);
   const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [adminStats, setAdminStats] = useState<StatItem>({
-    total_job_prints: {
-      total: 0,
-      total_motors: 0,
-      total_trimotors: 0,
-    },
-    today_prints: 0,
-    weekly_prints: 0,
-    monthly_prints: 0,
-    total_mechanics: 0,
-    total_motorcycle_jobs: 0,
-    total_trimotors_job: 0,
-    total_amount: 0,
-    total_job_motor_print: 0,
-    total_job_trimotor_print: 0,
-    top_over_all_job_orders: [
-      {
-        category: "",
-        amount: 0,
-      },
-    ],
-    top_area_manager_job_orders: [
-      {
-        category: "",
-        area_manager_name: "",
-        amount: 0,
-        branch: {
-          name: "",
-          code: "",
-        },
-      },
-    ],
-    top_branch_job_orders: [
-      {
-        category: "",
-        amount: 0,
-        branch: {
-          name: "",
-          code: "",
-        },
-      },
-    ],
-  });
+  const [adminStats, setAdminStats] = useState<StatItem>(
+    ADMIN_STATS_INITIAL_VALUES,
+  );
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -252,6 +270,10 @@ const Dashboard = () => {
     totalOverAllAmount: phpCurrency(Number(adminStats.total_amount) || 0),
     total_job_motor_print: adminStats.total_job_prints.total_motors,
     total_job_trimotor_print: adminStats.total_job_prints.total_trimotors,
+    total_tickets: adminStats.ticket_stats.total_tickets,
+    pending_tickets: adminStats.ticket_stats.pending_tickets,
+    edited_tickets: adminStats.ticket_stats.edited_tickets,
+    rejected_tickets: adminStats.ticket_stats.rejected_tickets,
   };
 
   const spinner = () => {
@@ -311,6 +333,34 @@ const Dashboard = () => {
       icon: PhilippinePeso,
       color: "from-yellow-500 to-orange-400",
       sub: "Overall revenue",
+    },
+    {
+      label: "Total Tickets",
+      value: isLoadingStats ? spinner() : data.total_tickets,
+      icon: Ticket,
+      color: "from-pink-500 to-red-400",
+      sub: "Overall tickets",
+    },
+    {
+      label: "Total Pending Tickets",
+      value: isLoadingStats ? spinner() : data.pending_tickets,
+      icon: TicketMinus,
+      color: "from-yellow-500 to-orange-400",
+      sub: "Total pending tickets",
+    },
+    {
+      label: "Total Edited Tickets",
+      value: isLoadingStats ? spinner() : data.edited_tickets,
+      icon: Ticket,
+      color: "from-blue-500 to-cyan-400",
+      sub: "Total edited tickets",
+    },
+    {
+      label: "Total Rejected Tickets",
+      value: isLoadingStats ? spinner() : data.rejected_tickets,
+      icon: Ticket,
+      color: "from-red-500 to-red-400",
+      sub: "Total rejected tickets",
     },
   ];
 
