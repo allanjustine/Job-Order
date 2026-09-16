@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStatusTicketRequest;
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateNoteContentRequest;
+use App\Http\Requests\UpdateTicketRejectedReasonRequest;
 use App\Models\Ticket;
 use App\Models\TicketNote;
 use App\Services\TicketService;
@@ -82,9 +84,13 @@ class TicketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Ticket $ticket)
     {
-        //
+        $this->ticketService->deleteTicket($ticket);
+
+        return response()->json([
+            'message' => "Ticket with ticket code of {$ticket->ticket_code} deleted successfully",
+        ], 200);
     }
 
     public function getAllTicketCategoriesAndBrands()
@@ -125,6 +131,28 @@ class TicketController extends Controller
 
         return response()->json([
             'message' => "Note \"{$data->content}\" deleted successfully",
+        ], 200);
+    }
+
+    public function updateTicketRejectedReason(UpdateTicketRejectedReasonRequest $request, Ticket $ticket)
+    {
+        $request->validated();
+
+        $message = $this->ticketService->updateTicketRejectedReason($ticket, $request);
+
+        return response()->json([
+            'message' => $message,
+        ], 200);
+    }
+
+    public function updateTicketNoteContent(UpdateNoteContentRequest $request, TicketNote $note)
+    {
+        $request->validated();
+
+        $message = $this->ticketService->updateTicketNoteContent($note, $request);
+
+        return response()->json([
+            'message' => $message,
         ], 200);
     }
 }

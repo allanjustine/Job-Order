@@ -23,6 +23,7 @@ import TicketChangeRequests from "./change-requests";
 import TicketAttachments from "./attachments";
 import TicketNotes from "./notes";
 import Swal from "sweetalert2";
+import { Pen } from "lucide-react";
 
 type ViewTicketProps = {
   isOpen: boolean;
@@ -78,6 +79,7 @@ export default function ViewTicket({
   const { isAdmin } = useAuth();
   const [data, setData] = useState<TicketType | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     if (!id && !isOpen) return;
@@ -88,9 +90,14 @@ export default function ViewTicket({
     setLoading(true);
     try {
       const response = await api.get(`/tickets/${id}`);
-      setData(response.data.data);
+      if (response.status === 200) {
+        setData(response.data.data);
+        setError("");
+      }
     } catch (error: any) {
       console.error(error);
+      setError(error.response.data.message);
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -226,6 +233,74 @@ export default function ViewTicket({
     });
   };
 
+  const handleEditRejectedReason = async () => {
+    Swal.fire({
+      title: `Are you sure you want to update the rejected reason to this ticket?`,
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `Yes, update it!`,
+      input: "textarea",
+      inputPlaceholder: "Enter a new rejected reason",
+      allowOutsideClick: false,
+      showCloseButton: true,
+      inputValue: data?.rejected_reason,
+      customClass: {
+        input: "resize-none h-46!",
+      },
+      inputAttributes: {
+        "aria-label": "Enter a new rejected reason",
+      },
+      inputValidator: (value) => {
+        if (!value.trim()) {
+          return "Please enter a new rejected reason!";
+        }
+
+        if (value.trim().length < 10) {
+          return "Rejected reason must be at least 10 characters.";
+        }
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Updating rejected reason...`,
+          text: "Please wait...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        try {
+          const response = await api.patch(
+            `/tickets/rejected-reason/${data!.id}/update-rejected-reason`,
+            {
+              rejected_reason: result.value,
+            },
+          );
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
+            fetchData();
+          }
+        } catch (error: any) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text:
+              error.response.data.message ||
+              "Something went wrong. Please try again later.",
+          });
+        }
+      }
+    });
+  };
+
   return (
     <Modal isOpen={isOpen && id} className="w-xl">
       <ModalHeader onClose={() => setIsOpen(false)}>
@@ -249,6 +324,8 @@ export default function ViewTicket({
             <Skeleton className="w-full h-50 bg-slate-200" />
             <Skeleton className="w-full h-30 bg-slate-200" />
           </div>
+        ) : error ? (
+          <small className="text-red-500">{error}</small>
         ) : (
           <div className="flex flex-col space-y-3">
             <Card title="Job Order Information">
@@ -289,13 +366,27 @@ export default function ViewTicket({
                   value={formatDateAndTime(data?.edited_at)}
                 />
               )}
-              {data?.rejected_reason && (
-                <CardItem
-                  title="Rejected Reason"
-                  value={data?.rejected_reason}
-                />
-              )}
             </Card>
+            {data?.rejected_reason && (
+              <Card
+                title="Rejected Reason"
+                cols="grid-cols-1"
+                button={
+                  isAdmin && (
+                    <Button
+                      type="button"
+                      onClick={handleEditRejectedReason}
+                      className="bg-blue-500 hover:bg-blue-600 hover:scale-102 hover:translate-x-1"
+                      size="sm"
+                    >
+                      <Pen /> Edit Reason
+                    </Button>
+                  )
+                }
+              >
+                <CardItem title="Content" value={data?.rejected_reason} />
+              </Card>
+            )}
             {data?.attachments?.length! > 0 && (
               <TicketAttachments attachments={data!.attachments} />
             )}
