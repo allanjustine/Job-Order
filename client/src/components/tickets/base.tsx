@@ -10,6 +10,9 @@ import { useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import ViewTicket from "./view";
+import Swal from "sweetalert2";
+import { api } from "@/lib/api";
+import { TICKET_STATUS } from "@/constants/ticket-status";
 
 export type UserType = {
   name: string;
@@ -157,10 +160,11 @@ export default function TicketBaseContent() {
           >
             <Eye /> View
           </Button>
-          {isAdmin && (
+          {row.status === TICKET_STATUS.PENDING && (
             <Button
               type="button"
               className="bg-red-500 hover:bg-red-600 hover:scale-102"
+              onClick={handleDeleteTicket(row.id)}
             >
               <Trash /> Delete
             </Button>
@@ -170,6 +174,50 @@ export default function TicketBaseContent() {
       width: "200px",
     },
   ];
+
+  const handleDeleteTicket = (ticketId: string | number) => () => {
+    Swal.fire({
+      title: "Are you sure you want to delete this ticket?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      allowOutsideClick: false,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Deleting ticket...`,
+          text: "Please wait...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        try {
+          const response = await api.delete(`/tickets/${ticketId}/delete`);
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.data.message,
+            });
+            fetchData();
+          }
+        } catch (error: any) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text:
+              error.response.data.message ||
+              "Something went wrong. Please try again later.",
+          });
+        }
+      }
+    });
+  };
 
   return (
     <>
