@@ -2,15 +2,16 @@
 "use client";
 
 import phpCurrency from "@/utils/phpCurrency";
-import MotorsImage from "./motors-image";
-import TriMotorsImage from "./trimotors-image";
 import { EmptyItem } from "./empty-item";
 import { Wrench } from "lucide-react";
 import formatDate from "@/utils/format-date";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 import { useMemo } from "react";
-import { getJobOrderPageRange, getJobOrderPrintPageCount,} from "@/utils/job-order-pagination";
+import {
+  getJobOrderPageRange,
+  getJobOrderPrintPageCount,
+} from "@/utils/job-order-pagination";
 
 interface PreviewJobOrderProps {
   data?: Record<string, any>;
@@ -25,7 +26,6 @@ const ViewJobOrder = ({
   printPage,
   isPrintRestItems,
 }: PreviewJobOrderProps) => {
- 
   const resolvedPage = printPage ?? (isPrintRestItems ? 1 : 0);
   const totalPages = getJobOrderPrintPageCount(data);
   const isLastPage = !isReprint || resolvedPage >= totalPages - 1;
@@ -33,9 +33,10 @@ const ViewJobOrder = ({
   const jobTotal = Number(data?.total_job_request) || 0;
   const partsTotal = Number(data?.total_parts_used) || 0;
   const grandTotal = Number(data?.job_order_details_sum_amount) || 0;
+  const WEBSITE_URL = `${window.location.origin}/search`;
 
   const formatCurrency = (amount: number | undefined): string => {
-    if (amount ===undefined) return "";
+    if (amount === undefined) return "";
     return phpCurrency(amount);
   };
 
@@ -50,9 +51,14 @@ const ViewJobOrder = ({
   }
 
   // Get all jobs and parts from the full data
-  const allJobs = data?.job_order_details?.filter((item: any) => item.type === "job_request") || [];
-  const allParts = data?.job_order_details?.filter((item: any) => item.type === "parts_replacement") || [];
-
+  const allJobs =
+    data?.job_order_details?.filter(
+      (item: any) => item.type === "job_request",
+    ) || [];
+  const allParts =
+    data?.job_order_details?.filter(
+      (item: any) => item.type === "parts_replacement",
+    ) || [];
 
   const filteredJobs = useMemo(() => {
     if (!isReprint) return allJobs;
@@ -202,7 +208,9 @@ const ViewJobOrder = ({
                 {isFirstPage && (
                   <h2
                     className="font-bold border-t border-b border-black py-0.5 my-0.5 text-center w-full"
-                    style={isReprint ? { fontSize: "8pt", lineHeight: "1" } : {}}
+                    style={
+                      isReprint ? { fontSize: "8pt", lineHeight: "1" } : {}
+                    }
                   >
                     VEHICLE CHECKLIST
                   </h2>
@@ -264,7 +272,9 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-24">Estimated Repair Time:</span>
+                      <span className="font-bold w-24">
+                        Estimated Repair Time:
+                      </span>
                       <span className="border-b border-black flex-1">
                         {data.estimated_repair_time || "N/A"}
                       </span>
@@ -317,7 +327,7 @@ const ViewJobOrder = ({
                     </div>
                   </div>
 
-              {/* {data?.job_order_type === "motors" ? (
+                  {/* {data?.job_order_type === "motors" ? (
           <MotorsImage data={data} />
         ) : (
           <TriMotorsImage data={data} />
@@ -363,8 +373,8 @@ const ViewJobOrder = ({
                                   {[
                                     ...trimotorsdiagnosisItems,
                                     ...motorsdiagnosisItems,
-                                  ].find((it) => it.key === item.title)?.label ||
-                                    "N/A"}
+                                  ].find((it) => it.key === item.title)
+                                    ?.label || "N/A"}
                                 </td>
                                 <td className="border-[0.1px] border-black p-px text-center font-bold text-red-600 w-1/3">
                                   {item?.status?.toUpperCase() || "N/A"}
@@ -424,21 +434,26 @@ const ViewJobOrder = ({
                         const rows = [];
                         for (let i = 0; i < maxItems; i++) {
                           const job = filteredJobs[i];
-                          
+
                           if (job) {
                             const jobLabel = job.category || "";
-                            const jobBrand = job.part_brand?.toLowerCase() !== "n/a" 
-                              ? ` - ${job.part_brand}` 
-                              : "";
-                            
+                            const jobBrand =
+                              job.part_brand?.toLowerCase() !== "n/a"
+                                ? ` - ${job.part_brand}`
+                                : "";
+
                             rows.push(
-                              <tr key={`job_${i}`} className="break-inside-avoid">
+                              <tr
+                                key={`job_${i}`}
+                                className="break-inside-avoid"
+                              >
                                 <td
                                   className="border-[0.1px] border-black align-top"
                                   style={{ padding: "1px 3px" }}
                                 >
                                   <span className="text-[7.5pt] leading-[1.2] block">
-                                    ✓ {jobLabel}{jobBrand}
+                                    ✓ {jobLabel}
+                                    {jobBrand}
                                   </span>
                                 </td>
                                 <td
@@ -449,11 +464,14 @@ const ViewJobOrder = ({
                                     {formatCurrency(job.amount)}
                                   </span>
                                 </td>
-                              </tr>
+                              </tr>,
                             );
                           } else {
                             rows.push(
-                              <tr key={`job_empty_${i}`} className="break-inside-avoid">
+                              <tr
+                                key={`job_empty_${i}`}
+                                className="break-inside-avoid"
+                              >
                                 <td
                                   className="border-[0.1px] border-black"
                                   style={{ padding: "1px 3px", height: "14px" }}
@@ -462,7 +480,7 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black"
                                   style={{ padding: "1px 3px", height: "14px" }}
                                 ></td>
-                              </tr>
+                              </tr>,
                             );
                           }
                         }
@@ -514,12 +532,15 @@ const ViewJobOrder = ({
                         const rows = [];
                         for (let i = 0; i < maxItems; i++) {
                           const part = filteredParts[i];
-                          
+
                           if (part) {
                             const partDetail = formatPartDetail(part);
-                            
+
                             rows.push(
-                              <tr key={`part_${i}`} className="break-inside-avoid">
+                              <tr
+                                key={`part_${i}`}
+                                className="break-inside-avoid"
+                              >
                                 <td
                                   className="border-[0.1px] border-black align-top"
                                   style={{ padding: "1px 3px" }}
@@ -532,7 +553,9 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black text-center align-top whitespace-nowrap"
                                   style={{ padding: "1px 3px" }}
                                 >
-                                  <span className="text-[7.5pt]">{part?.quantity || ""}</span>
+                                  <span className="text-[7.5pt]">
+                                    {part?.quantity || ""}
+                                  </span>
                                 </td>
                                 <td
                                   className="border-[0.1px] border-black text-left align-top overflow-hidden"
@@ -550,11 +573,14 @@ const ViewJobOrder = ({
                                     {formatCurrency(part?.amount)}
                                   </span>
                                 </td>
-                              </tr>
+                              </tr>,
                             );
                           } else {
                             rows.push(
-                              <tr key={`part_empty_${i}`} className="break-inside-avoid">
+                              <tr
+                                key={`part_empty_${i}`}
+                                className="break-inside-avoid"
+                              >
                                 <td
                                   className="border-[0.1px] border-black"
                                   style={{ padding: "1px 3px", height: "14px" }}
@@ -571,13 +597,13 @@ const ViewJobOrder = ({
                                   className="border-[0.1px] border-black"
                                   style={{ padding: "1px 3px", height: "14px" }}
                                 ></td>
-                              </tr>
+                              </tr>,
                             );
                           }
                         }
                         return rows;
                       })()}
-                      
+
                       <tr key="totals">
                         <td
                           className="border-b border-black p-0.5 font-semibold text-[7.5pt] "
@@ -612,7 +638,9 @@ const ViewJobOrder = ({
                       </span>
                       <span> or </span>
                       <span className="underline inline-block">
-                        {data.nextScheduleKms || data.next_schedule_kms || "N/A"}
+                        {data.nextScheduleKms ||
+                          data.next_schedule_kms ||
+                          "N/A"}
                       </span>
                       <span> kms (whichever comes first)</span>
                     </div>
@@ -698,7 +726,9 @@ const ViewJobOrder = ({
                 <>
                   <div className="flex mt-2" style={{ fontSize: "8pt" }}>
                     <span className="font-bold mr-2">Receipt #:</span>
-                    <span className="w-30 border-b border-black mt-1">{data.receipt_number || ""}</span>
+                    <span className="w-30 border-b border-black mt-1">
+                      {data.receipt_number || ""}
+                    </span>
                   </div>
                   <div className="flex mt-1" style={{ fontSize: "8pt" }}>
                     <span className="font-bold mr-2">Cashier's Signature:</span>
@@ -722,12 +752,20 @@ const ViewJobOrder = ({
               )}
 
               {isReprint && index === 1 && (
-                <span
-                  className="absolute bottom-1 right-1 text-xs"
-                  style={{ fontSize: "7pt" }}
-                >
-                  Customer's Copy
-                </span>
+                <>
+                  <span
+                    className="absolute bottom-4 right-1 text-xs"
+                    style={{ fontSize: "7pt" }}
+                  >
+                    {WEBSITE_URL}
+                  </span>
+                  <span
+                    className="absolute bottom-1 right-1 text-xs"
+                    style={{ fontSize: "7pt" }}
+                  >
+                    Customer's Copy
+                  </span>
+                </>
               )}
             </div>
           </div>
