@@ -45,6 +45,7 @@ import { jobItems } from "@/constants/job-items";
 import { partsItems } from "@/constants/part-items";
 import { getMotorsPrintPageCount } from "@/utils/job-order-pagination";
 import { Spinner } from "@/components/ui/spinner";
+import { EMPLOYEE_ACCESS } from "@/lib/permissions";
 
 const QUANTITY_DATA = {
   engineOil: 1,
@@ -1119,4 +1120,4 @@ const JobOrderForm = () => {
   );
 };
 
-export default withAuthPage(JobOrderForm);
+export default withAuthPage(JobOrderForm, EMPLOYEE_ACCESS);
