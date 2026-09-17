@@ -20,6 +20,7 @@ import CreateRolesOrPermissions, {
   Permission,
 } from "../../components/roles-and-permissions/create";
 import EditRolesOrPermissions from "../../components/roles-and-permissions/edit";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -329,4 +330,4 @@ const Reports = () => {
   );
 };
 
-export default withAuthPage(Reports);
+export default withAuthPage(Reports, ADMIN_ACCESS);
