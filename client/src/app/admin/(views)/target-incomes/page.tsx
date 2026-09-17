@@ -26,6 +26,7 @@ import { api } from "@/lib/api";
 import { format } from "date-fns";
 import Select from "@/components/ui/select";
 import TableLoader from "@/components/table-loader";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -49,6 +50,7 @@ const Reports = () => {
     handleSearch,
     handleRefresh,
     fetchData,
+    setIsLoading,
   } = useFetch("/target-incomes", { filterItems: filters });
 
   const DATES = [
@@ -260,6 +262,7 @@ const Reports = () => {
                 <Select
                   value={filters?.month}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                    setIsLoading(true);
                     setFilters({
                       month: e.target.value,
                     });
@@ -375,4 +378,4 @@ const Reports = () => {
   );
 };
 
-export default withAuthPage(Reports);
+export default withAuthPage(Reports, ADMIN_ACCESS);
