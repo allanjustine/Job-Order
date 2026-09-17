@@ -24,6 +24,7 @@ import CreateUser from "../../components/users/create";
 import { useState } from "react";
 import EditUser, { UserType } from "../../components/users/edit";
 import toast from "react-hot-toast";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Users = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -422,4 +423,4 @@ const Users = () => {
   );
 };
 
-export default withAuthPage(Users);
+export default withAuthPage(Users, ADMIN_ACCESS);

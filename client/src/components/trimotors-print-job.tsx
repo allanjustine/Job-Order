@@ -19,7 +19,10 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
-import { getJobOrderPageRange, getMotorsPrintPageCount,} from "@/utils/job-order-pagination";
+import {
+  getJobOrderPageRange,
+  getMotorsPrintPageCount,
+} from "@/utils/job-order-pagination";
 
 interface TrimotorsPrintJobOrderProps {
   data: {
@@ -68,7 +71,7 @@ const TrimotorsPrintJobOrder = ({
   hasRestData,
   printPage,
 }: TrimotorsPrintJobOrderProps) => {
-
+  const WEBSITE_URL = `${window.location.origin}/search`;
   const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
   const renderCheckbox = (checked: boolean) => (checked ? "[✓]" : "[  ]");
 
@@ -434,8 +437,8 @@ const TrimotorsPrintJobOrder = ({
                 {/* Vehicle Information - Compact Grid */}
                 <CustomerGridView data={data} />
 
-            {/* Motorcycle Unit & Engine Unit */}
-            {/* <div
+                {/* Motorcycle Unit & Engine Unit */}
+                {/* <div
               className="mb-2 grid grid-cols-1 gap-2"
               style={{ fontSize: "8pt", lineHeight: "0.8" }}
             >
@@ -467,55 +470,56 @@ const TrimotorsPrintJobOrder = ({
               </div>
             </div> */}
 
-            {/* Motorcycle Diagnosis Section */}
-            <div className="mb-2 text-xs">
-              <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-                TRIMOTORS' DIAGNOSIS
-              </h3>
+                {/* Motorcycle Diagnosis Section */}
+                <div className="mb-2 text-xs">
+                  <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                    TRIMOTORS' DIAGNOSIS
+                  </h3>
 
-              {allDiagnosisOK() && (
-                <div className="border border-black p-2 text-center">
-                  <p className="font-semibold">All diagnosis are OK</p>
+                  {allDiagnosisOK() && (
+                    <div className="border border-black p-2 text-center">
+                      <p className="font-semibold">All diagnosis are OK</p>
+                    </div>
+                  )}
+
+                  {hasNGDiagnosis() && (
+                    <table
+                      className="w-full border-collapse border border-black my-0"
+                      style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                    >
+                      <thead>
+                        <tr className="bg-gray-40">
+                          <th className="border border-black p-0.5 text-left">
+                            Diagnosis Item
+                          </th>
+                          <th className="border border-black p-0.5 text-center">
+                            Status
+                          </th>
+                          <th className="border border-black p-0.5 text-left">
+                            Remarks
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getNGDiagnosisItems().map((item) => (
+                          <tr key={item.key}>
+                            <td className="border border-black p-0.5 w-1/3">
+                              {item.label}
+                            </td>
+                            <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                              NG
+                            </td>
+                            <td className="border border-black p-0.5 w-1/3">
+                              {data.diagnosis?.[
+                                item.key as TrimotorsDiagnosisKeys
+                              ]?.remarks || ""}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
-              )}
-
-              {hasNGDiagnosis() && (
-                <table
-                  className="w-full border-collapse border border-black my-0"
-                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
-                >
-                  <thead>
-                    <tr className="bg-gray-40">
-                      <th className="border border-black p-0.5 text-left">
-                        Diagnosis Item
-                      </th>
-                      <th className="border border-black p-0.5 text-center">
-                        Status
-                      </th>
-                      <th className="border border-black p-0.5 text-left">
-                        Remarks
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getNGDiagnosisItems().map((item) => (
-                      <tr key={item.key}>
-                        <td className="border border-black p-0.5 w-1/3">
-                          {item.label}
-                        </td>
-                        <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                          NG
-                        </td>
-                        <td className="border border-black p-0.5 w-1/3">
-                          {data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]
-                            ?.remarks || ""}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
               </>
             )}
 
@@ -564,10 +568,7 @@ const TrimotorsPrintJobOrder = ({
                   {(() => {
                     const { start, end } = getJobOrderPageRange(resolvedPage);
                     const selectedJobs = getSelectedJobs().slice(start, end);
-                    const selectedParts = getSelectedParts().slice(
-                      start,
-                      end,
-                    );
+                    const selectedParts = getSelectedParts().slice(start, end);
 
                     // Get the maximum number of rows needed
                     const totalRows = Math.max(
@@ -740,12 +741,20 @@ const TrimotorsPrintJobOrder = ({
             )}
 
             {index === 1 && (
-              <span
-                className="absolute bottom-1 right-1 text-xs"
-                style={{ fontSize: "8pt" }}
-              >
-                Customer's Copy
-              </span>
+              <>
+                <span
+                  className="absolute bottom-4 right-1 text-xs"
+                  style={{ fontSize: "7pt" }}
+                >
+                  {WEBSITE_URL}
+                </span>
+                <span
+                  className="absolute bottom-1 right-1 text-xs"
+                  style={{ fontSize: "8pt" }}
+                >
+                  Customer's Copy
+                </span>
+              </>
             )}
           </div>
         </div>

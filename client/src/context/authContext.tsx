@@ -8,11 +8,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthContextProvider = ({ children }: any) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<any>("");
   const [user, setUser] = useState<any | null>(null);
   const [errors, setErrors] = useState<any>({});
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     fetchProfileData();
@@ -24,7 +23,6 @@ export const AuthContextProvider = ({ children }: any) => {
       const response = await fetchProfile();
       if (response.status === 200) {
         setUser(response.data);
-        setIsAdmin(response.data.is_admin);
         setIsAuthenticated(true);
       }
     } catch (error: any) {
@@ -32,7 +30,6 @@ export const AuthContextProvider = ({ children }: any) => {
       if (error.response.status === 401) {
         setIsAuthenticated(false);
         setUser(null);
-        setIsAdmin(false);
       }
     } finally {
       setIsLoading(false);
@@ -88,7 +85,6 @@ export const AuthContextProvider = ({ children }: any) => {
         error,
         user,
         errors,
-        isAdmin,
       }}
     >
       {children}

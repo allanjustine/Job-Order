@@ -3,13 +3,17 @@ import acronymName from "@/utils/acronymName";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, useEffect, useRef, useState } from "react";
+import { Activity, useEffect, useMemo, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import { Button } from "../ui/button";
 import { sidebarData } from "@/constants/sidebarData";
 import Swal from "sweetalert2";
 import { FaSignOutAlt } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+
+type RoleType = {
+  name: string;
+};
 
 export default function Sidebar({
   isSidebarOpen,
@@ -71,6 +75,14 @@ export default function Sidebar({
     return pathname === path;
   };
 
+  const FILTERED_SIDEBAR_ITEMS = useMemo(() => {
+    return sidebarData.filter((item) =>
+      item.permissions.some((permission) =>
+        user?.roles?.some((role: RoleType) => role?.name?.includes(permission)),
+      ),
+    );
+  }, [sidebarData, user?.roles]);
+
   return (
     <aside
       className={`bg-white shadow transition-all z-50 duration-300 ease-in-out overflow-hidden shrink-0 ${
@@ -87,7 +99,7 @@ export default function Sidebar({
       </div>
       <nav className="p-1 overflow-y-auto h-[calc(100vh-80px)]">
         <ul className="space-y-2">
-          {sidebarData.map((item, index) => (
+          {FILTERED_SIDEBAR_ITEMS.map((item, index) => (
             <Tooltip key={index}>
               <TooltipTrigger className="w-full">
                 <li className="flex items-center w-full">

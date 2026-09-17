@@ -1,15 +1,23 @@
 import Forbidden from "@/components/Forbidden";
 import GlobalLoader from "@/components/GlobalLoaders";
 import { useAuth } from "@/context/authContext";
-import { redirect, usePathname } from "next/navigation";
-import adminPaths from "@/data/admin-paths.json";
+import { redirect } from "next/navigation";
 import Swal from "sweetalert2";
+import { ComponentType } from "react";
 
-export default function withAuthPage(WrappedComponent: any) {
-  function WithAuthPageComponent(props: any) {
-    const { isLoading, isAuthenticated, isAdmin, user } = useAuth();
-    const pathname = usePathname();
-    const isAdminPath = adminPaths.some((item) => pathname?.startsWith(item));
+type RoleType = {
+  name: string;
+};
+
+export default function withAuthPage<P extends object>(
+  WrappedComponent: ComponentType<P>,
+  CAN_ACCESS?: string[],
+): ComponentType<P> {
+  function WithAuthPageComponent(props: P) {
+    const { isLoading, isAuthenticated, user } = useAuth();
+    const noAccess = !CAN_ACCESS?.some((item) =>
+      user?.roles?.some((role: RoleType) => role?.name?.includes(item)),
+    );
 
     if (isLoading) return <GlobalLoader />;
 
@@ -26,7 +34,7 @@ export default function withAuthPage(WrappedComponent: any) {
       redirect("/login");
     }
 
-    if (!isAdmin && isAdminPath) return <Forbidden />;
+    if (noAccess) return <Forbidden />;
 
     return <WrappedComponent {...props} />;
   }

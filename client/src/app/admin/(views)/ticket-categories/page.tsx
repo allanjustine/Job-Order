@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import TableLoader from "@/components/table-loader";
 import CreateTicketCategory from "../../components/ticket-categories/create";
 import EditTicketCategory from "../../components/ticket-categories/edit";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const TicketCategories = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -251,4 +252,4 @@ const TicketCategories = () => {
   );
 };
 
-export default withAuthPage(TicketCategories);
+export default withAuthPage(TicketCategories, ADMIN_ACCESS);

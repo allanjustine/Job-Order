@@ -2,6 +2,7 @@
 
 import TicketBaseContent from "@/components/tickets/base";
 import withAuthPage from "@/lib/hoc/with-auth-page";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Tickets = () => {
   return (
@@ -13,4 +14,4 @@ const Tickets = () => {
   );
 };
 
-export default withAuthPage(Tickets);
+export default withAuthPage(Tickets, ADMIN_ACCESS);

@@ -26,7 +26,10 @@ use Illuminate\Support\Str;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', function (Request $request) {
-        return $request->user()->load('roles:id,name', 'branch:id,branch_name,branch_code');
+        return $request->user()->load([
+            'roles:id,name',
+            'branch:id,branch_name,branch_code',
+        ]);
     });
 
     // ADMIN ROLE ROUTES
@@ -36,23 +39,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::controller(UsersController::class)->group(function () {
             Route::get('users', 'index');
-            Route::get('user-selection-options', 'userSelectionOptions');
             Route::patch('users/{user}/update', 'lockUpdate');
             Route::patch('users/{user}/update-details', 'update');
             Route::post('users', 'store');
             Route::delete('users/{user}/delete', 'destroy');
             Route::post('lock-all-user-date-pickers', 'lockAllUserDatePickers');
-        });
-        Route::controller(ReportController::class)->group(function () {
-            Route::get('reports', [ReportController::class, 'index']);
-            Route::get('export-reports', 'exportData');
-            Route::get('show-jo/{job_order}/browse', 'show');
-            Route::get('prev-next/{job_order}/stats', 'prevNextJobOrderStats');
-        });
-        Route::controller(JobOrderController::class)->group(function () {
-            Route::patch('update-job-order/{job_order}/update', 'update');
-            Route::delete('cancel-job-order/{id}', 'cancel');
-            Route::delete('delete-job-order/{id}', 'destroy');
         });
         Route::controller(ManageJobOrderDetail::class)->group(function () {
             Route::post('manage-job-order-detail/store', 'store');
@@ -78,10 +69,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('ticket-categories', TicketCategoryController::class);
         Route::apiResource('ticket-brands', TicketBrandController::class);
         Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
-        Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
         Route::get('activity-logs', [ActivityLogController::class, 'index']);
+    });
+
+    // ADMIN | AUDIT | ACCOUNTING ROLE ROUTES
+    Route::middleware('role:admin|audit|accounting')->group(function () {
+        Route::controller(ReportController::class)->group(function () {
+            Route::get('reports', 'index');
+            Route::get('export-reports', 'exportData');
+            Route::get('show-jo/{job_order}/browse', 'show');
+            Route::get('prev-next/{job_order}/stats', 'prevNextJobOrderStats');
+        });
+        Route::controller(JobOrderController::class)->group(function () {
+            Route::patch('update-job-order/{job_order}/update', 'update');
+            Route::delete('cancel-job-order/{id}', 'cancel');
+            Route::delete('delete-job-order/{id}', 'destroy');
+        });
+        Route::get('user-selection-options', [UsersController::class, 'userSelectionOptions']);
+        Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
     });
 
     // EMPLOYEE ROLE ROUTES

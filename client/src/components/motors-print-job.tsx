@@ -21,7 +21,10 @@ import { partsItems } from "@/constants/part-items";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
-import { getJobOrderPageRange, getMotorsPrintPageCount,} from "@/utils/job-order-pagination";
+import {
+  getJobOrderPageRange,
+  getMotorsPrintPageCount,
+} from "@/utils/job-order-pagination";
 
 interface PrintJobOrderProps {
   data: {
@@ -65,7 +68,12 @@ interface PrintJobOrderProps {
   printPage?: number;
 }
 
-const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProps) => {
+const MotorsPrintJobOrder = ({
+  data,
+  hasRestData,
+  printPage,
+}: PrintJobOrderProps) => {
+  const WEBSITE_URL = `${window.location.origin}/search`;
   const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
   // Safely calculate totals with fallbacks
   const jobTotal = Object.values(data.jobAmounts || {}).reduce(
@@ -430,8 +438,8 @@ const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProp
                 {/* Vehicle Information */}
                 <CustomerGridView data={data} />
 
-            {/* Motorcycle Unit & Engine Unit */}
-            {/* <div
+                {/* Motorcycle Unit & Engine Unit */}
+                {/* <div
         className="mb-2 grid grid-cols-2 gap-2"
         style={{ fontSize: "8pt", lineHeight: "0.8" }}
       >
@@ -482,60 +490,60 @@ const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProp
         </div>
       </div> */}
 
-            {/* <div className="flex mt-1 mb-2">
+                {/* <div className="flex mt-1 mb-2">
         <span className="font-bold w-40">Contents inside U-Box:</span>
         <span className="underline">{data.contentUbox}</span>
       </div> */}
 
-            {/* Motorcycle Diagnosis Section - keep existing */}
-            <div className="mb-2 text-xs">
-              <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-                MOTORCYCLE'S DIAGNOSIS
-              </h3>
+                {/* Motorcycle Diagnosis Section - keep existing */}
+                <div className="mb-2 text-xs">
+                  <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                    MOTORCYCLE'S DIAGNOSIS
+                  </h3>
 
-              {allDiagnosisOK() && (
-                <div className="border border-black p-2 text-center">
-                  <p className="font-semibold">All diagnosis are OK</p>
+                  {allDiagnosisOK() && (
+                    <div className="border border-black p-2 text-center">
+                      <p className="font-semibold">All diagnosis are OK</p>
+                    </div>
+                  )}
+
+                  {hasNGDiagnosis() && (
+                    <table
+                      className="w-full border-collapse border border-black my-0"
+                      style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                    >
+                      <thead>
+                        <tr className="bg-gray-40">
+                          <th className="border border-black p-0.5 text-left">
+                            Diagnosis Item
+                          </th>
+                          <th className="border border-black p-0.5 text-center">
+                            Status
+                          </th>
+                          <th className="border border-black p-0.5 text-left">
+                            Remarks
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getNGDiagnosisItems().map((item) => (
+                          <tr key={item.key}>
+                            <td className="border border-black p-0.5 w-1/3">
+                              {item.label}
+                            </td>
+                            <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
+                              NG
+                            </td>
+                            <td className="border border-black p-0.5 w-1/3">
+                              {data.diagnosis?.[item.key as DiagnosisKeys]
+                                ?.remarks || ""}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
-              )}
-
-              {hasNGDiagnosis() && (
-                <table
-                  className="w-full border-collapse border border-black my-0"
-                  style={{ fontSize: "8pt", lineHeight: "0.8" }}
-                >
-                  <thead>
-                    <tr className="bg-gray-40">
-                      <th className="border border-black p-0.5 text-left">
-                        Diagnosis Item
-                      </th>
-                      <th className="border border-black p-0.5 text-center">
-                        Status
-                      </th>
-                      <th className="border border-black p-0.5 text-left">
-                        Remarks
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getNGDiagnosisItems().map((item) => (
-                      <tr key={item.key}>
-                        <td className="border border-black p-0.5 w-1/3">
-                          {item.label}
-                        </td>
-                        <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                          NG
-                        </td>
-                        <td className="border border-black p-0.5 w-1/3">
-                          {data.diagnosis?.[item.key as DiagnosisKeys]
-                            ?.remarks || ""}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
               </>
             )}
 
@@ -680,7 +688,9 @@ const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProp
                                   (partsOthersItem.partNumber
                                     ? `#${partsOthersItem.partNumber}`
                                     : "");
-                            partAmount = phpCurrency(Number(partsOthersItem.amount));
+                            partAmount = phpCurrency(
+                              Number(partsOthersItem.amount),
+                            );
                             partCheckbox = "[✓] ";
                           }
                         } else if (typeof part === "string") {
@@ -803,12 +813,20 @@ const MotorsPrintJobOrder = ({ data, hasRestData, printPage,}: PrintJobOrderProp
             )}
 
             {index === 1 && (
-              <span
-                className="absolute bottom-1 right-1 text-xs"
-                style={{ fontSize: "8pt" }}
-              >
-                Customer's Copy
-              </span>
+              <>
+                <span
+                  className="absolute bottom-4 right-1 text-xs"
+                  style={{ fontSize: "7pt" }}
+                >
+                  {WEBSITE_URL}
+                </span>
+                <span
+                  className="absolute bottom-1 right-1 text-xs"
+                  style={{ fontSize: "8pt" }}
+                >
+                  Customer's Copy
+                </span>
+              </>
             )}
           </div>
         </div>

@@ -17,6 +17,7 @@ import { api } from "@/lib/api";
 import AddAreaManager from "../../components/area-manager/add-area-manager";
 import EditAreaManager from "../../components/area-manager/edit-area-manager";
 import TableLoader from "@/components/table-loader";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -277,4 +278,4 @@ const Reports = () => {
   );
 };
 
-export default withAuthPage(Reports);
+export default withAuthPage(Reports, ADMIN_ACCESS);

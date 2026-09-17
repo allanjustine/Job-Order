@@ -31,7 +31,14 @@ class UsersController extends Controller
 
         return response()->json([
             'message' => 'User selection options retrieved successfully.',
-            'data'    => $users->makeHidden(['roles', 'is_admin', 'redirect_url']),
+            'data'    => $users->makeHidden([
+                'roles',
+                'is_admin',
+                'is_audit',
+                'is_accounting',
+                'is_employee',
+                'redirect_url'
+            ]),
         ], 200);
     }
 

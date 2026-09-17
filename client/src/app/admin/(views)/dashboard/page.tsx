@@ -37,6 +37,7 @@ import { api } from "@/lib/api";
 import { formatDateAndTime } from "@/utils/format-date-and-time";
 import { diffForHumans } from "@/utils/diff-for-humans";
 import TableLoader from "@/components/table-loader";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const ADMIN_STATS_INITIAL_VALUES = {
   total_job_prints: {
@@ -692,4 +693,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuthPage(Dashboard);
+export default withAuthPage(Dashboard, ADMIN_ACCESS);
