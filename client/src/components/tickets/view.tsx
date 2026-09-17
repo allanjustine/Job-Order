@@ -78,7 +78,7 @@ export default function ViewTicket({
   fetchDataProp,
   setId,
 }: ViewTicketProps) {
-  const { isAdmin } = useAuth();
+  const { user } = useAuth();
   const [data, setData] = useState<TicketType | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -380,7 +380,7 @@ export default function ViewTicket({
                 title="Rejected Reason"
                 cols="grid-cols-1"
                 button={
-                  isAdmin && (
+                  user?.is_admin && (
                     <Button
                       type="button"
                       onClick={handleEditRejectedReason}
@@ -422,7 +422,7 @@ export default function ViewTicket({
         >
           Close
         </Button>
-        {isAdmin && data?.status === TICKET_STATUS.PENDING && (
+        {user?.is_admin && data?.status === TICKET_STATUS.PENDING && (
           <>
             <Button
               type="button"
