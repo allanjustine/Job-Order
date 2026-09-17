@@ -46,6 +46,7 @@ import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
 import { getMotorsPrintPageCount } from "@/utils/job-order-pagination";
 import { Spinner } from "@/components/ui/spinner";
+import { EMPLOYEE_ACCESS } from "@/lib/permissions";
 
 const QUANTITY_DATA = {
   bajajOil: 1,
@@ -1229,4 +1230,4 @@ const TrimotorsJobOrderForm = () => {
   );
 };
 
-export default withAuthPage(TrimotorsJobOrderForm);
+export default withAuthPage(TrimotorsJobOrderForm, EMPLOYEE_ACCESS);
