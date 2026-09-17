@@ -100,9 +100,11 @@ const Users = () => {
               className={`px-1.5 text-xs py-1 rounded-2xl font-bold ${
                 role.name === "admin"
                   ? "bg-blue-200 text-blue-700"
-                  : role.name === "approver"
+                  : role.name === "audit"
                     ? "bg-violet-200 text-violet-700"
-                    : "bg-cyan-200 text-cyan-700"
+                    : role.name === "accounting"
+                      ? "bg-indigo-200 text-indigo-700"
+                      : "bg-cyan-200 text-cyan-700"
               }`}
             >
               {role.name}
