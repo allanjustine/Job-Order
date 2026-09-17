@@ -37,7 +37,8 @@ class User extends Authenticatable
     protected $appends = [
         "redirect_url",
         'is_admin',
-        'is_approver',
+        'is_audit',
+        'is_accounting',
         'is_employee'
     ];
 
@@ -70,9 +71,14 @@ class User extends Authenticatable
         return $this->hasRole(RoleName::ADMIN);
     }
 
-    public function isApprover()
+    public function isAccounting()
     {
-        return $this->hasRole(RoleName::APPROVER);
+        return $this->hasRole(RoleName::ACCOUNTING);
+    }
+
+    public function isAudit()
+    {
+        return $this->hasRole(RoleName::AUDIT);
     }
 
     public function isEmployee()
@@ -82,7 +88,7 @@ class User extends Authenticatable
 
     public function getRedirectUrlAttribute()
     {
-        return $this->isAdmin() ? "/admin/dashboard" : "/dashboard";
+        return $this->isAdmin() ? "/admin/dashboard" : ($this->isAudit() || $this->isAccounting() ? "/admin/reports" : "/dashboard");
     }
 
     public function getIsAdminAttribute()
@@ -90,9 +96,14 @@ class User extends Authenticatable
         return $this->isAdmin();
     }
 
-    public function getIsApproverAttribute()
+    public function getIsAuditAttribute()
     {
-        return $this->isApprover();
+        return $this->isAudit();
+    }
+
+    public function getIsAccountingAttribute()
+    {
+        return $this->isAccounting();
     }
 
     public function getIsEmployeeAttribute()
