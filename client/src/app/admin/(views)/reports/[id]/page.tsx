@@ -5,6 +5,7 @@ import EditJoLoader from "@/components/edit-jo-loader";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
+import { REPORTS_ACCESS } from "@/lib/permissions";
 import { formatDate } from "date-fns";
 import { BookX } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -197,4 +198,4 @@ function EditJo() {
   );
 }
 
-export default withAuthPage(EditJo);
+export default withAuthPage(EditJo, REPORTS_ACCESS);
