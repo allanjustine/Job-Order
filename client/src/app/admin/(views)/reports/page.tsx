@@ -42,6 +42,7 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 import { useRouter } from "next/navigation";
+import { REPORTS_ACCESS } from "@/lib/permissions";
 
 export const FILTER_DATA = {
   branch: "",
@@ -117,6 +118,10 @@ const Reports = () => {
   const router = useRouter();
 
   useEffect(() => {
+    Swal.close();
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
@@ -189,12 +194,14 @@ const Reports = () => {
               Swal.close();
               fetchData();
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error(error);
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Something went wrong. Please try again!",
+              text:
+                error.response.data.message ||
+                "Something went wrong. Please try again!",
             });
           }
         }
@@ -248,12 +255,14 @@ const Reports = () => {
               Swal.close();
               fetchData();
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error(error);
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Something went wrong. Please try again!",
+              text:
+                error.response.data.message ||
+                "Something went wrong. Please try again!",
             });
           }
         }
@@ -878,4 +887,4 @@ const Reports = () => {
   );
 };
 
-export default withAuthPage(Reports);
+export default withAuthPage(Reports, REPORTS_ACCESS);
