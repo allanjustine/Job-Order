@@ -13,5 +13,4 @@ export interface AuthContextType {
   error: any;
   user: null | any;
   errors: any;
-  isAdmin: boolean;
 }
