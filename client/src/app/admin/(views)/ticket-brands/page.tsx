@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import TableLoader from "@/components/table-loader";
 import CreateTicketBrand from "../../components/ticket-brands/create";
 import EditTicketBrand from "../../components/ticket-brands/edit";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const TicketBrands = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -250,4 +251,4 @@ const TicketBrands = () => {
   );
 };
 
-export default withAuthPage(TicketBrands);
+export default withAuthPage(TicketBrands, ADMIN_ACCESS);
