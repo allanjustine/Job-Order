@@ -1,16 +1,12 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/authContext";
-import adminPaths from "@/data/admin-paths.json";
 import Sidebar from "./Sidebar";
 
 export default function BaseContent({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isAdmin } = useAuth();
-  const pathname = usePathname();
+  const { isAuthenticated, user } = useAuth();
   const [isSidebarOpen, setIsOpenSidebar] = useState<boolean>(true);
-  const isSidebarActive = adminPaths.some((item) => pathname.startsWith(item));
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,7 +28,7 @@ export default function BaseContent({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {isSidebarActive && isAuthenticated && isAdmin ? (
+      {isAuthenticated && !user?.is_employee ? (
         <div className="flex overflow-hidden">
           <Sidebar
             isSidebarOpen={isSidebarOpen}
