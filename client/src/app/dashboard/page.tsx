@@ -66,6 +66,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { EMPLOYEE_ACCESS } from "@/lib/permissions";
 
 const Dashboard = () => {
   const {
@@ -1259,4 +1260,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuthPage(Dashboard);
+export default withAuthPage(Dashboard, EMPLOYEE_ACCESS);
