@@ -8,6 +8,8 @@ enum RoleName: string
     case ADMIN = "admin";
     case ADMIN_ACCESS = "admin-access";
     case EMPLOYEE_ACCESS = "employee-access";
-    case APPROVER = "approver";
-    case APPROVER_ACCESS = "approver-access";
+    case AUDIT = "audit";
+    case AUDIT_ACCESS = "audit-access";
+    case ACCOUNTING = "accounting";
+    case ACCOUNTING_ACCESS = "accounting-access";
 }
