@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import toast from "react-hot-toast";
 import EditMechanic from "../../components/mechanics/edit-mechanic";
 import TableLoader from "@/components/table-loader";
+import { ADMIN_ACCESS } from "@/lib/permissions";
 
 const Mechanics = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -254,4 +255,4 @@ const Mechanics = () => {
   );
 };
 
-export default withAuthPage(Mechanics);
+export default withAuthPage(Mechanics, ADMIN_ACCESS);
