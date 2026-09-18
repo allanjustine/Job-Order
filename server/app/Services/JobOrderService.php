@@ -68,6 +68,12 @@ class JobOrderService
 
         $job_order_number = \sprintf('%07d', $last_job_order_number + 1);
 
+        $exists_job_order = JobOrder::query()
+            ->where('transaction_code', $request->job_order['transaction_code'])
+            ->exists();
+
+        abort_if($exists_job_order, 400, "Duplicate entries won’t be accepted. Please reload the page and check if the entry you just entered already exists. If it does not exist, please try submitting it again.");
+
         $customer = DB::transaction(function () use ($request, $user, $job_order_number) {
 
             $customer = $user
