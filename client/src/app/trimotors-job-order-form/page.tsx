@@ -718,8 +718,22 @@ const TrimotorsJobOrderForm = () => {
         setIsPrint(false);
         handleReset();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: error.response.data.message,
+        allowOutsideClick: false,
+        cancelButtonText: "Close",
+        showCancelButton: true,
+        confirmButtonText: "Reload",
+        confirmButtonColor: "#3085d6",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
     }
   };
 
