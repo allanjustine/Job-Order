@@ -25,21 +25,25 @@ class TargetIncomeService
 
         $month = request('month', '');
 
+        $year = request('year', '');
+
         $targetIncome = TargetIncome::query()
             ->with('user:id,code,name')
             ->where(
                 fn($targetIncome)
                 =>
-                $month ? $targetIncome->whereMonth('month_of', $month) : $targetIncome->whereMonth('month_of', now()->month)
-                    ->whereYear('month_of', now()->year)
+                $targetIncome->whereMonth('month_of', $month)
+                    ->whereYear('month_of', $year)
             )
             ->when(
-                $search, function ($query) use ($search) {
+                $search,
+                function ($query) use ($search) {
                     $query->where(function ($query) use ($search) {
                         $query->where('target_income', 'like', "%{$search}%")
                             ->orWhereRelation('user', 'name', 'like', "%{$search}%");
                     });
-                })
+                }
+            )
 
             ->orderBy($column, $sort['direction'])
             ->paginate($per_page, ['id', 'target_income', 'month_of', 'user_id', 'created_at']);
@@ -58,16 +62,17 @@ class TargetIncomeService
                 ->sum('job_order_details_by_job_request_type_sum_amount');
 
             return [
-                'id'            => $target->id,
-                'user'          => [
-                    'id'        => $target->user_id,
-                    'name'      => $target->user->name,
-                    'code'      => $target->user->code,
+                'id'                   => $target->id,
+                'user'                 => [
+                    'id'               => $target->user_id,
+                    'name'             => $target->user->name,
+                    'code'             => $target->user->code,
                 ],
-                'target_income' => $target->target_income,
-                'shop_income'   => $jobOrderIncome,
-                'created_at'    => $target->created_at,
-                'month_of'      => $target->month_of
+                'target_income'        => $target->target_income,
+                'shop_income'          => $jobOrderIncome,
+                'lacking_or_exceeding' => $jobOrderIncome - $target->target_income,
+                'created_at'           => $target->created_at,
+                'month_of'             => $target->month_of
             ];
         });
 
