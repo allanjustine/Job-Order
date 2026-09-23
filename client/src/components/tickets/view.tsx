@@ -310,6 +310,7 @@ export default function ViewTicket({
         onClose={() => {
           setIsOpen(false);
           setId(null);
+          setData(null);
         }}
       >
         {isLoading ? (
@@ -392,7 +393,11 @@ export default function ViewTicket({
                   )
                 }
               >
-                <CardItem title="Content" value={data?.rejected_reason} />
+                <CardItem
+                  title="Content"
+                  value={data?.rejected_reason}
+                  danger
+                />
               </Card>
             )}
             {data?.attachments?.length! > 0 && (
@@ -418,6 +423,7 @@ export default function ViewTicket({
           onClick={() => {
             setIsOpen(false);
             setId(null);
+            setData(null);
           }}
         >
           Close
@@ -481,16 +487,20 @@ export const Card = ({
 export const CardItem = ({
   title,
   value,
+  danger,
 }: {
   title: string;
   value?: string | number;
+  danger?: boolean;
 }) => {
   return (
     <div className="space-y-1">
       <h2 className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
         {title}
       </h2>
-      <p className="text-xs font-semibold text-gray-900 tracking-wide whitespace-break-spaces wrap-break-word">
+      <p
+        className={`text-xs font-semibold text-gray-900 tracking-wide whitespace-break-spaces wrap-break-word ${danger && "text-red-500"}`}
+      >
         {value}
       </p>
     </div>
