@@ -8,6 +8,7 @@ import withAuthPage from "@/lib/hoc/with-auth-page";
 import {
   CircleFadingPlus,
   PenIcon,
+  Plus,
   Search,
   SearchSlash,
   Trash,
@@ -32,8 +33,9 @@ const Reports = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
   const [selectedTargetIncome, setSelectedTargetIncome] = useState<any>(null);
-  const [filters, setFilters] = useState<{ month: string }>({
-    month: "Select Month",
+  const [filters, setFilters] = useState<{ month: string; year: string }>({
+    month: (new Date().getMonth() + 1).toString(),
+    year: new Date().getFullYear().toString(),
   });
   const {
     data: targetIncomes,
@@ -104,6 +106,10 @@ const Reports = () => {
     },
   ];
 
+  const YEARS = Array.from({ length: new Date().getFullYear() - 2020 + 1 })
+    .map((_, index) => 2020 + index)
+    .sort((a, b) => b - a);
+
   const columns = [
     {
       name: "ID",
@@ -145,6 +151,17 @@ const Reports = () => {
       name: "SHOP INCOME",
       cell: (row: any) => (
         <span className="font-semibold">{phpCurrency(row.shop_income)}</span>
+      ),
+    },
+    {
+      name: "LACKING/EXCEEDING INCOME",
+      cell: (row: any) => (
+        <span
+          className={`font-semibold ${row.lacking_or_exceeding < 0 ? "text-red-600" : "text-green-600"} flex items-center`}
+        >
+          {row.lacking_or_exceeding > 0 && <Plus size={11} />}
+          {phpCurrency(row.lacking_or_exceeding)}
+        </span>
       ),
     },
     {
@@ -257,25 +274,49 @@ const Reports = () => {
                 Job Order Printing System — Target Incomes Overview
               </p>
             </div>
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1 items-center lg:flex-row flex-col">
               <div>
                 <Select
                   value={filters?.month}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                     setIsLoading(true);
-                    setFilters({
+                    setFilters((prev) => ({
+                      ...prev,
                       month: e.target.value,
-                    });
+                    }));
                   }}
                   className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
                 >
                   <option value="Select Month" disabled>
                     Select Month
                   </option>
-                  <option value="This Month">This Month</option>
+                  <option value={new Date().getMonth() + 1}>This Month</option>
                   {DATES?.map(({ label, value }) => (
                     <option key={value} value={value}>
                       {label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Select
+                  value={filters?.year}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                    setIsLoading(true);
+                    setFilters((prev) => ({
+                      ...prev,
+                      year: e.target.value,
+                    }));
+                  }}
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-fit"
+                >
+                  <option value="Select Year" disabled>
+                    Select Year
+                  </option>
+                  <option value={new Date().getFullYear()}>This Year</option>
+                  {YEARS?.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
                     </option>
                   ))}
                 </Select>
