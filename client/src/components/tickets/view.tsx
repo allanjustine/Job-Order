@@ -98,8 +98,8 @@ export default function ViewTicket({
       }
     } catch (error: any) {
       console.error(error);
-      setError(error.response.data.message);
       setData(null);
+      setError(error.response.data.message);
     } finally {
       setLoading(false);
     }
