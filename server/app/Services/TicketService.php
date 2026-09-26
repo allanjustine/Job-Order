@@ -106,7 +106,7 @@ class TicketService
 
     public function getTicketById(Ticket $ticket)
     {
-        return $ticket->load(['user', 'editedBy', 'notes.notedBy', 'attachments', 'changeRequests', 'ticketCategory', 'ticketBrand', 'jobOrder:id,job_order_number,transaction_code']);
+        return $ticket->load(['user', 'editedBy', 'rejectedBy', 'notes.notedBy', 'attachments', 'changeRequests', 'ticketCategory', 'ticketBrand', 'jobOrder:id,job_order_number,transaction_code']);
     }
 
     public function getAllTicketCategoriesAndBrands()
@@ -147,7 +147,8 @@ class TicketService
             if ($title === 'reject') {
                 $ticket->update([
                     'rejected_reason' => $request->note,
-                    'status'          => TicketStatus::REJECTED
+                    'status'          => TicketStatus::REJECTED,
+                    'rejected_by'     => Auth::id()
                 ]);
             } else {
                 $ticket->update([

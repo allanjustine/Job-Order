@@ -64,6 +64,7 @@ type TicketType = {
   description: string;
   edited_at: string | null;
   edited_by: UserType | null;
+  rejected_by: UserType | null;
   notes: NotesType[];
   created_at: string;
   attachments: AttachmentsType[];
@@ -396,6 +397,7 @@ export default function ViewTicket({
                   )
                 }
               >
+                <CardItem title="Rejected By" value={data?.rejected_by?.name} />
                 <CardItem
                   title="Content"
                   value={data?.rejected_reason}

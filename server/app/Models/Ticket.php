@@ -27,6 +27,11 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'edited_by');
     }
 
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
     public function notes()
     {
         return $this->hasMany(TicketNote::class);
