@@ -19,6 +19,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'edited_by')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class, 'rejected_by')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(TicketCategory::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(TicketBrand::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(JobOrder::class)->constrained()->cascadeOnDelete();
