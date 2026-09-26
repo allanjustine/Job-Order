@@ -53,6 +53,22 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('role-and-permissions/{role}/roles', 'destroyRole');
             Route::delete('role-and-permissions/{permission}/permissions', 'destroyPermission');
         });
+        Route::controller(JobOrderController::class)->group(function () {
+            Route::patch('update-job-order/{job_order}/update', 'update');
+            Route::delete('cancel-job-order/{id}', 'cancel');
+            Route::delete('delete-job-order/{id}', 'destroy');
+        });
+        Route::controller(ManageJobOrderDetail::class)->group(function () {
+            Route::post('manage-job-order-detail/store', 'store');
+            Route::delete('manage-job-order-detail/{job_order_detail}/delete', 'destroy');
+        });
+        Route::controller(TicketController::class)->group(function () {
+            Route::patch('/tickets/{ticket}/{title}', 'updateTicketStatus');
+            Route::patch('/tickets/add-note/{ticket}/add-note', 'addNoteToTicket');
+            Route::delete('/notes/{note}/delete', 'deleteNote');
+            Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
+            Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
+        });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::resource('area-managers', AreaManagerController::class);
         Route::apiResource('ticket-categories', TicketCategoryController::class);
@@ -73,26 +89,6 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('user-selection-options', [UsersController::class, 'userSelectionOptions']);
         Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
-    });
-
-    // ADMIN | ACCOUNTING ROLE ROUTES
-    Route::middleware('role:admin|accounting')->group(function () {
-        Route::controller(JobOrderController::class)->group(function () {
-            Route::patch('update-job-order/{job_order}/update', 'update');
-            Route::delete('cancel-job-order/{id}', 'cancel');
-            Route::delete('delete-job-order/{id}', 'destroy');
-        });
-        Route::controller(ManageJobOrderDetail::class)->group(function () {
-            Route::post('manage-job-order-detail/store', 'store');
-            Route::delete('manage-job-order-detail/{job_order_detail}/delete', 'destroy');
-        });
-        Route::controller(TicketController::class)->group(function () {
-            Route::patch('/tickets/{ticket}/{title}', 'updateTicketStatus');
-            Route::patch('/tickets/add-note/{ticket}/add-note', 'addNoteToTicket');
-            Route::delete('/notes/{note}/delete', 'deleteNote');
-            Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
-            Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
-        });
     });
 
     // EMPLOYEE ROLE ROUTES

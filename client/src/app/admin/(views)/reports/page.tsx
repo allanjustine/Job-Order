@@ -409,7 +409,7 @@ const Reports = () => {
           >
             <Eye /> View
           </Button>
-          {(user?.is_admin || user?.is_accounting) && (
+          {user?.is_admin && (
             <>
               <HoverCard>
                 <HoverCardTrigger>
