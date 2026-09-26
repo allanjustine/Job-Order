@@ -45,10 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('users/{user}/delete', 'destroy');
             Route::post('lock-all-user-date-pickers', 'lockAllUserDatePickers');
         });
-        Route::controller(ManageJobOrderDetail::class)->group(function () {
-            Route::post('manage-job-order-detail/store', 'store');
-            Route::delete('manage-job-order-detail/{job_order_detail}/delete', 'destroy');
-        });
         Route::controller(RoleAndPermissionController::class)->group(function () {
             Route::get('get-all-roles', 'getAllRoles');
             Route::get('role-and-permissions', 'index');
@@ -56,13 +52,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('role-and-permissions/{id}/update', 'update');
             Route::delete('role-and-permissions/{role}/roles', 'destroyRole');
             Route::delete('role-and-permissions/{permission}/permissions', 'destroyPermission');
-        });
-        Route::controller(TicketController::class)->group(function () {
-            Route::patch('/tickets/{ticket}/{title}', 'updateTicketStatus');
-            Route::patch('/tickets/{ticket}/add-note', 'addNoteToTicket');
-            Route::delete('/notes/{note}/delete', 'deleteNote');
-            Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
-            Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
         });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::resource('area-managers', AreaManagerController::class);
@@ -82,13 +71,28 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('show-jo/{job_order}/browse', 'show');
             Route::get('prev-next/{job_order}/stats', 'prevNextJobOrderStats');
         });
+        Route::get('user-selection-options', [UsersController::class, 'userSelectionOptions']);
+        Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
+    });
+
+    // ADMIN | ACCOUNTING ROLE ROUTES
+    Route::middleware('role:admin|accounting')->group(function () {
         Route::controller(JobOrderController::class)->group(function () {
             Route::patch('update-job-order/{job_order}/update', 'update');
             Route::delete('cancel-job-order/{id}', 'cancel');
             Route::delete('delete-job-order/{id}', 'destroy');
         });
-        Route::get('user-selection-options', [UsersController::class, 'userSelectionOptions']);
-        Route::get('area-manager-selection-options', [AreaManagerController::class, 'areaManagerSelectionOptions']);
+        Route::controller(ManageJobOrderDetail::class)->group(function () {
+            Route::post('manage-job-order-detail/store', 'store');
+            Route::delete('manage-job-order-detail/{job_order_detail}/delete', 'destroy');
+        });
+        Route::controller(TicketController::class)->group(function () {
+            Route::patch('/tickets/{ticket}/{title}', 'updateTicketStatus');
+            Route::patch('/tickets/add-note/{ticket}/add-note', 'addNoteToTicket');
+            Route::delete('/notes/{note}/delete', 'deleteNote');
+            Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
+            Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
+        });
     });
 
     // EMPLOYEE ROLE ROUTES
