@@ -24,6 +24,7 @@ import TicketAttachments from "./attachments";
 import TicketNotes from "./notes";
 import Swal from "sweetalert2";
 import { Pen } from "lucide-react";
+import { TICKETS_ACCESS } from "@/lib/permissions";
 
 type ViewTicketProps = {
   isOpen: boolean;
@@ -211,9 +212,12 @@ export default function ViewTicket({
           },
         });
         try {
-          const response = await api.patch(`/tickets/${data!.id}/add-note`, {
-            note: result.value,
-          });
+          const response = await api.patch(
+            `/tickets/add-note/${data!.id}/add-note`,
+            {
+              note: result.value,
+            },
+          );
           if (response.status === 200) {
             Swal.fire({
               icon: "success",
@@ -381,7 +385,7 @@ export default function ViewTicket({
                 title="Rejected Reason"
                 cols="grid-cols-1"
                 button={
-                  user?.is_admin && (
+                  TICKETS_ACCESS.includes(user?.roles[0]?.name) && (
                     <Button
                       type="button"
                       onClick={handleEditRejectedReason}
@@ -406,13 +410,14 @@ export default function ViewTicket({
             {data?.change_requests?.length! > 0 && (
               <TicketChangeRequests changeRequests={data!.change_requests} />
             )}
-            {data?.status === TICKET_STATUS.EDITED && (
-              <TicketNotes
-                notes={data!.notes}
-                handleAddNote={handleAddNote}
-                fetchData={fetchData}
-              />
-            )}
+            {TICKETS_ACCESS.includes(user?.roles[0]?.name) &&
+              data?.status === TICKET_STATUS.EDITED && (
+                <TicketNotes
+                  notes={data!.notes}
+                  handleAddNote={handleAddNote}
+                  fetchData={fetchData}
+                />
+              )}
           </div>
         )}
       </ModalBody>
@@ -428,31 +433,32 @@ export default function ViewTicket({
         >
           Close
         </Button>
-        {user?.is_admin && data?.status === TICKET_STATUS.PENDING && (
-          <>
-            <Button
-              type="button"
-              className="bg-red-400 hover:bg-red-500 text-white py-5"
-              onClick={handleUpdateTicketStatus(data.id, "reject")}
-            >
-              Reject
-            </Button>
-            <Button
-              type="button"
-              className="bg-cyan-400 hover:bg-cyan-500 text-white py-5"
-              onClick={handleUpdateTicketStatus(data.id, "edit")}
-            >
-              Mark as Edited
-            </Button>
-            <Link
-              href={`/admin/reports/${data?.job_order.id}`}
-              className="bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center px-3 rounded-lg text-xs font-bold h-10"
-              target="_blank"
-            >
-              View Job Order
-            </Link>
-          </>
-        )}
+        {TICKETS_ACCESS.includes(user?.roles[0]?.name) &&
+          data?.status === TICKET_STATUS.PENDING && (
+            <>
+              <Button
+                type="button"
+                className="bg-red-400 hover:bg-red-500 text-white py-5"
+                onClick={handleUpdateTicketStatus(data.id, "reject")}
+              >
+                Reject
+              </Button>
+              <Button
+                type="button"
+                className="bg-cyan-400 hover:bg-cyan-500 text-white py-5"
+                onClick={handleUpdateTicketStatus(data.id, "edit")}
+              >
+                Mark as Edited
+              </Button>
+              <Link
+                href={`/admin/reports/${data?.job_order.id}`}
+                className="bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center px-3 rounded-lg text-xs font-bold h-10"
+                target="_blank"
+              >
+                View Job Order
+              </Link>
+            </>
+          )}
       </ModalFooter>
     </Modal>
   );
