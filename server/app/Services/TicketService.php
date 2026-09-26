@@ -24,7 +24,7 @@ class TicketService
 
         $tickets = Ticket::query()
             ->with(['user:id,name,code', 'ticketCategory:id,name', 'ticketBrand:id,name', 'jobOrder:id,job_order_number'])
-            ->when(!Auth::user()->isAdmin(), fn($query) => $query->where('user_id', Auth::id()))
+            ->when(Auth::user()->isEmployee(), fn($query) => $query->where('user_id', Auth::id()))
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->whereAny([

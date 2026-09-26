@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/combobox";
 import { useRouter } from "next/navigation";
 import { REPORTS_ACCESS } from "@/lib/permissions";
+import { useAuth } from "@/context/authContext";
 
 export const FILTER_DATA = {
   branch: "",
@@ -89,6 +90,7 @@ const Reports = () => {
     filterItems,
   });
   const [branches, setBranches] = useState<BranchProps[]>([]);
+  const { user } = useAuth();
   const [areaManagers, setAreaManagers] = useState<
     {
       id: number;
@@ -407,49 +409,53 @@ const Reports = () => {
           >
             <Eye /> View
           </Button>
-          <HoverCard>
-            <HoverCardTrigger>
-              <Button
-                type="button"
-                onClick={handleCancelJobOrder(row?.id)}
-                disabled={row.status}
-                className={`p-2 ${
-                  row.status
-                    ? "bg-gray-200 cursor-not-allowed text-yellow-600"
-                    : "bg-yellow-500 text-white"
-                }`}
-              >
-                <CircleX /> {row.status ? "Canceled" : "Cancel"}
-              </Button>
-            </HoverCardTrigger>
-            {row.status && (
-              <HoverCardContent side={"left"}>
-                <div className="flex flex-col gap-1">
-                  <h4 className="font-medium">Reason</h4>
-                  <p>{row.reason_for_cancellation || "N/A"}</p>
-                </div>
-              </HoverCardContent>
-            )}
-          </HoverCard>
-          <HoverCard>
-            <HoverCardTrigger>
-              <Button
-                type="button"
-                onClick={handleDeleteJobOrder(row?.id)}
-                className="bg-red-500 text-white"
-              >
-                <Trash2 /> Delete
-              </Button>
-            </HoverCardTrigger>
-            {row.status && (
-              <HoverCardContent side={"left"}>
-                <div className="flex flex-col gap-1">
-                  <h4 className="font-medium">Reason</h4>
-                  <p>{row.reason_for_cancellation || "N/A"}</p>
-                </div>
-              </HoverCardContent>
-            )}
-          </HoverCard>
+          {(user?.is_admin || user?.is_accounting) && (
+            <>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    type="button"
+                    onClick={handleCancelJobOrder(row?.id)}
+                    disabled={row.status}
+                    className={`p-2 ${
+                      row.status
+                        ? "bg-gray-200 cursor-not-allowed text-yellow-600"
+                        : "bg-yellow-500 text-white"
+                    }`}
+                  >
+                    <CircleX /> {row.status ? "Canceled" : "Cancel"}
+                  </Button>
+                </HoverCardTrigger>
+                {row.status && (
+                  <HoverCardContent side={"left"}>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-medium">Reason</h4>
+                      <p>{row.reason_for_cancellation || "N/A"}</p>
+                    </div>
+                  </HoverCardContent>
+                )}
+              </HoverCard>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    type="button"
+                    onClick={handleDeleteJobOrder(row?.id)}
+                    className="bg-red-500 text-white"
+                  >
+                    <Trash2 /> Delete
+                  </Button>
+                </HoverCardTrigger>
+                {row.status && (
+                  <HoverCardContent side={"left"}>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-medium">Reason</h4>
+                      <p>{row.reason_for_cancellation || "N/A"}</p>
+                    </div>
+                  </HoverCardContent>
+                )}
+              </HoverCard>
+            </>
+          )}
         </div>
       ),
     },
@@ -874,13 +880,15 @@ const Reports = () => {
           >
             Close
           </Button>
-          <Button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-600 py-5 px-5"
-            onClick={() => router.push(`/admin/reports/${viewData?.id}`)}
-          >
-            Edit
-          </Button>
+          {!isBrowsing && !viewData?.status && (
+            <Button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 py-5 px-5"
+              onClick={() => router.push(`/admin/reports/${viewData?.id}`)}
+            >
+              Edit
+            </Button>
+          )}
         </ModalFooter>
       </Modal>
     </>
