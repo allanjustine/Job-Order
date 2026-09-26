@@ -1,4 +1,8 @@
-import { ADMIN_ACCESS, REPORTS_ACCESS } from "@/lib/permissions";
+import {
+  ADMIN_ACCESS,
+  REPORTS_ACCESS,
+  TICKETS_ACCESS,
+} from "@/lib/permissions";
 import {
   Gauge,
   UserCog,
@@ -54,7 +58,7 @@ export const sidebarData = [
     href: "/tickets",
     icon: TicketIcon,
     name: "Tickets",
-    permissions: ADMIN_ACCESS,
+    permissions: TICKETS_ACCESS,
   },
   {
     href: "/admin/ticket-categories",
