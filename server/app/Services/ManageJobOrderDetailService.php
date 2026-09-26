@@ -30,6 +30,8 @@ class ManageJobOrderDetailService
 
     public function delete($jobOrderDetail)
     {
+        abort_unless(Auth::check() && !Auth::user()->isEmployee(), 403);
+
         activity()
             ->causedBy(Auth::user())
             ->performedOn($jobOrderDetail)
