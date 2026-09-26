@@ -14,7 +14,7 @@ class StoreJobOrderDetailsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check() && (Auth::user()->isAdmin() || Auth::user()->isAccounting());
+        return Auth::check() && Auth::user()->isAdmin();
     }
 
     /**
