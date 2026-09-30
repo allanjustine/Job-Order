@@ -485,7 +485,7 @@ export const Card = ({
         {title}
         {button}
       </h2>
-      <div className={`grid ${cols ?? "grid-cols-2"} space-y-2`}>
+      <div className={`grid ${cols ?? "grid-cols-2"} space-y-2 gap-1`}>
         {children}
       </div>
     </div>
