@@ -397,7 +397,10 @@ export default function ViewTicket({
                   )
                 }
               >
-                <CardItem title="Rejected By" value={data?.rejected_by?.name} />
+                <CardItem
+                  title="Rejected By"
+                  value={data?.rejected_by?.name ?? "N/A"}
+                />
                 <CardItem
                   title="Content"
                   value={data?.rejected_reason}
