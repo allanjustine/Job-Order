@@ -1,4 +1,3 @@
-import { api } from "@/lib/api";
 import phpCurrency from "@/utils/phpCurrency";
 import {
   ArrowDown,
@@ -8,7 +7,6 @@ import {
   PillBottleIcon,
   Plus,
   Printer,
-  Tags,
   TicketCheck,
   TicketIcon,
   TicketMinus,
@@ -16,7 +14,7 @@ import {
   UserCog,
   Wrench,
 } from "lucide-react";
-import { Activity, useEffect, useMemo, useState } from "react";
+import { Activity, useMemo } from "react";
 import { Button } from "./ui/button";
 
 export default function StatCards({
@@ -152,34 +150,34 @@ export default function StatCards({
                   {item.label}
                 </p>
                 <p
-                  className={`text-2xl font-semibold text-gray-800 items-center flex gap-2 ${item.value < 0 && "text-green-500"}`}
+                  className={`text-xl font-semibold text-gray-800 items-center flex gap-2 ${item.value < 0 && "text-green-500"}`}
                 >
                   {isLoading || isRefreshing
                     ? item.value
                     : phpCurrency(item.value).replace("-", "+")}{" "}
-                  <Activity mode={item.percentage ? "visible" : "hidden"}>
-                    <span
-                      className={`text-xs flex gap-1 items-center ${percentageColor(
-                        Number(
-                          !isLoading &&
-                            !isRefreshing &&
-                            item?.percentage?.split(".")[0],
-                        ),
-                      )}`}
-                    >
-                      {Number(
+                </p>
+                <Activity mode={item.percentage ? "visible" : "hidden"}>
+                  <span
+                    className={`text-[10px] flex gap-1 items-center ${percentageColor(
+                      Number(
                         !isLoading &&
                           !isRefreshing &&
                           item?.percentage?.split(".")[0],
-                      ) > 100 ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      )}{" "}
-                      {item.percentage}
-                    </span>
-                  </Activity>
-                </p>
+                      ),
+                    )}`}
+                  >
+                    {Number(
+                      !isLoading &&
+                        !isRefreshing &&
+                        item?.percentage?.replaceAll(",", "")?.split(".")[0],
+                    ) > 100 ? (
+                      <ArrowUp className="size-2" />
+                    ) : (
+                      <ArrowDown className="size-2" />
+                    )}{" "}
+                    {item.percentage}
+                  </span>
+                </Activity>
               </div>
               <div
                 className={`p-3 rounded-lg bg-linear-to-br ${item.color} shadow-md`}
