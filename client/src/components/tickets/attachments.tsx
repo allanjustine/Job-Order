@@ -23,12 +23,13 @@ export default function TicketAttachments({
           <Attachment
             key={attachment.id}
             orientation="vertical"
-            className="hover:shadow-xl hover:scale-102 duration-300 ease-in-out"
+            className="hover:shadow-sm duration-300 ease-in-out group"
           >
             <AttachmentMedia variant="image">
               <img
                 src={Storage(attachment.file_path)}
                 alt={attachment.file_name}
+                className="group-hover:scale-110 duration-300 ease-in-out"
               />
             </AttachmentMedia>
             <AttachmentContent>
@@ -41,7 +42,7 @@ export default function TicketAttachments({
             </AttachmentContent>
             <Link
               href={Storage(attachment.file_path)}
-              className="text-blue-500 hover:underline text-center"
+              className="text-blue-500 hover:underline text-center hover:text-blue-700 group-hover:font-bold"
               target="_blank"
             >
               View

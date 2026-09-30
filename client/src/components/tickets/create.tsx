@@ -356,9 +356,17 @@ export default function CreateTicket({
             {previews.length > 0 && (
               <AttachmentGroup>
                 {previews.map((preview) => (
-                  <Attachment key={preview.name} orientation="vertical">
+                  <Attachment
+                    key={preview.name}
+                    orientation="vertical"
+                    className="hover:shadow-sm duration-300 ease-in-out group"
+                  >
                     <AttachmentMedia variant="image">
-                      <img src={preview.url} alt={preview.name} />
+                      <img
+                        src={preview.url}
+                        alt={preview.name}
+                        className="group-hover:scale-110 duration-300 ease-in-out"
+                      />
                     </AttachmentMedia>
                     <AttachmentContent>
                       <AttachmentTitle>{preview.name}</AttachmentTitle>
