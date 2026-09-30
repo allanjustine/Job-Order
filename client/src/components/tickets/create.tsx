@@ -225,7 +225,7 @@ export default function CreateTicket({
 
   return (
     <Modal isOpen={isOpen} className="w-lg">
-      <ModalHeader onClose={() => setIsOpen(false)}>
+      <ModalHeader className="text-sm" onClose={() => setIsOpen(false)}>
         Submitting a ticket for "{selectedData?.transaction_code || "N/A"}"
       </ModalHeader>
       <ModalBody>
@@ -464,6 +464,11 @@ export default function CreateTicket({
         </div>
       </ModalBody>
       <ModalFooter>
+        {errors?.job_order_id && (
+          <small className="text-red-500">
+            {errors?.job_order_id?.message}
+          </small>
+        )}
         <Button
           type="button"
           className="bg-gray-400 hover:bg-gray-500 text-white py-5"

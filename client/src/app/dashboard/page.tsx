@@ -443,7 +443,9 @@ const Dashboard = () => {
               <Button
                 type="button"
                 className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded"
-                disabled={row?.has_pending_ticket}
+                disabled={
+                  row?.has_pending_ticket || row?.status === "cancelled"
+                }
                 onClick={() => {
                   Swal.fire({
                     title: "Are you sure?",

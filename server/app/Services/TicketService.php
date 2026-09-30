@@ -58,6 +58,13 @@ class TicketService
 
     public function storeTicket($request)
     {
+        $canceled_jo = Auth::user()
+            ->jobOrders()
+            ->findOrFail($request->job_order_id)
+            ->status === 'cancelled';
+
+        abort_if($canceled_jo, 400, "Job order is cancelled. You cannot create a ticket for it.");
+
         abort_if(Auth::user()->hasPendingTicket($request->job_order_id), 400, "You already have a pending ticket for this job order. Please wait for it to be edited.");
 
         return DB::transaction(function () use ($request) {
