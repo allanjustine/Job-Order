@@ -29,7 +29,7 @@ export default function TicketAttachments({
               <img
                 src={Storage(attachment.file_path)}
                 alt={attachment.file_name}
-                className="hover:scale-110 duration-300 ease-in-out"
+                className="group-hover:scale-110 duration-300 ease-in-out"
               />
             </AttachmentMedia>
             <AttachmentContent>
