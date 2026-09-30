@@ -162,7 +162,7 @@ export default function StatCards({
                       Number(
                         !isLoading &&
                           !isRefreshing &&
-                          item?.percentage?.split(".")[0],
+                          item?.percentage?.replaceAll(",", "")?.split(".")[0],
                       ),
                     )}`}
                   >
