@@ -38,6 +38,9 @@ import { formatDateAndTime } from "@/utils/format-date-and-time";
 import { diffForHumans } from "@/utils/diff-for-humans";
 import TableLoader from "@/components/table-loader";
 import { ADMIN_ACCESS } from "@/lib/permissions";
+import { ChartData, ChartDataType } from "../../components/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RadarComponent } from "../../components/radar";
 
 const ADMIN_STATS_INITIAL_VALUES = {
   total_job_prints: {
@@ -87,6 +90,8 @@ const ADMIN_STATS_INITIAL_VALUES = {
     edited_tickets: 0,
     rejected_tickets: 0,
   },
+  chart_data: [],
+  last_six_months_data: [],
 };
 
 interface StatItem {
@@ -131,6 +136,8 @@ interface StatItem {
     edited_tickets: number;
     rejected_tickets: number;
   };
+  chart_data: ChartDataType[];
+  last_six_months_data: { title: string; data: ChartDataType[] }[];
 }
 
 const Dashboard = () => {
@@ -276,6 +283,12 @@ const Dashboard = () => {
     edited_tickets: adminStats.ticket_stats.edited_tickets,
     rejected_tickets: adminStats.ticket_stats.rejected_tickets,
   };
+
+  const CHART_DATA = adminStats.chart_data.map((item) => {
+    const { month_number, ...rest } = item;
+
+    return rest;
+  });
 
   const spinner = () => {
     return (
@@ -469,93 +482,144 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 spacey-10">
           {/* Job Orders Table */}
-          <div className="xl:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 h-fit">
-            <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-gray-800">
-                  Recent Print Job Orders
-                </h2>
-                <p className="text-xs text-gray-400">
-                  Latest submitted job orders
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    onChange={handleSearch}
-                    className="border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-48"
-                  />
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="xl:col-span-3 bg-white rounded-2xl border-gray-100 h-fit">
+            <div className="border border-gray-100 rounded-lg shadow-sm">
+              <div className="p-5 flex border-b flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-800">
+                    Recent Print Job Orders
+                  </h2>
+                  <p className="text-xs text-gray-400">
+                    Latest submitted job orders
+                  </p>
                 </div>
-                <Button
-                  type="button"
-                  disabled={isRefresh}
-                  className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
-                    isRefresh && "opacity-60 cursor-not-allowed!"
-                  }`}
-                  onClick={() => {
-                    handleRefresh();
-                    setIsLoadingStats(true);
-                    fetchAdminStats();
-                  }}
-                >
-                  {isRefresh ? (
-                    <>
-                      <FaCircleNotch className="animate-spin" /> Refreshing...
-                    </>
-                  ) : (
-                    <>
-                      <FaRotateRight /> Refresh
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <DataTable
-                columns={columns}
-                data={jobOrders}
-                pagination
-                paginationServer
-                sortServer
-                onSort={handleSort}
-                paginationTotalRows={pagination.total}
-                onChangeRowsPerPage={handleRowsPerPageChange}
-                onChangePage={handlePageChange}
-                paginationPerPage={pagination.perPage}
-                striped
-                highlightOnHover
-                progressPending={isLoading || isRefresh || isSearching}
-                progressComponent={
-                  <TableLoader
-                    isSearching={isSearching}
-                    searchTerm={searchTerm}
-                  />
-                }
-                persistTableHead
-                paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
-                defaultSortAsc={sort.sortBy}
-                defaultSortFieldId={sort.column}
-                noDataComponent={
-                  <div className="py-10 text-gray-400 text-sm flex flex-col items-center gap-2">
-                    {searchTerm ? (
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Input
+                      type="search"
+                      placeholder="Search..."
+                      onChange={handleSearch}
+                      className="border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-48"
+                    />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  </div>
+                  <Button
+                    type="button"
+                    disabled={isRefresh}
+                    className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
+                      isRefresh && "opacity-60 cursor-not-allowed!"
+                    }`}
+                    onClick={() => {
+                      handleRefresh();
+                      setIsLoadingStats(true);
+                      fetchAdminStats();
+                    }}
+                  >
+                    {isRefresh ? (
                       <>
-                        <SearchSlash className="w-8 h-8" />
-                        <span>No results for "{searchTerm}"</span>
+                        <FaCircleNotch className="animate-spin" /> Refreshing...
                       </>
                     ) : (
                       <>
-                        <Printer className="w-8 h-8" />
-                        <span>No job orders yet.</span>
+                        <FaRotateRight /> Refresh
                       </>
                     )}
+                  </Button>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <DataTable
+                  columns={columns}
+                  data={jobOrders}
+                  pagination
+                  paginationServer
+                  sortServer
+                  onSort={handleSort}
+                  paginationTotalRows={pagination.total}
+                  onChangeRowsPerPage={handleRowsPerPageChange}
+                  onChangePage={handlePageChange}
+                  paginationPerPage={pagination.perPage}
+                  striped
+                  highlightOnHover
+                  progressPending={isLoading || isRefresh || isSearching}
+                  progressComponent={
+                    <TableLoader
+                      isSearching={isSearching}
+                      searchTerm={searchTerm}
+                    />
+                  }
+                  persistTableHead
+                  paginationRowsPerPageOptions={PER_PAGE_OPTIONS}
+                  defaultSortAsc={sort.sortBy}
+                  defaultSortFieldId={sort.column}
+                  noDataComponent={
+                    <div className="py-10 text-gray-400 text-sm flex flex-col items-center gap-2">
+                      {searchTerm ? (
+                        <>
+                          <SearchSlash className="w-8 h-8" />
+                          <span>No results for "{searchTerm}"</span>
+                        </>
+                      ) : (
+                        <>
+                          <Printer className="w-8 h-8" />
+                          <span>No job orders yet.</span>
+                        </>
+                      )}
+                    </div>
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 border border-gray-100 rounded-lg shadow-sm">
+              <div className="p-5 border-b">
+                <h2 className="text-base font-semibold text-gray-800">
+                  Tickets and Job Orders per Month
+                </h2>
+                <p className="text-xs text-gray-400">
+                  Monthly breakdown of tickets and job orders
+                </p>
+              </div>
+              {isLoadingStats ? (
+                <div className="h-100 w-full">
+                  <div className="flex gap-2 h-full p-2">
+                    {Array.from({ length: 9 }).map((_, i) => (
+                      <Skeleton className="h-full w-55" key={i} />
+                    ))}
                   </div>
-                }
-              />
+                </div>
+              ) : (
+                <ChartData chartData={CHART_DATA} />
+              )}
+            </div>
+
+            <div className="mt-5 border border-gray-100 rounded-lg shadow-sm">
+              <div className="p-5 border-b">
+                <h2 className="text-base font-semibold text-gray-800">
+                  Tickets and Job Orders
+                </h2>
+                <p className="text-xs text-gray-400">
+                  Radar chart of tickets and job orders
+                </p>
+              </div>
+              <div className="h-fit w-full">
+                <div className="flex gap-2 h-full p-2">
+                  {isLoadingStats
+                    ? Array.from({ length: 2 }).map((_, i) => (
+                        <Skeleton className="h-70 w-full" key={i} />
+                      ))
+                    : adminStats.last_six_months_data.map((item, index) => (
+                        <div className="w-full" key={index}>
+                          <RadarComponent
+                            chartData={item.data}
+                            title={item.title}
+                          />
+                        </div>
+                      ))}
+                </div>
+              </div>
             </div>
           </div>
 
