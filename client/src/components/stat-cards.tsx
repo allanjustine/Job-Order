@@ -1,7 +1,5 @@
 import phpCurrency from "@/utils/phpCurrency";
 import {
-  ArrowDown,
-  ArrowUp,
   ChartSpline,
   PhilippinePeso,
   PillBottleIcon,
@@ -11,6 +9,8 @@ import {
   TicketIcon,
   TicketMinus,
   TicketX,
+  TrendingDown,
+  TrendingUp,
   UserCog,
   Wrench,
 } from "lucide-react";
@@ -171,9 +171,9 @@ export default function StatCards({
                         !isRefreshing &&
                         item?.percentage?.replaceAll(",", "")?.split(".")[0],
                     ) > 100 ? (
-                      <ArrowUp className="size-2" />
+                      <TrendingUp className="size-2" />
                     ) : (
-                      <ArrowDown className="size-2" />
+                      <TrendingDown className="size-2" />
                     )}{" "}
                     {item.percentage}
                   </span>
