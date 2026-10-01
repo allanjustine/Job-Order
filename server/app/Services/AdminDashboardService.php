@@ -11,6 +11,7 @@ use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
 use App\Models\Mechanic;
 use App\Models\Ticket;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardService
@@ -194,6 +195,88 @@ class AdminDashboardService
         ];
     }
 
+    public function totalJoByMonths($startingDate = false)
+    {
+        return JobOrder::query()
+            ->whereNull('status')
+            ->whereYear('created_at', now()->year)
+            ->when($startingDate, function ($query) use ($startingDate) {
+                $query->where('created_at', '>=', $startingDate);
+            })
+            ->select(DB::raw('MONTH(created_at) as month'), DB::raw('COUNT(*) as total_jos'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    }
+
+    public function totalTicketsByMonths($startingDate = false)
+    {
+        return Ticket::query()
+            ->whereYear('created_at', now()->year)
+            ->when($startingDate, function ($query) use ($startingDate) {
+                $query->where('created_at', '>=', $startingDate);
+            })
+            ->select(DB::raw('MONTH(created_at) as month'), DB::raw('COUNT(*) as total_tickets'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    }
+
+    public function chartData()
+    {
+        return $this->totalTicketsByMonths()
+            ->concat($this->totalJoByMonths())
+            ->groupBy('month')
+            ->map(function ($items, $month) {
+                return [
+                    'month'        => Carbon::create()->month($month)->format("F"),
+                    'month_number' => $month,
+                    'ticket'       => $items->sum('total_tickets'),
+                    'job_order'    => $items->sum('total_jos')
+                ];
+            })
+            ->sortBy('month_number')
+            ->values();
+    }
+
+    public function getLastSixMonthsTicketsAndJoData()
+    {
+        $starting_date = now()->subMonths(5)->startOfMonth();
+
+        $last_six_months_date = collect(range(now()->subMonths(5)->month, now()->month));
+
+        $tickets = $this->totalTicketsByMonths($starting_date)
+            ->pluck('total_tickets', 'month');
+
+        $jos = $this->totalJoByMonths($starting_date)
+            ->pluck('total_jos', 'month');
+
+        $tickets_data = $last_six_months_date->map(function ($month) use ($tickets) {
+            return [
+                'month' => Carbon::create()->month($month)->format("F"),
+                'total' => $tickets[$month] ?? 0
+            ];
+        });
+
+        $jos_data = $last_six_months_date->map(function ($month) use ($jos) {
+            return [
+                'month' => Carbon::create()->month($month)->format("F"),
+                'total' => $jos[$month] ?? 0
+            ];
+        });
+
+        return [
+            [
+                'data'  => $tickets_data,
+                'title' => 'ticket'
+            ],
+            [
+                'data'  => $jos_data,
+                'title' => 'job_order'
+            ]
+        ];
+    }
+
     public function getAllStats()
     {
         return [
@@ -208,7 +291,9 @@ class AdminDashboardService
             'top_over_all_job_orders'     => $this->topTenOverAllJobOrders(),
             'top_branch_job_orders'       => $this->topTenBranchJobOrders(),
             'top_area_manager_job_orders' => $this->topTenAreaManagersJobOrders(),
-            'ticket_stats'                => $this->ticketStats()
+            'ticket_stats'                => $this->ticketStats(),
+            'chart_data'                  => $this->chartData(),
+            'last_six_months_data'        => $this->getLastSixMonthsTicketsAndJoData(),
         ];
     }
 }
