@@ -41,6 +41,7 @@ import { ADMIN_ACCESS } from "@/lib/permissions";
 import { ChartData, ChartDataType } from "../../components/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RadarComponent } from "../../components/radar";
+import { AreaChartComponent } from "../../components/area-chart";
 
 const ADMIN_STATS_INITIAL_VALUES = {
   total_job_prints: {
@@ -92,6 +93,7 @@ const ADMIN_STATS_INITIAL_VALUES = {
   },
   chart_data: [],
   last_six_months_data: [],
+  monthly_sales: [],
 };
 
 interface StatItem {
@@ -138,6 +140,11 @@ interface StatItem {
   };
   chart_data: ChartDataType[];
   last_six_months_data: { title: string; data: ChartDataType[] }[];
+  monthly_sales: {
+    month: string;
+    job_request_sales: number;
+    parts_replacement_sales: number;
+  }[];
 }
 
 const Dashboard = () => {
@@ -507,7 +514,7 @@ const Dashboard = () => {
                   </div>
                   <Button
                     type="button"
-                    disabled={isRefresh}
+                    disabled={isRefresh || isLoadingStats}
                     className={`bg-blue-500 hover:bg-blue-400 text-white py-5 ${
                       isRefresh && "opacity-60 cursor-not-allowed!"
                     }`}
@@ -517,7 +524,7 @@ const Dashboard = () => {
                       fetchAdminStats();
                     }}
                   >
-                    {isRefresh ? (
+                    {isRefresh || isLoadingStats ? (
                       <>
                         <FaCircleNotch className="animate-spin" /> Refreshing...
                       </>
@@ -621,10 +628,14 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
+            <AreaChartComponent
+              chartData={adminStats.monthly_sales}
+              isLoading={isLoadingStats}
+            />
           </div>
 
           {/* Rankings */}
-          <div className="xl:col-span-2 grid grid-cols-1 gap-4">
+          <div className="xl:col-span-2 grid grid-cols-1 gap-4 h-fit">
             {/* Top Overall */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
@@ -633,7 +644,7 @@ const Dashboard = () => {
               </h3>
               <div className="flex flex-col gap-2">
                 {isLoadingStats ? (
-                  skeletonRows(5)
+                  skeletonRows(7)
                 ) : adminStats.top_over_all_job_orders.length > 0 ? (
                   adminStats.top_over_all_job_orders.map((item, index) => (
                     <div
@@ -666,7 +677,7 @@ const Dashboard = () => {
               </h3>
               <div className="flex flex-col gap-2">
                 {isLoadingStats ? (
-                  skeletonRows(5)
+                  skeletonRows(7)
                 ) : adminStats.top_branch_job_orders.length > 0 ? (
                   adminStats.top_branch_job_orders.map((item, index) => (
                     <div
@@ -702,7 +713,7 @@ const Dashboard = () => {
               </h3>
               <div className="flex flex-col gap-2">
                 {isLoadingStats ? (
-                  skeletonRows(5, "h-14")
+                  skeletonRows(7, "h-14")
                 ) : adminStats.top_area_manager_job_orders.length > 0 ? (
                   adminStats.top_area_manager_job_orders.map((item, index) => (
                     <div
