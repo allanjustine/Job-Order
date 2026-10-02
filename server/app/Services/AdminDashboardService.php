@@ -222,6 +222,11 @@ class AdminDashboardService
             ->get();
     }
 
+    private function getMonthName(string | int $month)
+    {
+        return Carbon::create()->month($month)->format("F");
+    }
+
     public function chartData()
     {
         return $this->totalTicketsByMonths()
@@ -229,7 +234,7 @@ class AdminDashboardService
             ->groupBy('month')
             ->map(function ($items, $month) {
                 return [
-                    'month'        => Carbon::create()->month($month)->format("F"),
+                    'month'        => $this->getMonthName($month),
                     'month_number' => $month,
                     'ticket'       => $items->sum('total_tickets'),
                     'job_order'    => $items->sum('total_jos')
@@ -253,14 +258,14 @@ class AdminDashboardService
 
         $tickets_data = $last_six_months_date->map(function ($month) use ($tickets) {
             return [
-                'month' => Carbon::create()->month($month)->format("F"),
+                'month' => $this->getMonthName($month),
                 'total' => $tickets[$month] ?? 0
             ];
         });
 
         $jos_data = $last_six_months_date->map(function ($month) use ($jos) {
             return [
-                'month' => Carbon::create()->month($month)->format("F"),
+                'month' => $this->getMonthName($month),
                 'total' => $jos[$month] ?? 0
             ];
         });
@@ -275,6 +280,29 @@ class AdminDashboardService
                 'title' => 'job_order'
             ]
         ];
+    }
+
+    public function getMonthlySales()
+    {
+        $monthly_sales = JobOrderDetail::query()
+            ->whereRelation('jobOrder', 'status', null)
+            ->whereYear('created_at', now()->year)
+            ->select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw("COALESCE(SUM(CASE WHEN type = 'job_request' THEN amount END), 0) as job_request_sales"),
+                DB::raw("COALESCE(SUM(CASE WHEN type = 'parts_replacement' THEN amount END), 0) as parts_replacement_sales")
+            )
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        return $monthly_sales->map(function ($item) {
+            return [
+                'month'                   => $this->getMonthName($item->month),
+                'job_request_sales'       => $item->job_request_sales,
+                'parts_replacement_sales' => $item->parts_replacement_sales
+            ];
+        });
     }
 
     public function getAllStats()
@@ -294,6 +322,7 @@ class AdminDashboardService
             'ticket_stats'                => $this->ticketStats(),
             'chart_data'                  => $this->chartData(),
             'last_six_months_data'        => $this->getLastSixMonthsTicketsAndJoData(),
+            'monthly_sales'               => $this->getMonthlySales()
         ];
     }
 }

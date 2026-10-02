@@ -99,15 +99,15 @@ export default function EditTicketCategory({
       <Modal className="w-1/4" isOpen={isOpen}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader onClose={() => setIsOpen(false)}>
-            Edit Mechanic
+            Edit Category
           </ModalHeader>
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">Mechanic Name</Label>
+                <Label htmlFor="name">Category Name</Label>
                 <Input
                   className="py-3"
-                  placeholder="Enter mechanic name"
+                  placeholder="Enter category name"
                   {...register("name", { required: true })}
                 />
                 {errors.name && (

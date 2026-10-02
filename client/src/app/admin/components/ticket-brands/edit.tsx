@@ -98,16 +98,14 @@ export default function EditTicketBrand({
     <>
       <Modal className="w-1/4" isOpen={isOpen}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalHeader onClose={() => setIsOpen(false)}>
-            Edit Mechanic
-          </ModalHeader>
+          <ModalHeader onClose={() => setIsOpen(false)}>Edit Brand</ModalHeader>
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">Mechanic Name</Label>
+                <Label htmlFor="name">Brand Name</Label>
                 <Input
                   className="py-3"
-                  placeholder="Enter mechanic name"
+                  placeholder="Enter brand name"
                   {...register("name", { required: true })}
                 />
                 {errors.name && (

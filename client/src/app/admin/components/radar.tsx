@@ -42,7 +42,9 @@ export function RadarComponent({
   return (
     <Card>
       <CardHeader className="items-center">
-        <CardTitle>Radar Chart - Dots</CardTitle>
+        <CardTitle className="capitalize">
+          {title.replaceAll("_", " ")} per last 6 months
+        </CardTitle>
         <CardDescription>
           Showing total {title.replaceAll("_", " ")} for the last 6 months
         </CardDescription>
