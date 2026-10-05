@@ -79,6 +79,7 @@ export default function useFetch(
   useEffect(() => {
     fetchData();
   }, [
+    pagination.isLoading,
     pagination.page,
     pagination.perPage,
     sort.column,
@@ -100,6 +101,7 @@ export default function useFetch(
       ...pagination,
       perPage,
       page: 1,
+      isLoading: true,
     }));
   };
 
