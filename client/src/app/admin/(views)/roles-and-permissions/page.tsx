@@ -275,7 +275,8 @@ const Reports = () => {
                         progressPending={
                           isLoading ||
                           isRefresh ||
-                          (isSearching && keyItem === key)
+                          (isSearching && keyItem === key) ||
+                          pagination.isLoading
                         }
                         progressComponent={
                           <TableLoader
