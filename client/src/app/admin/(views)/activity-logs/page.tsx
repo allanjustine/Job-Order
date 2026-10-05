@@ -144,7 +144,9 @@ const ActivityLogs = () => {
               paginationPerPage={pagination.perPage}
               striped
               highlightOnHover
-              progressPending={isLoading || isRefresh || isSearching}
+              progressPending={
+                isLoading || isRefresh || isSearching || pagination.isLoading
+              }
               progressComponent={
                 <TableLoader
                   isSearching={isSearching}
