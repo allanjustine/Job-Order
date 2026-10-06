@@ -3,6 +3,8 @@ import { Label } from "./ui/label";
 import { MultiMechanic } from "./MultiMechanic";
 import Select from "./ui/select";
 import { useAuth } from "@/context/authContext";
+import { Button } from "./ui/button";
+import { RotateCcw } from "lucide-react";
 
 export default function CustomerGrid({
   errors,
@@ -41,6 +43,8 @@ export default function CustomerGrid({
   setEstimatedRepairTime,
   dealersName,
   setDealersName,
+  isLoadingDatas,
+  fetchDatas,
 }: any) {
   const { user } = useAuth();
 
@@ -257,12 +261,23 @@ export default function CustomerGrid({
         <Label>
           Select Mechanic<span className="text-red-500">*</span>
         </Label>
-        <MultiMechanic
-          mechanics={mechanics}
-          setMechanic={setMechanic}
-          mechanic={mechanic}
-          inputError={errors.mechanic}
-        />
+        <div className="flex gap-1">
+          <MultiMechanic
+            mechanics={mechanics}
+            setMechanic={setMechanic}
+            mechanic={mechanic}
+            inputError={errors.mechanic}
+          />
+          <Button
+            type="button"
+            variant="link"
+            title="Refresh"
+            disabled={isLoadingDatas}
+            onClick={fetchDatas}
+          >
+            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
       </div>
       <div className="col-span-1">
         <Label>
