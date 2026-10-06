@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\JobOrderController;
 use App\Http\Controllers\Api\Admin\MechanicController;
+use App\Http\Controllers\Api\Admin\PartNumberController;
 use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\RoleAndPermissionController;
 use App\Http\Controllers\Api\Admin\TargetIncomeController;
@@ -73,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('area-managers', AreaManagerController::class);
         Route::apiResource('ticket-categories', TicketCategoryController::class);
         Route::apiResource('ticket-brands', TicketBrandController::class);
+        Route::apiResource('part-numbers', PartNumberController::class);
         Route::post('target-incomes/sync-with-last-month', [TargetIncomeController::class, 'syncWithLastMonth']);
         Route::get('admin-stats', [AdminDashboardController::class, 'index']);
         Route::get('admin-job-orders', [AdminJobOrderController::class, 'index']);
@@ -128,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 "has_mechanic" => $has_mechanic->exists()
             ], 200);
         });
+        Route::get('all-part-numbers', [PartNumberController::class, 'index2']);
     });
 
     // GLOBAL AUTHENTICATED ROUTES

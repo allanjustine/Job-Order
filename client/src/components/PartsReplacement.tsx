@@ -13,7 +13,8 @@ import {
 import { partsItems } from "@/constants/part-items";
 import { useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, Trash2 } from "lucide-react";
+import { PartNumbersDropdown } from "./part-numbers-dropdown";
 
 interface PartsReplacementSectionProps {
   partsReplacement: PartsReplacement;
@@ -28,6 +29,9 @@ interface PartsReplacementSectionProps {
   setPartsNumber: React.Dispatch<React.SetStateAction<PartsNumber>>;
   partsQuantity: PartsQuantity;
   setPartsQuantity: React.Dispatch<React.SetStateAction<PartsQuantity>>;
+  fetchDatas: () => Promise<void>;
+  isLoadingDatas: boolean;
+  partNumbers: string[];
 }
 
 // Brand options
@@ -55,6 +59,9 @@ export default function PartsReplacementSection({
   setPartsNumber,
   partsQuantity,
   setPartsQuantity,
+  fetchDatas,
+  isLoadingDatas,
+  partNumbers,
 }: PartsReplacementSectionProps) {
   // Get parts others items
   const partsOthersItems: PartsOthersItem[] =
@@ -350,21 +357,28 @@ export default function PartsReplacementSection({
                       {/* Part Number Field - shows when brand is selected */}
                       {partsBrand[brandKey] && (
                         <>
-                          <Input
-                            type="text"
-                            placeholder="Part No."
-                            value={partsNumber[partNumberKey] || ""}
-                            readOnly={item.label.startsWith("Misc")}
-                            hidden={item.label.startsWith("Misc")}
-                            onChange={(e) =>
-                              handlePartNumberChange(
-                                partNumberKey,
-                                e.target.value,
-                              )
-                            }
-                            className="w-28 text-center"
-                            required
-                          />
+                          {!item.label.startsWith("Misc") && (
+                            <div className="flex gap-1">
+                              <PartNumbersDropdown
+                                partNumbers={partNumbers}
+                                handlePartNumberChange={handlePartNumberChange}
+                                partNumber={partsNumber[partNumberKey] || ""}
+                                partNumberKey={partNumberKey}
+                                isRequired={!item.label.startsWith("Misc")}
+                              />
+                              <Button
+                                type="button"
+                                variant="link"
+                                title="Refresh"
+                                disabled={isLoadingDatas}
+                                onClick={fetchDatas}
+                              >
+                                <RotateCcw
+                                  className={`${isLoadingDatas ? "animate-spin" : ""}`}
+                                />
+                              </Button>
+                            </div>
+                          )}
 
                           {/* Quantity Field */}
                           <div className="flex items-center gap-1">
@@ -531,7 +545,9 @@ export default function PartsReplacementSection({
                             onChange={(e) =>
                               updatePartsOthersAmount(
                                 item.id,
-                                e.target.value === "" ? "" : Number(e.target.value)
+                                e.target.value === ""
+                                  ? ""
+                                  : Number(e.target.value),
                               )
                             }
                             step="0.01"

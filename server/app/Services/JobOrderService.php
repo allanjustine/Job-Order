@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\JobOrder;
+use App\Models\PartNumber;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -112,6 +114,22 @@ class JobOrderService
                     ];
                 }
             }
+
+            $now = now();
+
+            $part_numbers = collect(Arr::pluck($data, 'part_number'))
+                ->map(function ($part_number) use ($now) {
+                    return [
+                        'part_number' => Str::of($part_number)->trim(),
+                        'created_at'  => $now,
+                        'updated_at'  => $now
+                    ];
+                })
+                ->unique()
+                ->values()
+                ->toArray();
+
+            PartNumber::query()->insertOrIgnore($part_numbers);
 
             $job_order
                 ->jobOrderDetails()

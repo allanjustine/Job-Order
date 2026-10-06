@@ -11,6 +11,7 @@ import {
   TicketIcon,
   Tags,
   Tickets,
+  FileDigit,
 } from "lucide-react";
 
 export const sidebarData = [
@@ -48,6 +49,12 @@ export const sidebarData = [
     href: "/admin/area-managers",
     icon: ShieldUser,
     name: "Area Managers",
+    permissions: ADMIN_ACCESS,
+  },
+  {
+    href: "/admin/part-numbers",
+    icon: FileDigit,
+    name: "Part Numbers",
     permissions: ADMIN_ACCESS,
   },
   {
