@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import SpecificJobRequest from "./SpecificJobRequest";
 import PartsReplacementSection from "./PartsReplacement";
 import phpCurrency from "@/utils/phpCurrency";
-import { 
-  JobAmountsType, 
-  PartsAmountsType, 
-  JobRequest, 
+import {
+  JobAmountsType,
+  PartsAmountsType,
+  JobRequest,
   PartsReplacement,
   PartsBrand,
   PartsNumber,
@@ -30,6 +30,9 @@ interface JobDetailsGridProps {
   jobTotal: number;
   partsTotal: number;
   overallTotal: number;
+  fetchDatas: () => Promise<void>;
+  isLoadingDatas: boolean;
+  partNumbers: string[];
 }
 
 export default function JobDetailsGrid({
@@ -50,12 +53,12 @@ export default function JobDetailsGrid({
   jobTotal,
   partsTotal,
   overallTotal,
+  fetchDatas,
+  isLoadingDatas,
+  partNumbers,
 }: JobDetailsGridProps) {
-  
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    
       <SpecificJobRequest
         jobRequest={jobRequest}
         setJobRequest={setJobRequest}
@@ -76,12 +79,17 @@ export default function JobDetailsGrid({
         setPartsNumber={setPartsNumber}
         partsQuantity={partsQuantity}
         setPartsQuantity={setPartsQuantity}
+        fetchDatas={fetchDatas}
+        isLoadingDatas={isLoadingDatas}
+        partNumbers={partNumbers}
       />
 
       {(jobTotal > 0 || partsTotal > 0) && (
         <div className="col-span-1 lg:col-span-2 bg-blue-50 p-4 rounded-md border border-blue-200">
           <div className="flex justify-between items-center">
-            <span className="font-bold text-lg text-blue-800">GRAND TOTAL:</span>
+            <span className="font-bold text-lg text-blue-800">
+              GRAND TOTAL:
+            </span>
             <span className="font-bold text-2xl text-blue-800">
               {phpCurrency(overallTotal)}
             </span>
