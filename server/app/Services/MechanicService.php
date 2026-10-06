@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Mechanic;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class MechanicService
@@ -53,23 +54,46 @@ class MechanicService
 
     public function store($request)
     {
-        return Mechanic::query()
+        $mechanic = Mechanic::query()
             ->create([
                 "name"    => Str::title($request->name),
                 "user_id" => $request->user_id,
             ]);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($mechanic)
+            ->log("Added new mechanic {$mechanic->name} and assigned to {$mechanic->user->name} to system.");
+
+        return $mechanic;
     }
 
     public function update($request, $mechanic)
     {
-        return $mechanic->update([
+        $old_mechanic_name = $mechanic->name;
+
+        $old_assigned_branch = $mechanic->user->name;
+
+        $mechanic->update([
             "name"    => Str::title($request->name),
             "user_id" => $request->user_id,
         ]);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($mechanic)
+            ->log("Updated mechanic name from \"{$old_mechanic_name}\" to \"{$mechanic->name}\" and assigned from {$old_assigned_branch} to {$mechanic->user->name}.");
+
+        return $mechanic;
     }
 
     public function delete($mechanic)
     {
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($mechanic)
+            ->log("Deleted {$mechanic->name} mechanic that assigned from {$mechanic->user->name}.");
+
         return $mechanic->delete();
     }
 }
