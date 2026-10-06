@@ -201,7 +201,7 @@ class ReportService
                 return [
                     'Date'                    => $item->jobOrder?->date->format('Y-m-d'),
                     'JO Number'               => $item->jobOrder?->job_order_number,
-                    'Branch Code'             => $item->jobOrder?->mechanics->first()?->user?->code,
+                    'Branch Name'             => $item->jobOrder?->mechanics->first()?->user?->name,
                     'Customer Name'           => $item->jobOrder?->customer?->name,
                     'Contact Number'          => $item->jobOrder?->customer?->contact_number,
                     'Address'                 => $item->jobOrder?->customer?->address,

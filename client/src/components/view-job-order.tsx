@@ -228,7 +228,7 @@ const ViewJobOrder = ({
                     }}
                   >
                     <div className="flex">
-                      <span className="font-bold w-16">Date:</span>
+                      <span className="font-bold w-28">Date:</span>
                       <span className="border-b border-black flex-1">
                         {data.date ? formatDate(new Date(data.date)) : "N/A"}
                       </span>
@@ -240,7 +240,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Branch Name:</span>
+                      <span className="font-bold w-28">Branch Name:</span>
                       <span className="border-b border-black flex-1">
                         {data.customer.user.name || "N/A"}
                       </span>
@@ -252,7 +252,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Customer Name:</span>
+                      <span className="font-bold w-28">Customer Name:</span>
                       <span className="border-b border-black flex-1">
                         {data.customer?.name || "N/A"}
                       </span>
@@ -266,7 +266,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Contact Number:</span>
+                      <span className="font-bold w-28">Contact Number:</span>
                       <span className="border-b border-black flex-1">
                         {data.customer.contact_number || "N/A"}
                       </span>
@@ -280,7 +280,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Model:</span>
+                      <span className="font-bold w-28">Model:</span>
                       <span className="border-b border-black flex-1">
                         {data.model || "N/A"}
                       </span>
@@ -292,7 +292,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Address:</span>
+                      <span className="font-bold w-28">Address:</span>
                       <span className="border-b border-black flex-1">
                         {data.customer?.address || "N/A"}
                       </span>
@@ -304,7 +304,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Category:</span>
+                      <span className="font-bold w-28">Category:</span>
                       <span className="border-b border-black flex-1">
                         {data.category || "N/A"}
                       </span>
@@ -320,7 +320,7 @@ const ViewJobOrder = ({
                       </span>
                     </div>
                     <div className="flex">
-                      <span className="font-bold w-16">Dealers Name:</span>
+                      <span className="font-bold w-28">Dealers Name:</span>
                       <span className="border-b border-black flex-1">
                         {data.dealers_name || "N/A"}
                       </span>
