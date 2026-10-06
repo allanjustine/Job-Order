@@ -295,37 +295,38 @@ const TrimotorsJobOrderForm = () => {
   // directly so ANY number of pages can be printed, not just a
   // hard-capped 20 items / 2 pages. hasRestData is kept only for
   // backward compat with the TrimotorsPreviewPrint modal component.
+  const [partNumbers, setPartNumbers] = useState<string[]>([]);
+  const [isLoadingDatas, setIsLoadingDatas] = useState<boolean>(false);
   const [printPage, setPrintPage] = useState<number>(0);
 
   useEffect(() => {
-    async function fetchMechanics() {
-      try {
-        const response = await api.get("/branch-mechanics");
-        if (response.status === 200) {
-          setMechanics(response.data.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchMechanics();
+    fetchDatas();
   }, []);
 
-  useEffect(() => {
-    fetchJobOrderNumber();
-  }, []);
-
-  const fetchJobOrderNumber = async () => {
+  const fetchDatas = async () => {
+    setIsLoadingDatas(true);
     try {
-      const response = await api.get("/get-job-order-number");
+      const [branchMechanics, jobOrderNumber, partNumbers] = await Promise.all([
+        api.get("/branch-mechanics"),
+        api.get("/get-job-order-number"),
+        api.get("/all-part-numbers"),
+      ]);
+      if (branchMechanics.status === 200) {
+        setMechanics(branchMechanics.data.data);
+      }
 
-      if (response.status === 200) {
-        setJobOrderNumber(response.data.job_order_number);
-        setTransactionCode(response.data.transaction_code);
+      if (jobOrderNumber.status === 200) {
+        setJobOrderNumber(jobOrderNumber.data.job_order_number);
+        setTransactionCode(jobOrderNumber.data.transaction_code);
+      }
+
+      if (partNumbers.status === 200) {
+        setPartNumbers(partNumbers.data.data);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoadingDatas(false);
     }
   };
 
@@ -579,14 +580,14 @@ const TrimotorsJobOrderForm = () => {
             setPrintPage(0);
             setIsPrint(false);
             handleSavePrint();
-            fetchJobOrderNumber();
+            fetchDatas();
           }
         });
       } else {
         setPrintPage(0);
         setIsPrint(false);
         handleSavePrint();
-        fetchJobOrderNumber();
+        fetchDatas();
       }
     };
 
@@ -769,7 +770,7 @@ const TrimotorsJobOrderForm = () => {
       });
 
       if (response.status === 204) {
-        fetchJobOrderNumber();
+        fetchDatas();
         setIsOpen(!isOpen);
       }
     } catch (error: any) {
@@ -1126,6 +1127,8 @@ const TrimotorsJobOrderForm = () => {
                   otherRemarks={otherRemarks}
                   dealersName={dealersName}
                   setDealersName={setDealersName}
+                  fetchDatas={fetchDatas}
+                  isLoadingDatas={isLoadingDatas}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
@@ -1160,6 +1163,9 @@ const TrimotorsJobOrderForm = () => {
                   jobTotal={jobTotal}
                   partsTotal={partsTotal}
                   overallTotal={overallTotal}
+                  fetchDatas={fetchDatas}
+                  isLoadingDatas={isLoadingDatas}
+                  partNumbers={partNumbers}
                 />
 
                 <NextSchedule
