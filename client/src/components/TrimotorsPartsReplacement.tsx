@@ -14,7 +14,8 @@ import {
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import { useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, Trash2 } from "lucide-react";
+import { PartNumbersDropdown } from "./part-numbers-dropdown";
 
 interface TrimotorsPartsReplacementSectionProps {
   partsReplacement: TrimotorsPartsReplacement;
@@ -33,6 +34,9 @@ interface TrimotorsPartsReplacementSectionProps {
   setPartsQuantity: React.Dispatch<
     React.SetStateAction<TrimotorsPartsQuantity>
   >;
+  fetchDatas: () => Promise<void>;
+  isLoadingDatas: boolean;
+  partNumbers: string[];
 }
 
 // Brand options
@@ -60,6 +64,9 @@ export default function TrimotorsPartsReplacementSection({
   setPartsNumber,
   partsQuantity,
   setPartsQuantity,
+  fetchDatas,
+  isLoadingDatas,
+  partNumbers,
 }: TrimotorsPartsReplacementSectionProps) {
   // Get parts others items
   const partsOthersItems: TrimotorsPartsOthersItem[] =
@@ -370,19 +377,30 @@ export default function TrimotorsPartsReplacementSection({
                         {/* Part Number Field - shows when brand is selected */}
                         {partsBrand[brandKey] && (
                           <>
-                            <Input
-                              type="text"
-                              placeholder="Part No."
-                              value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) =>
-                                handlePartNumberChange(
-                                  partNumberKey,
-                                  e.target.value,
-                                )
-                              }
-                              className="w-28 text-center"
-                              required
-                            />
+                            {!item.label.startsWith("Misc") && (
+                              <div className="flex gap-1">
+                                <PartNumbersDropdown
+                                  partNumbers={partNumbers}
+                                  handlePartNumberChange={
+                                    handlePartNumberChange
+                                  }
+                                  partNumber={partsNumber[partNumberKey] || ""}
+                                  partNumberKey={partNumberKey}
+                                  isRequired={!item.label.startsWith("Misc")}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="link"
+                                  title="Refresh"
+                                  disabled={isLoadingDatas}
+                                  onClick={fetchDatas}
+                                >
+                                  <RotateCcw
+                                    className={`${isLoadingDatas ? "animate-spin" : ""}`}
+                                  />
+                                </Button>
+                              </div>
+                            )}
 
                             {/* Quantity Field */}
                             <div className="flex items-center gap-1">
@@ -516,21 +534,30 @@ export default function TrimotorsPartsReplacementSection({
                         {/* Part Number Field - shows when brand is selected */}
                         {partsBrand[brandKey] && (
                           <>
-                            <Input
-                              type="text"
-                              placeholder="Part No."
-                              value={partsNumber[partNumberKey] || ""}
-                              onChange={(e) =>
-                                handlePartNumberChange(
-                                  partNumberKey,
-                                  e.target.value,
-                                )
-                              }
-                              className="w-28 text-center"
-                              required
-                              readOnly={item.label.startsWith("Misc")}
-                              hidden={item.label.startsWith("Misc")}
-                            />
+                            {!item.label.startsWith("Misc") && (
+                              <div className="flex gap-1">
+                                <PartNumbersDropdown
+                                  partNumbers={partNumbers}
+                                  handlePartNumberChange={
+                                    handlePartNumberChange
+                                  }
+                                  partNumber={partsNumber[partNumberKey] || ""}
+                                  partNumberKey={partNumberKey}
+                                  isRequired={!item.label.startsWith("Misc")}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="link"
+                                  title="Refresh"
+                                  disabled={isLoadingDatas}
+                                  onClick={fetchDatas}
+                                >
+                                  <RotateCcw
+                                    className={`${isLoadingDatas ? "animate-spin" : ""}`}
+                                  />
+                                </Button>
+                              </div>
+                            )}
 
                             {/* Quantity Field */}
                             <div className="flex items-center gap-1">
@@ -701,7 +728,9 @@ export default function TrimotorsPartsReplacementSection({
                             onChange={(e) =>
                               updatePartsOthersAmount(
                                 item.id,
-                                e.target.value === "" ? "" : Number(e.target.value)
+                                e.target.value === ""
+                                  ? ""
+                                  : Number(e.target.value),
                               )
                             }
                             step="0.01"
