@@ -17,15 +17,15 @@ import toast from "react-hot-toast";
 import { Spinner } from "@/components/ui/spinner";
 
 const schema = z.object({
-  part_number: z
+  _part_number: z
     .string()
-    .min(2, "Part_number must be at least 2 characters long")
-    .max(50, "Part_number must be at most 50 characters long")
-    .nonempty("Part_number is required"),
+    .min(2, "Part number must be at least 2 characters long")
+    .max(50, "Part number must be at most 50 characters long")
+    .nonempty("Part number is required"),
 });
 
 interface FormItem {
-  part_number: string;
+  _part_number: string;
 }
 
 export default function CreatePartNumber({
@@ -46,14 +46,14 @@ export default function CreatePartNumber({
   } = useForm<FormItem>({
     resolver: zodResolver(schema),
     defaultValues: {
-      part_number: "",
+      _part_number: "",
     },
   });
 
   async function onSubmit(data: any) {
     try {
       const response = await api.post("/part-numbers", {
-        part_number: data.part_number,
+        _part_number: data._part_number,
       });
 
       if (response.status === 201) {
@@ -103,11 +103,11 @@ export default function CreatePartNumber({
                 <Input
                   className="py-3"
                   placeholder="Enter ticket part number"
-                  {...register("part_number", { required: true })}
+                  {...register("_part_number", { required: true })}
                 />
-                {errors.part_number && (
+                {errors._part_number && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.part_number.message}
+                    {errors._part_number.message}
                   </p>
                 )}
               </div>
