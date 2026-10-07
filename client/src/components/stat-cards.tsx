@@ -1,4 +1,3 @@
-import phpCurrency from "@/utils/phpCurrency";
 import {
   ChartSpline,
   PhilippinePeso,
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 import { Activity, useMemo } from "react";
 import { Button } from "./ui/button";
+import CountUp from "react-countup";
 
 export default function StatCards({
   spinner,
@@ -32,13 +32,19 @@ export default function StatCards({
   const stats = [
     {
       label: "Monthly Service Target Income",
-      value: isLoading || isRefreshing ? spinner() : data.monthly_target_income,
+      value:
+        isLoading || isRefreshing
+          ? spinner()
+          : Number(data.monthly_target_income),
       icon: Wrench,
       color: "from-emerald-500 to-emerald-400",
     },
     {
       label: "Monthly Service Income",
-      value: isLoading || isRefreshing ? spinner() : data.monthly_shop_income,
+      value:
+        isLoading || isRefreshing
+          ? spinner()
+          : Number(data.monthly_shop_income),
       icon: PillBottleIcon,
       color: "from-rose-500 to-rose-400",
     },
@@ -47,7 +53,7 @@ export default function StatCards({
       value:
         isLoading || isRefreshing
           ? spinner()
-          : data.target_data.total_remaining_target,
+          : Number(data.target_data.total_remaining_target),
       percentage:
         isLoading || isRefreshing
           ? spinner()
@@ -110,9 +116,15 @@ export default function StatCards({
               Total Job Prints
             </p>
             <p className="text-2xl font-semibold text-gray-800">
-              {isLoading || isRefreshing
-                ? spinner()
-                : data.total_job_prints.total}
+              {isLoading || isRefreshing ? (
+                spinner()
+              ) : (
+                <CountUp
+                  end={data.total_job_prints.total}
+                  duration={2}
+                  separator=","
+                />
+              )}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-linear-to-br from-blue-500 to-blue-400 shadow-md">
@@ -123,15 +135,27 @@ export default function StatCards({
         <div className="absolute z-10 top-full left-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <p>
             <span className="font-medium">Motocycle:</span>{" "}
-            {isLoading || isRefreshing
-              ? spinner()
-              : data.total_job_prints.total_motors}
+            {isLoading || isRefreshing ? (
+              spinner()
+            ) : (
+              <CountUp
+                end={data.total_job_prints.total_motors}
+                duration={2}
+                separator=","
+              />
+            )}
           </p>
           <p>
             <span className="font-medium">Trimotors:</span>{" "}
-            {isLoading || isRefreshing
-              ? spinner()
-              : data.total_job_prints.total_trimotors}
+            {isLoading || isRefreshing ? (
+              spinner()
+            ) : (
+              <CountUp
+                end={data.total_job_prints.total_trimotors}
+                duration={2}
+                separator=","
+              />
+            )}
           </p>
         </div>
       </div>
@@ -150,11 +174,26 @@ export default function StatCards({
                   {item.label}
                 </p>
                 <p
-                  className={`text-xl font-semibold text-gray-800 items-center flex gap-2 ${item.value < 0 && "text-green-500"}`}
+                  className={`text-xl font-semibold text-gray-800 items-center flex gap-2 ${item.label.includes("Target Income Statistics") ? (item.value < 0 ? "text-green-500" : "text-red-500") : ""}`}
                 >
-                  {isLoading || isRefreshing
-                    ? item.value
-                    : phpCurrency(item.value).replace("-", "+")}{" "}
+                  {isLoading || isRefreshing ? (
+                    item.value
+                  ) : (
+                    <CountUp
+                      end={Math.abs(item.value)}
+                      duration={2}
+                      prefix={
+                        item.label.includes("Target Income Statistics")
+                          ? item.value < 0
+                            ? "+₱"
+                            : "-₱"
+                          : "₱"
+                      }
+                      separator=","
+                      decimals={2}
+                      decimal="."
+                    />
+                  )}
                 </p>
                 <Activity mode={item.percentage ? "visible" : "hidden"}>
                   <span
@@ -196,9 +235,18 @@ export default function StatCards({
               Total Amount
             </p>
             <p className="text-2xl font-semibold text-gray-800">
-              {isLoading || isRefreshing
-                ? spinner()
-                : phpCurrency(data.total_amount)}
+              {isLoading || isRefreshing ? (
+                spinner()
+              ) : (
+                <CountUp
+                  end={data.total_amount}
+                  duration={2}
+                  prefix="₱"
+                  separator=","
+                  decimals={2}
+                  decimal="."
+                />
+              )}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-linear-to-br from-amber-500 to-amber-400 shadow-md">
@@ -209,15 +257,33 @@ export default function StatCards({
         <div className="absolute z-10 top-full left-0 mt-2 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-md text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <p>
             <span className="font-medium">Job Request Total:</span>{" "}
-            {isLoading || isRefreshing
-              ? spinner()
-              : phpCurrency(data.sum_by_types.sum_of_job_request || 0)}
+            {isLoading || isRefreshing ? (
+              spinner()
+            ) : (
+              <CountUp
+                end={data.sum_by_types.sum_of_job_request || 0}
+                duration={2}
+                prefix="₱"
+                separator=","
+                decimals={2}
+                decimal="."
+              />
+            )}
           </p>
           <p>
             <span className="font-medium">Parts Replacement Total:</span>{" "}
-            {isLoading || isRefreshing
-              ? spinner()
-              : phpCurrency(data.sum_by_types.sum_of_parts_replacement)}
+            {isLoading || isRefreshing ? (
+              spinner()
+            ) : (
+              <CountUp
+                end={data.sum_by_types.sum_of_parts_replacement}
+                duration={2}
+                prefix="₱"
+                separator=","
+                decimals={2}
+                decimal="."
+              />
+            )}
           </p>
         </div>
       </div>
@@ -229,9 +295,15 @@ export default function StatCards({
             </p>
             <div className="flex gap-2 items-center">
               <p className="text-2xl font-semibold text-gray-800">
-                {isLoading || isRefreshing
-                  ? spinner()
-                  : data.total_mechanics + mechanicAdded}
+                {isLoading || isRefreshing ? (
+                  spinner()
+                ) : (
+                  <CountUp
+                    end={data.total_mechanics + mechanicAdded}
+                    duration={2}
+                    separator=","
+                  />
+                )}
               </p>
               <Activity mode={isMechanicOpen ? "hidden" : "visible"}>
                 <Button
@@ -266,7 +338,11 @@ export default function StatCards({
                 </p>
                 <div className="flex gap-2 items-center">
                   <p className="text-2xl font-semibold text-gray-800">
-                    {isLoading || isRefreshing ? spinner() : item.value}
+                    {isLoading || isRefreshing ? (
+                      spinner()
+                    ) : (
+                      <CountUp end={item.value} duration={2} separator="," />
+                    )}
                   </p>
                   <Activity
                     mode={
