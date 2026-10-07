@@ -42,6 +42,7 @@ import { ChartData, ChartDataType } from "../../components/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RadarComponent } from "../../components/radar";
 import { AreaChartComponent } from "../../components/area-chart";
+import CountUp from "react-countup";
 
 const ADMIN_STATS_INITIAL_VALUES = {
   total_job_prints: {
@@ -276,13 +277,11 @@ const Dashboard = () => {
     weeklyPrints: adminStats.weekly_prints,
     monthlyPrints: adminStats.monthly_prints,
     totalMechanics: adminStats.total_mechanics,
-    totalMotorcycleJobs: phpCurrency(
-      Number(adminStats.total_motorcycle_jobs) || 0,
-    ),
-    totalTrimotorsJobs: phpCurrency(
-      Number(adminStats.total_trimotors_job) || 0,
-    ),
-    totalOverAllAmount: phpCurrency(Number(adminStats.total_amount) || 0),
+    totalMotorcycleJobs: Number(adminStats.total_motorcycle_jobs) || 0,
+
+    totalTrimotorsJobs: Number(adminStats.total_trimotors_job) || 0,
+
+    totalOverAllAmount: Number(adminStats.total_amount) || 0,
     total_job_motor_print: adminStats.total_job_prints.total_motors,
     total_job_trimotor_print: adminStats.total_job_prints.total_trimotors,
     total_tickets: adminStats.ticket_stats.total_tickets,
@@ -308,77 +307,142 @@ const Dashboard = () => {
   const stats = [
     {
       label: "Today's Prints",
-      value: isLoadingStats ? spinner() : data.todaysPrints,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.todaysPrints} separator="," duration={2} />
+      ),
       icon: Clock,
       color: "from-green-500 to-green-400",
       sub: "Printed today",
     },
     {
       label: "Weekly Prints",
-      value: isLoadingStats ? spinner() : data.weeklyPrints,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.weeklyPrints} separator="," duration={2} />
+      ),
       icon: Calendar,
       color: "from-purple-500 to-purple-400",
       sub: "This week",
     },
     {
       label: "Monthly Prints",
-      value: isLoadingStats ? spinner() : data.monthlyPrints,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.monthlyPrints} separator="," duration={2} />
+      ),
       icon: Calendar,
       color: "from-orange-500 to-orange-400",
       sub: "This month",
     },
     {
       label: "Total Mechanics",
-      value: isLoadingStats ? spinner() : data.totalMechanics,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.totalMechanics} separator="," duration={2} />
+      ),
       icon: UserCog,
       color: "from-indigo-500 to-indigo-400",
       sub: "Active mechanics",
     },
     {
       label: "Motorcycle Jobs",
-      value: isLoadingStats ? spinner() : data.totalMotorcycleJobs,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp
+          end={data.totalMotorcycleJobs}
+          duration={2}
+          prefix="₱"
+          separator=","
+          decimals={2}
+          decimal="."
+        />
+      ),
       icon: BikeIcon,
       color: "from-emerald-500 to-emerald-400",
       sub: "Total revenue",
     },
     {
       label: "Trimotor Jobs",
-      value: isLoadingStats ? spinner() : data.totalTrimotorsJobs,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp
+          end={data.totalTrimotorsJobs}
+          duration={2}
+          prefix="₱"
+          separator=","
+          decimals={2}
+          decimal="."
+        />
+      ),
       icon: CarFrontIcon,
       color: "from-rose-500 to-rose-400",
       sub: "Total revenue",
     },
     {
       label: "Total Amount",
-      value: isLoadingStats ? spinner() : data.totalOverAllAmount,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp
+          end={data.totalOverAllAmount}
+          duration={2}
+          prefix="₱"
+          separator=","
+          decimals={2}
+          decimal="."
+        />
+      ),
       icon: PhilippinePeso,
       color: "from-yellow-500 to-orange-400",
       sub: "Overall revenue",
     },
     {
       label: "Total Tickets",
-      value: isLoadingStats ? spinner() : data.total_tickets,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.total_tickets} separator="," duration={2} />
+      ),
       icon: Ticket,
       color: "from-pink-500 to-red-400",
       sub: "Overall tickets",
     },
     {
       label: "Total Pending Tickets",
-      value: isLoadingStats ? spinner() : data.pending_tickets,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.pending_tickets} separator="," duration={2} />
+      ),
       icon: TicketMinus,
       color: "from-yellow-500 to-orange-400",
       sub: "Total pending tickets",
     },
     {
       label: "Total Edited Tickets",
-      value: isLoadingStats ? spinner() : data.edited_tickets,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.edited_tickets} separator="," duration={2} />
+      ),
       icon: Ticket,
       color: "from-blue-500 to-cyan-400",
       sub: "Total edited tickets",
     },
     {
       label: "Total Rejected Tickets",
-      value: isLoadingStats ? spinner() : data.rejected_tickets,
+      value: isLoadingStats ? (
+        spinner()
+      ) : (
+        <CountUp end={data.rejected_tickets} separator="," duration={2} />
+      ),
       icon: Ticket,
       color: "from-red-500 to-red-400",
       sub: "Total rejected tickets",
@@ -434,7 +498,15 @@ const Dashboard = () => {
                   Total Job Prints
                 </p>
                 <p className="xl:text-3xl text-xl font-bold text-gray-800 mt-5">
-                  {isLoadingStats ? spinner() : data.totalReceiptPrints}
+                  {isLoadingStats ? (
+                    spinner()
+                  ) : (
+                    <CountUp
+                      end={data.totalReceiptPrints}
+                      separator=","
+                      duration={2}
+                    />
+                  )}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   Hover to see breakdown
@@ -448,13 +520,29 @@ const Dashboard = () => {
               <div className="flex justify-between py-1 border-b border-gray-100">
                 <span className="text-gray-500">Motorcycle</span>
                 <span className="font-semibold">
-                  {isLoadingStats ? spinner() : data.total_job_motor_print}
+                  {isLoadingStats ? (
+                    spinner()
+                  ) : (
+                    <CountUp
+                      end={data.total_job_motor_print}
+                      separator=","
+                      duration={2}
+                    />
+                  )}
                 </span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-gray-500">Trimotors</span>
                 <span className="font-semibold">
-                  {isLoadingStats ? spinner() : data.total_job_trimotor_print}
+                  {isLoadingStats ? (
+                    spinner()
+                  ) : (
+                    <CountUp
+                      end={data.total_job_trimotor_print}
+                      separator=","
+                      duration={2}
+                    />
+                  )}
                 </span>
               </div>
             </div>
