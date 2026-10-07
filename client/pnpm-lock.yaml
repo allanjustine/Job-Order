@@ -50,6 +50,9 @@ importers:
       react:
         specifier: ^19.2.3
         version: 19.2.3
+      react-countup:
+        specifier: ^6.5.3
+        version: 6.5.3(react@19.2.3)
       react-data-table-component:
         specifier: ^7.7.0
         version: 7.7.0(react@19.2.3)(styled-components@6.1.19(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
@@ -1822,6 +1825,9 @@ packages:
       typescript:
         optional: true
 
+  countup.js@2.10.1:
+    resolution: {integrity: sha512-UHW/BsPDgVZfN919D4iu2HPv+jJxZUuaR3EhT0ScFZaD446GiQtkMTgOnOyJXdA2AewdlyUk9UvERlTHTbVpcw==}
+
   crc-32@1.2.2:
     resolution: {integrity: sha512-ROmzCKrTnOwybPcJApAA6WBWij23HVfGVNKqqrZpuyZOHqK2CwHSvpGuyt/UNNvaIjEd8X5IFGp4Mh+Ie1IHJQ==}
     engines: {node: '>=0.8'}
@@ -2801,6 +2807,11 @@ packages:
   raw-body@3.0.2:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
+
+  react-countup@6.5.3:
+    resolution: {integrity: sha512-udnqVQitxC7QWADSPDOxVWULkLvKUWrDapn5i53HE4DPRVgs+Y5rr4bo25qEl8jSh+0l2cToJgGMx+clxPM3+w==}
+    peerDependencies:
+      react: '>= 16.3.0'
 
   react-data-table-component@7.7.0:
     resolution: {integrity: sha512-5knL6zMSKlbvzu9P04KM5Lx8/EyQujb4I9z3rWeoVX++IDJadQ7aR4X5J6EeS90wjK0Xoa6btaVeglnCAqD2ag==}
@@ -5092,6 +5103,8 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
+  countup.js@2.10.1: {}
+
   crc-32@1.2.2: {}
 
   cross-spawn@7.0.6:
@@ -6005,6 +6018,11 @@ snapshots:
       http-errors: 2.0.1
       iconv-lite: 0.7.2
       unpipe: 1.0.0
+
+  react-countup@6.5.3(react@19.2.3):
+    dependencies:
+      countup.js: 2.10.1
+      react: 19.2.3
 
   react-data-table-component@7.7.0(react@19.2.3)(styled-components@6.1.19(react-dom@19.2.3(react@19.2.3))(react@19.2.3)):
     dependencies:
