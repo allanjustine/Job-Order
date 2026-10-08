@@ -5,7 +5,7 @@ import Input from "@/components/ui/input";
 import { PER_PAGE_OPTIONS } from "@/constants/perPageOptipns";
 import useFetch from "@/hooks/useFetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { PenIcon, Search, SearchSlash, Trash, UserPlus } from "lucide-react";
+import { PenIcon, Search, SearchSlash, Trash, Plus } from "lucide-react";
 import DataTable from "react-data-table-component";
 import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
 import { Activity, useState } from "react";
@@ -178,7 +178,7 @@ const PartNumbers = () => {
                 onClick={() => setIsOpen(true)}
                 className="bg-blue-500 hover:bg-blue-600 text-white py-5"
               >
-                <UserPlus /> Add Ticket Brand
+                <Plus /> Add Part Number
               </Button>
             </div>
           </div>
