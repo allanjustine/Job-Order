@@ -94,15 +94,15 @@ export default function CreatePartNumber({
       <Modal className="w-1/4" isOpen={isOpen}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader onClose={() => setIsOpen(false)}>
-            Add Ticket Brand
+            Add Part Number
           </ModalHeader>
           <ModalBody>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="name">Ticket Part Number</Label>
+                <Label htmlFor="name">Part Number</Label>
                 <Input
                   className="py-3"
-                  placeholder="Enter ticket part number"
+                  placeholder="Enter part number"
                   {...register("_part_number", { required: true })}
                 />
                 {errors._part_number && (
