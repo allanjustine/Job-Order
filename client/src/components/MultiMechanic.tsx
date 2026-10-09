@@ -1,7 +1,6 @@
 "use client";
 
 import React, { SetStateAction } from "react";
-
 import {
   Combobox,
   ComboboxChip,
@@ -29,7 +28,7 @@ export function MultiMechanic({
   const anchor = useComboboxAnchor();
 
   return (
-    <>
+    <div className="w-full flex flex-col">
       <Combobox
         multiple
         autoHighlight
@@ -69,6 +68,6 @@ export function MultiMechanic({
       </Combobox>
 
       {inputError && <p className="text-red-500 text-xs mt-1">{inputError}</p>}
-    </>
+    </div>
   );
 }
