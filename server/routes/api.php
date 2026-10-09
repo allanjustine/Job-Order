@@ -131,6 +131,8 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 200);
         });
         Route::get('all-part-numbers', [PartNumberController::class, 'index2']);
+        Route::get('all-customers', [CustomersController::class, 'index2']);
+        Route::get('all-dealers-names', [JobOrderController::class, 'index2']);
     });
 
     // GLOBAL AUTHENTICATED ROUTES
