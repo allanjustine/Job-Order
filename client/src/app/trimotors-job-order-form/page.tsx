@@ -296,6 +296,10 @@ const TrimotorsJobOrderForm = () => {
   // hard-capped 20 items / 2 pages. hasRestData is kept only for
   // backward compat with the TrimotorsPreviewPrint modal component.
   const [partNumbers, setPartNumbers] = useState<string[]>([]);
+  const [dealers, setDealers] = useState<string[]>([]);
+  const [customers, setCustomers] = useState<
+    { name: string; address: string }[]
+  >([]);
   const [isLoadingDatas, setIsLoadingDatas] = useState<boolean>(false);
   const [printPage, setPrintPage] = useState<number>(0);
 
@@ -306,10 +310,18 @@ const TrimotorsJobOrderForm = () => {
   const fetchDatas = async () => {
     setIsLoadingDatas(true);
     try {
-      const [branchMechanics, jobOrderNumber, partNumbers] = await Promise.all([
+      const [
+        branchMechanics,
+        jobOrderNumber,
+        partNumbers,
+        customersData,
+        dealersNames,
+      ] = await Promise.all([
         api.get("/branch-mechanics"),
         api.get("/get-job-order-number"),
         api.get("/all-part-numbers"),
+        api.get("/all-customers"),
+        api.get("/all-dealers-names"),
       ]);
       if (branchMechanics.status === 200) {
         setMechanics(branchMechanics.data.data);
@@ -322,6 +334,14 @@ const TrimotorsJobOrderForm = () => {
 
       if (partNumbers.status === 200) {
         setPartNumbers(partNumbers.data.data);
+      }
+
+      if (customersData.status === 200) {
+        setCustomers(customersData.data.data);
+      }
+
+      if (dealersNames.status === 200) {
+        setDealers(dealersNames.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -1129,6 +1149,8 @@ const TrimotorsJobOrderForm = () => {
                   setDealersName={setDealersName}
                   fetchDatas={fetchDatas}
                   isLoadingDatas={isLoadingDatas}
+                  customers={customers}
+                  dealers={dealers}
                 />
 
                 <p className="block text-lg font-bold text-gray-900 mb-1">
