@@ -1,7 +1,6 @@
 "use client";
 
-import React, { SetStateAction } from "react";
-
+import React from "react";
 import {
   Combobox,
   ComboboxChips,

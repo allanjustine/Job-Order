@@ -21,6 +21,16 @@ class JobOrderController extends Controller
         ], 200);
     }
 
+    public function index2(JobOrderService $jobOrderService)
+    {
+        $data = $jobOrderService->getDistinctDealersName();
+
+        return response()->json([
+            'message' => 'Distinct dealers name fetched successfully.',
+            'data'    => $data
+        ], 200);
+    }
+
     public function store(Request $request, JobOrderService $jobOrderService)
     {
         $customer = $jobOrderService->store($request);

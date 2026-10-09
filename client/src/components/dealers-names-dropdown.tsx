@@ -1,9 +1,8 @@
 "use client";
 
-import React, { SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import {
   Combobox,
-  ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
   ComboboxContent,
@@ -14,53 +13,47 @@ import {
   useComboboxAnchor,
 } from "./ui/combobox";
 
-export function MultiMechanic({
-  mechanics,
-  setMechanic,
-  mechanic,
+export function DealersNamesDropdown({
+  dealersNames,
+  onChange,
+  dealerName,
   inputError,
 }: {
-  mechanics: any;
-  setMechanic: React.Dispatch<SetStateAction<any>>;
-  mechanic?: any;
+  dealersNames: any;
+  onChange: Dispatch<SetStateAction<string>>;
+  dealerName?: any;
   inputError?: string;
+  isRequired?: boolean;
 }) {
   const anchor = useComboboxAnchor();
 
   return (
     <div className="w-full flex flex-col">
       <Combobox
-        multiple
         autoHighlight
-        items={mechanics}
-        onValueChange={setMechanic}
-        value={mechanic}
+        items={dealersNames}
+        onValueChange={onChange}
+        value={dealerName}
       >
         <ComboboxChips
           ref={anchor}
           className={`w-full ${inputError ? "border-red-500" : "border-gray-300"} border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
         >
           <ComboboxValue>
-            {(items) => (
-              <React.Fragment>
-                {mechanics
-                  .filter((mechanic: any) => items.includes(mechanic.id))
-                  .map((mechanic: any) => (
-                    <ComboboxChip key={mechanic.id}>
-                      {mechanic?.name}
-                    </ComboboxChip>
-                  ))}
-                <ComboboxChipsInput />
-              </React.Fragment>
-            )}
+            <React.Fragment>
+              <ComboboxChipsInput
+                placeholder="Dealers Name"
+                onChange={(e) => onChange(e.target.value)}
+              />
+            </React.Fragment>
           </ComboboxValue>
         </ComboboxChips>
-        <ComboboxContent anchor={anchor}>
-          <ComboboxEmpty>No mechanics found.</ComboboxEmpty>
+        <ComboboxContent anchor={anchor} className="w-fit">
+          <ComboboxEmpty>No dealers found.</ComboboxEmpty>
           <ComboboxList>
             {(item) => (
-              <ComboboxItem key={item.id} value={item.id}>
-                {item.name}
+              <ComboboxItem key={item} value={item}>
+                {item}
               </ComboboxItem>
             )}
           </ComboboxList>

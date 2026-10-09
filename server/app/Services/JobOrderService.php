@@ -60,6 +60,15 @@ class JobOrderService
         return $jobOrders;
     }
 
+    public function getDistinctDealersName()
+    {
+        return JobOrder::query()
+            ->whereRelation('customer.user', 'id', Auth::id())
+            ->select('dealers_name')
+            ->distinct()
+            ->pluck('dealers_name');
+    }
+
     public function store($request)
     {
         $user = Auth::user();
@@ -203,6 +212,7 @@ class JobOrderService
             $job_order->update([
                 'receipt_number' => $request->receipt_number,
             ]);
+
             return $job_order;
         });
     }
