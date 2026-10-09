@@ -5,6 +5,8 @@ import Select from "./ui/select";
 import { useAuth } from "@/context/authContext";
 import { Button } from "./ui/button";
 import { RotateCcw } from "lucide-react";
+import { CustomersDropdown } from "./customers-dropdown";
+import { DealersNamesDropdown } from "./dealers-names-dropdown";
 
 export default function CustomerGrid({
   errors,
@@ -45,6 +47,8 @@ export default function CustomerGrid({
   setDealersName,
   isLoadingDatas,
   fetchDatas,
+  customers,
+  dealers,
 }: any) {
   const { user } = useAuth();
 
@@ -78,19 +82,52 @@ export default function CustomerGrid({
           <p className="text-red-500 text-xs mt-1">{errors.branch}</p>
         )}
       </div>
+
+      <div className="col-span-1">
+        <Label>
+          Select Mechanic<span className="text-red-500">*</span>
+        </Label>
+        <div className="flex gap-1">
+          <MultiMechanic
+            mechanics={mechanics}
+            setMechanic={setMechanic}
+            mechanic={mechanic}
+            inputError={errors.mechanic}
+          />
+          <Button
+            type="button"
+            variant="link"
+            title="Refresh"
+            disabled={isLoadingDatas}
+            onClick={fetchDatas}
+          >
+            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
+      </div>
       <div className="col-span-1">
         <Label>
           Customer Name<span className="text-red-500">*</span>
         </Label>
-        <Input
-          type="text"
-          error={errors.customerName}
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-        />
-        {errors.customerName && (
-          <p className="text-red-500 text-xs mt-1">{errors.customerName}</p>
-        )}
+        <div className="flex gap-1">
+          <CustomersDropdown
+            customers={customers}
+            setCustomerName={setCustomerName}
+            setContact={setContact}
+            setAddress={setAddress}
+            customer={customerName}
+            inputError={errors.customerName}
+          />
+          <Button
+            type="button"
+            variant="link"
+            title="Refresh"
+            disabled={isLoadingDatas}
+            onClick={fetchDatas}
+          >
+            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
       </div>
       <div className="col-span-1">
         <Label>
@@ -104,6 +141,20 @@ export default function CustomerGrid({
         />
         {errors.contact && (
           <p className="text-red-500 text-xs mt-1">{errors.contact}</p>
+        )}
+      </div>
+      <div className="col-span-1">
+        <Label>
+          Address<span className="text-red-500">*</span>
+        </Label>
+        <Input
+          type="text"
+          error={errors.address}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        {errors.address && (
+          <p className="text-red-500 text-xs mt-1">{errors.address}</p>
         )}
       </div>
       <div className="col-span-1">
@@ -162,17 +213,14 @@ export default function CustomerGrid({
       </div>
       <div className="col-span-1">
         <Label>
-          Address<span className="text-red-500">*</span>
+          Dealers Name<span className="text-red-500">*</span>
         </Label>
-        <Input
-          type="text"
-          error={errors.address}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+        <DealersNamesDropdown
+          dealersNames={dealers}
+          onChange={setDealersName}
+          dealerName={dealersName}
+          inputError={errors.dealersName}
         />
-        {errors.address && (
-          <p className="text-red-500 text-xs mt-1">{errors.address}</p>
-        )}
       </div>
       <div className="col-span-1">
         <Label>
@@ -254,43 +302,6 @@ export default function CustomerGrid({
         )}
         {errors.remarks && (
           <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
-        )}
-      </div>
-
-      <div className="col-span-1">
-        <Label>
-          Select Mechanic<span className="text-red-500">*</span>
-        </Label>
-        <div className="flex gap-1">
-          <MultiMechanic
-            mechanics={mechanics}
-            setMechanic={setMechanic}
-            mechanic={mechanic}
-            inputError={errors.mechanic}
-          />
-          <Button
-            type="button"
-            variant="link"
-            title="Refresh"
-            disabled={isLoadingDatas}
-            onClick={fetchDatas}
-          >
-            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
-          </Button>
-        </div>
-      </div>
-      <div className="col-span-1">
-        <Label>
-          Dealers Name<span className="text-red-500">*</span>
-        </Label>
-        <Input
-          type="text"
-          value={dealersName}
-          onChange={(e) => setDealersName(e.target.value)}
-          className={errors.dealersName && "border-red-500"}
-        />
-        {errors.dealersName && (
-          <p className="text-red-500 text-xs mt-1">{errors.dealersName}</p>
         )}
       </div>
     </div>
