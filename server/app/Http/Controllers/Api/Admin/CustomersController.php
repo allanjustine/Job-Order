@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomersController extends Controller
 {
@@ -44,6 +45,21 @@ class CustomersController extends Controller
         ]);
 
         return response()->json(await($data), 200);
+    }
+
+    public function index2()
+    {
+        $customers = Customer::query()
+            ->where('user_id', Auth::id())
+            ->select(['name', 'contact_number', 'address'])
+            ->distinct()
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'message' => 'Customers retrieved successfully.',
+            'data'    => $customers
+        ], 200);
     }
 
     /**
