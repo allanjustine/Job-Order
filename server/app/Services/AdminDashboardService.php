@@ -11,6 +11,7 @@ use App\Models\JobOrder;
 use App\Models\JobOrderDetail;
 use App\Models\Mechanic;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -87,93 +88,81 @@ class AdminDashboardService
     private function topTenOverAllJobOrders()
     {
         $jobOrderDetails = JobOrderDetail::query()
-            ->get(['id', 'category', 'amount', 'job_order_id'])
-            ->groupBy('category');
+            ->select('category')
+            ->selectRaw('sum(amount) as amount')
+            ->groupBy('category')
+            ->orderByDesc('amount')
+            ->limit(10)
+            ->get();
 
-        return $jobOrderDetails->map(fn($items, $category) => [
-            'category' => $category,
-            'amount'   => $items->sum('amount'),
-        ])
-            ->sortByDesc('amount')
-            ->filter()
-            ->take(10)
-            ->values();
+        return $jobOrderDetails;
     }
 
     private function topTenBranchJobOrders()
     {
-        $customers = Customer::query()
-            ->get(['id', 'user_id'])
-            ->groupBy('user_id');
+        $users = User::query()
+            ->join('customers', 'customers.user_id', '=', 'users.id')
+            ->join('job_orders', 'job_orders.customer_id', '=', 'customers.id')
+            ->join('job_order_details', 'job_order_details.job_order_id', '=', 'job_orders.id')
+            ->select(
+                'users.name',
+                'users.code',
+                'job_order_details.category',
+                DB::raw('SUM(job_order_details.amount) as total_sales'),
+                DB::raw('ROW_NUMBER() OVER (PARTITION BY users.id ORDER BY SUM(job_order_details.amount) DESC) as tops')
+            )
+            ->groupBy(
+                'job_order_details.category',
+                'users.id',
+                'users.name'
+            );
 
-        return $customers->map(function ($items) {
-            $customerIds = $items->pluck('id');
-
-            $jobOrderIds = JobOrder::query()
-                ->whereIn('customer_id', $customerIds)
-                ->pluck('id');
-
-            $jobOrderDetails = JobOrderDetail::query()
-                ->with('jobOrder.customer.user')
-                ->whereIn('job_order_id', $jobOrderIds)
-                ->get(['id', 'category', 'amount', 'job_order_id'])
-                ->groupBy('category');
-
-            return $jobOrderDetails->map(fn($items, $category) => [
-                'category' => $category,
-                'amount'   => $items->sum('amount'),
-                'branch'   => [
-                    'name' => $items->first()->jobOrder?->customer?->user?->name,
-                    'code' => $items->first()->jobOrder?->customer?->user?->code
-                ]
-            ])
-                ->sortByDesc('amount')
-                ->first();
-        })
-            ->sortByDesc('amount')
-            ->filter()
-            ->take(10)
-            ->values();
+        return User::query()
+            ->fromSub($users, 'top_branches')
+            ->where('tops', 1)
+            ->orderByDesc('total_sales')
+            ->limit(10)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category' => $item->category,
+                    'amount'   => $item->total_sales,
+                    'branch'   => [
+                        'name' => $item->name,
+                        'code' => $item->code
+                    ]
+                ];
+            });
     }
 
     private function topTenAreaManagersJobOrders()
     {
-        $areaManagers = AreaManager::query()
-            ->with('users:id,name,code')
-            ->get();
-
-        return $areaManagers->map(function ($item) {
-            $userIds = $item->users->pluck('id');
-
-            $customerIds = Customer::query()
-                ->whereIn('user_id', $userIds)
-                ->pluck('id');
-
-            $jobOrderIds = JobOrder::query()
-                ->whereIn('customer_id', $customerIds)
-                ->pluck('id');
-
-            $jobOrderDetails = JobOrderDetail::query()
-                ->with('jobOrder.customer.user')
-                ->whereIn('job_order_id', $jobOrderIds)
-                ->get(['id', 'category', 'amount', 'job_order_id'])
-                ->groupBy('category');
-
-            return $jobOrderDetails->map(fn($items, $category) => [
-                'category'          => $category,
-                'area_manager_name' => $item->name,
-                'amount'            => $items->sum('amount'),
-                'branch'            => [
-                    'name'          => $items->first()->jobOrder?->customer?->user?->name,
-                    'code'          => $items->first()->jobOrder?->customer?->user?->code
-                ]
-            ])
-                ->sortByDesc('amount')
-                ->first();
-        })->sortByDesc('amount')
-            ->filter()
-            ->take(10)
-            ->values();
+        return AreaManager::query()
+            ->join('area_manager_user', 'area_manager_user.area_manager_id', '=', 'area_managers.id')
+            ->join('users', 'users.id', '=', 'area_manager_user.user_id')
+            ->join('customers', 'customers.user_id', '=', 'users.id')
+            ->join('job_orders', 'job_orders.customer_id', '=', 'customers.id')
+            ->join('job_order_details', 'job_order_details.job_order_id', '=', 'job_orders.id')
+            ->select(
+                'area_managers.id',
+                'area_managers.name as area_name',
+                DB::raw('SUM(job_order_details.amount) as total_sales')
+            )
+            ->withCount('users')
+            ->groupBy(
+                'area_managers.id',
+                'area_managers.name',
+            )
+            ->orderByDesc('total_sales')
+            ->limit(10)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'area_manager_name' => $item->area_name,
+                    'amount'            => $item->total_sales,
+                    'total_branches'    => $item->users_count
+                ];
+            });
     }
 
     public function ticketStats()
