@@ -67,13 +67,9 @@ const ADMIN_STATS_INITIAL_VALUES = {
   ],
   top_area_manager_job_orders: [
     {
-      category: "",
       area_manager_name: "",
       amount: 0,
-      branch: {
-        name: "",
-        code: "",
-      },
+      total_branches: 0,
     },
   ],
   top_branch_job_orders: [
@@ -117,13 +113,9 @@ interface StatItem {
     amount: number;
   }[];
   top_area_manager_job_orders: {
-    category: string;
     area_manager_name: string;
     amount: number;
-    branch: {
-      name: string;
-      code: string;
-    };
+    total_branches: number | string;
   }[];
   top_branch_job_orders: {
     category: string;
@@ -750,7 +742,7 @@ const Dashboard = () => {
                         {item.category}
                       </span>
                       <span className="text-xs font-bold text-gray-800 shrink-0">
-                        {phpCurrency(item.amount)}
+                        {phpCurrency(Number(item.amount))}
                       </span>
                     </div>
                   ))
@@ -786,7 +778,7 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <span className="text-xs font-bold text-gray-800 shrink-0">
-                        {phpCurrency(item.amount)}
+                        {phpCurrency(Number(item.amount))}
                       </span>
                     </div>
                   ))
@@ -802,7 +794,7 @@ const Dashboard = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-                Top 10 Area Manager Job Orders
+                Top 10 Area Managers with the Highest Sales
               </h3>
               <div className="flex flex-col gap-2">
                 {isLoadingStats ? (
@@ -812,20 +804,22 @@ const Dashboard = () => {
                     <div
                       key={index}
                       className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors"
-                      title={item.category}
+                      title={item.area_manager_name}
                     >
                       {rankBadge(index)}
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-gray-700 line-clamp-1">
                           {item.area_manager_name}
                         </p>
-                        <p className="text-xs font-medium text-gray-500 line-clamp-1">{`(${item.branch.code}) ${item.branch.name}`}</p>
-                        <p className="text-xs text-gray-400 line-clamp-1">
-                          {item.category}
+                        <p className="text-xs font-medium text-gray-500">
+                          Total Branches:{" "}
+                          <span className="py-1 px-1.5 rounded-full bg-blue-300 text-white">
+                            {item.total_branches}
+                          </span>
                         </p>
                       </div>
                       <span className="text-xs font-bold text-gray-800 shrink-0">
-                        {phpCurrency(item.amount)}
+                        {phpCurrency(Number(item.amount))}
                       </span>
                     </div>
                   ))
