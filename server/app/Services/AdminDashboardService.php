@@ -114,7 +114,8 @@ class AdminDashboardService
             ->groupBy(
                 'job_order_details.category',
                 'users.id',
-                'users.name'
+                'users.name',
+                'users.code'
             );
 
         return User::query()
