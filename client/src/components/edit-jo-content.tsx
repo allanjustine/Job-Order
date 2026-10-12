@@ -15,6 +15,15 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import JobOrderDetailsContent from "./job-order-details-content";
 
+const toDateInputValue = (raw: unknown): string => {
+  if (!raw) return "";
+  try {
+    return formatDate(String(raw), "yyyy-MM-dd");
+  } catch {
+    return "";
+  }
+};
+
 export default function EditJoContent({
   formInputs,
   setFormInputs,
@@ -33,6 +42,17 @@ export default function EditJoContent({
   prevNextStats: { prev: number | null; next: number | null };
 }) {
   const router = useRouter();
+
+  // Reads the value from the field's OWN key (customer or job order),
+  // instead of always using formInputs.date.
+  const getFieldValue = (field: (typeof CUSTOMER_DETAILS_FIELDS)[number]) => {
+    const raw = field.is_customer_details
+      ? formInputs.customer?.[field.value as keyof Customer]
+      : formInputs[field.value as keyof FormInputType];
+
+    if (field.type === "date") return toDateInputValue(raw);
+    return String(raw ?? "");
+  };
 
   const handleSave = () => {
     Swal.fire({
@@ -173,7 +193,7 @@ export default function EditJoContent({
               ) : (
                 <Input
                   type={field.type}
-                  value={`${field.value === "date" || field.value === "purchase_date" ? formatDate(formInputs.date, "yyyy-MM-dd") : field.is_customer_details ? formInputs.customer[field.value as keyof Customer] : formInputs[field.value as keyof FormInputType]}`}
+                  value={getFieldValue(field)}
                   className="h-10"
                   onChange={(e) =>
                     setFormInputs((prev) => {
@@ -218,13 +238,13 @@ export default function EditJoContent({
               <Input
                 type={field.type}
                 value={
-                  field.type === "date" &&
-                  formInputs[field.value as keyof FormInputType]
-                    ? formatDate(
-                        String(formInputs[field.value as keyof FormInputType]),
-                        "yyyy-MM-dd",
+                  field.type === "date"
+                    ? toDateInputValue(
+                        formInputs[field.value as keyof FormInputType],
                       )
-                    : String(formInputs[field.value as keyof FormInputType])
+                    : String(
+                        formInputs[field.value as keyof FormInputType] ?? "",
+                      )
                 }
                 className="h-10"
                 onChange={(e) =>
