@@ -85,28 +85,6 @@ export default function CustomerGrid({
 
       <div className="col-span-1">
         <Label>
-          Select Mechanic<span className="text-red-500">*</span>
-        </Label>
-        <div className="flex gap-1">
-          <MultiMechanic
-            mechanics={mechanics}
-            setMechanic={setMechanic}
-            mechanic={mechanic}
-            inputError={errors.mechanic}
-          />
-          <Button
-            type="button"
-            variant="link"
-            title="Refresh"
-            disabled={isLoadingDatas}
-            onClick={fetchDatas}
-          >
-            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
-          </Button>
-        </div>
-      </div>
-      <div className="col-span-1">
-        <Label>
           Customer Name<span className="text-red-500">*</span>
         </Label>
         <div className="flex gap-1">
@@ -213,17 +191,6 @@ export default function CustomerGrid({
       </div>
       <div className="col-span-1">
         <Label>
-          Dealers Name<span className="text-red-500">*</span>
-        </Label>
-        <DealersNamesDropdown
-          dealersNames={dealers}
-          onChange={setDealersName}
-          dealerName={dealersName}
-          inputError={errors.dealersName}
-        />
-      </div>
-      <div className="col-span-1">
-        <Label>
           Estimated Repair Time<span className="text-red-500">*</span>
         </Label>
         <Input
@@ -304,6 +271,40 @@ export default function CustomerGrid({
           <p className="text-red-500 text-xs mt-1">{errors.remarks}</p>
         )}
       </div>
+      <div className="col-span-1">
+        <Label>
+          Select Mechanic<span className="text-red-500">*</span>
+        </Label>
+        <div className="flex gap-1">
+          <MultiMechanic
+            mechanics={mechanics}
+            setMechanic={setMechanic}
+            mechanic={mechanic}
+            inputError={errors.mechanic}
+          />
+          <Button
+            type="button"
+            variant="link"
+            title="Refresh"
+            disabled={isLoadingDatas}
+            onClick={fetchDatas}
+          >
+            <RotateCcw className={`${isLoadingDatas ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
+      </div>
+      <div className="col-span-1">
+        <Label>
+          Dealers Name<span className="text-red-500">*</span>
+        </Label>
+        <DealersNamesDropdown
+          dealersNames={dealers}
+          onChange={setDealersName}
+          dealerName={dealersName}
+          inputError={errors.dealersName}
+        />
+      </div>
     </div>
+
   );
 }
