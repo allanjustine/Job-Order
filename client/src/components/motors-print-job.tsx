@@ -21,10 +21,8 @@ import { partsItems } from "@/constants/part-items";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
-import {
-  getJobOrderPageRange,
-  getMotorsPrintPageCount,
-} from "@/utils/job-order-pagination";
+import { useEffect } from "react";
+import { buildTrimotorsPages } from "@/utils/job-order-pagination";
 
 interface PrintJobOrderProps {
   data: {
@@ -66,12 +64,16 @@ interface PrintJobOrderProps {
   };
   hasRestData?: boolean;
   printPage?: number;
+  // Reports the real number of print pages (diagnosis + jobs + parts)
+  // so the parent can drive the "Print Rest Items" prompt accurately.
+  onTotalPages?: (totalPages: number) => void;
 }
 
 const MotorsPrintJobOrder = ({
   data,
   hasRestData,
   printPage,
+  onTotalPages,
 }: PrintJobOrderProps) => {
   const WEBSITE_URL = `${window.location.origin}/search`;
   const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
@@ -315,17 +317,34 @@ const MotorsPrintJobOrder = ({
     );
   };
 
-  const totalPages = getMotorsPrintPageCount(
-    getAllSelectedJobs().length,
-    getAllSelectedParts().length,
+  // Diagnosis (NG items), jobs and parts are paginated TOGETHER so many NG
+  // diagnosis items can never push the job/parts rows off the printed sheet.
+  const ngItems = getNGDiagnosisItems();
+  const allJobs = getAllSelectedJobs();
+  const allParts = getAllSelectedParts();
+
+  const pages = buildTrimotorsPages(
+    ngItems.length,
+    allJobs.length,
+    allParts.length,
   );
+  const totalPages = pages.length;
+  const page = pages[Math.min(resolvedPage, totalPages - 1)];
+
   // Footer content (Grand Total, next service schedule, "Printed on")
   // only makes sense once, so only show it on the LAST printed page.
   const isLastPage = resolvedPage >= totalPages - 1;
-  // On continuation pages (page 2, 3, ...) don't repeat the header,
-  // vehicle info, or diagnosis section — only the JOB ORDER table
-  // continues, so printed sheets look clean.
+  // Header, vehicle info and checklist title only on the FIRST page.
   const isFirstPage = resolvedPage === 0;
+  const hasNoItems = allJobs.length + allParts.length === 0;
+  // Show the JOB ORDER table only on pages that have rows (or on the last
+  // page when nothing is selected, to show the grand total).
+  const showJobTable =
+    page.jobEnd > page.jobStart || (isLastPage && hasNoItems);
+
+  useEffect(() => {
+    onTotalPages?.(totalPages);
+  }, [totalPages]);
 
   return (
     <div className="print-page">
@@ -495,68 +514,75 @@ const MotorsPrintJobOrder = ({
         <span className="underline">{data.contentUbox}</span>
       </div> */}
 
-                {/* Motorcycle Diagnosis Section - keep existing */}
-                <div className="mb-2 text-xs">
-                  <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-                    MOTORCYCLE'S DIAGNOSIS
-                  </h3>
+              </>
+            )}
 
-                  {allDiagnosisOK() && (
-                    <div className="border border-black p-2 text-center">
-                      <p className="font-semibold">All diagnosis are OK</p>
-                    </div>
-                  )}
+            {/* DIAGNOSIS - all OK message (first page only) */}
+            {isFirstPage && allDiagnosisOK() && (
+              <div className="mb-2 text-xs">
+                <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                  MOTORCYCLE'S DIAGNOSIS
+                </h3>
+                <div className="border border-black p-1 text-center">
+                  <p className="font-semibold">All diagnosis are OK</p>
+                </div>
+              </div>
+            )}
 
-                  {hasNGDiagnosis() && (
+            {/* DIAGNOSIS - NG items, 2 per row, continues on next pages */}
+            {page.ngEnd > page.ngStart &&
+              (() => {
+                const slice = ngItems.slice(page.ngStart * 2, page.ngEnd * 2);
+                const pairs: (typeof slice)[] = [];
+                for (let i = 0; i < slice.length; i += 2) {
+                  pairs.push(slice.slice(i, i + 2));
+                }
+
+                const renderCells = (item?: (typeof slice)[number]) => {
+                  const remarks = item
+                    ? data.diagnosis?.[item.key as DiagnosisKeys]?.remarks
+                    : "";
+                  return (
+                    <>
+                      <td className="border border-black p-0.5 w-[19%]">
+                        {item?.label}
+                      </td>
+                      <td className="border border-black p-0.5 w-[31%]">
+                        {item && (
+                          <>
+                            <b className="text-red-600 text-center">NG</b>
+                            {remarks ? ` - ${remarks}` : ""}
+                          </>
+                        )}
+                      </td>
+                    </>
+                  );
+                };
+
+                return (
+                  <div className="mb-1 text-xs">
+                    <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                      MOTORCYCLE'S DIAGNOSIS{isFirstPage ? "" : " (continued)"}
+                    </h3>
                     <table
                       className="w-full border-collapse border border-black my-0"
-                      style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                      style={{ fontSize: "7pt", lineHeight: "0.9" }}
                     >
-                      <thead>
-                        <tr className="bg-gray-40">
-                          <th className="border border-black p-0.5 text-left">
-                            Diagnosis Item
-                          </th>
-                          <th className="border border-black p-0.5 text-center">
-                            Status
-                          </th>
-                          <th className="border border-black p-0.5 text-left">
-                            Remarks
-                          </th>
-                        </tr>
-                      </thead>
                       <tbody>
-                        {getNGDiagnosisItems().map((item) => (
-                          <tr key={item.key}>
-                            <td className="border border-black p-0.5 w-1/3">
-                              {item.label}
-                            </td>
-                            <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                              NG
-                            </td>
-                            <td className="border border-black p-0.5 w-1/3">
-                              {data.diagnosis?.[item.key as DiagnosisKeys]
-                                ?.remarks || ""}
-                            </td>
+                        {pairs.map((pair, idx) => (
+                          <tr key={idx}>
+                            {renderCells(pair[0])}
+                            {renderCells(pair[1])}
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                  )}
-                </div>
-              </>
-            )}
+                  </div>
+                );
+              })()}
 
-            {!isFirstPage && (
-              <div
-                className="mb-1 text-center font-bold border border-black py-0.5 bg-gray-100"
-                style={{ fontSize: "7.5pt" }}
-              >
-                JOB ORDER (continued)
-              </div>
-            )}
-
-            {/* JOB ORDER - Fixed 17 rows (16 data rows + 1 totals row) */}
+            {/* JOB ORDER - rows paginated together with the diagnosis */}
+            {showJobTable && (
             <div
               className="mb-1 text-xs"
               style={{ fontSize: "7.5pt", lineHeight: "0.8" }}
@@ -590,14 +616,13 @@ const MotorsPrintJobOrder = ({
                 </thead>
                 <tbody>
                   {(() => {
-                    const { start, end } = getJobOrderPageRange(resolvedPage);
-                    const allSelectedJobs = getAllSelectedJobs().slice(
-                      start,
-                      end,
+                    const allSelectedJobs = allJobs.slice(
+                      page.jobStart,
+                      page.jobEnd,
                     );
-                    const allSelectedParts = getAllSelectedParts().slice(
-                      start,
-                      end,
+                    const allSelectedParts = allParts.slice(
+                      page.jobStart,
+                      page.jobEnd,
                     );
 
                     // Fixed number of data rows (16 data rows + 1 totals row = 17 total rows)
@@ -761,8 +786,8 @@ const MotorsPrintJobOrder = ({
                       );
                     }
 
-                    // Add totals row (row 17)
-                    rows.push(
+                    // Totals row only on the LAST page (it covers all pages)
+                    if (isLastPage) rows.push(
                       <tr key="totals">
                         <td
                           className="border border-black p-0.5 font-semibold"
@@ -797,6 +822,7 @@ const MotorsPrintJobOrder = ({
                 </>
               )}
             </div>
+            )}
 
             {isLastPage && (
               <>

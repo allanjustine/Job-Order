@@ -44,7 +44,6 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import TrimotorsJobDetailsGrid from "@/components/TrimotorsJobDetailsGrid";
 import { trimotorsPartsItems } from "@/constants/trimotors-part-items";
 import TrimotorsCategory from "@/components/TrimotorsCategory";
-import { getMotorsPrintPageCount } from "@/utils/job-order-pagination";
 import { Spinner } from "@/components/ui/spinner";
 import { EMPLOYEE_ACCESS } from "@/lib/permissions";
 
@@ -300,8 +299,14 @@ const TrimotorsJobOrderForm = () => {
   const [customers, setCustomers] = useState<
     { name: string; address: string }[]
   >([]);
-  const [isLoadingDatas, setIsLoadingDatas] = useState<boolean>(false);
+  const [isLoadingDatas, setIsLoadingDatas] = useState<boolean>(true);
   const [printPage, setPrintPage] = useState<number>(0);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  // Real number of print pages (diagnosis + jobs + parts), reported by
+  // TrimotorsPrintJobOrder. A ref so the print effect doesn't re-run.
+  const totalPagesRef = useRef<number>(1);
+  const [isLoadingJobOrderNumber, setIsLoadingJobOrderNumber] =
+    useState<boolean>(false);
 
   useEffect(() => {
     fetchDatas();
@@ -347,6 +352,24 @@ const TrimotorsJobOrderForm = () => {
       console.error(error);
     } finally {
       setIsLoadingDatas(false);
+    }
+  };
+
+  // Lightweight fetch: only the next JO number + transaction code. Used after
+  // Preview and after print, so mechanics and part numbers are not reloaded
+  // every time (fetchDatas is kept for the first load and the refresh buttons).
+  const fetchJobOrderNumber = async () => {
+    setIsLoadingJobOrderNumber(true);
+    try {
+      const response = await api.get("/get-job-order-number");
+      if (response.status === 200) {
+        setJobOrderNumber(response.data.job_order_number);
+        setTransactionCode(response.data.transaction_code);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingJobOrderNumber(false);
     }
   };
 
@@ -569,15 +592,9 @@ const TrimotorsJobOrderForm = () => {
   useEffect(() => {
     if (!isPrint) return;
 
-    const jobRequestCount = Object.entries(
-      TrimotorsjobOrderData.jobAmounts,
-    ).length;
-    const partsCount = Object.entries(
-      TrimotorsjobOrderData.partsAmounts,
-    ).length;
-    const totalPages = getMotorsPrintPageCount(jobRequestCount, partsCount);
-
     window.onafterprint = () => {
+      // Read at print time: the print component has already reported it.
+      const totalPages = totalPagesRef.current;
       const nextPage = printPage + 1;
 
       if (nextPage < totalPages) {
@@ -597,40 +614,43 @@ const TrimotorsJobOrderForm = () => {
           if (result.isConfirmed) {
             setPrintPage(nextPage);
           } else {
-            setPrintPage(0);
-            setIsPrint(false);
-            handleSavePrint();
-            fetchDatas();
+            finishPrint();
           }
         });
       } else {
-        setPrintPage(0);
-        setIsPrint(false);
-        handleSavePrint();
-        fetchDatas();
+        finishPrint();
       }
     };
 
+    // First page: confirm the JO was saved. Next pages: just a processing note.
     Swal.fire({
       icon: "success",
-      title: "Please wait...",
-      text: "Processing data to print...",
+      title: printPage === 0 ? "Job Order Saved!" : "Please wait...",
+      text:
+        printPage === 0
+          ? `JO No. ${jobOrderNumber} was saved successfully. Opening print window...`
+          : "Processing data to print...",
+      allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
     });
 
-    setTimeout(() => {
+    let printTimer: ReturnType<typeof setTimeout> | undefined;
+    const closeTimer = setTimeout(() => {
       Swal.close();
-      setTimeout(() => {
+      printTimer = setTimeout(() => {
         window.print();
       }, 500);
     }, 2500);
 
     return () => {
+      clearTimeout(closeTimer);
+      if (printTimer) clearTimeout(printTimer);
       window.onafterprint = null;
+      Swal.close();
     };
-  }, [isPrint, printPage, TrimotorsjobOrderData]);
+  }, [isPrint, printPage]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -720,47 +740,115 @@ const TrimotorsJobOrderForm = () => {
     diagnosis: mergedDiagnosis,
   };
 
-  const handleSavePrint = async () => {
+  // Save only (no reset) so the form data is still available for printing.
+  const saveJobOrder = async (): Promise<boolean> => {
     try {
-      const response = await api.post("/create-job-order", itemToStore);
+      const response = await api.post("/create-job-order", itemToStore, {
+        timeout: 15000,
+      });
+
       if (response.status === 201) {
-        toast.success(response.data, {
-          position: "bottom-center",
-          duration: 5000,
-          icon: "👍",
-          style: {
-            borderRadius: "15px",
-            background: "#333",
-            color: "#fff",
-            padding: "15px",
-          },
-        });
-        setIsOpen(false);
-        setIsPrint(false);
-        handleReset();
+        // Use the final JO number assigned by the server so the printed
+        // number always matches the saved one.
+        const savedNumber = response.data?.job_order_number;
+        if (savedNumber) setJobOrderNumber(savedNumber);
+        // The "saved" confirmation is shown in the print popup (see print effect).
+        return true;
       }
+      return false;
     } catch (error: any) {
       console.error(error);
+
+      const noInternet = !error.response;
+
       Swal.fire({
         icon: "error",
-        title: "Something went wrong",
-        text: error.response.data.message,
-        allowOutsideClick: false,
-        cancelButtonText: "Close",
-        showCancelButton: true,
-        confirmButtonText: "Reload",
+        title: noInternet ? "No internet connection" : "Unable to save",
+        text: noInternet
+          ? "Dili ma-print ang Job Order kay wala ma-save. Palihog i-check ang internet ug sulayi balik."
+          : error.response?.data?.message || "Something went wrong.",
+        confirmButtonText: "OK",
         confirmButtonColor: "#3085d6",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.reload();
-        }
       });
+      return false;
     }
   };
 
-  const handlePrint = () => {
+  // Runs after printing is done: clear the form and get the next JO number.
+  const finishPrint = () => {
     setPrintPage(0);
-    setIsPrint(!isPrint);
+    setIsPrint(false);
+    setIsOpen(false);
+    handleReset();
+    // Clear the used JO number/code so they can never be reused if the
+    // refetch below fails (e.g. no internet right after printing).
+    setJobOrderNumber("");
+    setTransactionCode("");
+    fetchJobOrderNumber();
+  };
+
+  // Right before saving, re-check the JO number: another tab of the same user
+  // may have already used the number shown in this preview. The server assigns
+  // the final number on save, so the printed number must match it.
+  const checkLatestJobOrderNumber = async (): Promise<boolean> => {
+    try {
+      const response = await api.get("/get-job-order-number", {
+        timeout: 15000,
+      });
+      const latest = response.data?.job_order_number;
+
+      if (latest && latest !== jobOrderNumber) {
+        setJobOrderNumber(latest);
+        await Swal.fire({
+          icon: "info",
+          title: "JO number updated",
+          text: `Gi-usab ang JO number gikan sa ${jobOrderNumber} ngadto sa ${latest} kay naay lain nga JO nga na-save. Ang ${latest} ang ma-print.`,
+          confirmButtonText: "OK",
+          confirmButtonColor: "#3085d6",
+          allowOutsideClick: false,
+        });
+      }
+      return true;
+    } catch (error: any) {
+      console.error(error);
+
+      const noInternet = !error.response;
+
+      Swal.fire({
+        icon: "error",
+        title: noInternet ? "No internet connection" : "Unable to check JO number",
+        text: noInternet
+          ? "Dili ma-print ang Job Order kay wala ma-save. Palihog i-check ang internet ug sulayi balik."
+          : error.response?.data?.message || "Something went wrong.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3085d6",
+      });
+      return false;
+    }
+  };
+
+  const handlePrint = async () => {
+    if (isSaving) return; // prevent double click / double save
+
+    if (!jobOrderNumber || !transactionCode) {
+      Swal.fire({
+        icon: "warning",
+        title: "JO number not loaded",
+        text: "Hulata nga ma-load ang JO number, o i-click ang Retry, unya sulayi balik.",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    const numberOk = await checkLatestJobOrderNumber();
+    const saved = numberOk ? await saveJobOrder() : false;
+    setIsSaving(false);
+
+    if (!saved) return; // BLOCK: do not print if the save failed
+
+    setIsOpen(false);
+    setPrintPage(0);
+    setIsPrint(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -790,16 +878,31 @@ const TrimotorsJobOrderForm = () => {
       });
 
       if (response.status === 204) {
-        fetchDatas();
+        fetchJobOrderNumber();
         setIsOpen(!isOpen);
       }
     } catch (error: any) {
       console.error(error);
-      if (error.response.status === 400) {
+      if (!error.response) {
+        // No response at all: offline, timeout or server unreachable
+        Swal.fire({
+          icon: "error",
+          title: "No internet connection",
+          text: "Unable to verify the Job Order. Palihog i-check ang internet ug sulayi balik.",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#3085d6",
+        });
+      } else if (error.response.status === 400) {
         Swal.fire({
           icon: "error",
           title: "Ops! Something went wrong.",
           text: error.response.data.message,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          text: error.response.data?.message || "Please try again.",
         });
       }
     } finally {
@@ -1019,6 +1122,9 @@ const TrimotorsJobOrderForm = () => {
         <TrimotorsPrintJobOrder
           data={TrimotorsjobOrderData}
           printPage={printPage}
+          onTotalPages={(n) => {
+            totalPagesRef.current = n;
+          }}
         />
       ) : (
         <>
@@ -1208,7 +1314,29 @@ const TrimotorsJobOrderForm = () => {
                   setReceiptNumber={setReceiptNumber}
                 />
                 {/* Submit Button */}
-                <div className="flex justify-end">
+                <div className="flex items-center justify-end gap-4">
+                  {(!jobOrderNumber || !transactionCode) && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      {isLoadingDatas || isLoadingJobOrderNumber ? (
+                        <>
+                          <Spinner /> Loading JO number...
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-red-600">
+                            Unable to load JO number.
+                          </span>
+                          <button
+                            type="button"
+                            onClick={fetchJobOrderNumber}
+                            className="underline text-blue-600"
+                          >
+                            Retry
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -1222,7 +1350,9 @@ const TrimotorsJobOrderForm = () => {
                       ref={modalButtonRef}
                       type="submit"
                       className="bg-blue-600 hover:bg-blue-700 text-white py-5"
-                      disabled={isVerifying}
+                      disabled={
+                        isVerifying || !jobOrderNumber || !transactionCode
+                      }
                     >
                       {isVerifying ? (
                         <>
@@ -1261,8 +1391,17 @@ const TrimotorsJobOrderForm = () => {
                 type="button"
                 className="bg-blue-600 hover:bg-blue-700 text-white py-5"
                 onClick={handlePrint}
+                disabled={isSaving || !jobOrderNumber || !transactionCode}
               >
-                <FaPrint /> Print Job Order
+                {isSaving ? (
+                  <>
+                    <Spinner /> Saving...
+                  </>
+                ) : (
+                  <>
+                    <FaPrint /> Print Job Order
+                  </>
+                )}
               </Button>
             </ModalFooter>
           </Modal>

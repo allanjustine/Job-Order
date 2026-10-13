@@ -7,11 +7,7 @@ import { Wrench } from "lucide-react";
 import formatDate from "@/utils/format-date";
 import { motorsdiagnosisItems } from "@/constants/motors-diagnosis";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
-import { useMemo } from "react";
-import {
-  getJobOrderPageRange,
-  getJobOrderPrintPageCount,
-} from "@/utils/job-order-pagination";
+import { buildTrimotorsPages } from "@/utils/job-order-pagination";
 
 interface PreviewJobOrderProps {
   data?: Record<string, any>;
@@ -27,9 +23,47 @@ const ViewJobOrder = ({
   isPrintRestItems,
 }: PreviewJobOrderProps) => {
   const resolvedPage = printPage ?? (isPrintRestItems ? 1 : 0);
-  const totalPages = getJobOrderPrintPageCount(data);
+
+  // Get all jobs, parts and NG diagnosis items from the full data
+  const allJobs =
+    data?.job_order_details?.filter(
+      (item: any) => item.type === "job_request",
+    ) || [];
+  const allParts =
+    data?.job_order_details?.filter(
+      (item: any) => item.type === "parts_replacement",
+    ) || [];
+  const diagnosisItems: any[] = data?.job_order_diagnosis || [];
+
+  // Diagnosis, jobs and parts are paginated TOGETHER (see
+  // buildTrimotorsPages) so many NG items can never push the job/parts
+  // rows off the printed sheet.
+  const pages = buildTrimotorsPages(
+    diagnosisItems.length,
+    allJobs.length,
+    allParts.length,
+  );
+  const totalPages = pages.length;
+  const page = pages[Math.min(resolvedPage, totalPages - 1)];
   const isLastPage = !isReprint || resolvedPage >= totalPages - 1;
   const isFirstPage = !isReprint || resolvedPage === 0;
+  const hasNoItems = allJobs.length + allParts.length === 0;
+  // On print, show the JOB ORDER table only on pages that have rows (or on
+  // the last page when nothing is selected, to show the grand total).
+  const showJobTable =
+    !isReprint || page.jobEnd > page.jobStart || (isLastPage && hasNoItems);
+
+  const filteredJobs = isReprint
+    ? allJobs.slice(page.jobStart, page.jobEnd)
+    : allJobs;
+  const filteredParts = isReprint
+    ? allParts.slice(page.jobStart, page.jobEnd)
+    : allParts;
+
+  const getDiagnosisLabel = (title: string): string =>
+    [...trimotorsdiagnosisItems, ...motorsdiagnosisItems].find(
+      (it) => it.key === title,
+    )?.label || "N/A";
   const jobTotal = Number(data?.total_job_request) || 0;
   const partsTotal = Number(data?.total_parts_used) || 0;
   const grandTotal = Number(data?.job_order_details_sum_amount) || 0;
@@ -49,28 +83,6 @@ const ViewJobOrder = ({
       />
     );
   }
-
-  // Get all jobs and parts from the full data
-  const allJobs =
-    data?.job_order_details?.filter(
-      (item: any) => item.type === "job_request",
-    ) || [];
-  const allParts =
-    data?.job_order_details?.filter(
-      (item: any) => item.type === "parts_replacement",
-    ) || [];
-
-  const filteredJobs = useMemo(() => {
-    if (!isReprint) return allJobs;
-    const { start, end } = getJobOrderPageRange(resolvedPage);
-    return allJobs.slice(start, end);
-  }, [isReprint, resolvedPage, allJobs]);
-
-  const filteredParts = useMemo(() => {
-    if (!isReprint) return allParts;
-    const { start, end } = getJobOrderPageRange(resolvedPage);
-    return allParts.slice(start, end);
-  }, [isReprint, resolvedPage, allParts]);
 
   // Get the max items for dynamic row matching
   const maxItems = Math.max(filteredJobs.length, filteredParts.length);
@@ -217,7 +229,7 @@ const ViewJobOrder = ({
                 )}
               </div>
 
-              {isFirstPage ? (
+              {isFirstPage && (
                 <>
                   {/* Vehicle Information */}
                   <div
@@ -327,13 +339,12 @@ const ViewJobOrder = ({
                     </div>
                   </div>
 
-                  {/* {data?.job_order_type === "motors" ? (
-          <MotorsImage data={data} />
-        ) : (
-          <TriMotorsImage data={data} />
-        )} */}
+                </>
+              )}
 
-                  {/* here */}
+              {/* DIAGNOSIS */}
+              {!isReprint ? (
+                <>
                   <div className="mb-1 text-xs">
                     <h3 className="font-bold text-center border-[0.1px] border-black py-0.5 bg-gray-100 text-[7.5pt]">
                       MOTORCYCLE'S DIAGNOSIS
@@ -395,15 +406,75 @@ const ViewJobOrder = ({
                   </div>
                 </>
               ) : (
-                <div
-                  className="mb-1 text-center font-bold border-[0.1px] border-black py-0.5 bg-gray-100"
-                  style={{ fontSize: isReprint ? "7.5pt" : "9pt" }}
-                >
-                  JOB ORDER (continued)
-                </div>
+                <>
+                  {isFirstPage && diagnosisItems.length === 0 && (
+                    <div className="mb-1 text-xs">
+                      <h3 className="font-bold text-center border-[0.1px] border-black py-0.5 bg-gray-100 text-[7.5pt]">
+                        MOTORCYCLE'S DIAGNOSIS
+                      </h3>
+                      <div className="border-[0.1px] border-black p-1 text-center">
+                        <p className="font-semibold">All diagnosis are OK</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* NG items, 2 per row, continues on the next page */}
+                  {page.ngEnd > page.ngStart &&
+                    (() => {
+                      const slice = diagnosisItems.slice(
+                        page.ngStart * 2,
+                        page.ngEnd * 2,
+                      );
+                      const pairs: any[][] = [];
+                      for (let i = 0; i < slice.length; i += 2) {
+                        pairs.push(slice.slice(i, i + 2));
+                      }
+
+                      const renderCells = (item?: any) => (
+                        <>
+                          <td className="border-[0.1px] border-black p-px w-[19%]">
+                            {item ? getDiagnosisLabel(item.title) : ""}
+                          </td>
+                          <td className="border-[0.1px] border-black p-px w-[31%]">
+                            {item && (
+                              <>
+                                <b className="text-red-600 text-center">
+                                  {item.status?.toUpperCase() || "N/A"}
+                                </b>
+                                {item.remarks ? ` - ${item.remarks}` : ""}
+                              </>
+                            )}
+                          </td>
+                        </>
+                      );
+
+                      return (
+                        <div className="mb-1 text-xs">
+                          <h3 className="font-bold text-center border-[0.1px] border-black py-0.5 bg-gray-100 text-[7.5pt]">
+                            MOTORCYCLE'S DIAGNOSIS
+                            {isFirstPage ? "" : " (continued)"}
+                          </h3>
+                          <table
+                            className="w-full border-collapse border-[0.1px] border-black my-0"
+                            style={{ fontSize: "7pt", lineHeight: "1" }}
+                          >
+                            <tbody>
+                              {pairs.map((pair, idx) => (
+                                <tr key={idx}>
+                                  {renderCells(pair[0])}
+                                  {renderCells(pair[1])}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    })()}
+                </>
               )}
 
               {/* JOB ORDER */}
+              {showJobTable && (
               <div
                 className="mb-0.5 text-xs"
                 style={isReprint ? { fontSize: "7pt", lineHeight: "1" } : {}}
@@ -486,7 +557,8 @@ const ViewJobOrder = ({
                         }
                         return rows;
                       })()}
-                      <tr key="totals">
+                      {isLastPage && (
+<tr key="totals">
                         <td className="border-b border-black p-0.5 font-semibold text-[7.5pt]">
                           Total Labor Cost:
                         </td>
@@ -494,6 +566,7 @@ const ViewJobOrder = ({
                           {phpCurrency(jobTotal)}
                         </td>
                       </tr>
+)}
                     </tbody>
                   </table>
 
@@ -604,7 +677,8 @@ const ViewJobOrder = ({
                         return rows;
                       })()}
 
-                      <tr key="totals">
+                      {isLastPage && (
+<tr key="totals">
                         <td
                           className="border-b border-black p-0.5 font-semibold text-[7.5pt] "
                           colSpan={3}
@@ -615,6 +689,7 @@ const ViewJobOrder = ({
                           {phpCurrency(partsTotal)}
                         </td>
                       </tr>
+)}
                     </tbody>
                   </table>
                 </div>
@@ -654,6 +729,7 @@ const ViewJobOrder = ({
                   </>
                 )}
               </div>
+              )}
 
               {/* Signatures */}
               {isLastPage && (

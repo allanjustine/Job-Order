@@ -19,10 +19,8 @@ import { trimotorsJobItems } from "@/constants/trimotors-job-items";
 import { trimotorsdiagnosisItems } from "@/constants/trimotors-diagnosis";
 import NextServiceScheduleView from "./NextServiceScheduleView";
 import CustomerGridView from "./CustomerGridView";
-import {
-  getJobOrderPageRange,
-  getMotorsPrintPageCount,
-} from "@/utils/job-order-pagination";
+import { useEffect } from "react";
+import { buildTrimotorsPages } from "@/utils/job-order-pagination";
 
 interface TrimotorsPrintJobOrderProps {
   data: {
@@ -64,12 +62,16 @@ interface TrimotorsPrintJobOrderProps {
   };
   hasRestData?: boolean;
   printPage?: number;
+  // Reports the real number of print pages (diagnosis + jobs + parts)
+  // so the parent can drive the "Print Rest Items" prompt accurately.
+  onTotalPages?: (totalPages: number) => void;
 }
 
 const TrimotorsPrintJobOrder = ({
   data,
   hasRestData,
   printPage,
+  onTotalPages,
 }: TrimotorsPrintJobOrderProps) => {
   const WEBSITE_URL = `${window.location.origin}/search`;
   const resolvedPage = printPage ?? (hasRestData ? 1 : 0);
@@ -312,19 +314,34 @@ const TrimotorsPrintJobOrder = ({
     return item?.status === statusType ? "✓" : "";
   };
 
-  // Total pages needed to fit ALL selected jobs/parts (dynamic, not
-  // capped to 20 items / 2 pages anymore).
-  const totalPages = getMotorsPrintPageCount(
-    getSelectedJobs().length,
-    getSelectedParts().length,
+  // Diagnosis (NG items), jobs and parts are paginated TOGETHER so many NG
+  // diagnosis items can never push the job/parts rows off the printed sheet.
+  const ngItems = getNGDiagnosisItems();
+  const allJobs = getSelectedJobs();
+  const allParts = getSelectedParts();
+
+  const pages = buildTrimotorsPages(
+    ngItems.length,
+    allJobs.length,
+    allParts.length,
   );
+  const totalPages = pages.length;
+  const page = pages[Math.min(resolvedPage, totalPages - 1)];
+
   // Footer content (Grand Total, next service schedule, "Printed on")
   // only makes sense once, so only show it on the LAST printed page.
   const isLastPage = resolvedPage >= totalPages - 1;
-  // On continuation pages (page 2, 3, ...) don't repeat the header,
-  // vehicle info, or diagnosis section — only the JOB ORDER table
-  // continues, so printed sheets look clean.
+  // Header, vehicle info and checklist title only on the FIRST page.
   const isFirstPage = resolvedPage === 0;
+  const hasNoItems = allJobs.length + allParts.length === 0;
+  // Show the JOB ORDER table only on pages that have rows (or on the last
+  // page when nothing is selected, to show the empty state + grand total).
+  const showJobTable =
+    page.jobEnd > page.jobStart || (isLastPage && hasNoItems);
+
+  useEffect(() => {
+    onTotalPages?.(totalPages);
+  }, [totalPages]);
 
   return (
     <div className="print-page">
@@ -432,107 +449,76 @@ const TrimotorsPrintJobOrder = ({
               )}
             </div>
 
-            {isFirstPage && (
-              <>
-                {/* Vehicle Information - Compact Grid */}
-                <CustomerGridView data={data} />
+            {/* Vehicle Information - first page only */}
+            {isFirstPage && <CustomerGridView data={data} />}
 
-                {/* Motorcycle Unit & Engine Unit */}
-                {/* <div
-              className="mb-2 grid grid-cols-1 gap-2"
-              style={{ fontSize: "8pt", lineHeight: "0.8" }}
-            >
-              <div className="border border-black p-0.5">
-                <div className="font-bold mb-1">TRIMOTOR UNIT:</div>
-                <div
-                  className="mb-1"
-                  style={{ fontSize: "6pt", lineHeight: "0.6" }}
-                >
-                  <span className="font-bold mr-2">LEGEND:</span>
-                  <span className="mr-2">X-SCRATCH</span>
-                  <span className="mr-2">●-DENT</span>
-                  <span className="mr-2">■-CRACK</span>
-                  <span>□-NOT AVAILABLE</span>
-                </div>
-
-                <div className="mb-1">
-                  <div
-                    className="flex items-center justify-center overflow-hidden"
-                    style={{ height: "145px" }}
-                  >
-                    <img
-                      src="/trimotors.png"
-                      alt="Trimotors Unit Diagram"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            {/* DIAGNOSIS - all OK message (first page only) */}
+            {isFirstPage && allDiagnosisOK() && (
+              <div className="mb-2 text-xs">
+                <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                  TRIMOTORS' DIAGNOSIS
+                </h3>
+                <div className="border border-black p-1 text-center">
+                  <p className="font-semibold">All diagnosis are OK</p>
                 </div>
               </div>
-            </div> */}
+            )}
 
-                {/* Motorcycle Diagnosis Section */}
-                <div className="mb-2 text-xs">
-                  <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
-                    TRIMOTORS' DIAGNOSIS
-                  </h3>
+            {/* DIAGNOSIS - NG items, 2 per row, continues on next pages */}
+            {page.ngEnd > page.ngStart &&
+              (() => {
+                const slice = ngItems.slice(page.ngStart * 2, page.ngEnd * 2);
+                const pairs: (typeof slice)[] = [];
+                for (let i = 0; i < slice.length; i += 2) {
+                  pairs.push(slice.slice(i, i + 2));
+                }
 
-                  {allDiagnosisOK() && (
-                    <div className="border border-black p-2 text-center">
-                      <p className="font-semibold">All diagnosis are OK</p>
-                    </div>
-                  )}
+                const renderCells = (item?: (typeof slice)[number]) => {
+                  const remarks = item
+                    ? data.diagnosis?.[item.key as TrimotorsDiagnosisKeys]
+                        ?.remarks
+                    : "";
+                  return (
+                    <>
+                      <td className="border border-black p-0.5 w-[19%]">
+                        {item?.label}
+                      </td>
+                      <td className="border border-black p-0.5 w-[31%]">
+                        {item && (
+                          <>
+                            <b className="text-red-600 text-center">NG</b>
+                            {remarks ? ` - ${remarks}` : ""}
+                          </>
+                        )}
+                      </td>
+                    </>
+                  );
+                };
 
-                  {hasNGDiagnosis() && (
+                return (
+                  <div className="mb-1 text-xs">
+                    <h3 className="font-bold text-center border border-black py-0.5 bg-gray-100 text-[7pt]">
+                      TRIMOTORS' DIAGNOSIS{isFirstPage ? "" : " (continued)"}
+                    </h3>
                     <table
                       className="w-full border-collapse border border-black my-0"
-                      style={{ fontSize: "8pt", lineHeight: "0.8" }}
+                      style={{ fontSize: "7pt", lineHeight: "0.9" }}
                     >
-                      <thead>
-                        <tr className="bg-gray-40">
-                          <th className="border border-black p-0.5 text-left">
-                            Diagnosis Item
-                          </th>
-                          <th className="border border-black p-0.5 text-center">
-                            Status
-                          </th>
-                          <th className="border border-black p-0.5 text-left">
-                            Remarks
-                          </th>
-                        </tr>
-                      </thead>
                       <tbody>
-                        {getNGDiagnosisItems().map((item) => (
-                          <tr key={item.key}>
-                            <td className="border border-black p-0.5 w-1/3">
-                              {item.label}
-                            </td>
-                            <td className="border border-black p-0.5 text-center font-bold text-red-600 w-1/3">
-                              NG
-                            </td>
-                            <td className="border border-black p-0.5 w-1/3">
-                              {data.diagnosis?.[
-                                item.key as TrimotorsDiagnosisKeys
-                              ]?.remarks || ""}
-                            </td>
+                        {pairs.map((pair, idx) => (
+                          <tr key={idx}>
+                            {renderCells(pair[0])}
+                            {renderCells(pair[1])}
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                  )}
-                </div>
-              </>
-            )}
-
-            {!isFirstPage && (
-              <div
-                className="mb-1 text-center font-bold border border-black py-0.5 bg-gray-100"
-                style={{ fontSize: "7.5pt" }}
-              >
-                JOB ORDER (continued)
-              </div>
-            )}
+                  </div>
+                );
+              })()}
 
             {/* JOB ORDER - Dynamic rows based on selected items (including multiple others) */}
+            {showJobTable && (
             <div
               className="mb-1 text-xs"
               style={{ fontSize: "7.5pt", lineHeight: "0.8" }}
@@ -566,9 +552,14 @@ const TrimotorsPrintJobOrder = ({
                 </thead>
                 <tbody>
                   {(() => {
-                    const { start, end } = getJobOrderPageRange(resolvedPage);
-                    const selectedJobs = getSelectedJobs().slice(start, end);
-                    const selectedParts = getSelectedParts().slice(start, end);
+                    const selectedJobs = allJobs.slice(
+                      page.jobStart,
+                      page.jobEnd,
+                    );
+                    const selectedParts = allParts.slice(
+                      page.jobStart,
+                      page.jobEnd,
+                    );
 
                     // Get the maximum number of rows needed
                     const totalRows = Math.max(
@@ -687,8 +678,8 @@ const TrimotorsPrintJobOrder = ({
                       }
                     }
 
-                    // Add totals row (only if there are selections)
-                    if (totalRows > 0) {
+                    // Totals row only on the LAST page (it covers all pages)
+                    if (totalRows > 0 && isLastPage) {
                       rows.push(
                         <tr key="totals">
                           <td
@@ -725,6 +716,7 @@ const TrimotorsPrintJobOrder = ({
                 </>
               )}
             </div>
+            )}
 
             {isLastPage && (
               <>
