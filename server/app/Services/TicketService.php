@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\TicketStatus;
+use App\Models\Branch;
 use App\Models\Ticket;
 use App\Models\TicketBrand;
 use App\Models\TicketCategory;
@@ -19,6 +20,10 @@ class TicketService
         $search = request('search', '');
 
         $status = request('status', '');
+
+        $month = request('month', 'ALL');
+
+        $year = request('year', 'ALL');
 
         $sort = request('sort', ["column" => "created_at", "direction" => "desc"]);
 
@@ -39,6 +44,8 @@ class TicketService
                 });
             })
             ->when($status !== 'ALL', fn($query) => $query->where('status', $status))
+            ->when($month && $month !== 'ALL', fn($query) => $query->whereMonth('created_at', $month))
+            ->when($year && $year !== 'ALL', fn($query) => $query->whereYear('created_at', $year))
             ->orderBy($sort['column'], $sort['direction'])
             ->paginate($per_page, [
                 'id',
@@ -55,6 +62,44 @@ class TicketService
 
         return $tickets;
     }
+
+    public function exportReports()
+    {
+        $month = request('month', 'ALL');
+        $year = request('year', 'ALL');
+
+        $rows = Ticket::query()
+            ->join('users', 'users.id', '=', 'tickets.user_id')
+            ->where('tickets.status', TicketStatus::EDITED->value)
+            ->when(
+                $month && $month !== 'ALL',
+                fn($q) => $q->whereMonth('tickets.edited_at', $month)
+            )
+            ->when(
+                $year && $year !== 'ALL',
+                fn($q) => $q->whereYear('tickets.edited_at', $year)
+            )
+            ->groupBy('tickets.user_id', 'users.name')
+            ->orderByDesc('total_edited')
+            ->selectRaw('
+                tickets.user_id,
+                users.name as user_name,
+                COUNT(tickets.id) as total_edited
+            ')
+            ->get()
+            ->map(fn($row) => [
+                'Branch Name' => $row->user_name,
+                'Number of Tickets Edited' => (int) $row->total_edited,
+            ]);
+
+        $rows->push([
+            'Branch Name' => 'TOTAL',
+            'Number of Tickets Edited' => $rows->sum('Number of Tickets Edited'),
+        ]);
+
+        return $rows->values();
+    }
+
 
     public function storeTicket($request)
     {

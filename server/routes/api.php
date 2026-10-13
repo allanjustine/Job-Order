@@ -69,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/notes/{note}/delete', 'deleteNote');
             Route::patch('/notes/{note}/update', 'updateTicketNoteContent');
             Route::patch('/tickets/rejected-reason/{ticket}/update-rejected-reason', 'updateTicketRejectedReason');
+            Route::get('/export-ticket-reports', [TicketController::class, 'exportReports']);
         });
         Route::resource('target-incomes', TargetIncomeController::class);
         Route::resource('area-managers', AreaManagerController::class);

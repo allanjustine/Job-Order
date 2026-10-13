@@ -155,4 +155,9 @@ class TicketController extends Controller
             'message' => $message,
         ], 200);
     }
+
+    public function exportReports(TicketService $service)
+    {
+        return response()->json(['data' => $service->exportReports()]);
+    }
 }

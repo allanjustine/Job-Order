@@ -7,12 +7,14 @@ import { format, formatDistanceToNowStrict } from "date-fns";
 import { Eye, Search, SearchSlash, Trash } from "lucide-react";
 import { useState } from "react";
 import DataTable from "react-data-table-component";
-import { FaCircleNotch, FaRotateRight } from "react-icons/fa6";
+import { FaCircleNotch, FaRotateRight, FaFileExcel } from "react-icons/fa6";
 import ViewTicket from "./view";
 import Swal from "sweetalert2";
 import { api } from "@/lib/api";
 import { TICKET_STATUS } from "@/constants/ticket-status";
 import Select from "../ui/select";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export type UserType = {
   name: string;
@@ -41,16 +43,43 @@ type TicketType = {
   created_at: string;
 };
 
+type FilterItemsType = {
+  status: string;
+  month: string;
+  year: string;
+};
+
 export const TICKET_STATUS_COLOR = {
   pending: "bg-yellow-100 text-yellow-800",
   edited: "bg-blue-100 text-blue-800",
   rejected: "bg-red-100 text-red-800",
 };
 
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 2 }, (_, i) => CURRENT_YEAR - i);
+
 export default function TicketBaseContent() {
   const [isView, setIsView] = useState<boolean>(false);
-  const [filterItems, setFilterItems] = useState<{ status: string }>({
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [filterItems, setFilterItems] = useState<FilterItemsType>({
     status: "ALL",
+    month: "ALL",
+    year: "ALL",
   });
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
   const {
@@ -70,6 +99,64 @@ export default function TicketBaseContent() {
     fetchData,
     setIsLoading,
   } = useFetch("/tickets", { filterItems });
+
+  const handleFilterChange =
+    (key: keyof FilterItemsType) =>
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setFilterItems((prev) => ({ ...prev, [key]: e.target.value }));
+      setIsLoading(true);
+    };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await api.get("/export-ticket-reports", {
+        params: {
+          month: filterItems.month,
+          year: filterItems.year,
+        },
+      });
+
+      if (response.status === 200) {
+        const worksheet = XLSX.utils.json_to_sheet(response.data.data);
+        worksheet["!cols"] = [{ wch: 30 }, { wch: 22 }];
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Edited Tickets");
+
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], {
+          type: "application/octet-stream",
+        });
+
+        const monthLabel =
+          filterItems.month !== "ALL"
+            ? MONTHS[Number(filterItems.month) - 1]
+            : "all-months";
+        const yearLabel =
+          filterItems.year !== "ALL" ? filterItems.year : "all-years";
+
+        saveAs(
+          blob,
+          `edited-tickets-by-branch-${monthLabel}-${yearLabel}.xlsx`,
+        );
+      }
+    } catch (error: any) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Export failed",
+        text:
+          error?.response?.data?.message ||
+          "Something went wrong. Please try again later.",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const columns = [
     {
@@ -236,10 +323,7 @@ export default function TicketBaseContent() {
           <div className="mb-2 flex gap-1 items-center flex-col lg:flex-row">
             <Select
               value={filterItems.status}
-              onChange={(e) => {
-                setFilterItems({ status: e.target.value });
-                setIsLoading(true);
-              }}
+              onChange={handleFilterChange("status")}
             >
               <option value="" disabled>
                 Select status
@@ -251,6 +335,28 @@ export default function TicketBaseContent() {
                   </option>
                 ),
               )}
+            </Select>
+            <Select
+              value={filterItems.month}
+              onChange={handleFilterChange("month")}
+            >
+              <option value="ALL">All months</option>
+              {MONTHS.map((m, i) => (
+                <option key={m} value={i + 1}>
+                  {m}
+                </option>
+              ))}
+            </Select>
+            <Select
+              value={filterItems.year}
+              onChange={handleFilterChange("year")}
+            >
+              <option value="ALL">All years</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
             </Select>
             <div className="relative">
               <Input
@@ -276,6 +382,22 @@ export default function TicketBaseContent() {
               ) : (
                 <>
                   <FaRotateRight /> Refresh
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white py-5"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <>
+                  <FaCircleNotch className="animate-spin" /> Exporting...
+                </>
+              ) : (
+                <>
+                  <FaFileExcel /> Export 
                 </>
               )}
             </Button>
